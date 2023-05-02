@@ -312,6 +312,7 @@ namespace mtlpp {
             mtlpp::Buffer _mBufferA;
             mtlpp::Buffer _mBufferB;
             mtlpp::Buffer _mBufferResult;
+            mtlpp::IndirectCommandBuffer _icbArgumentBuffer;
 
             //Pointer for Any Errors generated
             ns::Error* error; //nullptr
@@ -489,7 +490,7 @@ namespace mtlpp {
                         //Encode the ICB into the argument buffer:
                         mtlpp::ArgumentEncoder argumentEncoder = GPUCommandEncodingKernel.newArgumentEncoderWithBufferIndex(AAPLKernelBufferIndexCommandBufferContainer);
 
-                        mtlpp::Buffer _icbArgumentBuffer = device.newBuffer(argumentEncoder.encodedLength, ResourceStorageMode::Shared);
+                        _icbArgumentBuffer = device.newBuffer(argumentEncoder.encodedLength, ResourceStorageMode::Shared);
                         _icbArgumentBuffer.label = "ICB Argument Buffer";
 
                         argumentEncoder.setArgumentBuffer(_icbArgumentBuffer, 0);

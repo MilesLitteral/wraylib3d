@@ -6,13 +6,13 @@ namespace mtlpp
 {
     //Retrieving Commands
     //Gets the render command at the given index. Required.
-    MTLIndirectRenderCommand IndirectCommandBuffer::indirectRenderCommandAt(int renderCommandAt){
+    mtlpp::IndirectRenderCommand IndirectCommandBuffer::indirectRenderCommandAt(int renderCommandAt){
         Validate();
         [(__bridge id<MTLIndirectRenderCommand>)m_ptr indirectRenderCommandAt:(__bridge id<int>)renderCommandAt.GetPtr()];
     }
 
     // Gets the compute command at the given index. Required.
-    MTLIndirectComputeCommand IndirectCommandBuffer::indirectComputeCommandAt(int computeCommandAt){
+    mtlpp::IndirectComputeCommand IndirectCommandBuffer::indirectComputeCommandAt(int computeCommandAt){
         Validate();
         [(__bridge id<MTLIndirectRenderCommand>)m_ptr indirectComputeCommandAt:(__bridge id<int>)computeCommandAt.GetPtr()];
     } 

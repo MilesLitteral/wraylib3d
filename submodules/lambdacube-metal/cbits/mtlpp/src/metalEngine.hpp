@@ -17,14 +17,13 @@ namespace mtlpp {
     void mtlAddArrays(const float* inA, const float* inB, float* result, int length);
     //end define Metal Reflections
 
-    class MetalEngine
-        {
+    class MetalEngine {
         mtlpp::Device _mDevice = mtlpp::Device::CreateSystemDefaultDevice();
         mtlpp::ComputePipelineState _mFunctionPSO;
         mtlpp::CommandQueue _mCommandQueue;
-        mtlpp::Buffer _mBufferA;
-        mtlpp::Buffer _mBufferB;
-        mtlpp::Buffer _mBufferResult;
+        // mtlpp::Buffer _mBufferA;
+        // mtlpp::Buffer _mBufferB;
+        // mtlpp::Buffer _mBufferResult;
         ns::Error* error; //nullptr
 
         MetalEngine();
@@ -36,7 +35,11 @@ namespace mtlpp {
         void commitRandomFloatData(mtlpp::Buffer   buffer, char* floatData);
         void prepareData(mtlpp::Device device);
         void sendComputeCommand(mtlpp::CommandQueue commandQueue);
-        void encodeCommand(mtlpp::ComputeCommandEncoder computeEncoder);
+        //void encodeCommand(mtlpp::ComputeCommandEncoder computeEncoder);
+        void encodeCommand(mtlpp::ComputeCommandEncoder computeEncoder, mtlpp::Buffer buffer);
+        void encodeCommand(mtlpp::ComputeCommandEncoder computeEncoder, mtlpp::Buffer buffer, mtlpp::Buffer buffer2);
+        void encodeCommand(mtlpp::ComputeCommandEncoder computeEncoder, mtlpp::Buffer buffer, mtlpp::Buffer buffer2, mtlpp::Buffer buffer3);
+        void encodeCommand(mtlpp::ComputeCommandEncoder computeEncoder, mtlpp::Buffer buffers[], mtlpp::Buffer bufferR);
         void execute();
         void verifyResults();
     };
@@ -45,9 +48,9 @@ namespace mtlpp {
         mtlpp::Device _mDevice = mtlpp::Device::CreateSystemDefaultDevice();
         mtlpp::ComputePipelineState _mFunctionPSO;
         mtlpp::CommandQueue _mCommandQueue;
-        mtlpp::Buffer _mBufferA;
-        mtlpp::Buffer _mBufferB;
-        mtlpp::Buffer _mBufferResult;
+        // mtlpp::Buffer _mBufferA;
+        // mtlpp::Buffer _mBufferB;
+        // mtlpp::Buffer _mBufferResult;
         ns::Error* error; //nullptr
 
         MetalRenderingEngine();
@@ -60,12 +63,16 @@ namespace mtlpp {
         void prepareData(mtlpp::Device device);
         void sendComputeCommand(mtlpp::CommandQueue commandQueue);
         void encodeCommand(mtlpp::ComputeCommandEncoder computeEncoder);
+        void encodeCommand(mtlpp::ComputeCommandEncoder computeEncoder, mtlpp::Buffer buffer);
+        void encodeCommand(mtlpp::ComputeCommandEncoder computeEncoder, mtlpp::Buffer buffer, mtlpp::Buffer buffer2);
+        void encodeCommand(mtlpp::ComputeCommandEncoder computeEncoder, mtlpp::Buffer buffer, mtlpp::Buffer buffer2, mtlpp::Buffer buffer3);
+        void encodeCommand(mtlpp::ComputeCommandEncoder computeEncoder, mtlpp::Buffer buffers[], mtlpp::Buffer bufferR);
         void verifyResults();
         void execute();
     };
 
     class MetalRenderingEngineCPU {
-        IndirectCommandBuffer _indirectCommandBuffer;
+        mtlpp::IndirectCommandBuffer _indirectCommandBuffer;
 
         // #if TARGET_IOS
         //     supportICB = Device(); //[_view.device supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily3_v4];
@@ -86,7 +93,7 @@ namespace mtlpp {
         MetalRenderingEngineCPU();
         MetalRenderingEngineCPU(mtlpp::Device device);
 
-        void encodeDrawCommand ();
+        void encodeDrawCommand (int vertexStart);
         void encodeBlitCommands();
         void executeICB();
     };
