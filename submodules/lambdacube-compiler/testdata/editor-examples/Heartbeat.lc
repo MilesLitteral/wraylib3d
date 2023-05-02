@@ -1,0 +1,43 @@
+time = Uniform "Time" :: Float
+
+clear = FrameBuffer $ (DepthImage @1 1000, ColorImage @1 red)   -- ...
+clear' = FrameBuffer $ (DepthImage @1 1000, ColorImage @1 blue)   -- ...
+
+triangleRasterCtx = TriangleCtx CullNone PolygonFill NoOffset LastVertex
+triangles = triangleRasterCtx
+colorFragmentCtx = (DepthOp Less True, ColorOp NoBlending (V4 True True True True))
+
+cubeVertexStream = fetch "stream4" (Attribute "position4" :: Vec 4 Float, Attribute "vertexUV" :: Vec 2 Float)
+mapFragments2 s fs = accumulate colorFragmentCtx (\((a)) -> ((fs a))) s clear
+
+rotate' v = projmat *. v
+  where
+    projmat = perspective 0.1 100.0 (30 * pi / 180) 1.0
+          .*. lookat (V3 3.0 1.3 0.3) (V3 0.0 0.0 0.0) (V3 0.0 1.0 0.0)
+          .*. rotMatrixY (pi / 24.0 * time)
+
+
+texImage = PrjImageColor $
+            cubeVertexStream         -- cube vertices
+     &      mapPrimitives (\(x, y) -> (scale 1.0 x, V2 y%x (1-y%y)))
+     &      rasterizePrimitives triangles ((Smooth))  -- rasterize
+    `mapFragments2`
+    (\xy -> let
+                x = ((xy :: Vec 2 Float)%x :: Float) -! 0.85
+                y = ((xy :: Vec 2 Float)%y :: Float) -! 0.85
+                t = (0.0005 *! sin (3 *! PrimATan2 x y +! 15 *! time))
+                t' = (0.002 *! sin (5 *! PrimATan2 x y -! 5 *! time))
+                t'' = (0.002 *! sin (7 *! PrimATan2 x y +! 3 *! time))
+                ti = (PrimAbs $ sin (time *! 4) -! 0.37)
+    in if x*!x +! y*!y +! t < 0.005 *! ti then navy else
+       if x*!x +! y*!y +! t' < 0.02 *! ti then blue else
+       if x*!x +! y*!y +! t'' < 0.05 *! ti then white else yellow
+    )
+
+sampler = Sampler LinearFilter MirroredRepeat $ Texture2D (V2 128 128) texImage
+
+main =             cubeVertexStream         -- cube vertices
+     &             mapPrimitives (\(x, y) -> (scale 0.5 . rotate' $ x, y))
+     &             rasterizePrimitives triangles ((Smooth)) -- rasterize
+    `mapFragments2` (texture2D sampler)
+     &             ScreenOut                --  draw into screen

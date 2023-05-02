@@ -1,0 +1,357 @@
+main is not found
+------------ desugared source code
+data Data0 :: Type where
+    Data0 :: Data0
+
+data Data1 (_ :: Type) (_ :: Type) (_ :: Type) :: Type where
+    Data1 :: forall a b c . a -> b -> c -> Data1 a b c
+
+data Data2 :: Type where
+    Data21 :: Int -> Data2
+    Data22 :: Int -> Int -> Data2
+    Data23 :: Int -> Data2
+    Data24 :: Data2
+
+x
+  = _lhs
+    x
+    \(a :: _) -> case'Data2
+      (\(_ :: _) -> _)
+      (\(_ :: _) -> _rhs undefined)
+      (\(b :: _) (_ :: _) -> _rhs b)
+      (\(c :: _) -> _rhs c)
+      (_rhs undefined)
+      a
+
+y
+  = _lhs
+    y
+    \(a :: _) -> case'Data2
+      (\(_ :: _) -> _)
+      (\(_ :: _) -> _rhs undefined)
+      (\(_ :: _) (b :: _) -> _rhs b)
+      (\(_ :: _) -> _rhs undefined)
+      (_rhs undefined)
+      a
+
+data Data5 (_ :: Type) (_ :: Type) (_ :: Type) :: Type where
+    Data51 :: forall a b c . a -> Data5 a b c
+    Data52 :: forall d e f . d -> e -> f -> Data5 d e f
+    Data53 :: forall g h i . Int -> g -> Float -> h -> i -> Data5 g h i
+
+a5
+  = _lhs
+    a5
+    \(a :: _) -> case'Data5
+      (\(_ :: _) -> _)
+      (\(b :: _) -> _rhs b)
+      (\(c :: _) (_ :: _) (_ :: _) -> _rhs c)
+      (\(_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) -> _rhs undefined)
+      a
+
+b5
+  = _lhs
+    b5
+    \(a :: _) -> case'Data5
+      (\(_ :: _) -> _)
+      (\(_ :: _) -> _rhs undefined)
+      (\(_ :: _) (b :: _) (_ :: _) -> _rhs b)
+      (\(_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) -> _rhs undefined)
+      a
+
+c5
+  = _lhs
+    c5
+    \(a :: _) -> case'Data5
+      (\(_ :: _) -> _)
+      (\(_ :: _) -> _rhs undefined)
+      (\(_ :: _) (_ :: _) (b :: _) -> _rhs b)
+      (\(_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) -> _rhs undefined)
+      a
+------------ core code
+'Data0 :: Type
+'Data0 = <<type constructor with 0 indices; constructors: Data0>>
+
+'Data1 :: Type -> Type -> Type -> Type
+'Data1 = <<type constructor with 0 indices; constructors: Data1>>
+
+'Data2 :: Type
+'Data2
+  = <<type constructor with 0 indices; constructors: Data21, Data22, Data23, Data24>>
+
+'Data5 :: Type -> Type -> Type -> Type
+'Data5
+  = <<type constructor with 0 indices; constructors: Data51, Data52, Data53>>
+
+Data0 :: Data0
+Data0 = <<0th constructor of 'Data0>>
+
+Data1 :: forall a b c . a -> b -> c -> Data1 a b c
+Data1 = <<0th constructor of 'Data1>>
+
+Data21 :: Int -> Data2
+Data21 = <<0th constructor of 'Data2>>
+
+Data22 :: Int -> Int -> Data2
+Data22 = <<1st constructor of 'Data2>>
+
+Data23 :: Int -> Data2
+Data23 = <<2nd constructor of 'Data2>>
+
+Data24 :: Data2
+Data24 = <<3rd constructor of 'Data2>>
+
+Data51 :: forall a b c . a -> Data5 a b c
+Data51 = <<0th constructor of 'Data5>>
+
+Data52 :: forall a b c . a -> b -> c -> Data5 a b c
+Data52 = <<1st constructor of 'Data5>>
+
+Data53 :: forall a b c . Int -> a -> Float -> b -> c -> Data5 a b c
+Data53 = <<2nd constructor of 'Data5>>
+
+a5 :: forall a b c . Data5 a b c -> a
+a5
+  = \a b c d -> case'Data5
+    (\_ -> a)
+    (\e -> _rhs e)
+    (\f _ _ -> _rhs f)
+    (\_ _ _ _ _ -> _rhs (undefined a))
+    d
+
+b5 :: forall a b c . Data5 a b c -> b
+b5
+  = \a b c d -> case'Data5
+    (\_ -> b)
+    (\_ -> _rhs (undefined b))
+    (\_ e _ -> _rhs e)
+    (\_ _ _ _ _ -> _rhs (undefined b))
+    d
+
+c5 :: forall a b c . Data5 a b c -> c
+c5
+  = \a b c d -> case'Data5
+    (\_ -> c)
+    (\_ -> _rhs (undefined c))
+    (\_ _ e -> _rhs e)
+    (\_ _ _ _ _ -> _rhs (undefined c))
+    d
+
+case'Data0
+  :: forall (a :: Data0 -> Type) -> a 'Data0 -> forall (b :: Data0) -> a b
+case'Data0 = \a b c -> <<case function of a type with 0 parameters>>
+
+case'Data1
+  :: forall a b c
+    . forall (d :: Data1 a b c -> Type)
+      -> (forall (e :: a) (f :: b) (g :: c) -> d ('Data1 e f g))
+        -> forall (h :: Data1 a b c) -> d h
+case'Data1 = \_ _ _ a b c -> <<case function of a type with 3 parameters>>
+
+case'Data2
+  :: forall (a :: Data2 -> Type)
+    -> (forall (b :: Int) -> a ('Data21 b))
+      -> (forall (c :: Int) (d :: Int) -> a ('Data22 c d))
+        -> (forall (e :: Int) -> a ('Data23 e))
+          -> a 'Data24 -> forall (f :: Data2) -> a f
+case'Data2 = \a b c d e f -> <<case function of a type with 0 parameters>>
+
+case'Data5
+  :: forall a b c
+    . forall (d :: Data5 a b c -> Type)
+      -> (forall (e :: a) -> d ('Data51 e))
+        -> (forall (f :: a) (g :: b) (h :: c) -> d ('Data52 f g h))
+          -> (forall (i :: Int) (j :: a) (k :: Float) (l :: b) (m :: c)
+              -> d ('Data53 i j k l m))
+            -> forall (n :: Data5 a b c) -> d n
+case'Data5 = \_ _ _ a b c d e -> <<case function of a type with 3 parameters>>
+
+match'Data0 :: forall (a :: Type -> Type) -> a Data0 -> forall b -> a b -> a b
+match'Data0 = \a b c d -> <<type case function>>
+
+match'Data1
+  :: forall (a :: Type -> Type)
+    -> (forall b c d -> a (Data1 b c d)) -> forall e -> a e -> a e
+match'Data1 = \a b c d -> <<type case function>>
+
+match'Data2 :: forall (a :: Type -> Type) -> a Data2 -> forall b -> a b -> a b
+match'Data2 = \a b c d -> <<type case function>>
+
+match'Data5
+  :: forall (a :: Type -> Type)
+    -> (forall b c d -> a (Data5 b c d)) -> forall e -> a e -> a e
+match'Data5 = \a b c d -> <<type case function>>
+
+x :: Data2 -> Int
+x
+  = \a -> case'Data2
+    (\_ -> 'Int)
+    (\_ -> _rhs (undefined 'Int))
+    (\b _ -> _rhs b)
+    (\c -> _rhs c)
+    (_rhs (undefined 'Int))
+    a
+
+y :: Data2 -> Int
+y
+  = \a -> case'Data2
+    (\_ -> 'Int)
+    (\_ -> _rhs (undefined 'Int))
+    (\_ b -> _rhs b)
+    (\_ -> _rhs (undefined 'Int))
+    (_rhs (undefined 'Int))
+    a
+------------ tooltips
+1:6-1:11
+    Type | Type | Type | Type | Type
+1:6-1:19
+    Type
+1:14-1:19
+    Data0
+3:6-3:11
+    Type -> Type -> Type -> Type | Type -> Type -> Type -> Type | Type
+      -> Type -> Type -> Type | Type -> Type -> Type -> Type | Type
+3:6-3:13
+    Type -> Type -> Type
+3:6-3:15
+    Type -> Type
+3:6-3:17
+    Type | Type
+3:6-3:25
+    Type | Type | Type | Type
+3:6-3:31
+    Type | Type | Type | Type | Type
+3:12-3:13
+    Type
+3:14-3:15
+    Type
+3:16-3:17
+    Type
+3:20-3:25
+    forall a b c . a -> b -> c -> Data1 a b c | Data1
+      _g
+      _f
+      _e | Type | Type | Type | Type
+3:26-3:27
+    Type
+3:28-3:29
+    Type
+3:30-3:31
+    Type
+5:6-5:11
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+5:6-6:39
+    Type
+5:6-8:20
+    Type | Type | Type | Type
+5:14-5:20
+    Int -> Data2 | Data2 | Type | Type
+5:21-5:24
+    Type
+6:14-6:20
+    Int -> Int -> Data2 | Data2 | Type | Type | Type
+6:23-6:24
+    Data2 -> Int
+6:28-6:31
+    Type
+6:33-6:34
+    Data2 -> Int
+6:36-6:39
+    Type
+7:14-7:20
+    Int -> Data2 | Data2 | Type | Type
+7:28-7:31
+    Type
+8:14-8:20
+    Data2
+10:6-10:11
+    Type -> Type -> Type -> Type | Type -> Type -> Type -> Type | Type
+      -> Type -> Type -> Type | Type -> Type -> Type -> Type | Type
+      -> Type -> Type -> Type | Type -> Type -> Type -> Type | Type
+10:6-10:14
+    Type -> Type -> Type | Type -> Type -> Type | Type -> Type -> Type
+10:6-10:17
+    Type -> Type | Type -> Type | Type -> Type
+10:6-10:20
+    Type | Type | Type | Type | Type | Type
+10:6-10:38
+    Type | Type | Type
+10:6-11:54
+    Type | Type | Type | Type | Type
+10:6-12:29
+    Type | Type | Type | Type | Type | Type
+10:6-12:48
+    Type | Type | Type | Type | Type | Type | Type
+10:12-10:14
+    Type | Type | Type
+10:15-10:17
+    Type | Type | Type
+10:18-10:20
+    Type | Type | Type
+10:23-10:29
+    forall a b c . a -> Data5 a b c | Data5 _e _d _c | Type | Type
+10:32-10:34
+    forall a b c . Data5 a b c -> a
+10:36-10:38
+    Type
+11:23-11:29
+    forall a b c . a -> b -> c -> Data5 a b c | Data5
+      _h
+      _g
+      _f | Type | Type | Type | Type
+11:36-11:38
+    Type
+11:40-11:42
+    forall a b c . Data5 a b c -> b
+11:44-11:46
+    Type
+11:48-11:50
+    forall a b c . Data5 a b c -> c
+11:52-11:54
+    Type
+12:23-12:29
+    forall a b c . Int -> a -> Float -> b -> c -> Data5 a b c | Data5
+      _k
+      _j
+      _i | Type | Type | Type | Type | Type | Type
+12:30-12:33
+    Type
+12:34-12:36
+    Type
+12:37-12:42
+    Type
+12:43-12:45
+    Type
+12:46-12:48
+    Type
+------------ warnings
+Uncovered pattern(s) at testdata/data.lc:6:23:
+           | Data22 { x :: Int, y::Int }
+                      ^
+Missing case(s):
+    x (Data21 _)
+    x Data24
+Uncovered pattern(s) at testdata/data.lc:6:33:
+           | Data22 { x :: Int, y::Int }
+                                ^
+Missing case(s):
+    y (Data21 _)
+    y (Data23 _)
+    y Data24
+Uncovered pattern(s) at testdata/data.lc:10:32:
+data Data5 a5 b5 c5 = Data51 { a5::a5}
+                               ^^
+Missing case(s):
+    a5 (Data53 _ _ _ _ _)
+Uncovered pattern(s) at testdata/data.lc:11:40:
+                    | Data52 { a5::a5, b5::b5, c5::c5 }
+                                       ^^
+Missing case(s):
+    b5 (Data51 _)
+    b5 (Data53 _ _ _ _ _)
+Uncovered pattern(s) at testdata/data.lc:11:48:
+                    | Data52 { a5::a5, b5::b5, c5::c5 }
+                                               ^^
+Missing case(s):
+    c5 (Data51 _)
+    c5 (Data53 _ _ _ _ _)

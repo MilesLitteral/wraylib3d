@@ -1,0 +1,11 @@
+main is not found
+------------ desugared source code
+funUnit = _lhs funUnit \(_ :: _) -> _rhs ()
+------------ core code
+funUnit :: forall a . a -> ()
+funUnit = \a _ -> _rhs ()
+------------ tooltips
+1:1-1:8
+    forall a . a -> ()
+1:13-1:15
+    ()

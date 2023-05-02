@@ -1,0 +1,26 @@
+main is not found
+------------ desugared source code
+value1 :: Char
+value1 = _lhs value1 (_rhs 'a')
+
+value2 :: Char
+value2 = _lhs value2 (_rhs 'a')
+------------ core code
+value1 :: Char
+value1 = _rhs 'a'
+
+value2 :: Char
+value2 = _rhs 'a'
+------------ tooltips
+1:11-1:15
+    Type
+2:1-2:7
+    Char
+2:10-2:13
+    Char
+4:9-4:13
+    Type
+5:1-5:7
+    Char
+5:8-5:11
+    Char

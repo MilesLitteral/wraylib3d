@@ -1,0 +1,7 @@
+
+data M :: Type -> String -> Type where
+  Value :: a -> forall m . M a m
+
+data M2 :: Type -> String -> Type where
+  Value :: a -> forall m . M2 a m
+

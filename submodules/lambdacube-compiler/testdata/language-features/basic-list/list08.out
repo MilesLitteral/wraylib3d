@@ -1,0 +1,15 @@
+main is not found
+------------ desugared source code
+value = _lhs value (_rhs [fromInt 1, 1.2])
+------------ core code
+value :: [Float]
+value = _rhs [1.0, 1.2]
+------------ tooltips
+1:1-1:6
+    [Float]
+1:9-1:16
+    [Float]
+1:10-1:11
+    _b
+1:12-1:15
+    Float | [Float]

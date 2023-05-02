@@ -1,0 +1,54 @@
+main is not found
+------------ desugared source code
+value
+  = _lhs value (_rhs [fromInt 1, fromInt 2, fromInt 3, fromInt 4, fromInt 5])
+------------ core code
+value :: forall a . Num a => [a]
+value
+  = \a b -> _rhs
+    [fromInt a b 1, fromInt a b 2, fromInt a b 3, fromInt a b 4, fromInt a b 5]
+------------ tooltips
+1:1-1:6
+    forall a . Num a => [a]
+1:9-1:10
+    _b
+1:9-1:11
+    [_b] -> [_b]
+1:9-1:21
+    [_c]
+1:10-1:11
+    forall a . a -> [a] -> [a]
+1:11-1:12
+    _b
+1:11-1:13
+    [_b] -> [_b]
+1:11-1:21
+    [_d]
+1:12-1:13
+    forall a . a -> [a] -> [a]
+1:13-1:14
+    _b
+1:13-1:15
+    [_b] -> [_b]
+1:13-1:21
+    [_e]
+1:14-1:15
+    forall a . a -> [a] -> [a]
+1:15-1:16
+    _b
+1:15-1:17
+    [_b] -> [_b]
+1:15-1:21
+    [_f]
+1:16-1:17
+    forall a . a -> [a] -> [a]
+1:17-1:18
+    _b
+1:17-1:19
+    [_b] -> [_b]
+1:17-1:21
+    [_f]
+1:18-1:19
+    forall a . a -> [a] -> [a]
+1:19-1:21
+    forall a . [a]

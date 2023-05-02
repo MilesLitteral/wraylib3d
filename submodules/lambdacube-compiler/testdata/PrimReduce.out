@@ -1,0 +1,85 @@
+Pipeline
+  { info = ""
+  , backend = OpenGL33
+  , textures = []
+  , samplers = []
+  , targets =
+      [ RenderTarget
+          { renderTargets =
+              [ TargetItem
+                  { targetSemantic = Color , targetRef = Just (Framebuffer Color) }
+              ]
+          }
+      ]
+  , programs =
+      [ Program
+          { programUniforms = fromList []
+          , programStreams =
+              fromList
+                [ ( "vi1" , Parameter { name = "position4" , ty = V4F } ) ]
+          , programInTextures = fromList []
+          , programOutput = [ Parameter { name = "f0" , ty = V4F } ]
+          , vertexShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              in vec4 vi1;
+              vec4 rotate(float z0,vec4 z1) {
+                  return (mat4 (vec4 (cos (z0),(0.0) - (sin (z0)),0.0,0.0)
+                               ,vec4 (sin (z0),cos (z0),0.0,0.0)
+                               ,vec4 (0.0,0.0,1.0,0.0)
+                               ,vec4 (0.0,0.0,0.0,1.0))) * (z1);
+              }
+              vec4 scale(float z0,vec4 z1) {
+                  return (z1) * (vec4 (z0,z0,z0,1.0));
+              }
+              void main() {
+                  gl_Position = scale (0.1,rotate (3.0,vi1));
+              }
+              """
+          , geometryShader = Nothing
+          , fragmentShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              out vec4 f0;
+              vec4 blue;
+              void main() {
+                  blue = vec4 (0.0,0.0,1.0,1.0);
+                  f0 = blue;
+              }
+              """
+          }
+      ]
+  , slots =
+      [ Slot
+          { slotName = "stream4"
+          , slotStreams = fromList [ ( "position4" , V4F ) ]
+          , slotUniforms = fromList []
+          , slotPrimitive = Triangles
+          , slotPrograms = [ 0 ]
+          }
+      ]
+  , streams = []
+  , commands =
+      [ SetRenderTarget 0
+      , ClearRenderTarget
+          [ ClearImage
+              { imageSemantic = Color , clearValue = VV4F (V4 1.0 0.0 0.0 1.0) }
+          ]
+      , SetProgram 0
+      , SetRasterContext
+          (TriangleCtx CullNone PolygonFill NoOffset LastVertex)
+      , SetAccumulationContext
+          AccumulationContext
+            { accViewportName = Nothing
+            , accOperations =
+                [ ColorOp NoBlending (VV4B (V4 True True True True)) ]
+            }
+      , RenderSlot 0
+      ]
+  }

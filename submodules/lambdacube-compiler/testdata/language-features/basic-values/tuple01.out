@@ -1,0 +1,11 @@
+main is not found
+------------ desugared source code
+unit = _lhs unit (_rhs ())
+------------ core code
+unit :: ()
+unit = _rhs ()
+------------ tooltips
+1:1-1:5
+    ()
+1:8-1:10
+    ()

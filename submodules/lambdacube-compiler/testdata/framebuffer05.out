@@ -1,0 +1,22 @@
+Pipeline
+  { info = ""
+  , backend = OpenGL33
+  , textures = []
+  , samplers = []
+  , targets =
+      [ RenderTarget
+          { renderTargets =
+              [ TargetItem
+                  { targetSemantic = Depth , targetRef = Just (Framebuffer Depth) }
+              ]
+          }
+      ]
+  , programs = []
+  , slots = []
+  , streams = []
+  , commands =
+      [ SetRenderTarget 0
+      , ClearRenderTarget
+          [ ClearImage { imageSemantic = Depth , clearValue = VFloat 1.0 } ]
+      ]
+  }

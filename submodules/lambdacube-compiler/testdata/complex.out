@@ -1,0 +1,1026 @@
+main is not found
+------------ desugared source code
+data Repr :: Type where
+    Normal :: Repr
+    Polar :: Repr
+
+data Complex :: Repr -> Type where
+    Complex :: forall (a :: _) . Float -> Float -> Complex a
+
+repr :: forall (a :: _) . Complex a -> Repr
+repr = _lhs repr \ @(a :: _) (_ :: _) -> _rhs a
+
+normal :: Float -> Float -> Complex Normal
+normal = _lhs normal \(a :: _) (b :: _) -> _rhs (Complex a b)
+
+polar :: Float -> Float -> Complex Polar
+polar = _lhs polar \(a :: _) (b :: _) -> _rhs (Complex a b)
+
+cabs :: forall (a :: _) . Complex a -> Float
+cabs
+  = _lhs
+    cabs
+    \ @(a :: _) (b :: _) -> case'Repr
+      (\(_ :: _) -> _)
+      (case'Complex
+        (\(_ :: _) (_ :: _) -> _)
+        (\(c :: _) (d :: _) -> _rhs (sqrt (c * c + d * d)))
+        b)
+      (case'Complex (\(_ :: _) (_ :: _) -> _) (\(e :: _) (_ :: _) -> _rhs e) b)
+      a
+
+toPolar :: Complex Normal -> Complex Polar
+toPolar
+  = _lhs
+    toPolar
+    \(a :: _) -> case'Complex
+      (\(_ :: _) (_ :: _) -> _)
+      (\(b :: _) (c :: _) -> _rhs
+        let d = sqrt (b * b + c * c) in primIfThenElse
+          (b > 0.0)
+          (polar d (atan (c / b)))
+          (primIfThenElse
+            (b < 0.0 && c >= 0.0)
+            (polar d (atan (c / b) + pi))
+            (primIfThenElse
+              (b < 0.0 && c < 0.0)
+              (polar d (atan (c / b) - pi))
+              (primIfThenElse
+                (b == 0.0 && c >= 0.0)
+                (polar d (pi / 2.0))
+                (primIfThenElse
+                  (b == 0.0 && c < 0.0)
+                  (polar d (fromInt 0 - pi / 2.0))
+                  undefined)))))
+      a
+
+toNormal :: Complex Polar -> Complex Normal
+toNormal
+  = _lhs
+    toNormal
+    \(a :: _) -> case'Complex
+      (\(_ :: _) (_ :: _) -> _)
+      (\(b :: _) (c :: _) -> _rhs (Complex (b * cos c) (b * sin c)))
+      a
+
+it_should_fail
+  = _lhs
+    it_should_fail
+    \(a :: _) -> case'Complex
+      (\(_ :: _) (_ :: _) -> _)
+      (\(b :: _) (_ :: _) -> _rhs b)
+      a
+
+add :: forall (a :: _) (b :: _) . Complex a -> Complex b -> Complex a
+add
+  = _lhs
+    add
+    \ @(a :: _) @(b :: _) (c :: _) (d :: _) -> case'Repr
+      (\(_ :: _) -> _)
+      (case'Repr
+        (\(_ :: _) -> _)
+        (case'Complex
+          (\(_ :: _) (_ :: _) -> _)
+          (\(e :: _) (f :: _) -> case'Complex
+            (\(_ :: _) (_ :: _) -> _)
+            (\(g :: _) (h :: _) -> _rhs (Complex (e + g) (f + h)))
+            d)
+          c)
+        (_rhs undefined)
+        b)
+      (_rhs undefined)
+      a
+
+mul :: forall (a :: _) (b :: _) . Complex a -> Complex b -> Complex a
+mul
+  = _lhs
+    mul
+    \ @(a :: _) @(b :: _) (c :: _) (d :: _) -> case'Repr
+      (\(_ :: _) -> _)
+      (case'Repr
+        (\(_ :: _) -> _)
+        (case'Complex
+          (\(_ :: _) (_ :: _) -> _)
+          (\(e :: _) (f :: _) -> case'Complex
+            (\(_ :: _) (_ :: _) -> _)
+            (\(g :: _) (h :: _) -> _rhs (Complex (e * g - f * h) (f * g + e * h)))
+            d)
+          c)
+        (_rhs undefined)
+        b)
+      (_rhs undefined)
+      a
+
+s :: forall (a :: _) . Complex a -> Complex a
+s = _lhs s \(a :: _) -> _rhs (mul a a `add` a)
+
+s4 = _lhs s4 \(a :: _) -> _rhs (s (s (s (s a))))
+
+iter = _lhs iter (_rhs s4)
+
+mandel = _lhs mandel \(a :: _) -> _rhs (cabs (iter a) < 2.0)
+------------ core code
+'Complex :: Repr -> Type
+'Complex = <<type constructor with 1 indices; constructors: Complex>>
+
+'Repr :: Type
+'Repr = <<type constructor with 0 indices; constructors: Normal, Polar>>
+
+Complex :: forall (a :: Repr) . Float -> Float -> Complex a
+Complex = <<0th constructor of 'Complex>>
+
+Normal :: Repr
+Normal = <<0th constructor of 'Repr>>
+
+Polar :: Repr
+Polar = <<1st constructor of 'Repr>>
+
+add :: forall (a :: Repr) (b :: Repr) . Complex a -> Complex b -> Complex a
+add
+  = \a b c d -> case'Repr
+    (\_ -> 'Complex a)
+    (case'Repr
+      (\_ -> 'Complex a)
+      (case'Complex
+        (\_ _ -> 'Complex a)
+        (\_ e f -> case'Complex
+          (\_ _ -> 'Complex a)
+          (\_ g h -> _rhs (Complex a (e + g) (f + h)))
+          b
+          d)
+        a
+        c)
+      (_rhs (undefined ('Complex a)))
+      b)
+    (_rhs (undefined ('Complex a)))
+    a
+
+cabs :: forall (a :: Repr) . Complex a -> Float
+cabs
+  = \a b -> case'Repr
+    (\_ -> 'Float)
+    (case'Complex
+      (\_ _ -> 'Float)
+      (\_ c d -> _rhs (PrimSqrt ('VecScalar 1 'Float) 1 TT (c * c + (d * d))))
+      a
+      b)
+    (case'Complex (\_ _ -> 'Float) (\_ e _ -> _rhs e) a b)
+    a
+
+case'Complex
+  :: forall (a :: forall (b :: Repr) -> Complex b -> Type)
+    -> (forall (c :: Repr)
+        . forall (d :: Float) (e :: Float) -> a c ('Complex c d e))
+      -> forall (f :: Repr) . forall (g :: Complex f) -> a f g
+case'Complex = \a b c d -> <<case function of a type with 0 parameters>>
+
+case'Repr
+  :: forall (a :: Repr -> Type)
+    -> a 'Normal -> a 'Polar -> forall (b :: Repr) -> a b
+case'Repr = \a b c d -> <<case function of a type with 0 parameters>>
+
+it_should_fail :: forall (a :: Repr) . Complex a -> Float
+it_should_fail = \a b -> case'Complex (\_ _ -> 'Float) (\_ c _ -> _rhs c) a b
+
+iter :: forall (a :: Repr) . Complex a -> Complex a
+iter = _rhs \a -> s4
+
+mandel :: forall (a :: Repr) . Complex a -> VecScalar 1 Bool
+mandel
+  = \a b -> _rhs
+    (PrimLessThan
+      ('VecScalar 1 'Float)
+      1
+      'Float
+      ('VecScalar 1 'Bool)
+      TT
+      TT
+      TT
+      (cabs a (s4 b))
+      2.0)
+
+match'Complex
+  :: forall (a :: Type -> Type)
+    -> (forall (b :: Repr) -> a (Complex b)) -> forall c -> a c -> a c
+match'Complex = \a b c d -> <<type case function>>
+
+match'Repr :: forall (a :: Type -> Type) -> a Repr -> forall b -> a b -> a b
+match'Repr = \a b c d -> <<type case function>>
+
+mul :: forall (a :: Repr) (b :: Repr) . Complex a -> Complex b -> Complex a
+mul
+  = \a b c d -> case'Repr
+    (\_ -> 'Complex a)
+    (case'Repr
+      (\_ -> 'Complex a)
+      (case'Complex
+        (\_ _ -> 'Complex a)
+        (\_ e f -> case'Complex
+          (\_ _ -> 'Complex a)
+          (\_ g h -> _rhs (Complex a (e * g - (f * h)) (f * g + (e * h))))
+          b
+          d)
+        a
+        c)
+      (_rhs (undefined ('Complex a)))
+      b)
+    (_rhs (undefined ('Complex a)))
+    a
+
+normal :: Float -> Float -> Complex 'Normal
+normal = \a b -> _rhs (Complex Normal a b)
+
+polar :: Float -> Float -> Complex 'Polar
+polar = \a b -> _rhs (Complex Polar a b)
+
+repr :: forall (a :: Repr) . Complex a -> Repr
+repr = \a _ -> _rhs a
+
+s :: forall (a :: Repr) . Complex a -> Complex a
+s = \a b -> _rhs (add a a (mul a a b b) b)
+
+s4 :: forall (a :: Repr) . Complex a -> Complex a
+s4
+  = \a b -> _rhs
+    (add a a (mul a a (s a (s a (s a b))) (s a (s a (s a b)))) (s a (s a (s a b))))
+
+toNormal :: Complex 'Polar -> Complex 'Normal
+toNormal
+  = \a -> case'Complex
+    (\_ _ -> 'Complex Normal)
+    (\_ b c -> _rhs
+      (Complex
+        Normal
+        (b * PrimCos ('VecScalar 1 'Float) 1 TT c)
+        (b * PrimSin ('VecScalar 1 'Float) 1 TT c)))
+    Polar
+    a
+
+toPolar :: Complex 'Normal -> Complex 'Polar
+toPolar
+  = \a -> case'Complex
+    (\_ _ -> 'Complex Polar)
+    (\_ b c -> _rhs
+      (primIfThenElse
+        ('Complex Polar)
+        (b > 0.0)
+        (polar
+          (PrimSqrt ('VecScalar 1 'Float) 1 TT (b * b + (c * c)))
+          (PrimATan ('VecScalar 1 'Float) 1 TT (c / b)))
+        (primIfThenElse
+          ('Complex Polar)
+          (b < 0.0 && (c >= 0.0))
+          (polar
+            (PrimSqrt ('VecScalar 1 'Float) 1 TT (b * b + (c * c)))
+            (PrimATan ('VecScalar 1 'Float) 1 TT (c / b) + pi))
+          (primIfThenElse
+            ('Complex Polar)
+            (b < 0.0 && (c < 0.0))
+            (polar
+              (PrimSqrt ('VecScalar 1 'Float) 1 TT (b * b + (c * c)))
+              (PrimATan ('VecScalar 1 'Float) 1 TT (c / b) - pi))
+            (primIfThenElse
+              ('Complex Polar)
+              (b == 0.0 && (c >= 0.0))
+              (polar (PrimSqrt ('VecScalar 1 'Float) 1 TT (b * b + (c * c))) (pi / 2.0))
+              (primIfThenElse
+                ('Complex Polar)
+                (b == 0.0 && (c < 0.0))
+                (polar
+                  (PrimSqrt ('VecScalar 1 'Float) 1 TT (b * b + (c * c)))
+                  (0.0 - (pi / 2.0)))
+                (undefined ('Complex Polar))))))))
+    Normal
+    a
+------------ tooltips
+3:6-3:10
+    Type | Type | Type | Type | Type | Type
+3:6-3:27
+    Type | Type
+3:13-3:19
+    Repr
+3:22-3:27
+    Repr
+5:6-5:13
+    Repr -> Type | Repr -> Type | Type | Repr -> Type | Type | Type
+5:6-6:52
+    Type
+5:17-5:21
+    Type
+5:25-5:29
+    Type | Type
+6:3-6:10
+    forall (a :: Repr) . Float -> Float -> Complex a | Complex _c
+6:3-6:52
+    Type | Type | Type | Type
+6:25-6:30
+    Type
+6:25-6:52
+    Type
+6:34-6:39
+    Type
+6:34-6:52
+    Type
+6:43-6:50
+    Repr -> Type
+6:43-6:52
+    Type | Type
+6:51-6:52
+    _d | Repr
+8:20-8:27
+    Repr -> Type
+8:20-8:29
+    Type
+8:20-8:37
+    Type
+8:28-8:29
+    _b
+8:33-8:37
+    Type | Type
+9:1-9:5
+    forall (a :: Repr) . Complex a -> Repr
+9:13-9:14
+    Repr
+11:11-11:16
+    Type
+11:20-11:25
+    Type
+11:20-11:43
+    Type
+11:29-11:36
+    Repr -> Type
+11:29-11:43
+    Type | Type
+11:37-11:43
+    Repr
+12:1-12:7
+    Float -> Float -> Complex 'Normal
+12:14-12:21
+    forall (a :: Repr) . Float -> Float -> Complex a
+12:14-12:23
+    Float -> Complex _a
+12:14-12:25
+    Complex 'Normal
+12:22-12:23
+    Float
+12:24-12:25
+    Float
+14:10-14:15
+    Type
+14:19-14:24
+    Type
+14:19-14:41
+    Type
+14:28-14:35
+    Repr -> Type
+14:28-14:41
+    Type | Type
+14:36-14:41
+    Repr
+15:1-15:6
+    Float -> Float -> Complex 'Polar
+15:13-15:20
+    forall (a :: Repr) . Float -> Float -> Complex a
+15:13-15:22
+    Float -> Complex _a
+15:13-15:24
+    Complex 'Polar
+15:21-15:22
+    Float
+15:23-15:24
+    Float
+18:20-18:27
+    Repr -> Type
+18:20-18:29
+    Type
+18:20-18:38
+    Type
+18:28-18:29
+    _b
+18:33-18:38
+    Type | Type
+19:1-19:5
+    forall (a :: Repr) . Complex a -> Float
+19:34-19:38
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+19:34-19:50
+    VecScalar 1 Float | Float
+19:34-20:35
+    Repr -> Float | Float
+19:40-19:41
+    Float
+19:40-19:42
+    Float -> Float
+19:40-19:43
+    Float
+19:40-19:45
+    Float -> Float
+19:40-19:49
+    Float
+19:41-19:42
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+19:42-19:43
+    Float
+19:44-19:45
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+19:46-19:47
+    Float
+19:46-19:48
+    Float -> Float
+19:46-19:49
+    Float
+19:47-19:48
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+19:48-19:49
+    Float
+20:34-20:35
+    Float | Float
+22:12-22:19
+    Repr -> Type
+22:12-22:26
+    Type
+22:20-22:26
+    Repr
+22:30-22:37
+    Repr -> Type
+22:30-22:43
+    Type | Type
+22:38-22:43
+    Repr
+23:1-23:8
+    Complex 'Normal -> Complex 'Polar
+24:8-29:17
+    Complex 'Polar
+24:8-31:25
+    Complex 'Polar
+24:11-24:12
+    Float
+24:11-24:14
+    VecScalar 1 Float -> VecScalar 1 Bool
+24:11-24:19
+    VecScalar 1 Bool
+24:11-24:59
+    Complex 'Polar -> Complex 'Polar
+24:13-24:14
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+24:16-24:19
+    Float
+24:37-24:42
+    Float -> Float -> Complex 'Polar
+24:37-24:44
+    Float -> Complex 'Polar
+24:37-24:59
+    Complex 'Polar
+24:43-24:44
+    VecScalar 1 Float
+24:46-24:50
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+24:46-24:58
+    VecScalar 1 Float
+24:52-24:53
+    Float
+24:52-24:55
+    VecScalar 1 Float -> VecScalar 1 Float
+24:52-24:57
+    VecScalar 1 Float
+24:54-24:55
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+24:56-24:57
+    Float
+25:8-29:17
+    Complex 'Polar
+25:11-25:12
+    Float
+25:11-25:14
+    VecScalar 1 Float -> VecScalar 1 Bool
+25:11-25:19
+    VecScalar 1 Bool
+25:11-25:22
+    Bool -> Bool
+25:11-25:31
+    Bool
+25:11-25:64
+    Complex 'Polar -> Complex 'Polar
+25:13-25:14
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+25:16-25:19
+    Float
+25:20-25:22
+    Bool -> Bool -> Bool
+25:23-25:24
+    Float
+25:23-25:27
+    VecScalar 1 Float -> VecScalar 1 Bool
+25:23-25:31
+    VecScalar 1 Bool
+25:25-25:27
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+25:28-25:31
+    Float
+25:37-25:42
+    Float -> Float -> Complex 'Polar
+25:37-25:44
+    Float -> Complex 'Polar
+25:37-25:64
+    Complex 'Polar
+25:43-25:44
+    VecScalar 1 Float
+25:46-25:50
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+25:46-25:58
+    VecScalar 1 Float
+25:46-25:60
+    Float -> Float
+25:46-25:63
+    Float
+25:52-25:53
+    Float
+25:52-25:55
+    VecScalar 1 Float -> VecScalar 1 Float
+25:52-25:57
+    VecScalar 1 Float
+25:54-25:55
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+25:56-25:57
+    Float
+25:59-25:60
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+25:61-25:63
+    Float
+26:8-29:17
+    Complex 'Polar
+26:11-26:12
+    Float
+26:11-26:14
+    VecScalar 1 Float -> VecScalar 1 Bool
+26:11-26:19
+    VecScalar 1 Bool
+26:11-26:22
+    Bool -> Bool
+26:11-26:31
+    Bool
+26:11-26:64
+    Complex 'Polar -> Complex 'Polar
+26:13-26:14
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+26:16-26:19
+    Float
+26:20-26:22
+    Bool -> Bool -> Bool
+26:23-26:24
+    Float
+26:23-26:26
+    VecScalar 1 Float -> VecScalar 1 Bool
+26:23-26:31
+    VecScalar 1 Bool
+26:25-26:26
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+26:28-26:31
+    Float
+26:37-26:42
+    Float -> Float -> Complex 'Polar
+26:37-26:44
+    Float -> Complex 'Polar
+26:37-26:64
+    Complex 'Polar
+26:43-26:44
+    VecScalar 1 Float
+26:46-26:50
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+26:46-26:58
+    VecScalar 1 Float
+26:46-26:60
+    Float -> Float
+26:46-26:63
+    Float
+26:52-26:53
+    Float
+26:52-26:55
+    VecScalar 1 Float -> VecScalar 1 Float
+26:52-26:57
+    VecScalar 1 Float
+26:54-26:55
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+26:56-26:57
+    Float
+26:59-26:60
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+26:61-26:63
+    Float
+27:8-29:17
+    Complex 'Polar
+27:11-27:12
+    Float
+27:11-27:15
+    Float -> Bool
+27:11-27:19
+    Bool
+27:11-27:22
+    Bool -> Bool
+27:11-27:31
+    Bool
+27:11-27:56
+    Complex 'Polar -> Complex 'Polar
+27:13-27:15
+    forall a . Eq a => a -> a -> Bool
+27:16-27:19
+    Float
+27:20-27:22
+    Bool -> Bool -> Bool
+27:23-27:24
+    Float
+27:23-27:27
+    VecScalar 1 Float -> VecScalar 1 Bool
+27:23-27:31
+    VecScalar 1 Bool
+27:25-27:27
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+27:28-27:31
+    Float
+27:37-27:42
+    Float -> Float -> Complex 'Polar
+27:37-27:44
+    Float -> Complex 'Polar
+27:37-27:56
+    Complex 'Polar
+27:43-27:44
+    VecScalar 1 Float
+27:47-27:49
+    Float
+27:47-27:51
+    VecScalar 1 Float -> VecScalar 1 Float
+27:47-27:55
+    VecScalar 1 Float
+27:50-27:51
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+27:52-27:55
+    Float
+28:8-29:17
+    Complex 'Polar
+28:11-28:12
+    Float
+28:11-28:15
+    Float -> Bool
+28:11-28:19
+    Bool
+28:11-28:22
+    Bool -> Bool
+28:11-28:31
+    Bool
+28:11-28:56
+    Complex 'Polar -> Complex 'Polar
+28:13-28:15
+    forall a . Eq a => a -> a -> Bool
+28:16-28:19
+    Float
+28:20-28:22
+    Bool -> Bool -> Bool
+28:23-28:24
+    Float
+28:23-28:26
+    VecScalar 1 Float -> VecScalar 1 Bool
+28:23-28:31
+    VecScalar 1 Bool
+28:25-28:26
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+28:28-28:31
+    Float
+28:37-28:42
+    Float -> Float -> Complex 'Polar
+28:37-28:44
+    Float -> Complex 'Polar
+28:37-28:56
+    Complex 'Polar
+28:43-28:44
+    VecScalar 1 Float
+28:46-28:47
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+28:46-28:55
+    Float
+28:47-28:49
+    Float
+28:47-28:51
+    VecScalar 1 Float -> VecScalar 1 Float
+28:47-28:55
+    VecScalar 1 Float
+28:50-28:51
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+28:52-28:55
+    Float
+29:8-29:17
+    forall a . a
+31:9-31:13
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+31:9-31:25
+    VecScalar 1 Float
+31:15-31:16
+    Float
+31:15-31:17
+    Float -> Float
+31:15-31:18
+    Float
+31:15-31:20
+    Float -> Float
+31:15-31:24
+    Float
+31:16-31:17
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+31:17-31:18
+    Float
+31:19-31:20
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+31:21-31:22
+    Float
+31:21-31:23
+    Float -> Float
+31:21-31:24
+    Float
+31:22-31:23
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+31:23-31:24
+    Float
+64:13-64:20
+    Repr -> Type
+64:13-64:26
+    Type
+64:21-64:26
+    Repr
+64:30-64:37
+    Repr -> Type
+64:30-64:44
+    Type | Type
+64:38-64:44
+    Repr
+65:1-65:9
+    Complex 'Polar -> Complex 'Normal
+65:28-65:35
+    forall (a :: Repr) . Float -> Float -> Complex a
+65:28-65:49
+    Float -> Complex _a
+65:28-65:63
+    Complex _a | Complex _a
+65:37-65:38
+    Float
+65:37-65:40
+    Float -> Float
+65:37-65:48
+    Float
+65:39-65:40
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+65:41-65:44
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+65:41-65:48
+    VecScalar 1 Float
+65:45-65:48
+    Float
+65:51-65:52
+    Float
+65:51-65:54
+    Float -> Float
+65:51-65:62
+    Float
+65:53-65:54
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+65:55-65:58
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+65:55-65:62
+    VecScalar 1 Float
+65:59-65:62
+    Float
+111:1-111:15
+    forall (a :: Repr) . Complex a -> Float
+111:38-111:39
+    Float
+113:20-113:70
+    Type
+113:32-113:39
+    Repr -> Type
+113:32-113:42
+    Type
+113:32-113:70
+    Type
+113:40-113:42
+    _d
+113:46-113:53
+    Repr -> Type
+113:46-113:56
+    Type
+113:46-113:70
+    Type
+113:54-113:56
+    _c
+113:60-113:67
+    Repr -> Type
+113:60-113:70
+    Type | Type
+113:68-113:70
+    Repr
+114:1-114:4
+    forall (a :: Repr) (b :: Repr) . Complex a -> Complex b -> Complex a
+114:53-114:60
+    forall (a :: Repr) . Float -> Float -> Complex a
+114:53-114:68
+    Float -> Complex _a
+114:53-114:76
+    Complex _a | Complex _a | Complex _a | Complex _a | Complex _d
+114:62-114:63
+    Float
+114:62-114:65
+    Float -> Float
+114:62-114:67
+    Float
+114:64-114:65
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+114:66-114:67
+    Float
+114:70-114:71
+    Float
+114:70-114:73
+    Float -> Float
+114:70-114:75
+    Float
+114:72-114:73
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+114:74-114:75
+    Float
+128:23-128:30
+    Repr -> Type
+128:23-128:33
+    Type
+128:23-128:61
+    Type | Type
+128:31-128:33
+    _d
+128:37-128:44
+    Repr -> Type
+128:37-128:47
+    Type
+128:37-128:61
+    Type
+128:45-128:47
+    _c
+128:51-128:58
+    Repr -> Type
+128:51-128:61
+    Type | Type
+128:59-128:61
+    Repr
+129:1-129:4
+    forall (a :: Repr) (b :: Repr) . Complex a -> Complex b -> Complex a
+129:53-129:60
+    forall (a :: Repr) . Float -> Float -> Complex a
+129:53-129:72
+    Float -> Complex _a
+129:53-129:84
+    Complex _a | Complex _a | Complex _a | Complex _a | Complex _d
+129:62-129:63
+    Float
+129:62-129:64
+    Float -> Float
+129:62-129:65
+    Float
+129:62-129:67
+    Float -> Float
+129:62-129:71
+    Float
+129:63-129:64
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+129:64-129:65
+    Float
+129:66-129:67
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+129:68-129:69
+    Float
+129:68-129:70
+    Float -> Float
+129:68-129:71
+    Float
+129:69-129:70
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+129:70-129:71
+    Float
+129:74-129:75
+    Float
+129:74-129:76
+    Float -> Float
+129:74-129:77
+    Float
+129:74-129:79
+    Float -> Float
+129:74-129:83
+    Float
+129:75-129:76
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+129:76-129:77
+    Float
+129:78-129:79
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+129:80-129:81
+    Float
+129:80-129:82
+    Float -> Float
+129:80-129:83
+    Float
+129:81-129:82
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+129:82-129:83
+    Float
+137:6-137:13
+    Repr -> Type
+137:6-137:15
+    Type
+137:6-137:28
+    Type
+137:14-137:15
+    _b
+137:19-137:26
+    Repr -> Type
+137:19-137:28
+    Type | Type
+137:27-137:28
+    Repr
+138:1-138:2
+    forall (a :: Repr) . Complex a -> Complex a
+138:7-138:22
+    Complex _a -> Complex _c
+138:7-138:24
+    Complex _b
+138:8-138:11
+    forall (a :: Repr) (b :: Repr) . Complex a -> Complex b -> Complex a
+138:8-138:13
+    Complex _a -> Complex _e
+138:8-138:15
+    Complex _c
+138:12-138:13
+    Complex _f
+138:14-138:15
+    Complex _d
+138:17-138:22
+    forall (a :: Repr) (b :: Repr) . Complex a -> Complex b -> Complex a
+138:23-138:24
+    Complex _c
+141:1-141:3
+    forall (a :: Repr) . Complex a -> Complex a
+141:8-141:9
+    forall (a :: Repr) . Complex a -> Complex a
+141:8-141:23
+    Complex _a
+141:11-141:12
+    forall (a :: Repr) . Complex a -> Complex a
+141:11-141:22
+    Complex _a
+141:14-141:15
+    forall (a :: Repr) . Complex a -> Complex a
+141:14-141:21
+    Complex _a
+141:17-141:18
+    forall (a :: Repr) . Complex a -> Complex a
+141:17-141:20
+    Complex _a
+141:19-141:20
+    _f
+143:1-143:5
+    forall (a :: Repr) . Complex a -> Complex a
+143:8-143:10
+    forall (a :: Repr) . Complex a -> Complex a
+145:1-145:7
+    forall (a :: Repr) . Complex a -> VecScalar 1 Bool
+145:12-145:16
+    forall (a :: Repr) . Complex a -> Float
+145:12-145:25
+    Float
+145:12-145:27
+    VecScalar 1 Float -> VecScalar 1 Bool
+145:12-145:31
+    VecScalar 1 Bool
+145:18-145:22
+    forall (a :: Repr) . Complex a -> Complex a
+145:18-145:24
+    Complex _a
+145:23-145:24
+    _g
+145:26-145:27
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+145:28-145:31
+    Float
+------------ warnings
+Uncovered pattern(s) at testdata/complex.lc:114:1:
+add @'Normal @'Normal (Complex a b) (Complex c d) = Complex (a + c) (b + d)
+^^^
+Missing case(s):
+    add Normal Polar _ _
+    add Polar _ _ _
+Uncovered pattern(s) at testdata/complex.lc:129:1:
+mul @'Normal @'Normal (Complex a b) (Complex c d) = Complex (a*c - b*d) (b*c + a*d)
+^^^
+Missing case(s):
+    mul Normal Polar _ _
+    mul Polar _ _ _

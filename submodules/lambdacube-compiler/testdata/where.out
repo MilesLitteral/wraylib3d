@@ -1,0 +1,17 @@
+main is not found
+------------ desugared source code
+f = _lhs f (_rhs let a = let c = 1.0 in c; b = 1.0 in b)
+------------ core code
+f :: Float
+f = _rhs 1.0
+------------ tooltips
+3:1-3:2
+    Float
+3:5-3:6
+    Float
+5:9-5:10
+    Float
+7:13-7:16
+    Float
+8:9-8:12
+    Float

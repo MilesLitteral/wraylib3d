@@ -1,0 +1,19 @@
+already defined hello at testdata/language-features/module/import04.reject.lc:4:1:
+hello = "hello"
+^^^^^
+and at testdata/language-features/module/Hello01.lc:3:1:
+hello = "hello"
+^^^^^
+------------ trace
+hello :: String
+!already defined hello at testdata/language-features/module/import04.reject.lc:4:1:
+hello = "hello"
+^^^^^
+and at testdata/language-features/module/Hello01.lc:3:1:
+hello = "hello"
+^^^^^
+------------ tooltips
+4:1-4:6
+    String
+4:9-4:16
+    String

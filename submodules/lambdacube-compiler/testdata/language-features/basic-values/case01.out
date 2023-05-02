@@ -1,0 +1,80 @@
+main is not found
+------------ desugared source code
+value1 = _lhs value1 (_rhs ((\(a :: _) -> hlistNilCase _ () a) ()))
+
+value2 = _lhs value2 (_rhs ((\(a :: _) -> hlistNilCase _ () a) ()))
+
+value3 = _lhs value3 (_rhs ((\(a :: _) -> hlistNilCase _ () a) ()))
+
+value4 = _lhs value4 (_rhs ((\(a :: _) -> hlistNilCase _ () a) ()))
+
+value5 = _lhs value5 (_rhs ((\(a :: _) -> hlistNilCase _ () a) ()))
+
+value6 = _lhs value6 (_rhs ((\(_ :: _) -> ()) ()))
+------------ core code
+value1 :: ()
+value1 = _rhs ()
+
+value2 :: ()
+value2 = _rhs ()
+
+value3 :: ()
+value3 = _rhs ()
+
+value4 :: ()
+value4 = _rhs ()
+
+value5 :: ()
+value5 = _rhs ()
+
+value6 :: ()
+value6 = _rhs ()
+------------ tooltips
+1:1-1:7
+    ()
+1:10-1:29
+    ()
+1:15-1:17
+    ()
+1:27-1:29
+    ()
+3:1-3:7
+    ()
+3:10-4:11
+    ()
+3:15-3:17
+    ()
+4:9-4:11
+    ()
+6:1-6:7
+    ()
+7:3-8:13
+    ()
+7:8-7:10
+    ()
+8:11-8:13
+    ()
+10:1-10:7
+    ()
+11:3-13:9
+    ()
+11:8-11:10
+    ()
+13:7-13:9
+    ()
+15:1-15:7
+    ()
+16:3-19:11
+    ()
+16:8-16:10
+    ()
+19:9-19:11
+    ()
+21:1-21:7
+    ()
+22:3-23:12
+    ()
+22:8-22:10
+    ()
+23:10-23:12
+    ()

@@ -1,0 +1,20 @@
+main is not found
+------------ desugared source code
+hello = _lhs hello (_rhs ())
+
+x = _lhs x (_rhs world)
+------------ core code
+hello :: ()
+hello = _rhs ()
+
+x :: String
+x = _rhs "world"
+------------ tooltips
+3:1-3:6
+    ()
+3:9-3:11
+    ()
+4:1-4:2
+    String
+4:5-4:10
+    String

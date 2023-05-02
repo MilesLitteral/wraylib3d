@@ -1,0 +1,50 @@
+main is not found
+------------ desugared source code
+fun1 :: forall (a :: _) (b :: _) (c :: _) . a -> b -> c -> ()
+fun1 = _lhs fun1 \(_ :: _) (_ :: _) (_ :: _) -> _rhs ()
+
+fun2 :: forall (a :: _) (b :: _) (c :: _) . a -> b -> c -> ()
+fun2 = _lhs fun2 \(_ :: _) (_ :: _) (_ :: _) -> _rhs ()
+------------ core code
+fun1 :: forall a b c . a -> b -> c -> ()
+fun1 = \_ _ _ _ _ _ -> _rhs ()
+
+fun2 :: forall a b c . a -> b -> c -> ()
+fun2 = \_ _ _ _ _ _ -> _rhs ()
+------------ tooltips
+1:9-1:10
+    _f
+1:9-1:26
+    Type | Type | Type
+1:14-1:15
+    _e
+1:14-1:26
+    Type
+1:19-1:20
+    _d
+1:19-1:26
+    Type
+1:24-1:26
+    Type | Type
+2:1-2:5
+    forall a b c . a -> b -> c -> ()
+2:14-2:16
+    ()
+4:7-4:8
+    _f
+4:7-4:18
+    Type | Type | Type
+4:10-4:11
+    _e
+4:10-4:18
+    Type
+4:13-4:14
+    _d
+4:13-4:18
+    Type
+4:16-4:18
+    Type | Type
+5:1-5:5
+    forall a b c . a -> b -> c -> ()
+5:14-5:16
+    ()

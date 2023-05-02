@@ -1,0 +1,64 @@
+main :: Bool
+main = True
+------------ desugared source code
+main :: Bool
+main
+  = _lhs
+    main
+    (_rhs
+      ((\(a :: _) -> case'List
+          (\(_ :: _) -> _)
+          undefined
+          (\(b :: _) (c :: _) -> case'Bool
+            (\(_ :: _) -> _)
+            undefined
+            (case'List
+              (\(_ :: _) -> _)
+              undefined
+              (\(d :: _) (e :: _) -> case'Bool
+                (\(_ :: _) -> _)
+                undefined
+                (case'List
+                  (\(_ :: _) -> _)
+                  undefined
+                  (\(f :: _) (g :: _) -> case'Bool
+                    (\(_ :: _) -> _)
+                    undefined
+                    (case'List (\(_ :: _) -> _) True (\(_ :: _) (_ :: _) -> undefined) g)
+                    (3.0 == f))
+                  e)
+                (2.0 == d))
+              c)
+            (1.0 == b))
+          a)
+        (fromTo 1.0 3.0)))
+------------ core code
+main :: Bool
+main = _rhs True
+------------ tooltips
+1:9-1:13
+    Type
+2:1-2:5
+    Bool
+2:8-3:33
+    Bool
+2:13-2:23
+    [Float]
+2:14-2:17
+    Float
+2:19-2:22
+    Float
+3:29-3:33
+    Bool | Bool | Bool | Bool | Bool | Bool | Bool
+------------ warnings
+Uncovered pattern(s) at testdata/dotdot01.lc:2:13:
+main = case [1.0..3.0] of
+            ^^^^^^^^^^
+Missing case(s):
+     []
+     (_ : _) | False <- 1.0 == _b
+     [_] | True <- 1.0 == _b
+     (_ : _ : _) | True <- 1.0 == _b, False <- 2.0 == _b
+     [_, _] | True <- 1.0 == _b, True <- 2.0 == _b
+     (_ : _ : _ : _) | True <- 1.0 == _b, True <- 2.0 == _b, False <- 3.0 == _b
+     (_ : _ : _ : _ : _) | True <- 1.0 == _b, True <- 2.0 == _b, True <- 3.0 == _b

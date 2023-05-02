@@ -1,0 +1,365 @@
+main :: Bool
+main = True
+------------ desugared source code
+v1 = _lhs v1 (_rhs (RecordCons @[RecItem "x" _, RecItem "y" _] (1.0, 0.0)))
+
+v2
+  = _lhs
+    v2
+    (_rhs
+      (RecordCons @[RecItem "x" _, RecItem "y" _, RecItem "z" _] (1.0, 0.0, 10.0)))
+
+v3 = _lhs v3 (_rhs (RecordCons @[RecItem "v1" _, RecItem "v2" _] (v1, v2)))
+
+f = _lhs f \(a :: _) -> _rhs (project "x" a +! project "y" a)
+
+g
+  = _lhs
+    g
+    \(a :: _) -> _rhs (project "x" (project "v1" a) +! project "z" (project "v2" a))
+
+x = _lhs x \(a :: _) -> _rhs (project "x" (a v3))
+
+z = _lhs z \(a :: _) -> _rhs (project "v" (project "c" (project "x" (a v3))))
+
+main
+  = _lhs
+    main
+    (_rhs
+      ((\(a :: _) -> case'Bool (\(_ :: _) -> _) False True (13.0 == a))
+        (f v1 +! f v2 +! g v3)))
+------------ core code
+f
+  :: forall a
+    . Num (MatVecScalarElem a)
+      => forall (b :: [RecItem])
+        . (isKeyC "x" a b, isKeyC "y" (MatVecScalarElem a) b) => RecordC b -> a
+f
+  = \a b c d e f -> _rhs
+    (PrimAddS
+      ('MatVecScalarElem a)
+      a
+      TT
+      b
+      (project a c "x" d f)
+      (project ('MatVecScalarElem a) c "y" e f))
+
+g
+  :: forall a
+    . Num (MatVecScalarElem a)
+      => forall (b :: [RecItem])
+        . isKeyC "x" a b
+          => forall (c :: [RecItem])
+            . isKeyC "v1" (RecordC b) c
+              => forall (d :: [RecItem])
+                . (isKeyC "z" (MatVecScalarElem a) d, isKeyC "v2" (RecordC d) c)
+                  => RecordC c -> a
+g
+  = \a b c d e f g h i j -> _rhs
+    (PrimAddS
+      ('MatVecScalarElem a)
+      a
+      TT
+      b
+      (project a c "x" d (project ('RecordC c) e "v1" f j))
+      (project ('MatVecScalarElem a) g "z" h (project ('RecordC g) e "v2" i j)))
+
+main :: Bool
+main = _rhs True
+
+v1 :: RecordC ' ['RecItem "x" Float, 'RecItem "y" Float]
+v1 = _rhs (RecordCons (1.0, 0.0))
+
+v2 :: RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float]
+v2 = _rhs (RecordCons (1.0, 0.0, 10.0))
+
+v3
+  :: RecordC
+    ' ['RecItem "v1" (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float])
+    , 'RecItem
+      "v2"
+      (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float])]
+v3 = _rhs (RecordCons (v1, v2))
+
+x
+  :: forall a (b :: [RecItem])
+    . isKeyC "x" a b
+      => (RecordC
+            ' ['RecItem "v1" (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float])
+            , 'RecItem
+              "v2"
+              (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float])]
+          -> RecordC b)
+        -> a
+x = \a b c d -> _rhs (project a b "x" c (d v3))
+
+z
+  :: forall a (b :: [RecItem])
+    . isKeyC "v" a b
+      => forall (c :: [RecItem])
+        . isKeyC "c" (RecordC b) c
+          => forall (d :: [RecItem])
+            . isKeyC "x" (RecordC c) d
+              => (RecordC
+                    ' ['RecItem "v1" (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float])
+                    , 'RecItem
+                      "v2"
+                      (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float])]
+                  -> RecordC d)
+                -> a
+z
+  = \a b c d e f g h -> _rhs
+    (project
+      a
+      b
+      "v"
+      c
+      (project ('RecordC b) d "c" e (project ('RecordC d) f "x" g (h v3))))
+------------ tooltips
+1:1-1:3
+    RecordC ' ['RecItem "x" Float, 'RecItem "y" Float]
+1:6-1:19
+    RecordC ' ['RecItem "x" Float, 'RecItem "y" Float]
+1:7-1:8
+    String | RecItem
+1:7-1:14
+    [RecItem]
+1:9-1:12
+    Float
+1:9-1:18
+    HList (Float : recItemType ('RecItem "y" Float) : map recItemType ' [])
+1:13-1:14
+    String | RecItem | [RecItem]
+1:15-1:18
+    Float | ((Float))
+2:1-2:3
+    RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float]
+2:6-2:26
+    RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float]
+2:7-2:8
+    String | RecItem
+2:7-2:20
+    [RecItem]
+2:9-2:12
+    Float
+2:9-2:25
+    HList
+      (Float
+        : recItemType ('RecItem "y" Float) : map recItemType ' ['RecItem "z" Float])
+2:13-2:14
+    String | RecItem
+2:13-2:20
+    [RecItem]
+2:15-2:18
+    Float
+2:15-2:25
+    HList (Float : recItemType ('RecItem "z" Float) : map recItemType ' [])
+2:19-2:20
+    String | RecItem | [RecItem]
+2:21-2:25
+    Float | ((Float))
+3:1-3:3
+    RecordC
+      ' ['RecItem "v1" (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float])
+      , 'RecItem
+        "v2"
+        (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float])]
+3:6-3:20
+    RecordC
+      ' ['RecItem "v1" (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float])
+      , 'RecItem
+        "v2"
+        (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float])]
+3:7-3:9
+    String | RecItem
+3:7-3:16
+    [RecItem]
+3:10-3:12
+    RecordC ' ['RecItem "x" Float, 'RecItem "y" Float]
+3:10-3:19
+    HList
+      (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float]
+        : recItemType
+            ('RecItem
+              "v2"
+              (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float]))
+          : map recItemType ' [])
+3:14-3:16
+    String | RecItem | [RecItem]
+3:17-3:19
+    RecordC
+      ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float] | ((RecordC
+      ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float]))
+4:1-4:2
+    forall a
+      . Num (MatVecScalarElem a)
+        => forall (b :: [RecItem])
+          . (isKeyC "x" a b, isKeyC "y" (MatVecScalarElem a) b) => RecordC b -> a
+4:7-4:8
+    _g
+4:7-4:10
+    _c
+4:7-4:13
+    MatVecScalarElem _d -> _d
+4:7-4:17
+    _e
+4:9-4:10
+    String
+4:11-4:13
+    forall a . Num (MatVecScalarElem a) => a -> MatVecScalarElem a -> a
+4:14-4:15
+    RecordC _e
+4:14-4:17
+    _b
+4:16-4:17
+    String
+5:1-5:2
+    forall a
+      . Num (MatVecScalarElem a)
+        => forall (b :: [RecItem])
+          . isKeyC "x" a b
+            => forall (c :: [RecItem])
+              . isKeyC "v1" (RecordC b) c
+                => forall (d :: [RecItem])
+                  . (isKeyC "z" (MatVecScalarElem a) d, isKeyC "v2" (RecordC d) c)
+                    => RecordC c -> a
+5:7-5:8
+    _j
+5:7-5:11
+    _c
+5:7-5:13
+    _e
+5:7-5:16
+    MatVecScalarElem _f -> _f
+5:7-5:23
+    _i
+5:9-5:11
+    String
+5:12-5:13
+    String
+5:14-5:16
+    forall a . Num (MatVecScalarElem a) => a -> MatVecScalarElem a -> a
+5:17-5:18
+    RecordC _h
+5:17-5:21
+    _b
+5:17-5:23
+    _d
+5:19-5:21
+    String
+5:22-5:23
+    String
+7:1-7:2
+    forall a (b :: [RecItem])
+      . isKeyC "x" a b
+        => (RecordC
+              ' ['RecItem "v1" (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float])
+              , 'RecItem
+                "v2"
+                (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float])]
+            -> RecordC b)
+          -> a
+7:7-7:15
+    _c
+7:8-7:9
+    _e
+7:10-7:12
+    RecordC
+      ' ['RecItem "v1" (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float])
+      , 'RecItem
+        "v2"
+        (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float])]
+7:14-7:15
+    String
+8:1-8:2
+    forall a (b :: [RecItem])
+      . isKeyC "v" a b
+        => forall (c :: [RecItem])
+          . isKeyC "c" (RecordC b) c
+            => forall (d :: [RecItem])
+              . isKeyC "x" (RecordC c) d
+                => (RecordC
+                      ' ['RecItem "v1" (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float])
+                      , 'RecItem
+                        "v2"
+                        (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float])]
+                    -> RecordC d)
+                  -> a
+8:7-8:19
+    _g
+8:8-8:9
+    _k
+8:8-8:15
+    _c
+8:8-8:17
+    _e
+8:10-8:12
+    RecordC
+      ' ['RecItem "v1" (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float])
+      , 'RecItem
+        "v2"
+        (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float])]
+8:14-8:15
+    String
+8:16-8:17
+    String
+8:18-8:19
+    String
+10:1-10:5
+    Bool
+10:8-12:15
+    Bool
+10:13-10:14
+    forall a
+      . Num (MatVecScalarElem a)
+        => forall (b :: [RecItem])
+          . (isKeyC "x" a b, isKeyC "y" (MatVecScalarElem a) b) => RecordC b -> a
+10:13-10:17
+    _d
+10:13-10:20
+    MatVecScalarElem Float -> Float
+10:13-10:25
+    Float
+10:13-10:28
+    MatVecScalarElem Float -> Float
+10:13-10:33
+    Float
+10:15-10:17
+    RecordC ' ['RecItem "x" Float, 'RecItem "y" Float]
+10:18-10:20
+    forall a . Num (MatVecScalarElem a) => a -> MatVecScalarElem a -> a
+10:21-10:22
+    forall a
+      . Num (MatVecScalarElem a)
+        => forall (b :: [RecItem])
+          . (isKeyC "x" a b, isKeyC "y" (MatVecScalarElem a) b) => RecordC b -> a
+10:21-10:25
+    _d
+10:23-10:25
+    RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float]
+10:26-10:28
+    forall a . Num (MatVecScalarElem a) => a -> MatVecScalarElem a -> a
+10:29-10:30
+    forall a
+      . Num (MatVecScalarElem a)
+        => forall (b :: [RecItem])
+          . isKeyC "x" a b
+            => forall (c :: [RecItem])
+              . isKeyC "v1" (RecordC b) c
+                => forall (d :: [RecItem])
+                  . (isKeyC "z" (MatVecScalarElem a) d, isKeyC "v2" (RecordC d) c)
+                    => RecordC c -> a
+10:29-10:33
+    _h
+10:31-10:33
+    RecordC
+      ' ['RecItem "v1" (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float])
+      , 'RecItem
+        "v2"
+        (RecordC ' ['RecItem "x" Float, 'RecItem "y" Float, 'RecItem "z" Float])]
+11:13-11:17
+    Bool
+11:13-12:15
+    Bool -> Bool
+12:10-12:15
+    Bool

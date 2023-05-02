@@ -1,0 +1,20 @@
+main is not found
+------------ desugared source code
+value1 = _lhs value1 (_rhs True)
+
+value2 = _lhs value2 (_rhs False)
+------------ core code
+value1 :: Bool
+value1 = _rhs True
+
+value2 :: Bool
+value2 = _rhs False
+------------ tooltips
+1:1-1:7
+    Bool
+1:10-1:14
+    Bool
+2:1-2:7
+    Bool
+2:10-2:15
+    Bool

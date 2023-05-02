@@ -1,0 +1,218 @@
+main :: Bool
+main = True
+------------ desugared source code
+a :: [(Float, Float)]
+a
+  = _lhs
+    a
+    (_rhs
+      (concatMap
+        (\(a :: _) -> concatMap (\(b :: _) -> [(a *! b, a +! b)]) [1.0, 1.0])
+        [1.0, 1.0]))
+
+main :: Bool
+main
+  = _lhs
+    main
+    (_rhs
+      ((\(a :: _) -> case'List
+          (\(_ :: _) -> _)
+          undefined
+          (\(b :: _) (c :: _) -> hlistConsCase
+            _
+            (\(d :: _) (e :: _) -> case'Bool
+              (\(_ :: _) -> _)
+              undefined
+              (hlistConsCase
+                _
+                (\(f :: _) (g :: _) -> case'Bool
+                  (\(_ :: _) -> _)
+                  undefined
+                  (hlistNilCase
+                    _
+                    (case'List
+                      (\(_ :: _) -> _)
+                      undefined
+                      (\(h :: _) (i :: _) -> hlistConsCase
+                        _
+                        (\(j :: _) (k :: _) -> case'Bool
+                          (\(_ :: _) -> _)
+                          undefined
+                          (hlistConsCase
+                            _
+                            (\(l :: _) (m :: _) -> case'Bool
+                              (\(_ :: _) -> _)
+                              undefined
+                              (hlistNilCase
+                                _
+                                (case'List
+                                  (\(_ :: _) -> _)
+                                  undefined
+                                  (\(n :: _) (o :: _) -> hlistConsCase
+                                    _
+                                    (\(p :: _) (q :: _) -> case'Bool
+                                      (\(_ :: _) -> _)
+                                      undefined
+                                      (hlistConsCase
+                                        _
+                                        (\(r :: _) (s :: _) -> case'Bool
+                                          (\(_ :: _) -> _)
+                                          undefined
+                                          (hlistNilCase
+                                            _
+                                            (case'List
+                                              (\(_ :: _) -> _)
+                                              undefined
+                                              (\(t :: _) (u :: _) -> hlistConsCase
+                                                _
+                                                (\(v :: _) (w :: _) -> case'Bool
+                                                  (\(_ :: _) -> _)
+                                                  undefined
+                                                  (hlistConsCase
+                                                    _
+                                                    (\(x :: _) (y :: _) -> case'Bool
+                                                      (\(_ :: _) -> _)
+                                                      undefined
+                                                      (hlistNilCase
+                                                        _
+                                                        (case'List (\(_ :: _) -> _) True (\(_ :: _) (_ :: _) -> undefined) u)
+                                                        y)
+                                                      (2.0 == x))
+                                                    w)
+                                                  (1.0 == v))
+                                                t)
+                                              o)
+                                            s)
+                                          (2.0 == r))
+                                        q)
+                                      (1.0 == p))
+                                    n)
+                                  i)
+                                m)
+                              (2.0 == l))
+                            k)
+                          (1.0 == j))
+                        h)
+                      c)
+                    g)
+                  (2.0 == f))
+                e)
+              (1.0 == d))
+            b)
+          a)
+        a))
+------------ core code
+a :: [(Float, Float)]
+a
+  = _rhs
+    ((1.0 *! 1.0, 1.0 +! 1.0)
+      : [] ++ foldr (++) [] (map (\a -> [(1.0 *! a, 1.0 +! a)]) [1.0])
+        ++ foldr
+          (++)
+          []
+          (map
+            (\b -> concatMap
+              ('MatVecScalarElem 'Float)
+              ' ('Float, 'Float)
+              (\c -> [(b *! c, b +! c)])
+              [1.0, 1.0])
+            [1.0]))
+
+main :: Bool
+main = _rhs True
+------------ tooltips
+1:6-1:21
+    Type
+1:7-1:20
+    Type
+1:8-1:13
+    Type
+1:8-1:19
+    [Type]
+1:14-1:19
+    Type | [Type]
+2:1-2:2
+    [(Float, Float)]
+2:5-2:51
+    [(Float, Float)]
+2:6-2:17
+    (_g, _g) | [(_e, _e)]
+2:6-2:50
+    [(_d, _d)]
+2:7-2:8
+    _k
+2:7-2:10
+    MatVecScalarElem _j -> _j
+2:7-2:11
+    _h
+2:8-2:10
+    forall a . Num (MatVecScalarElem a) => a -> MatVecScalarElem a -> a
+2:10-2:11
+    _f
+2:12-2:13
+    _k
+2:12-2:15
+    MatVecScalarElem _j -> _j
+2:12-2:16
+    _i | ((_g))
+2:13-2:15
+    forall a . Num (MatVecScalarElem a) => a -> MatVecScalarElem a -> a
+2:15-2:16
+    MatVecScalarElem _i
+2:23-2:33
+    [Float]
+2:24-2:27
+    Float
+2:29-2:32
+    Float | [Float]
+2:40-2:50
+    [Float]
+2:41-2:44
+    Float
+2:46-2:49
+    Float | [Float]
+4:9-4:13
+    Type
+5:1-5:5
+    Bool
+5:8-6:59
+    Bool
+5:13-5:14
+    [(Float, Float)]
+6:55-6:59
+    Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool | Bool
+------------ warnings
+Uncovered pattern(s) at testdata/listcompr02.lc:5:13:
+main = case a of
+            ^
+Missing case(s):
+     []
+     (HCons _ _ : _) | False <- 1.0 == _b
+     (HCons _ (HCons _ _) : _) | True <- 1.0 == _b, False <- 2.0 == _b
+     [(_, _)] | True <- 1.0 == _b, True <- 2.0 == _b
+     ((_, _) : HCons _ _ : _)
+      | True <- 1.0 == _b, True <- 2.0 == _b, False <- 1.0 == _b
+     ((_, _) : HCons _ (HCons _ _) : _)
+      | True <- 1.0 == _b, True <- 2.0 == _b, True <- 1.0 == _b, False <- 2.0 == _b
+     [(_, _), (_, _)]
+      | True <- 1.0 == _b, True <- 2.0 == _b, True <- 1.0 == _b, True <- 2.0 == _b
+     ((_, _) : (_, _) : HCons _ _ : _)
+      | True <- 1.0 == _b, True <- 2.0 == _b, True <- 1.0 == _b, True
+                <- 2.0 == _b, False <- 1.0 == _b
+     ((_, _) : (_, _) : HCons _ (HCons _ _) : _)
+      | True <- 1.0 == _b, True <- 2.0 == _b, True <- 1.0 == _b, True
+                <- 2.0 == _b, True <- 1.0 == _b, False <- 2.0 == _b
+     [(_, _), (_, _), (_, _)]
+      | True <- 1.0 == _b, True <- 2.0 == _b, True <- 1.0 == _b, True
+                <- 2.0 == _b, True <- 1.0 == _b, True <- 2.0 == _b
+     ((_, _) : (_, _) : (_, _) : HCons _ _ : _)
+      | True <- 1.0 == _b, True <- 2.0 == _b, True <- 1.0 == _b, True
+                <- 2.0 == _b, True <- 1.0 == _b, True <- 2.0 == _b, False <- 1.0 == _b
+     ((_, _) : (_, _) : (_, _) : HCons _ (HCons _ _) : _)
+      | True <- 1.0 == _b, True <- 2.0 == _b, True <- 1.0 == _b, True
+                <- 2.0 == _b, True <- 1.0 == _b, True <- 2.0 == _b, True <- 1.0 == _b, False
+                      <- 2.0 == _b
+     ((_, _) : (_, _) : (_, _) : (_, _) : _ : _)
+      | True <- 1.0 == _b, True <- 2.0 == _b, True <- 1.0 == _b, True
+                <- 2.0 == _b, True <- 1.0 == _b, True <- 2.0 == _b, True <- 1.0 == _b, True
+                      <- 2.0 == _b

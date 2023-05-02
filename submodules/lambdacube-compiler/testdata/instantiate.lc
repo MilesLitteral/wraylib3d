@@ -1,0 +1,2 @@
+main' =
+    let f = PrimAdd in f (V2 1.0 2.0) (V2 1.0 2.0)

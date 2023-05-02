@@ -1,0 +1,10 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+import Internals
+
+x = False: y
+y = True: x
+
+main = case x of
+    False: True: False: _ -> True
+
+

@@ -1,0 +1,34 @@
+type error: no instance of 'Show' on ???
+in 'Type Wildcard2
+------------ trace
+'X :: Type
+X :: X
+case'X :: forall (a :: X -> Type) -> a 'X -> forall (b :: X) -> a b
+match'X :: forall (a :: Type -> Type) -> a X -> forall b -> a b -> a b
+'Show' :: Type -> Constraint
+show' :: forall a . @(Empty "no instance of 'Show' on ???") -> a -> X
+!type error: no instance of 'Show' on ???
+in 'Type Wildcard2
+------------ tooltips
+1:6-1:7
+    Type | Type | Type | Type | Type
+1:6-1:11
+    Type
+1:10-1:11
+    X
+3:7-3:12
+    Type -> Constraint | Type -> Constraint | Constraint
+3:7-3:36
+    Type
+3:21-3:26
+    forall a . @(Empty "no instance of 'Show' on ???") -> a -> X
+3:30-3:31
+    Type
+3:30-3:36
+    Type
+3:35-3:36
+    Type | Type
+5:11-5:12
+    Type
+6:10-6:15
+    forall a . @(Empty "no instance of 'Show' on ???") -> a -> X

@@ -1,0 +1,20 @@
+main is not found
+------------ desugared source code
+value1
+  = _lhs
+    value1
+    (_rhs (concatMap (\(_ :: _) -> [\(a :: _) -> hlistNilCase _ "Hello" a]) []))
+------------ core code
+value1 :: @Type -> [() -> String]
+value1 = \_ -> _rhs []
+------------ tooltips
+1:1-1:7
+    @Type -> [() -> String]
+1:10-1:36
+    [() -> String]
+1:11-1:25
+    [() -> String]
+1:18-1:25
+    String
+1:33-1:35
+    forall a . [a]

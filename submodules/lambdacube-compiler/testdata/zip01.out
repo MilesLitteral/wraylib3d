@@ -1,0 +1,85 @@
+main is not found
+------------ desugared source code
+zip2 :: forall (a :: _) (b :: _) . [a] -> [b] -> [(a, b)]
+zip2
+  = primFix
+    \(a :: _) -> _lhs
+      zip2
+      \(b :: _) (c :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs [])
+        (\(d :: _) (e :: _) -> case'List
+          (\(_ :: _) -> _)
+          (_rhs [])
+          (\(f :: _) (g :: _) -> _rhs ((d, f) : a e g))
+          c)
+        b
+------------ core code
+zip2 :: forall a b . [a] -> [b] -> [(a, b)]
+zip2
+  = primFix
+    _
+    \a b c d e -> case'List
+      (\_ -> [' (b, c)])
+      (_rhs [])
+      (\f g -> case'List
+        (\_ -> [' (b, c)])
+        (_rhs [])
+        (\h i -> _rhs ((f, h) : a b c g i))
+        e)
+      d
+------------ tooltips
+1:9-1:12
+    Type
+1:9-1:30
+    Type | Type
+1:10-1:11
+    _d
+1:16-1:19
+    Type
+1:16-1:30
+    Type
+1:17-1:18
+    _c
+1:23-1:30
+    Type | Type
+1:24-1:29
+    Type
+1:25-1:26
+    Type
+1:25-1:28
+    [Type]
+1:27-1:28
+    Type | [Type]
+2:1-2:5
+    forall a b . [a] -> [b] -> [(a, b)]
+2:22-2:24
+    forall a . [a]
+2:22-4:40
+    [_a] -> [(_a, _d)] | [(_d, _c)]
+3:22-3:24
+    forall a . [a]
+3:22-4:40
+    [_a] -> [(_e, _a)] | [(_c, _f)]
+4:22-4:27
+    (_h, _d)
+4:22-4:29
+    [(_h, _d)] -> [(_h, _d)]
+4:22-4:40
+    [(_g, _c)]
+4:23-4:24
+    _k
+4:25-4:26
+    _g | ((_d))
+4:28-4:29
+    forall a . a -> [a] -> [a]
+4:30-4:34
+    forall a b . [a] -> [b] -> [(a, b)]
+4:30-4:37
+    [_a] -> [(_h, _a)]
+4:30-4:40
+    [(_g, _c)]
+4:35-4:37
+    [_i]
+4:38-4:40
+    [_c]

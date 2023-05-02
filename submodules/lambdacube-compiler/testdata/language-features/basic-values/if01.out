@@ -1,0 +1,36 @@
+main is not found
+------------ desugared source code
+value1 = _lhs value1 (_rhs (primIfThenElse True () ()))
+
+value2 = _lhs value2 (_rhs (primIfThenElse False 1.0 2.0))
+------------ core code
+value1 :: ()
+value1 = _rhs ()
+
+value2 :: Float
+value2 = _rhs 2.0
+------------ tooltips
+1:1-1:7
+    ()
+1:10-1:33
+    ()
+1:13-1:17
+    Bool
+1:13-1:25
+    () -> ()
+1:23-1:25
+    ()
+1:31-1:33
+    ()
+2:1-2:7
+    Float
+2:10-2:36
+    Float
+2:13-2:18
+    Bool
+2:13-2:27
+    Float -> Float
+2:24-2:27
+    Float
+2:33-2:36
+    Float

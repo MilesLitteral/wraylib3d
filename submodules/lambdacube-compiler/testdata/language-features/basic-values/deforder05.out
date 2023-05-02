@@ -1,0 +1,15 @@
+main is not found
+------------ desugared source code
+value = _lhs value (_rhs let a = (); b = a in '1')
+------------ core code
+value :: Char
+value = _rhs '1'
+------------ tooltips
+1:1-1:6
+    Char
+1:9-1:12
+    Char
+1:23-1:24
+    ()
+2:23-2:25
+    ()

@@ -1,0 +1,141 @@
+{-# LANGUAGE RecordWildCards #-}
+module HRayLib3d.GameEngine.Graphics.GLTF (
+  -- ( addGLTF
+  -- , addGPUGLTF
+  -- , setGLTFFrame
+  -- , uploadGLTF
+  -- , GPUGLTF(..)
+  -- , GLTFInstance(..)
+  ) where
+
+import Control.Monad
+import Data.HashSet (HashSet)
+import Data.Map (Map)
+import qualified Data.Map as Map
+import qualified Data.HashSet as HashSet
+import Data.Vector (Vector)
+import qualified Data.Vector as V
+import qualified Data.Vector.Storable as SV
+import qualified Data.ByteString.Char8 as SB8
+import Foreign
+
+import LambdaCube.GL
+import LambdaCube.GL.Mesh
+
+import HRayLib3d.GameEngine.Data.GLTF
+import HRayLib3d.GameEngine.Graphics.Storage
+import HRayLib3d.GameEngine.Utils
+
+-- data GlTFInstance
+--   = GlTFInstance
+--   { gltfInstanceObject :: [Object]
+--   , gltfInstanceBuffer :: Buffer
+--   , gltfInstanceFrames :: Vector [(Int,Array)]
+--   , gltfInstanceModel  :: GlTFModel
+--   }
+
+-- data GPUGlTF
+--   = GPUGlTF
+--   { gpuGlTFBuffer    :: Buffer
+--   , gpuGlTFSurfaces  :: [(IndexStream Buffer,Map String (Stream Buffer))] -- index stream, attribute streams
+--   , gpuGlTFFrames    :: Vector [(Int,Array)]
+--   , gpuGlTFModel     :: GlTFModel
+--   , gpuGlTFShaders   :: HashSet String
+--   }
+
+-- setGlTFFrame :: GlTFInstance -> Int -> IO ()
+-- setGlTFFrame (GlTFInstance{..}) idx = case gltfInstanceFrames V.!? idx of
+--   Just frame  -> updateBuffer gltfInstanceBuffer frame
+--   Nothing     -> pure ()
+
+-- {-
+--     buffer layout
+--       index arrays for surfaces         [index array of surface 0,          index array of surface 1,         ...]
+--       texture coord arrays for surfaces [texture coord array of surface 0,  texture coord array of surface 1, ...]
+--       position arrays for surfaces      [position array of surface 0,       position array of surface 1,      ...]
+--       normal arrays for surfaces        [normal array of surface 0,         normal array of surface 1,        ...]
+--     in short: [ surf1_idx..surfN_idx
+--               , surf1_tex..surfN_tex
+--               , surf1_pos..surfN_pos
+--               , surf1_norm..surfN_norm
+--               ]
+-- -}
+-- uploadGlTF :: GlTFModel -> IO GPUGlTF
+-- uploadGlTF model@GlTFModel{..} = do
+--   let cvtSurface :: Surface -> (Array,Array,Vector (Array,Array))
+--       cvtSurface Surface{..} =
+--         ( Array ArrWord32 (SV.length srTriangles) (withV srTriangles)
+--         , Array ArrFloat (2 * SV.length srTexCoords) (withV srTexCoords)
+--         , V.map cvtPosNorm srXyzNormal
+--         )
+--         where
+--           withV a f = SV.unsafeWith a (\p -> f $ castPtr p)
+--           cvtPosNorm (p,n) = (f p, f n) where f sv = Array ArrFloat (3 * SV.length sv) $ withV sv
+
+--       addSurface sf (il,tl,pl,nl,pnl) = (i:il,t:tl,p:pl,n:nl,pn:pnl) where
+--         (i,t,pn) = cvtSurface sf
+--         (p,n)    = V.head pn
+
+--       (il,tl,pl,nl,pnl) = V.foldr addSurface ([],[],[],[],[]) mdSurfaces
+
+--   buffer <- compileBuffer (concat [il,tl,pl,nl])
+
+--   let numSurfaces = V.length mdSurfaces
+--       surfaceData idx Surface{..} = (index,attributes) where
+--         index = IndexStream buffer idx 0 (SV.length srTriangles)
+--         countV = SV.length srTexCoords
+--         attributes = Map.fromList $
+--           [ ("diffuseUV",   Stream Attribute_V2F buffer (1 * numSurfaces + idx) 0 countV)
+--           , ("position",    Stream Attribute_V3F buffer (2 * numSurfaces + idx) 0 countV)
+--           , ("normal",      Stream Attribute_V3F buffer (3 * numSurfaces + idx) 0 countV)
+--           , ("color",       ConstV4F (V4 1 1 1 1))
+--           , ("lightmapUV",  ConstV2F (V2 0 0))
+--           ]
+
+--       frames = foldr addSurfaceFrames emptyFrame $ zip [0..] pnl where
+--         emptyFrame = V.replicate (V.length mdFrames) []
+--         addSurfaceFrames (idx,pn) f = V.zipWith (\l (p,n) -> (2 * numSurfaces + idx,p):(3 * numSurfaces + idx,n):l) f pn
+
+--   return $ GPUGlTF
+--     { gpuGlTFBuffer    = buffer
+--     , gpuGlTFSurfaces  = zipWith surfaceData [0..] (V.toList mdSurfaces)
+--     , gpuGlTFFrames    = frames
+--     , gpuGlTFModel     = model
+--     , gpuGlTFShaders   = HashSet.fromList $ concat [map (SB8.unpack . shName) $ V.toList srShaders | Surface{..} <- V.toList mdSurfaces]
+--     }
+
+-- addGPUGlTF :: GLStorage -> GPUGlTF -> GlTFSkin -> [String] -> IO GlTFInstance
+-- addGPUGlTF r GPUGlTF{..} skin unis = do
+--   let GlTFModel{..} = gpuGlTFModel
+--   objs <- forM (zip gpuGlTFSurfaces $ V.toList mdSurfaces) $ \((index,attrs),sf) -> do
+--     let materialName s = case Map.lookup (SB8.unpack $ srName sf) skin of
+--           Nothing -> SB8.unpack $ shName s
+--           Just a  -> a
+--     objList <- concat <$> forM (V.toList $ srShaders sf) (\s -> do
+--       a <- addObjectWithMaterial r (materialName s) TriangleList (Just index) attrs $ setNub $ "worldMat":unis
+--       b <- addObject r "LightMapOnly" TriangleList (Just index) attrs $ setNub $ "worldMat":unis
+--       return [a,b])
+
+--     -- add collision geometry
+--     collisionObjs <- case V.toList mdFrames of
+--       (Frame{..}:_) -> do
+--         sphereObj <- uploadMeshToGPU (sphere (V4 1 0 0 1) 4 frRadius) >>= addMeshToObjectArray r "CollisionShape" (setNub $ ["worldMat","origin"] ++ unis)
+--         boxObj    <- uploadMeshToGPU (bbox (V4 0 0 1 1) frMins frMaxs) >>= addMeshToObjectArray r "CollisionShape" (setNub $ ["worldMat","origin"] ++ unis)
+--         --when (frOrigin /= zero) $ putStrLn $ "frOrigin: " ++ show frOrigin
+--         return [sphereObj,boxObj]
+--       _ -> return []
+
+--     return $ objList ++ collisionObjs
+--   -- question: how will be the referred shaders loaded?
+--   --           general problem: should the gfx network contain all passes (every possible materials)?
+--   return $ GlTFInstance
+--     { gltfInstanceObject = concat objs
+--     , gltfInstanceBuffer = gpuGlTFBuffer
+--     , gltfInstanceFrames = gpuGlTFFrames
+--     , gltfInstanceModel  = gpuGlTFModel
+--     }
+
+-- addGlTF :: GLStorage -> GlTFModel -> GlTFSkin -> [String] -> IO GlTFInstance
+-- addGlTF r model skin unis = do
+--   gpuGlTF <- uploadGlTF model
+--   addGPUGlTF r gpuGlTF skin unis

@@ -1,0 +1,1859 @@
+main is not found
+------------ desugared source code
+identityLight :: Float
+identityLight = _lhs identityLight (_rhs (fromInt 1))
+
+data Entity :: Type where
+    Entity
+      :: Vec (fromInt 4) Float
+        -> Vec (fromInt 4) Float
+          -> Vec (fromInt 3) Float -> Vec (fromInt 4) Float -> Entity
+
+eAmbientLight
+  = _lhs
+    eAmbientLight
+    \(a :: _) -> case'Entity
+      (\(_ :: _) -> _)
+      (\(b :: _) (_ :: _) (_ :: _) (_ :: _) -> _rhs b)
+      a
+
+eDirectedLight
+  = _lhs
+    eDirectedLight
+    \(a :: _) -> case'Entity
+      (\(_ :: _) -> _)
+      (\(_ :: _) (b :: _) (_ :: _) (_ :: _) -> _rhs b)
+      a
+
+eLightDir
+  = _lhs
+    eLightDir
+    \(a :: _) -> case'Entity
+      (\(_ :: _) -> _)
+      (\(_ :: _) (_ :: _) (b :: _) (_ :: _) -> _rhs b)
+      a
+
+eShaderRGBA
+  = _lhs
+    eShaderRGBA
+    \(a :: _) -> case'Entity
+      (\(_ :: _) -> _)
+      (\(_ :: _) (_ :: _) (_ :: _) (b :: _) -> _rhs b)
+      a
+
+data WaveType :: Type where
+    WT_Sin :: WaveType
+    WT_Triangle :: WaveType
+    WT_Square :: WaveType
+    WT_Sawtooth :: WaveType
+    WT_InverseSawtooth :: WaveType
+    WT_Noise :: WaveType
+
+data Wave :: Type where
+    Wave :: WaveType -> Float -> Float -> Float -> Float -> Wave
+
+data Deform :: Type where
+    D_AutoSprite :: Deform
+    D_AutoSprite2 :: Deform
+    D_Bulge :: Float -> Float -> Float -> Deform
+    D_Move :: Vec (fromInt 3) Float -> Wave -> Deform
+    D_Normal :: Float -> Float -> Deform
+    D_ProjectionShadow :: Deform
+    D_Text0 :: Deform
+    D_Text1 :: Deform
+    D_Text2 :: Deform
+    D_Text3 :: Deform
+    D_Text4 :: Deform
+    D_Text5 :: Deform
+    D_Text6 :: Deform
+    D_Text7 :: Deform
+    D_Wave :: Float -> Wave -> Deform
+
+data CullType :: Type where
+    CT_FrontSided :: CullType
+    CT_BackSided :: CullType
+    CT_TwoSided :: CullType
+
+data Blending' :: Type where
+    B_DstAlpha :: Blending'
+    B_DstColor :: Blending'
+    B_One :: Blending'
+    B_OneMinusDstAlpha :: Blending'
+    B_OneMinusDstColor :: Blending'
+    B_OneMinusSrcAlpha :: Blending'
+    B_OneMinusSrcColor :: Blending'
+    B_SrcAlpha :: Blending'
+    B_SrcAlphaSaturate :: Blending'
+    B_SrcColor :: Blending'
+    B_Zero :: Blending'
+
+data RGBGen :: Type where
+    RGB_Wave :: Wave -> RGBGen
+    RGB_Const :: Float -> Float -> Float -> RGBGen
+    RGB_Identity :: RGBGen
+    RGB_IdentityLighting :: RGBGen
+    RGB_Entity :: RGBGen
+    RGB_OneMinusEntity :: RGBGen
+    RGB_ExactVertex :: RGBGen
+    RGB_Vertex :: RGBGen
+    RGB_LightingDiffuse :: RGBGen
+    RGB_OneMinusVertex :: RGBGen
+    RGB_Undefined :: RGBGen
+
+data AlphaGen :: Type where
+    A_Wave :: Wave -> AlphaGen
+    A_Const :: Float -> AlphaGen
+    A_Portal :: AlphaGen
+    A_Identity :: AlphaGen
+    A_Entity :: AlphaGen
+    A_OneMinusEntity :: AlphaGen
+    A_Vertex :: AlphaGen
+    A_LightingSpecular :: AlphaGen
+    A_OneMinusVertex :: AlphaGen
+
+data TCGen :: Type where
+    TG_Base :: TCGen
+    TG_Lightmap :: TCGen
+    TG_Environment :: TCGen
+    TG_Vector :: Vec (fromInt 3) Float -> Vec (fromInt 3) Float -> TCGen
+    TG_Undefined :: TCGen
+
+data TCMod :: Type where
+    TM_EntityTranslate :: TCMod
+    TM_Rotate :: Float -> TCMod
+    TM_Scroll :: Float -> Float -> TCMod
+    TM_Scale :: Float -> Float -> TCMod
+    TM_Stretch :: Wave -> TCMod
+    TM_Transform :: Float -> Float -> Float -> Float -> Float -> Float -> TCMod
+    TM_Turb :: Float -> Float -> Float -> Float -> TCMod
+
+data StageTexture :: Type where
+    ST_Map :: String -> StageTexture
+    ST_ClampMap :: String -> StageTexture
+    ST_AnimMap :: Float -> [String] -> StageTexture
+    ST_Lightmap :: StageTexture
+    ST_WhiteImage :: StageTexture
+
+data AlphaFunction :: Type where
+    A_Gt0 :: AlphaFunction
+    A_Lt128 :: AlphaFunction
+    A_Ge128 :: AlphaFunction
+
+data DepthFunction :: Type where
+    D_Equal :: DepthFunction
+    D_Lequal :: DepthFunction
+
+data StageAttrs :: Type where
+    StageAttrs
+      :: Maybe (Blending', Blending')
+        -> RGBGen
+          -> AlphaGen
+            -> TCGen
+              -> [TCMod]
+                -> StageTexture
+                  -> Bool -> DepthFunction -> Maybe AlphaFunction -> Bool -> String -> StageAttrs
+
+saBlend
+  = _lhs
+    saBlend
+    \(a :: _) -> case'StageAttrs
+      (\(_ :: _) -> _)
+      (\(b :: _)
+          (_ :: _)
+            (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+saRGBGen
+  = _lhs
+    saRGBGen
+    \(a :: _) -> case'StageAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (b :: _)
+            (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+saAlphaGen
+  = _lhs
+    saAlphaGen
+    \(a :: _) -> case'StageAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (b :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+saTCGen
+  = _lhs
+    saTCGen
+    \(a :: _) -> case'StageAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _) (b :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+saTCMod
+  = _lhs
+    saTCMod
+    \(a :: _) -> case'StageAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _) (_ :: _) (b :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+saTexture
+  = _lhs
+    saTexture
+    \(a :: _) -> case'StageAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _) (_ :: _) (_ :: _) (b :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+saDepthWrite
+  = _lhs
+    saDepthWrite
+    \(a :: _) -> case'StageAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _) (_ :: _) (_ :: _) (_ :: _) (b :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+saDepthFunc
+  = _lhs
+    saDepthFunc
+    \(a :: _) -> case'StageAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (b :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+saAlphaFunc
+  = _lhs
+    saAlphaFunc
+    \(a :: _) -> case'StageAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (b :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+saDepthMaskExplicit
+  = _lhs
+    saDepthMaskExplicit
+    \(a :: _) -> case'StageAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (b :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+saTextureUniform
+  = _lhs
+    saTextureUniform
+    \(a :: _) -> case'StageAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (b :: _)
+        -> _rhs b)
+      a
+
+defaultStageAttrs :: StageAttrs
+defaultStageAttrs
+  = _lhs
+    defaultStageAttrs
+    (_rhs
+      (StageAttrs
+        Nothing
+        RGB_Undefined
+        A_Identity
+        TG_Undefined
+        []
+        ST_WhiteImage
+        True
+        D_Lequal
+        Nothing
+        False
+        ""))
+
+data CommonAttrs :: Type where
+    CommonAttrs
+      :: ()
+        -> ()
+          -> Bool
+            -> Float
+              -> Bool
+                -> Bool
+                  -> CullType -> [Deform] -> Bool -> Bool -> [StageAttrs] -> Bool -> CommonAttrs
+
+caSkyParms
+  = _lhs
+    caSkyParms
+    \(a :: _) -> case'CommonAttrs
+      (\(_ :: _) -> _)
+      (\(b :: _)
+          (_ :: _)
+            (_ :: _)
+              (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+caFogParms
+  = _lhs
+    caFogParms
+    \(a :: _) -> case'CommonAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (b :: _)
+            (_ :: _)
+              (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+caPortal
+  = _lhs
+    caPortal
+    \(a :: _) -> case'CommonAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (b :: _)
+              (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+caSort
+  = _lhs
+    caSort
+    \(a :: _) -> case'CommonAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _)
+              (b :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+caEntityMergable
+  = _lhs
+    caEntityMergable
+    \(a :: _) -> case'CommonAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _)
+              (_ :: _) (b :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+caFogOnly
+  = _lhs
+    caFogOnly
+    \(a :: _) -> case'CommonAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _)
+              (_ :: _) (_ :: _) (b :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+caCull
+  = _lhs
+    caCull
+    \(a :: _) -> case'CommonAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _)
+              (_ :: _) (_ :: _) (_ :: _) (b :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+caDeformVertexes
+  = _lhs
+    caDeformVertexes
+    \(a :: _) -> case'CommonAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _)
+              (_ :: _) (_ :: _) (_ :: _) (_ :: _) (b :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+caNoMipMaps
+  = _lhs
+    caNoMipMaps
+    \(a :: _) -> case'CommonAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _)
+              (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (b :: _) (_ :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+caPolygonOffset
+  = _lhs
+    caPolygonOffset
+    \(a :: _) -> case'CommonAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _)
+              (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (b :: _) (_ :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+caStages
+  = _lhs
+    caStages
+    \(a :: _) -> case'CommonAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _)
+              (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (b :: _) (_ :: _)
+        -> _rhs b)
+      a
+
+caIsSky
+  = _lhs
+    caIsSky
+    \(a :: _) -> case'CommonAttrs
+      (\(_ :: _) -> _)
+      (\(_ :: _)
+          (_ :: _)
+            (_ :: _)
+              (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (_ :: _) (b :: _)
+        -> _rhs b)
+      a
+
+defaultCommonAttrs :: CommonAttrs
+defaultCommonAttrs
+  = _lhs
+    defaultCommonAttrs
+    (_rhs
+      (CommonAttrs
+        ()
+        ()
+        False
+        (fromInt 0)
+        False
+        False
+        CT_FrontSided
+        []
+        False
+        False
+        []
+        False))
+------------ core code
+'AlphaFunction :: Type
+'AlphaFunction
+  = <<type constructor with 0 indices; constructors: A_Gt0, A_Lt128, A_Ge128>>
+
+'AlphaGen :: Type
+'AlphaGen
+  = <<type constructor with 0 indices; constructors: A_Wave, A_Const, A_Portal, A_Identity, A_Entity, A_OneMinusEntity, A_Vertex, A_LightingSpecular, A_OneMinusVertex>>
+
+'Blending' :: Type
+'Blending'
+  = <<type constructor with 0 indices; constructors: B_DstAlpha, B_DstColor, B_One, B_OneMinusDstAlpha, B_OneMinusDstColor, B_OneMinusSrcAlpha, B_OneMinusSrcColor, B_SrcAlpha, B_SrcAlphaSaturate, B_SrcColor, B_Zero>>
+
+'CommonAttrs :: Type
+'CommonAttrs = <<type constructor with 0 indices; constructors: CommonAttrs>>
+
+'CullType :: Type
+'CullType
+  = <<type constructor with 0 indices; constructors: CT_FrontSided, CT_BackSided, CT_TwoSided>>
+
+'Deform :: Type
+'Deform
+  = <<type constructor with 0 indices; constructors: D_AutoSprite, D_AutoSprite2, D_Bulge, D_Move, D_Normal, D_ProjectionShadow, D_Text0, D_Text1, D_Text2, D_Text3, D_Text4, D_Text5, D_Text6, D_Text7, D_Wave>>
+
+'DepthFunction :: Type
+'DepthFunction
+  = <<type constructor with 0 indices; constructors: D_Equal, D_Lequal>>
+
+'Entity :: Type
+'Entity = <<type constructor with 0 indices; constructors: Entity>>
+
+'RGBGen :: Type
+'RGBGen
+  = <<type constructor with 0 indices; constructors: RGB_Wave, RGB_Const, RGB_Identity, RGB_IdentityLighting, RGB_Entity, RGB_OneMinusEntity, RGB_ExactVertex, RGB_Vertex, RGB_LightingDiffuse, RGB_OneMinusVertex, RGB_Undefined>>
+
+'StageAttrs :: Type
+'StageAttrs = <<type constructor with 0 indices; constructors: StageAttrs>>
+
+'StageTexture :: Type
+'StageTexture
+  = <<type constructor with 0 indices; constructors: ST_Map, ST_ClampMap, ST_AnimMap, ST_Lightmap, ST_WhiteImage>>
+
+'TCGen :: Type
+'TCGen
+  = <<type constructor with 0 indices; constructors: TG_Base, TG_Lightmap, TG_Environment, TG_Vector, TG_Undefined>>
+
+'TCMod :: Type
+'TCMod
+  = <<type constructor with 0 indices; constructors: TM_EntityTranslate, TM_Rotate, TM_Scroll, TM_Scale, TM_Stretch, TM_Transform, TM_Turb>>
+
+'Wave :: Type
+'Wave = <<type constructor with 0 indices; constructors: Wave>>
+
+'WaveType :: Type
+'WaveType
+  = <<type constructor with 0 indices; constructors: WT_Sin, WT_Triangle, WT_Square, WT_Sawtooth, WT_InverseSawtooth, WT_Noise>>
+
+A_Const :: Float -> AlphaGen
+A_Const = <<1st constructor of 'AlphaGen>>
+
+A_Entity :: AlphaGen
+A_Entity = <<4th constructor of 'AlphaGen>>
+
+A_Ge128 :: AlphaFunction
+A_Ge128 = <<2nd constructor of 'AlphaFunction>>
+
+A_Gt0 :: AlphaFunction
+A_Gt0 = <<0th constructor of 'AlphaFunction>>
+
+A_Identity :: AlphaGen
+A_Identity = <<3rd constructor of 'AlphaGen>>
+
+A_LightingSpecular :: AlphaGen
+A_LightingSpecular = <<7th constructor of 'AlphaGen>>
+
+A_Lt128 :: AlphaFunction
+A_Lt128 = <<1st constructor of 'AlphaFunction>>
+
+A_OneMinusEntity :: AlphaGen
+A_OneMinusEntity = <<5th constructor of 'AlphaGen>>
+
+A_OneMinusVertex :: AlphaGen
+A_OneMinusVertex = <<8th constructor of 'AlphaGen>>
+
+A_Portal :: AlphaGen
+A_Portal = <<2nd constructor of 'AlphaGen>>
+
+A_Vertex :: AlphaGen
+A_Vertex = <<6th constructor of 'AlphaGen>>
+
+A_Wave :: Wave -> AlphaGen
+A_Wave = <<0th constructor of 'AlphaGen>>
+
+B_DstAlpha :: Blending'
+B_DstAlpha = <<0th constructor of 'Blending'>>
+
+B_DstColor :: Blending'
+B_DstColor = <<1st constructor of 'Blending'>>
+
+B_One :: Blending'
+B_One = <<2nd constructor of 'Blending'>>
+
+B_OneMinusDstAlpha :: Blending'
+B_OneMinusDstAlpha = <<3rd constructor of 'Blending'>>
+
+B_OneMinusDstColor :: Blending'
+B_OneMinusDstColor = <<4th constructor of 'Blending'>>
+
+B_OneMinusSrcAlpha :: Blending'
+B_OneMinusSrcAlpha = <<5th constructor of 'Blending'>>
+
+B_OneMinusSrcColor :: Blending'
+B_OneMinusSrcColor = <<6th constructor of 'Blending'>>
+
+B_SrcAlpha :: Blending'
+B_SrcAlpha = <<7th constructor of 'Blending'>>
+
+B_SrcAlphaSaturate :: Blending'
+B_SrcAlphaSaturate = <<8th constructor of 'Blending'>>
+
+B_SrcColor :: Blending'
+B_SrcColor = <<9th constructor of 'Blending'>>
+
+B_Zero :: Blending'
+B_Zero = <<10th constructor of 'Blending'>>
+
+CT_BackSided :: CullType
+CT_BackSided = <<1st constructor of 'CullType>>
+
+CT_FrontSided :: CullType
+CT_FrontSided = <<0th constructor of 'CullType>>
+
+CT_TwoSided :: CullType
+CT_TwoSided = <<2nd constructor of 'CullType>>
+
+CommonAttrs
+  :: ()
+    -> ()
+      -> Bool
+        -> Float
+          -> Bool
+            -> Bool
+              -> CullType -> [Deform] -> Bool -> Bool -> [StageAttrs] -> Bool -> CommonAttrs
+CommonAttrs = <<0th constructor of 'CommonAttrs>>
+
+D_AutoSprite :: Deform
+D_AutoSprite = <<0th constructor of 'Deform>>
+
+D_AutoSprite2 :: Deform
+D_AutoSprite2 = <<1st constructor of 'Deform>>
+
+D_Bulge :: Float -> Float -> Float -> Deform
+D_Bulge = <<2nd constructor of 'Deform>>
+
+D_Equal :: DepthFunction
+D_Equal = <<0th constructor of 'DepthFunction>>
+
+D_Lequal :: DepthFunction
+D_Lequal = <<1st constructor of 'DepthFunction>>
+
+D_Move :: Vec 3 Float -> Wave -> Deform
+D_Move = <<3rd constructor of 'Deform>>
+
+D_Normal :: Float -> Float -> Deform
+D_Normal = <<4th constructor of 'Deform>>
+
+D_ProjectionShadow :: Deform
+D_ProjectionShadow = <<5th constructor of 'Deform>>
+
+D_Text0 :: Deform
+D_Text0 = <<6th constructor of 'Deform>>
+
+D_Text1 :: Deform
+D_Text1 = <<7th constructor of 'Deform>>
+
+D_Text2 :: Deform
+D_Text2 = <<8th constructor of 'Deform>>
+
+D_Text3 :: Deform
+D_Text3 = <<9th constructor of 'Deform>>
+
+D_Text4 :: Deform
+D_Text4 = <<10th constructor of 'Deform>>
+
+D_Text5 :: Deform
+D_Text5 = <<11th constructor of 'Deform>>
+
+D_Text6 :: Deform
+D_Text6 = <<12th constructor of 'Deform>>
+
+D_Text7 :: Deform
+D_Text7 = <<13th constructor of 'Deform>>
+
+D_Wave :: Float -> Wave -> Deform
+D_Wave = <<14th constructor of 'Deform>>
+
+Entity :: Vec 4 Float -> Vec 4 Float -> Vec 3 Float -> Vec 4 Float -> Entity
+Entity = <<0th constructor of 'Entity>>
+
+RGB_Const :: Float -> Float -> Float -> RGBGen
+RGB_Const = <<1st constructor of 'RGBGen>>
+
+RGB_Entity :: RGBGen
+RGB_Entity = <<4th constructor of 'RGBGen>>
+
+RGB_ExactVertex :: RGBGen
+RGB_ExactVertex = <<6th constructor of 'RGBGen>>
+
+RGB_Identity :: RGBGen
+RGB_Identity = <<2nd constructor of 'RGBGen>>
+
+RGB_IdentityLighting :: RGBGen
+RGB_IdentityLighting = <<3rd constructor of 'RGBGen>>
+
+RGB_LightingDiffuse :: RGBGen
+RGB_LightingDiffuse = <<8th constructor of 'RGBGen>>
+
+RGB_OneMinusEntity :: RGBGen
+RGB_OneMinusEntity = <<5th constructor of 'RGBGen>>
+
+RGB_OneMinusVertex :: RGBGen
+RGB_OneMinusVertex = <<9th constructor of 'RGBGen>>
+
+RGB_Undefined :: RGBGen
+RGB_Undefined = <<10th constructor of 'RGBGen>>
+
+RGB_Vertex :: RGBGen
+RGB_Vertex = <<7th constructor of 'RGBGen>>
+
+RGB_Wave :: Wave -> RGBGen
+RGB_Wave = <<0th constructor of 'RGBGen>>
+
+ST_AnimMap :: Float -> [String] -> StageTexture
+ST_AnimMap = <<2nd constructor of 'StageTexture>>
+
+ST_ClampMap :: String -> StageTexture
+ST_ClampMap = <<1st constructor of 'StageTexture>>
+
+ST_Lightmap :: StageTexture
+ST_Lightmap = <<3rd constructor of 'StageTexture>>
+
+ST_Map :: String -> StageTexture
+ST_Map = <<0th constructor of 'StageTexture>>
+
+ST_WhiteImage :: StageTexture
+ST_WhiteImage = <<4th constructor of 'StageTexture>>
+
+StageAttrs
+  :: Maybe (Blending', Blending')
+    -> RGBGen
+      -> AlphaGen
+        -> TCGen
+          -> [TCMod]
+            -> StageTexture
+              -> Bool -> DepthFunction -> Maybe AlphaFunction -> Bool -> String -> StageAttrs
+StageAttrs = <<0th constructor of 'StageAttrs>>
+
+TG_Base :: TCGen
+TG_Base = <<0th constructor of 'TCGen>>
+
+TG_Environment :: TCGen
+TG_Environment = <<2nd constructor of 'TCGen>>
+
+TG_Lightmap :: TCGen
+TG_Lightmap = <<1st constructor of 'TCGen>>
+
+TG_Undefined :: TCGen
+TG_Undefined = <<4th constructor of 'TCGen>>
+
+TG_Vector :: Vec 3 Float -> Vec 3 Float -> TCGen
+TG_Vector = <<3rd constructor of 'TCGen>>
+
+TM_EntityTranslate :: TCMod
+TM_EntityTranslate = <<0th constructor of 'TCMod>>
+
+TM_Rotate :: Float -> TCMod
+TM_Rotate = <<1st constructor of 'TCMod>>
+
+TM_Scale :: Float -> Float -> TCMod
+TM_Scale = <<3rd constructor of 'TCMod>>
+
+TM_Scroll :: Float -> Float -> TCMod
+TM_Scroll = <<2nd constructor of 'TCMod>>
+
+TM_Stretch :: Wave -> TCMod
+TM_Stretch = <<4th constructor of 'TCMod>>
+
+TM_Transform :: Float -> Float -> Float -> Float -> Float -> Float -> TCMod
+TM_Transform = <<5th constructor of 'TCMod>>
+
+TM_Turb :: Float -> Float -> Float -> Float -> TCMod
+TM_Turb = <<6th constructor of 'TCMod>>
+
+WT_InverseSawtooth :: WaveType
+WT_InverseSawtooth = <<4th constructor of 'WaveType>>
+
+WT_Noise :: WaveType
+WT_Noise = <<5th constructor of 'WaveType>>
+
+WT_Sawtooth :: WaveType
+WT_Sawtooth = <<3rd constructor of 'WaveType>>
+
+WT_Sin :: WaveType
+WT_Sin = <<0th constructor of 'WaveType>>
+
+WT_Square :: WaveType
+WT_Square = <<2nd constructor of 'WaveType>>
+
+WT_Triangle :: WaveType
+WT_Triangle = <<1st constructor of 'WaveType>>
+
+Wave :: WaveType -> Float -> Float -> Float -> Float -> Wave
+Wave = <<0th constructor of 'Wave>>
+
+caCull :: CommonAttrs -> CullType
+caCull
+  = \a -> case'CommonAttrs
+    (\_ -> 'CullType)
+    (\_ _ _ _ _ _ b _ _ _ _ _ -> _rhs b)
+    a
+
+caDeformVertexes :: CommonAttrs -> [Deform]
+caDeformVertexes
+  = \a -> case'CommonAttrs
+    (\_ -> ['Deform])
+    (\_ _ _ _ _ _ _ b _ _ _ _ -> _rhs b)
+    a
+
+caEntityMergable :: CommonAttrs -> Bool
+caEntityMergable
+  = \a -> case'CommonAttrs (\_ -> 'Bool) (\_ _ _ _ b _ _ _ _ _ _ _ -> _rhs b) a
+
+caFogOnly :: CommonAttrs -> Bool
+caFogOnly
+  = \a -> case'CommonAttrs (\_ -> 'Bool) (\_ _ _ _ _ b _ _ _ _ _ _ -> _rhs b) a
+
+caFogParms :: CommonAttrs -> ()
+caFogParms
+  = \a -> case'CommonAttrs (\_ -> ' ()) (\_ b _ _ _ _ _ _ _ _ _ _ -> _rhs b) a
+
+caIsSky :: CommonAttrs -> Bool
+caIsSky
+  = \a -> case'CommonAttrs (\_ -> 'Bool) (\_ _ _ _ _ _ _ _ _ _ _ b -> _rhs b) a
+
+caNoMipMaps :: CommonAttrs -> Bool
+caNoMipMaps
+  = \a -> case'CommonAttrs (\_ -> 'Bool) (\_ _ _ _ _ _ _ _ b _ _ _ -> _rhs b) a
+
+caPolygonOffset :: CommonAttrs -> Bool
+caPolygonOffset
+  = \a -> case'CommonAttrs (\_ -> 'Bool) (\_ _ _ _ _ _ _ _ _ b _ _ -> _rhs b) a
+
+caPortal :: CommonAttrs -> Bool
+caPortal
+  = \a -> case'CommonAttrs (\_ -> 'Bool) (\_ _ b _ _ _ _ _ _ _ _ _ -> _rhs b) a
+
+caSkyParms :: CommonAttrs -> ()
+caSkyParms
+  = \a -> case'CommonAttrs (\_ -> ' ()) (\b _ _ _ _ _ _ _ _ _ _ _ -> _rhs b) a
+
+caSort :: CommonAttrs -> Float
+caSort
+  = \a -> case'CommonAttrs (\_ -> 'Float) (\_ _ _ b _ _ _ _ _ _ _ _ -> _rhs b) a
+
+caStages :: CommonAttrs -> [StageAttrs]
+caStages
+  = \a -> case'CommonAttrs
+    (\_ -> ['StageAttrs])
+    (\_ _ _ _ _ _ _ _ _ _ b _ -> _rhs b)
+    a
+
+case'AlphaFunction
+  :: forall (a :: AlphaFunction -> Type)
+    -> a 'A_Gt0 -> a 'A_Lt128 -> a 'A_Ge128 -> forall (b :: AlphaFunction) -> a b
+case'AlphaFunction = \a b c d e -> <<case function of a type with 0 parameters>>
+
+case'AlphaGen
+  :: forall (a :: AlphaGen -> Type)
+    -> (forall (b :: Wave) -> a ('A_Wave b))
+      -> (forall (c :: Float) -> a ('A_Const c))
+        -> a 'A_Portal
+          -> a 'A_Identity
+            -> a 'A_Entity
+              -> a 'A_OneMinusEntity
+                -> a 'A_Vertex
+                  -> a 'A_LightingSpecular -> a 'A_OneMinusVertex -> forall (d :: AlphaGen) -> a d
+case'AlphaGen
+  = \a b c d e f g h i j k -> <<case function of a type with 0 parameters>>
+
+case'Blending'
+  :: forall (a :: Blending' -> Type)
+    -> a 'B_DstAlpha
+      -> a 'B_DstColor
+        -> a 'B_One
+          -> a 'B_OneMinusDstAlpha
+            -> a 'B_OneMinusDstColor
+              -> a 'B_OneMinusSrcAlpha
+                -> a 'B_OneMinusSrcColor
+                  -> a 'B_SrcAlpha
+                    -> a 'B_SrcAlphaSaturate
+                      -> a 'B_SrcColor -> a 'B_Zero -> forall (b :: Blending') -> a b
+case'Blending'
+  = \a b c d e f g h i j k l m -> <<case function of a type with 0 parameters>>
+
+case'CommonAttrs
+  :: forall (a :: CommonAttrs -> Type)
+    -> (forall (b :: ())
+          (c :: ())
+            (d :: Bool)
+              (e :: Float)
+                (f :: Bool)
+                  (g :: Bool)
+                    (h :: CullType)
+                      (i :: [Deform]) (j :: Bool) (k :: Bool) (l :: [StageAttrs]) (m :: Bool)
+        -> a ('CommonAttrs b c d e f g h i j k l m))
+      -> forall (n :: CommonAttrs) -> a n
+case'CommonAttrs = \a b c -> <<case function of a type with 0 parameters>>
+
+case'CullType
+  :: forall (a :: CullType -> Type)
+    -> a 'CT_FrontSided
+      -> a 'CT_BackSided -> a 'CT_TwoSided -> forall (b :: CullType) -> a b
+case'CullType = \a b c d e -> <<case function of a type with 0 parameters>>
+
+case'Deform
+  :: forall (a :: Deform -> Type)
+    -> a 'D_AutoSprite
+      -> a 'D_AutoSprite2
+        -> (forall (b :: Float) (c :: Float) (d :: Float) -> a ('D_Bulge b c d))
+          -> (forall (e :: Vec 3 Float) (f :: Wave) -> a ('D_Move e f))
+            -> (forall (g :: Float) (h :: Float) -> a ('D_Normal g h))
+              -> a 'D_ProjectionShadow
+                -> a 'D_Text0
+                  -> a 'D_Text1
+                    -> a 'D_Text2
+                      -> a 'D_Text3
+                        -> a 'D_Text4
+                          -> a 'D_Text5
+                            -> a 'D_Text6
+                              -> a 'D_Text7
+                                -> (forall (i :: Float) (j :: Wave) -> a ('D_Wave i j))
+                                  -> forall (k :: Deform) -> a k
+case'Deform
+  = \a b c d e f g h i j k l m n o p q
+    -> <<case function of a type with 0 parameters>>
+
+case'DepthFunction
+  :: forall (a :: DepthFunction -> Type)
+    -> a 'D_Equal -> a 'D_Lequal -> forall (b :: DepthFunction) -> a b
+case'DepthFunction = \a b c d -> <<case function of a type with 0 parameters>>
+
+case'Entity
+  :: forall (a :: Entity -> Type)
+    -> (forall (b :: Vec 4 Float)
+          (c :: Vec 4 Float) (d :: Vec 3 Float) (e :: Vec 4 Float)
+        -> a ('Entity b c d e))
+      -> forall (f :: Entity) -> a f
+case'Entity = \a b c -> <<case function of a type with 0 parameters>>
+
+case'RGBGen
+  :: forall (a :: RGBGen -> Type)
+    -> (forall (b :: Wave) -> a ('RGB_Wave b))
+      -> (forall (c :: Float) (d :: Float) (e :: Float) -> a ('RGB_Const c d e))
+        -> a 'RGB_Identity
+          -> a 'RGB_IdentityLighting
+            -> a 'RGB_Entity
+              -> a 'RGB_OneMinusEntity
+                -> a 'RGB_ExactVertex
+                  -> a 'RGB_Vertex
+                    -> a 'RGB_LightingDiffuse
+                      -> a 'RGB_OneMinusVertex -> a 'RGB_Undefined -> forall (f :: RGBGen) -> a f
+case'RGBGen
+  = \a b c d e f g h i j k l m -> <<case function of a type with 0 parameters>>
+
+case'StageAttrs
+  :: forall (a :: StageAttrs -> Type)
+    -> (forall (b :: Maybe (Blending', Blending'))
+          (c :: RGBGen)
+            (d :: AlphaGen)
+              (e :: TCGen)
+                (f :: [TCMod])
+                  (g :: StageTexture)
+                    (h :: Bool)
+                      (i :: DepthFunction) (j :: Maybe AlphaFunction) (k :: Bool) (l :: String)
+        -> a ('StageAttrs b c d e f g h i j k l))
+      -> forall (m :: StageAttrs) -> a m
+case'StageAttrs = \a b c -> <<case function of a type with 0 parameters>>
+
+case'StageTexture
+  :: forall (a :: StageTexture -> Type)
+    -> (forall (b :: String) -> a ('ST_Map b))
+      -> (forall (c :: String) -> a ('ST_ClampMap c))
+        -> (forall (d :: Float) (e :: [String]) -> a ('ST_AnimMap d e))
+          -> a 'ST_Lightmap -> a 'ST_WhiteImage -> forall (f :: StageTexture) -> a f
+case'StageTexture
+  = \a b c d e f g -> <<case function of a type with 0 parameters>>
+
+case'TCGen
+  :: forall (a :: TCGen -> Type)
+    -> a 'TG_Base
+      -> a 'TG_Lightmap
+        -> a 'TG_Environment
+          -> (forall (b :: Vec 3 Float) (c :: Vec 3 Float) -> a ('TG_Vector b c))
+            -> a 'TG_Undefined -> forall (d :: TCGen) -> a d
+case'TCGen = \a b c d e f g -> <<case function of a type with 0 parameters>>
+
+case'TCMod
+  :: forall (a :: TCMod -> Type)
+    -> a 'TM_EntityTranslate
+      -> (forall (b :: Float) -> a ('TM_Rotate b))
+        -> (forall (c :: Float) (d :: Float) -> a ('TM_Scroll c d))
+          -> (forall (e :: Float) (f :: Float) -> a ('TM_Scale e f))
+            -> (forall (g :: Wave) -> a ('TM_Stretch g))
+              -> (forall (h :: Float)
+                    (i :: Float) (j :: Float) (k :: Float) (l :: Float) (m :: Float)
+                  -> a ('TM_Transform h i j k l m))
+                -> (forall (n :: Float) (o :: Float) (p :: Float) (q :: Float)
+                    -> a ('TM_Turb n o p q))
+                  -> forall (r :: TCMod) -> a r
+case'TCMod = \a b c d e f g h i -> <<case function of a type with 0 parameters>>
+
+case'Wave
+  :: forall (a :: Wave -> Type)
+    -> (forall (b :: WaveType) (c :: Float) (d :: Float) (e :: Float) (f :: Float)
+        -> a ('Wave b c d e f))
+      -> forall (g :: Wave) -> a g
+case'Wave = \a b c -> <<case function of a type with 0 parameters>>
+
+case'WaveType
+  :: forall (a :: WaveType -> Type)
+    -> a 'WT_Sin
+      -> a 'WT_Triangle
+        -> a 'WT_Square
+          -> a 'WT_Sawtooth
+            -> a 'WT_InverseSawtooth -> a 'WT_Noise -> forall (b :: WaveType) -> a b
+case'WaveType
+  = \a b c d e f g h -> <<case function of a type with 0 parameters>>
+
+defaultCommonAttrs :: CommonAttrs
+defaultCommonAttrs
+  = _rhs
+    (CommonAttrs () () False 0.0 False False CT_FrontSided [] False False [] False)
+
+defaultStageAttrs :: StageAttrs
+defaultStageAttrs
+  = _rhs
+    (StageAttrs
+      Nothing
+      RGB_Undefined
+      A_Identity
+      TG_Undefined
+      []
+      ST_WhiteImage
+      True
+      D_Lequal
+      Nothing
+      False
+      "")
+
+eAmbientLight :: Entity -> VecS Float 4
+eAmbientLight = \a -> case'Entity (\_ -> 'VecS 'Float 4) (\b _ _ _ -> _rhs b) a
+
+eDirectedLight :: Entity -> VecS Float 4
+eDirectedLight = \a -> case'Entity (\_ -> 'VecS 'Float 4) (\_ b _ _ -> _rhs b) a
+
+eLightDir :: Entity -> VecS Float 3
+eLightDir = \a -> case'Entity (\_ -> 'VecS 'Float 3) (\_ _ b _ -> _rhs b) a
+
+eShaderRGBA :: Entity -> VecS Float 4
+eShaderRGBA = \a -> case'Entity (\_ -> 'VecS 'Float 4) (\_ _ _ b -> _rhs b) a
+
+identityLight :: Float
+identityLight = _rhs 1.0
+
+match'AlphaFunction
+  :: forall (a :: Type -> Type) -> a AlphaFunction -> forall b -> a b -> a b
+match'AlphaFunction = \a b c d -> <<type case function>>
+
+match'AlphaGen
+  :: forall (a :: Type -> Type) -> a AlphaGen -> forall b -> a b -> a b
+match'AlphaGen = \a b c d -> <<type case function>>
+
+match'Blending'
+  :: forall (a :: Type -> Type) -> a Blending' -> forall b -> a b -> a b
+match'Blending' = \a b c d -> <<type case function>>
+
+match'CommonAttrs
+  :: forall (a :: Type -> Type) -> a CommonAttrs -> forall b -> a b -> a b
+match'CommonAttrs = \a b c d -> <<type case function>>
+
+match'CullType
+  :: forall (a :: Type -> Type) -> a CullType -> forall b -> a b -> a b
+match'CullType = \a b c d -> <<type case function>>
+
+match'Deform :: forall (a :: Type -> Type) -> a Deform -> forall b -> a b -> a b
+match'Deform = \a b c d -> <<type case function>>
+
+match'DepthFunction
+  :: forall (a :: Type -> Type) -> a DepthFunction -> forall b -> a b -> a b
+match'DepthFunction = \a b c d -> <<type case function>>
+
+match'Entity :: forall (a :: Type -> Type) -> a Entity -> forall b -> a b -> a b
+match'Entity = \a b c d -> <<type case function>>
+
+match'RGBGen :: forall (a :: Type -> Type) -> a RGBGen -> forall b -> a b -> a b
+match'RGBGen = \a b c d -> <<type case function>>
+
+match'StageAttrs
+  :: forall (a :: Type -> Type) -> a StageAttrs -> forall b -> a b -> a b
+match'StageAttrs = \a b c d -> <<type case function>>
+
+match'StageTexture
+  :: forall (a :: Type -> Type) -> a StageTexture -> forall b -> a b -> a b
+match'StageTexture = \a b c d -> <<type case function>>
+
+match'TCGen :: forall (a :: Type -> Type) -> a TCGen -> forall b -> a b -> a b
+match'TCGen = \a b c d -> <<type case function>>
+
+match'TCMod :: forall (a :: Type -> Type) -> a TCMod -> forall b -> a b -> a b
+match'TCMod = \a b c d -> <<type case function>>
+
+match'Wave :: forall (a :: Type -> Type) -> a Wave -> forall b -> a b -> a b
+match'Wave = \a b c d -> <<type case function>>
+
+match'WaveType
+  :: forall (a :: Type -> Type) -> a WaveType -> forall b -> a b -> a b
+match'WaveType = \a b c d -> <<type case function>>
+
+saAlphaFunc :: StageAttrs -> Maybe AlphaFunction
+saAlphaFunc
+  = \a -> case'StageAttrs
+    (\_ -> 'Maybe 'AlphaFunction)
+    (\_ _ _ _ _ _ _ _ b _ _ -> _rhs b)
+    a
+
+saAlphaGen :: StageAttrs -> AlphaGen
+saAlphaGen
+  = \a -> case'StageAttrs (\_ -> 'AlphaGen) (\_ _ b _ _ _ _ _ _ _ _ -> _rhs b) a
+
+saBlend :: StageAttrs -> Maybe (Blending', Blending')
+saBlend
+  = \a -> case'StageAttrs
+    (\_ -> 'Maybe ' ('Blending', 'Blending'))
+    (\b _ _ _ _ _ _ _ _ _ _ -> _rhs b)
+    a
+
+saDepthFunc :: StageAttrs -> DepthFunction
+saDepthFunc
+  = \a -> case'StageAttrs
+    (\_ -> 'DepthFunction)
+    (\_ _ _ _ _ _ _ b _ _ _ -> _rhs b)
+    a
+
+saDepthMaskExplicit :: StageAttrs -> Bool
+saDepthMaskExplicit
+  = \a -> case'StageAttrs (\_ -> 'Bool) (\_ _ _ _ _ _ _ _ _ b _ -> _rhs b) a
+
+saDepthWrite :: StageAttrs -> Bool
+saDepthWrite
+  = \a -> case'StageAttrs (\_ -> 'Bool) (\_ _ _ _ _ _ b _ _ _ _ -> _rhs b) a
+
+saRGBGen :: StageAttrs -> RGBGen
+saRGBGen
+  = \a -> case'StageAttrs (\_ -> 'RGBGen) (\_ b _ _ _ _ _ _ _ _ _ -> _rhs b) a
+
+saTCGen :: StageAttrs -> TCGen
+saTCGen
+  = \a -> case'StageAttrs (\_ -> 'TCGen) (\_ _ _ b _ _ _ _ _ _ _ -> _rhs b) a
+
+saTCMod :: StageAttrs -> [TCMod]
+saTCMod
+  = \a -> case'StageAttrs (\_ -> ['TCMod]) (\_ _ _ _ b _ _ _ _ _ _ -> _rhs b) a
+
+saTexture :: StageAttrs -> StageTexture
+saTexture
+  = \a -> case'StageAttrs
+    (\_ -> 'StageTexture)
+    (\_ _ _ _ _ b _ _ _ _ _ -> _rhs b)
+    a
+
+saTextureUniform :: StageAttrs -> String
+saTextureUniform
+  = \a -> case'StageAttrs (\_ -> 'String) (\_ _ _ _ _ _ _ _ _ _ b -> _rhs b) a
+------------ tooltips
+7:18-7:23
+    Type
+8:1-8:14
+    Float
+8:17-8:18
+    _b
+10:6-10:12
+    Type | Type | Type | Type | Type | Type
+10:6-11:13
+    Type
+10:6-15:39
+    Type | Type | Type
+11:7-11:13
+    Vec 4 Float
+      -> Vec 4 Float
+        -> Vec 3 Float
+          -> Vec 4 Float -> Entity | Entity | Type | Type | Type | Type | Type
+12:7-12:20
+    Entity -> VecS Float 4
+12:28-12:31
+    Nat -> Type -> Type
+12:28-12:33
+    Type -> Type
+12:28-12:39
+    Type
+12:32-12:33
+    _b
+12:34-12:39
+    Type
+13:7-13:21
+    Entity -> VecS Float 4
+13:28-13:31
+    Nat -> Type -> Type
+13:28-13:33
+    Type -> Type
+13:28-13:39
+    Type
+13:32-13:33
+    _b
+13:34-13:39
+    Type
+14:7-14:16
+    Entity -> VecS Float 3
+14:28-14:31
+    Nat -> Type -> Type
+14:28-14:33
+    Type -> Type
+14:28-14:39
+    Type
+14:32-14:33
+    _b
+14:34-14:39
+    Type
+15:7-15:18
+    Entity -> VecS Float 4
+15:28-15:31
+    Nat -> Type -> Type
+15:28-15:33
+    Type -> Type
+15:28-15:39
+    Type
+15:32-15:33
+    _b
+15:34-15:39
+    Type
+18:6-18:14
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+18:6-24:15
+    Type | Type | Type | Type | Type | Type
+19:7-19:13
+    WaveType
+20:7-20:18
+    WaveType
+21:7-21:16
+    WaveType
+22:7-22:18
+    WaveType
+23:7-23:25
+    WaveType
+24:7-24:15
+    WaveType
+27:6-27:10
+    Type | Type | Type | Type | Type | Type
+27:6-27:17
+    Type
+27:6-27:50
+    Type | Type | Type | Type
+27:13-27:17
+    WaveType
+      -> Float
+        -> Float
+          -> Float -> Float -> Wave | Wave | Type | Type | Type | Type | Type | Type
+27:18-27:26
+    Type
+27:27-27:32
+    Type
+27:33-27:38
+    Type
+27:39-27:44
+    Type
+27:45-27:50
+    Type
+29:6-29:12
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+29:6-32:32
+    Type | Type
+29:6-33:32
+    Type
+29:6-34:27
+    Type
+29:6-44:13
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+29:6-44:24
+    Type
+30:7-30:19
+    Deform
+31:7-31:20
+    Deform
+32:7-32:14
+    Float -> Float -> Float -> Deform | Deform | Type | Type | Type | Type
+32:15-32:20
+    Type
+32:21-32:26
+    Type
+32:27-32:32
+    Type
+33:7-33:13
+    Vec 3 Float -> Wave -> Deform | Deform | Type | Type | Type
+33:15-33:18
+    Nat -> Type -> Type
+33:15-33:20
+    Type -> Type
+33:15-33:26
+    Type
+33:19-33:20
+    _b
+33:21-33:26
+    Type
+33:28-33:32
+    Type
+34:7-34:15
+    Float -> Float -> Deform | Deform | Type | Type | Type
+34:16-34:21
+    Type
+34:22-34:27
+    Type
+35:7-35:25
+    Deform
+36:7-36:14
+    Deform
+37:7-37:14
+    Deform
+38:7-38:14
+    Deform
+39:7-39:14
+    Deform
+40:7-40:14
+    Deform
+41:7-41:14
+    Deform
+42:7-42:14
+    Deform
+43:7-43:14
+    Deform
+44:7-44:13
+    Float -> Wave -> Deform | Deform | Type | Type | Type
+44:14-44:19
+    Type
+44:20-44:24
+    Type
+47:6-47:14
+    Type | Type | Type | Type | Type | Type | Type
+47:6-50:18
+    Type | Type | Type
+48:7-48:20
+    CullType
+49:7-49:19
+    CullType
+50:7-50:18
+    CullType
+53:6-53:15
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+53:6-64:13
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+54:7-54:17
+    Blending'
+55:7-55:17
+    Blending'
+56:7-56:12
+    Blending'
+57:7-57:25
+    Blending'
+58:7-58:25
+    Blending'
+59:7-59:25
+    Blending'
+60:7-60:25
+    Blending'
+61:7-61:17
+    Blending'
+62:7-62:25
+    Blending'
+63:7-63:17
+    Blending'
+64:7-64:13
+    Blending'
+67:6-67:12
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+67:6-69:34
+    Type | Type
+67:6-78:20
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+68:7-68:15
+    Wave -> RGBGen | RGBGen | Type | Type
+68:16-68:20
+    Type
+69:7-69:16
+    Float -> Float -> Float -> RGBGen | RGBGen | Type | Type | Type | Type
+69:17-69:22
+    Type
+69:23-69:28
+    Type
+69:29-69:34
+    Type
+70:7-70:19
+    RGBGen
+71:7-71:27
+    RGBGen
+72:7-72:17
+    RGBGen
+73:7-73:25
+    RGBGen
+74:7-74:22
+    RGBGen
+75:7-75:17
+    RGBGen
+76:7-76:26
+    RGBGen
+77:7-77:25
+    RGBGen
+78:7-78:20
+    RGBGen
+81:6-81:14
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+81:6-90:23
+    Type | Type | Type | Type | Type | Type | Type | Type | Type
+82:7-82:13
+    Wave -> AlphaGen | AlphaGen | Type | Type
+82:14-82:18
+    Type
+83:7-83:14
+    Float -> AlphaGen | AlphaGen | Type | Type
+83:15-83:20
+    Type
+84:7-84:15
+    AlphaGen
+85:7-85:17
+    AlphaGen
+86:7-86:15
+    AlphaGen
+87:7-87:23
+    AlphaGen
+88:7-88:15
+    AlphaGen
+89:7-89:25
+    AlphaGen
+90:7-90:23
+    AlphaGen
+93:6-93:11
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+93:6-97:44
+    Type
+93:6-98:19
+    Type | Type | Type | Type | Type
+94:7-94:14
+    TCGen
+95:7-95:18
+    TCGen
+96:7-96:21
+    TCGen
+97:7-97:16
+    Vec 3 Float -> Vec 3 Float -> TCGen | TCGen | Type | Type | Type
+97:18-97:21
+    Nat -> Type -> Type
+97:18-97:23
+    Type -> Type
+97:18-97:29
+    Type
+97:22-97:23
+    _b
+97:24-97:29
+    Type
+97:32-97:35
+    Nat -> Type -> Type
+97:32-97:37
+    Type -> Type
+97:32-97:43
+    Type
+97:36-97:37
+    _b
+97:38-97:43
+    Type
+98:7-98:19
+    TCGen
+101:6-101:11
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+101:6-104:28
+    Type
+101:6-105:27
+    Type
+101:6-107:55
+    Type | Type | Type | Type | Type
+101:6-108:14
+    Type | Type | Type | Type | Type | Type | Type
+101:6-108:38
+    Type | Type | Type
+102:7-102:25
+    TCMod
+103:7-103:16
+    Float -> TCMod | TCMod | Type | Type
+103:17-103:22
+    Type
+104:7-104:16
+    Float -> Float -> TCMod | TCMod | Type | Type | Type
+104:17-104:22
+    Type
+104:23-104:28
+    Type
+105:7-105:15
+    Float -> Float -> TCMod | TCMod | Type | Type | Type
+105:16-105:21
+    Type
+105:22-105:27
+    Type
+106:7-106:17
+    Wave -> TCMod | TCMod | Type | Type
+106:18-106:22
+    Type
+107:7-107:19
+    Float
+      -> Float
+        -> Float
+          -> Float
+            -> Float
+              -> Float -> TCMod | TCMod | Type | Type | Type | Type | Type | Type | Type
+107:20-107:25
+    Type
+107:26-107:31
+    Type
+107:32-107:37
+    Type
+107:38-107:43
+    Type
+107:44-107:49
+    Type
+107:50-107:55
+    Type
+108:7-108:14
+    Float
+      -> Float -> Float -> Float -> TCMod | TCMod | Type | Type | Type | Type | Type
+108:15-108:20
+    Type
+108:21-108:26
+    Type
+108:27-108:32
+    Type
+108:33-108:38
+    Type
+111:6-111:18
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+111:6-114:35
+    Type
+111:6-116:20
+    Type | Type | Type | Type | Type
+112:7-112:13
+    String -> StageTexture | StageTexture | Type | Type
+112:21-112:27
+    Type
+113:7-113:18
+    String -> StageTexture | StageTexture | Type | Type
+113:21-113:27
+    Type
+114:7-114:17
+    Float -> [String] -> StageTexture | StageTexture | Type | Type | Type
+114:21-114:26
+    Type
+114:27-114:35
+    Type
+114:28-114:34
+    Type
+115:7-115:18
+    StageTexture
+116:7-116:20
+    StageTexture
+119:6-119:19
+    Type | Type | Type | Type | Type | Type | Type
+119:6-122:14
+    Type | Type | Type
+120:7-120:12
+    AlphaFunction
+121:7-121:14
+    AlphaFunction
+122:7-122:14
+    AlphaFunction
+125:6-125:19
+    Type | Type | Type | Type | Type | Type
+125:6-127:15
+    Type | Type
+126:7-126:14
+    DepthFunction
+127:7-127:15
+    DepthFunction
+130:6-130:16
+    Type | Type | Type | Type | Type | Type
+130:6-131:17
+    Type
+130:6-144:34
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+131:7-131:17
+    Maybe (Blending', Blending')
+      -> RGBGen
+        -> AlphaGen
+          -> TCGen
+            -> [TCMod]
+              -> StageTexture
+                -> Bool
+                  -> DepthFunction
+                    -> Maybe AlphaFunction
+                      -> Bool
+                        -> String
+                          -> StageAttrs | StageAttrs | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+132:7-132:14
+    StageAttrs -> Maybe (Blending', Blending')
+132:25-132:30
+    Type -> Type
+132:25-132:53
+    Type
+132:31-132:53
+    Type
+132:32-132:41
+    Type
+132:32-132:52
+    [Type]
+132:43-132:52
+    Type | [Type]
+133:7-133:15
+    StageAttrs -> RGBGen
+133:24-133:30
+    Type
+134:7-134:17
+    StageAttrs -> AlphaGen
+134:24-134:32
+    Type
+135:7-135:14
+    StageAttrs -> TCGen
+135:24-135:29
+    Type
+136:7-136:14
+    StageAttrs -> [TCMod]
+136:24-136:31
+    Type
+136:25-136:30
+    Type
+137:7-137:16
+    StageAttrs -> StageTexture
+137:24-137:36
+    Type
+138:7-138:19
+    StageAttrs -> Bool
+138:24-138:28
+    Type
+139:7-139:18
+    StageAttrs -> DepthFunction
+139:24-139:37
+    Type
+140:7-140:18
+    StageAttrs -> Maybe AlphaFunction
+140:25-140:30
+    Type -> Type
+140:25-140:44
+    Type
+140:31-140:44
+    Type
+143:7-143:26
+    StageAttrs -> Bool
+143:32-143:36
+    Type
+144:7-144:23
+    StageAttrs -> String
+144:28-144:34
+    Type
+148:22-148:32
+    Type
+149:1-149:18
+    StageAttrs
+149:21-149:31
+    Maybe (Blending', Blending')
+      -> RGBGen
+        -> AlphaGen
+          -> TCGen
+            -> [TCMod]
+              -> StageTexture
+                -> Bool -> DepthFunction -> Maybe AlphaFunction -> Bool -> String -> StageAttrs
+149:21-150:30
+    RGBGen
+      -> AlphaGen
+        -> TCGen
+          -> [TCMod]
+            -> StageTexture
+              -> Bool -> DepthFunction -> Maybe AlphaFunction -> Bool -> String -> StageAttrs
+149:21-151:36
+    AlphaGen
+      -> TCGen
+        -> [TCMod]
+          -> StageTexture
+            -> Bool -> DepthFunction -> Maybe AlphaFunction -> Bool -> String -> StageAttrs
+149:21-152:33
+    TCGen
+      -> [TCMod]
+        -> StageTexture
+          -> Bool -> DepthFunction -> Maybe AlphaFunction -> Bool -> String -> StageAttrs
+149:21-153:35
+    [TCMod]
+      -> StageTexture
+        -> Bool -> DepthFunction -> Maybe AlphaFunction -> Bool -> String -> StageAttrs
+149:21-154:25
+    StageTexture
+      -> Bool -> DepthFunction -> Maybe AlphaFunction -> Bool -> String -> StageAttrs
+149:21-155:36
+    Bool -> DepthFunction -> Maybe AlphaFunction -> Bool -> String -> StageAttrs
+149:21-156:27
+    DepthFunction -> Maybe AlphaFunction -> Bool -> String -> StageAttrs
+149:21-157:31
+    Maybe AlphaFunction -> Bool -> String -> StageAttrs
+149:21-158:30
+    Bool -> String -> StageAttrs
+149:21-159:36
+    String -> StageAttrs
+149:21-161:6
+    StageAttrs
+150:23-150:30
+    forall a . Maybe a
+151:23-151:36
+    RGBGen
+152:23-152:33
+    AlphaGen
+153:23-153:35
+    TCGen
+154:23-154:25
+    forall a . [a]
+155:23-155:36
+    StageTexture
+156:23-156:27
+    Bool
+157:23-157:31
+    DepthFunction
+158:23-158:30
+    forall a . Maybe a
+159:31-159:36
+    Bool
+160:27-160:29
+    String
+163:6-163:17
+    Type | Type | Type | Type | Type | Type
+163:6-164:18
+    Type
+163:6-178:32
+    Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+164:7-164:18
+    ()
+      -> ()
+        -> Bool
+          -> Float
+            -> Bool
+              -> Bool
+                -> CullType
+                  -> [Deform]
+                    -> Bool
+                      -> Bool
+                        -> [StageAttrs]
+                          -> Bool
+                            -> CommonAttrs | CommonAttrs | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type | Type
+165:7-165:17
+    CommonAttrs -> ()
+165:28-165:30
+    Type
+166:7-166:17
+    CommonAttrs -> ()
+166:28-166:30
+    Type
+167:7-167:15
+    CommonAttrs -> Bool
+167:28-167:32
+    Type
+168:7-168:13
+    CommonAttrs -> Float
+168:28-168:33
+    Type
+169:7-169:23
+    CommonAttrs -> Bool
+169:28-169:32
+    Type
+170:7-170:16
+    CommonAttrs -> Bool
+170:28-170:32
+    Type
+171:7-171:13
+    CommonAttrs -> CullType
+171:28-171:36
+    Type
+172:7-172:23
+    CommonAttrs -> [Deform]
+172:28-172:36
+    Type
+172:29-172:35
+    Type
+173:7-173:18
+    CommonAttrs -> Bool
+173:28-173:32
+    Type
+174:7-174:22
+    CommonAttrs -> Bool
+174:28-174:32
+    Type
+175:7-175:15
+    CommonAttrs -> [StageAttrs]
+175:28-175:40
+    Type
+175:29-175:39
+    Type
+178:7-178:14
+    CommonAttrs -> Bool
+178:28-178:32
+    Type
+182:23-182:34
+    Type
+183:1-183:19
+    CommonAttrs
+183:22-183:33
+    ()
+      -> ()
+        -> Bool
+          -> Float
+            -> Bool
+              -> Bool
+                -> CullType -> [Deform] -> Bool -> Bool -> [StageAttrs] -> Bool -> CommonAttrs
+183:22-184:29
+    ()
+      -> Bool
+        -> Float
+          -> Bool
+            -> Bool
+              -> CullType -> [Deform] -> Bool -> Bool -> [StageAttrs] -> Bool -> CommonAttrs
+183:22-185:29
+    Bool
+      -> Float
+        -> Bool
+          -> Bool
+            -> CullType -> [Deform] -> Bool -> Bool -> [StageAttrs] -> Bool -> CommonAttrs
+183:22-186:32
+    Float
+      -> Bool
+        -> Bool
+          -> CullType -> [Deform] -> Bool -> Bool -> [StageAttrs] -> Bool -> CommonAttrs
+183:22-187:28
+    Bool
+      -> Bool
+        -> CullType -> [Deform] -> Bool -> Bool -> [StageAttrs] -> Bool -> CommonAttrs
+183:22-188:32
+    Bool
+      -> CullType -> [Deform] -> Bool -> Bool -> [StageAttrs] -> Bool -> CommonAttrs
+183:22-189:32
+    CullType -> [Deform] -> Bool -> Bool -> [StageAttrs] -> Bool -> CommonAttrs
+183:22-190:40
+    [Deform] -> Bool -> Bool -> [StageAttrs] -> Bool -> CommonAttrs
+183:22-191:29
+    Bool -> Bool -> [StageAttrs] -> Bool -> CommonAttrs
+183:22-192:32
+    Bool -> [StageAttrs] -> Bool -> CommonAttrs
+183:22-193:32
+    [StageAttrs] -> Bool -> CommonAttrs
+183:22-194:29
+    Bool -> CommonAttrs
+183:22-196:6
+    CommonAttrs
+184:27-184:29
+    ()
+185:27-185:29
+    ()
+186:27-186:32
+    Bool
+187:27-187:28
+    _b
+188:27-188:32
+    Bool
+189:27-189:32
+    Bool
+190:27-190:40
+    CullType
+191:27-191:29
+    forall a . [a]
+192:27-192:32
+    Bool
+193:27-193:32
+    Bool
+194:27-194:29
+    forall a . [a]
+195:27-195:32
+    Bool

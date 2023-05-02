@@ -1,0 +1,24 @@
+Pipeline
+  { info = ""
+  , backend = OpenGL33
+  , textures = []
+  , samplers = []
+  , targets =
+      [ RenderTarget
+          { renderTargets =
+              [ TargetItem
+                  { targetSemantic = Color , targetRef = Just (Framebuffer Color) }
+              ]
+          }
+      ]
+  , programs = []
+  , slots = []
+  , streams = []
+  , commands =
+      [ SetRenderTarget 0
+      , ClearRenderTarget
+          [ ClearImage
+              { imageSemantic = Color , clearValue = VV4F (V4 0.0 1.0 0.0 1.0) }
+          ]
+      ]
+  }

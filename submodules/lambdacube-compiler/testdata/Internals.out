@@ -1,0 +1,1395 @@
+main is not found
+------------ desugared source code
+typeAnn = _lhs typeAnn \(a :: _) -> _rhs a
+
+parens = _lhs parens \(a :: _) -> _rhs a
+
+undefined :: forall a . a
+
+primFix :: forall a . (a -> a) -> a
+
+data Unit :: Type where
+    TT :: Unit
+
+data String :: Type where
+    
+
+data Empty (_ :: String) :: Type where
+    
+
+unsafeCoerce :: forall (a :: _) (b :: _) . a -> b
+
+data Constraint :: Type where
+    CUnit :: Constraint
+    CEmpty :: String -> Constraint
+
+'CW :: Constraint -> Type
+
+'EqCT :: forall a -> a -> a -> Constraint
+
+parEval :: forall (a :: _) -> a -> a -> a
+
+'T2 :: Constraint -> Constraint -> Constraint
+
+match'Type :: forall (a :: Type -> Type) -> a Type -> forall b -> a b -> a b
+
+'EqCTt = _lhs 'EqCTt (_rhs ('EqCT (_ :: _)))
+
+t2C :: Unit -> Unit -> Unit
+
+data Int :: Type where
+    
+
+data Word :: Type where
+    
+
+data Float :: Type where
+    
+
+data Char :: Type where
+    
+
+data Bool :: Type where
+    False :: Bool
+    True :: Bool
+
+data Ordering :: Type where
+    LT :: Ordering
+    EQ :: Ordering
+    GT :: Ordering
+
+data Nat :: Type where
+    Zero :: Nat
+    Succ :: Nat -> Nat
+
+primIntToWord :: Int -> Word
+
+primIntToFloat :: Int -> Float
+
+primIntToNat :: Int -> Nat
+
+primCompareInt :: Int -> Int -> Ordering
+
+primCompareWord :: Word -> Word -> Ordering
+
+primCompareFloat :: Float -> Float -> Ordering
+
+primCompareChar :: Char -> Char -> Ordering
+
+primCompareString :: String -> String -> Ordering
+
+primNegateInt :: Int -> Int
+
+primNegateWord :: Word -> Word
+
+primNegateFloat :: Float -> Float
+
+primAddInt :: Int -> Int -> Int
+
+primSubInt :: Int -> Int -> Int
+
+primModInt :: Int -> Int -> Int
+
+primSqrtFloat :: Float -> Float
+
+primRound :: Float -> Int
+
+primIfThenElse :: forall (a :: _) . Bool -> a -> a -> a
+primIfThenElse
+  = _lhs
+    primIfThenElse
+    \(a :: _) (b :: _) (c :: _) -> case'Bool (\(_ :: _) -> _) (_rhs c) (_rhs b) a
+
+isEQ
+  = _lhs
+    isEQ
+    \(a :: _) -> case'Ordering
+      (\(_ :: _) -> _)
+      (_rhs False)
+      (_rhs True)
+      (_rhs False)
+      a
+
+'Num :: Type -> Constraint
+'Num
+  = _lhs
+    'Num
+    \(a :: _) -> match'Int
+      (\(_ :: _) -> _)
+      (_rhs CUnit)
+      a
+      (match'Word
+        (\(_ :: _) -> _)
+        (_rhs CUnit)
+        a
+        (match'Float
+          (\(_ :: _) -> _)
+          (_rhs CUnit)
+          a
+          (match'Nat
+            (\(_ :: _) -> _)
+            (_rhs CUnit)
+            a
+            (_rhs (CEmpty "no instance of 'Num on ???")))))
+
+fromInt :: forall a . Num a => Int -> a
+fromInt
+  = _lhs
+    fromInt
+    \ @a @(_ :: _) -> match'Int
+      (\(_ :: _) -> _)
+      (_rhs let b = _lhs fromInt (_rhs \(c :: _) -> c) in b)
+      a
+      (match'Word
+        (\(_ :: _) -> _)
+        (_rhs let d = _lhs fromInt (_rhs primIntToWord) in d)
+        a
+        (match'Float
+          (\(_ :: _) -> _)
+          (_rhs let e = _lhs fromInt (_rhs primIntToFloat) in e)
+          a
+          (match'Nat
+            (\(_ :: _) -> _)
+            (_rhs let f = _lhs fromInt (_rhs primIntToNat) in f)
+            a
+            (_rhs undefined))))
+
+compare :: forall a . Num a => a -> a -> Ordering
+compare
+  = _lhs
+    compare
+    \ @a @(_ :: _) -> match'Int
+      (\(_ :: _) -> _)
+      (_rhs let b = _lhs compare (_rhs primCompareInt) in b)
+      a
+      (match'Word
+        (\(_ :: _) -> _)
+        (_rhs let c = _lhs compare (_rhs primCompareWord) in c)
+        a
+        (match'Float
+          (\(_ :: _) -> _)
+          (_rhs let d = _lhs compare (_rhs primCompareFloat) in d)
+          a
+          (match'Nat
+            (\(_ :: _) -> _)
+            (_rhs let e = _lhs compare (_rhs undefined) in e)
+            a
+            (_rhs undefined))))
+
+negate :: forall a . Num a => a -> a
+negate
+  = _lhs
+    negate
+    \ @a @(_ :: _) -> match'Int
+      (\(_ :: _) -> _)
+      (_rhs let b = _lhs negate (_rhs primNegateInt) in b)
+      a
+      (match'Word
+        (\(_ :: _) -> _)
+        (_rhs let c = _lhs negate (_rhs primNegateWord) in c)
+        a
+        (match'Float
+          (\(_ :: _) -> _)
+          (_rhs let d = _lhs negate (_rhs primNegateFloat) in d)
+          a
+          (match'Nat
+            (\(_ :: _) -> _)
+            (_rhs let e = _lhs negate (_rhs undefined) in e)
+            a
+            (_rhs undefined))))
+
+'Eq :: Type -> Constraint
+'Eq
+  = _lhs
+    'Eq
+    \(a :: _) -> match'String
+      (\(_ :: _) -> _)
+      (_rhs CUnit)
+      a
+      (match'Char
+        (\(_ :: _) -> _)
+        (_rhs CUnit)
+        a
+        (match'Int
+          (\(_ :: _) -> _)
+          (_rhs CUnit)
+          a
+          (match'Float
+            (\(_ :: _) -> _)
+            (_rhs CUnit)
+            a
+            (match'Bool
+              (\(_ :: _) -> _)
+              (_rhs CUnit)
+              a
+              (match'Nat
+                (\(_ :: _) -> _)
+                (_rhs CUnit)
+                a
+                (_rhs (CEmpty "no instance of 'Eq on ???")))))))
+
+(==) :: forall a . Eq a => a -> a -> Bool
+(==)
+  = primFix
+    \(a :: _) -> _lhs
+      (==)
+      \ @b @(_ :: _) -> match'String
+        (\(_ :: _) -> _)
+        (_rhs
+          let
+            c = _lhs (==) \(d :: _) (e :: _) -> _rhs (isEQ (primCompareString d e))
+            in c)
+        b
+        (match'Char
+          (\(_ :: _) -> _)
+          (_rhs
+            let f = _lhs (==) \(g :: _) (h :: _) -> _rhs (isEQ (primCompareChar g h)) in f)
+          b
+          (match'Int
+            (\(_ :: _) -> _)
+            (_rhs
+              let i = _lhs (==) \(j :: _) (k :: _) -> _rhs (isEQ (primCompareInt j k)) in i)
+            b
+            (match'Float
+              (\(_ :: _) -> _)
+              (_rhs
+                let l = _lhs (==) \(m :: _) (n :: _) -> _rhs (isEQ (primCompareFloat m n)) in l)
+              b
+              (match'Bool
+                (\(_ :: _) -> _)
+                (_rhs
+                  let
+                    o
+                      = _lhs
+                        (==)
+                        \(p :: _) (q :: _) -> case'Bool
+                          (\(_ :: _) -> _)
+                          (case'Bool (\(_ :: _) -> _) (_rhs True) (_rhs False) q)
+                          (case'Bool (\(_ :: _) -> _) (_rhs False) (_rhs True) q)
+                          p
+                    in o)
+                b
+                (match'Nat
+                  (\(_ :: _) -> _)
+                  (_rhs
+                    let
+                      r
+                        = _lhs
+                          (==)
+                          \(s :: _) (t :: _) -> case'Nat
+                            (\(_ :: _) -> _)
+                            (case'Nat (\(_ :: _) -> _) (_rhs True) (\(_ :: _) -> _rhs False) t)
+                            (\(u :: _) -> case'Nat
+                              (\(_ :: _) -> _)
+                              (_rhs False)
+                              (\(v :: _) -> _rhs (a u v))
+                              t)
+                            s
+                      in r)
+                  b
+                  (_rhs undefined))))))
+
+infix 4 ==
+
+data List (_ :: Type) :: Type where
+    [] :: forall a . [a]
+    (:) :: forall b . b -> [b] -> [b]
+
+infixr 5 :
+
+data HList :: [Type] -> Type where
+    () :: ()
+    HCons :: forall (a :: _) (b :: _) . a -> HList b -> HList (a : b)
+
+hlistNilCase :: forall (a :: _) -> a -> HList Nil -> a
+
+hlistConsCase
+  :: forall a (b :: [Type])
+    . forall (c :: _) -> (a -> HList b -> c) -> HList (a : b) -> c
+------------ core code
+'Bool :: Type
+'Bool = <<type constructor with 0 indices; constructors: False, True>>
+
+'CW :: Constraint -> Type
+'CW = \a -> <<delta function with arity 1>>
+
+'Char :: Type
+'Char = <<type constructor with 0 indices; constructors: >>
+
+'Constraint :: Type
+'Constraint = <<type constructor with 0 indices; constructors: CUnit, CEmpty>>
+
+'Empty :: String -> Type
+'Empty = <<type constructor with 0 indices; constructors: >>
+
+'Eq :: Type -> Constraint
+'Eq
+  = \a -> match'String
+    (\_ -> 'Constraint)
+    (_rhs CUnit)
+    a
+    (match'Char
+      (\_ -> 'Constraint)
+      (_rhs CUnit)
+      a
+      (match'Int
+        (\_ -> 'Constraint)
+        (_rhs CUnit)
+        a
+        (match'Float
+          (\_ -> 'Constraint)
+          (_rhs CUnit)
+          a
+          (match'Bool
+            (\_ -> 'Constraint)
+            (_rhs CUnit)
+            a
+            (match'Nat
+              (\_ -> 'Constraint)
+              (_rhs CUnit)
+              a
+              (_rhs (CEmpty "no instance of 'Eq on ???")))))))
+
+'EqCT :: forall a -> a -> a -> Constraint
+'EqCT = \a b c -> b ~ (c :: a)
+
+'EqCTt :: forall a . a -> a -> Constraint
+'EqCTt = \a -> _rhs \b c -> b ~ (c :: a)
+
+'Float :: Type
+'Float = <<type constructor with 0 indices; constructors: >>
+
+'HList :: [Type] -> Type
+'HList = <<type constructor with 1 indices; constructors: HNil, HCons>>
+
+'Int :: Type
+'Int = <<type constructor with 0 indices; constructors: >>
+
+'List :: Type -> Type
+'List = <<type constructor with 0 indices; constructors: Nil, :>>
+
+'Nat :: Type
+'Nat = <<type constructor with 0 indices; constructors: Zero, Succ>>
+
+'Num :: Type -> Constraint
+'Num
+  = \a -> match'Int
+    (\_ -> 'Constraint)
+    (_rhs CUnit)
+    a
+    (match'Word
+      (\_ -> 'Constraint)
+      (_rhs CUnit)
+      a
+      (match'Float
+        (\_ -> 'Constraint)
+        (_rhs CUnit)
+        a
+        (match'Nat
+          (\_ -> 'Constraint)
+          (_rhs CUnit)
+          a
+          (_rhs (CEmpty "no instance of 'Num on ???")))))
+
+'Ordering :: Type
+'Ordering = <<type constructor with 0 indices; constructors: LT, EQ, GT>>
+
+'String :: Type
+'String = <<type constructor with 0 indices; constructors: >>
+
+'T2 :: Constraint -> Constraint -> Constraint
+'T2 = \a b -> <<delta function with arity 2>>
+
+'Unit :: Type
+'Unit = <<type constructor with 0 indices; constructors: TT>>
+
+'Word :: Type
+'Word = <<type constructor with 0 indices; constructors: >>
+
+: :: forall a . a -> [a] -> [a]
+: = <<1st constructor of 'List>>
+
+== :: forall a . Eq a => a -> a -> Bool
+==
+  = primFix
+    _
+    \a b _ -> match'String
+      (\c -> c -> c -> 'Bool)
+      (_rhs (==))
+      b
+      (match'Char
+        (\d -> d -> d -> 'Bool)
+        (_rhs (==))
+        b
+        (match'Int
+          (\e -> e -> e -> 'Bool)
+          (_rhs (==))
+          b
+          (match'Float
+            (\f -> f -> f -> 'Bool)
+            (_rhs (==))
+            b
+            (match'Bool
+              (\g -> g -> g -> 'Bool)
+              (_rhs (==))
+              b
+              (match'Nat
+                (\h -> h -> h -> 'Bool)
+                (_rhs (==))
+                b
+                (_rhs (undefined (b -> b -> 'Bool))))))))
+
+CEmpty :: String -> Constraint
+CEmpty = <<1st constructor of 'Constraint>>
+
+CUnit :: Constraint
+CUnit = <<0th constructor of 'Constraint>>
+
+EQ :: Ordering
+EQ = <<1st constructor of 'Ordering>>
+
+False :: Bool
+False = <<0th constructor of 'Bool>>
+
+GT :: Ordering
+GT = <<2nd constructor of 'Ordering>>
+
+HCons :: forall a (b :: [Type]) . a -> HList b -> HList (a : b)
+HCons = <<1st constructor of 'HList>>
+
+() :: ()
+() = <<0th constructor of 'HList>>
+
+LT :: Ordering
+LT = <<0th constructor of 'Ordering>>
+
+[] :: forall a . [a]
+[] = <<0th constructor of 'List>>
+
+Succ :: Nat -> Nat
+Succ = <<1st constructor of 'Nat>>
+
+TT :: Unit
+TT = <<0th constructor of 'Unit>>
+
+True :: Bool
+True = <<1st constructor of 'Bool>>
+
+Zero :: Nat
+Zero = 0
+
+case'Bool
+  :: forall (a :: Bool -> Type)
+    -> a 'False -> a 'True -> forall (b :: Bool) -> a b
+case'Bool = \a b c d -> <<case function of a type with 0 parameters>>
+
+case'Char :: forall (a :: Char -> Type) (b :: Char) -> a b
+case'Char = \a b -> <<case function of a type with 0 parameters>>
+
+case'Constraint
+  :: forall (a :: Constraint -> Type)
+    -> a 'CUnit
+      -> (forall (b :: String) -> a ('CEmpty b)) -> forall (c :: Constraint) -> a c
+case'Constraint = \a b c d -> <<case function of a type with 0 parameters>>
+
+case'Empty
+  :: forall (a :: String) . forall (b :: Empty a -> Type) (c :: Empty a) -> b c
+case'Empty = \_ a b -> <<case function of a type with 1 parameters>>
+
+case'Float :: forall (a :: Float -> Type) (b :: Float) -> a b
+case'Float = \a b -> <<case function of a type with 0 parameters>>
+
+case'HList
+  :: forall (a :: forall (b :: [Type]) -> HList b -> Type)
+    -> a ' [] ' ()
+      -> (forall c (d :: [Type])
+          . forall (e :: c) (f :: HList d) -> a (c : d) ('HCons e f))
+        -> forall (g :: [Type]) . forall (h :: HList g) -> a g h
+case'HList = \a b c d e -> <<case function of a type with 0 parameters>>
+
+case'Int :: forall (a :: Int -> Type) (b :: Int) -> a b
+case'Int = \a b -> <<case function of a type with 0 parameters>>
+
+case'List
+  :: forall a
+    . forall (b :: [a] -> Type)
+      -> b ' []
+        -> (forall (c :: a) (d :: [a]) -> b (c : d)) -> forall (e :: [a]) -> b e
+case'List = \_ a b c d -> <<case function of a type with 1 parameters>>
+
+case'Nat
+  :: forall (a :: Nat -> Type)
+    -> a 0 -> (forall (b :: Nat) -> a ('Succ b)) -> forall (c :: Nat) -> a c
+case'Nat = \a b c d -> <<case function of a type with 0 parameters>>
+
+case'Ordering
+  :: forall (a :: Ordering -> Type)
+    -> a 'LT -> a 'EQ -> a 'GT -> forall (b :: Ordering) -> a b
+case'Ordering = \a b c d e -> <<case function of a type with 0 parameters>>
+
+case'String :: forall (a :: String -> Type) (b :: String) -> a b
+case'String = \a b -> <<case function of a type with 0 parameters>>
+
+case'Unit :: forall (a :: Unit -> Type) -> a 'TT -> forall (b :: Unit) -> a b
+case'Unit = \a b c -> <<case function of a type with 0 parameters>>
+
+case'Word :: forall (a :: Word -> Type) (b :: Word) -> a b
+case'Word = \a b -> <<case function of a type with 0 parameters>>
+
+compare :: forall a . Num a => a -> a -> Ordering
+compare
+  = \a _ -> match'Int
+    (\b -> b -> b -> 'Ordering)
+    (_rhs \c d -> primCompareInt c d)
+    a
+    (match'Word
+      (\e -> e -> e -> 'Ordering)
+      (_rhs \f g -> primCompareWord f g)
+      a
+      (match'Float
+        (\h -> h -> h -> 'Ordering)
+        (_rhs \i j -> primCompareFloat i j)
+        a
+        (match'Nat
+          (\k -> k -> k -> 'Ordering)
+          (_rhs (undefined ('Nat -> 'Nat -> 'Ordering)))
+          a
+          (_rhs (undefined (a -> a -> 'Ordering))))))
+
+fromInt :: forall a . Num a => Int -> a
+fromInt
+  = \a _ -> match'Int
+    (\b -> 'Int -> b)
+    (_rhs \c -> c)
+    a
+    (match'Word
+      (\d -> 'Int -> d)
+      (_rhs \e -> primIntToWord e)
+      a
+      (match'Float
+        (\f -> 'Int -> f)
+        (_rhs \g -> primIntToFloat g)
+        a
+        (match'Nat
+          (\h -> 'Int -> h)
+          (_rhs \i -> primIntToNat i)
+          a
+          (_rhs (undefined ('Int -> a))))))
+
+hlistConsCase
+  :: forall a (b :: [Type])
+    . forall c -> (a -> HList b -> c) -> HList (a : b) -> c
+hlistConsCase = \a b c d e -> <<delta function with arity 5>>
+
+hlistNilCase :: forall a -> a -> () -> a
+hlistNilCase = \a b c -> <<delta function with arity 3>>
+
+isEQ :: Ordering -> Bool
+isEQ = \a -> case'Ordering (\_ -> 'Bool) (_rhs False) (_rhs True) (_rhs False) a
+
+match'Bool :: forall (a :: Type -> Type) -> a Bool -> forall b -> a b -> a b
+match'Bool = \a b c d -> <<type case function>>
+
+match'Char :: forall (a :: Type -> Type) -> a Char -> forall b -> a b -> a b
+match'Char = \a b c d -> <<type case function>>
+
+match'Constraint
+  :: forall (a :: Type -> Type) -> a Constraint -> forall b -> a b -> a b
+match'Constraint = \a b c d -> <<type case function>>
+
+match'Empty
+  :: forall (a :: Type -> Type)
+    -> (forall (b :: String) -> a (Empty b)) -> forall c -> a c -> a c
+match'Empty = \a b c d -> <<type case function>>
+
+match'Float :: forall (a :: Type -> Type) -> a Float -> forall b -> a b -> a b
+match'Float = \a b c d -> <<type case function>>
+
+match'HList
+  :: forall (a :: Type -> Type)
+    -> (forall (b :: [Type]) -> a (HList b)) -> forall c -> a c -> a c
+match'HList = \a b c d -> <<type case function>>
+
+match'Int :: forall (a :: Type -> Type) -> a Int -> forall b -> a b -> a b
+match'Int = \a b c d -> <<type case function>>
+
+match'List
+  :: forall (a :: Type -> Type) -> (forall b -> a [b]) -> forall c -> a c -> a c
+match'List = \a b c d -> <<type case function>>
+
+match'Nat :: forall (a :: Type -> Type) -> a Nat -> forall b -> a b -> a b
+match'Nat = \a b c d -> <<type case function>>
+
+match'Ordering
+  :: forall (a :: Type -> Type) -> a Ordering -> forall b -> a b -> a b
+match'Ordering = \a b c d -> <<type case function>>
+
+match'String :: forall (a :: Type -> Type) -> a String -> forall b -> a b -> a b
+match'String = \a b c d -> <<type case function>>
+
+match'Type :: forall (a :: Type -> Type) -> a Type -> forall b -> a b -> a b
+match'Type = \a b c d -> <<builtin>>
+
+match'Unit :: forall (a :: Type -> Type) -> a Unit -> forall b -> a b -> a b
+match'Unit = \a b c d -> <<type case function>>
+
+match'Word :: forall (a :: Type -> Type) -> a Word -> forall b -> a b -> a b
+match'Word = \a b c d -> <<type case function>>
+
+negate :: forall a . Num a => a -> a
+negate
+  = \a _ -> match'Int
+    (\b -> b -> b)
+    (_rhs \c -> primNegateInt c)
+    a
+    (match'Word
+      (\d -> d -> d)
+      (_rhs \e -> primNegateWord e)
+      a
+      (match'Float
+        (\f -> f -> f)
+        (_rhs \g -> primNegateFloat g)
+        a
+        (match'Nat
+          (\h -> h -> h)
+          (_rhs (undefined ('Nat -> 'Nat)))
+          a
+          (_rhs (undefined (a -> a))))))
+
+parEval :: forall a -> a -> a -> a
+parEval = \a b c -> <<delta function with arity 3>>
+
+parens :: forall a . a -> a
+parens = \a b -> _rhs b
+
+primAddInt :: Int -> Int -> Int
+primAddInt = \a b -> <<delta function with arity 2>>
+
+primCompareChar :: Char -> Char -> Ordering
+primCompareChar = \a b -> <<delta function with arity 2>>
+
+primCompareFloat :: Float -> Float -> Ordering
+primCompareFloat = \a b -> <<delta function with arity 2>>
+
+primCompareInt :: Int -> Int -> Ordering
+primCompareInt = \a b -> <<delta function with arity 2>>
+
+primCompareString :: String -> String -> Ordering
+primCompareString = \a b -> <<delta function with arity 2>>
+
+primCompareWord :: Word -> Word -> Ordering
+primCompareWord = \a b -> <<builtin>>
+
+primFix :: forall a . (a -> a) -> a
+primFix = \a b -> primFix _ b
+
+primIfThenElse :: forall a . Bool -> a -> a -> a
+primIfThenElse = \a b c d -> case'Bool (\_ -> a) (_rhs d) (_rhs c) b
+
+primIntToFloat :: Int -> Float
+primIntToFloat = \a -> <<delta function with arity 1>>
+
+primIntToNat :: Int -> Nat
+primIntToNat = \a -> <<delta function with arity 1>>
+
+primIntToWord :: Int -> Word
+primIntToWord = \a -> <<builtin>>
+
+primModInt :: Int -> Int -> Int
+primModInt = \a b -> <<delta function with arity 2>>
+
+primNegateFloat :: Float -> Float
+primNegateFloat = \a -> <<builtin>>
+
+primNegateInt :: Int -> Int
+primNegateInt = \a -> <<builtin>>
+
+primNegateWord :: Word -> Word
+primNegateWord = \a -> <<builtin>>
+
+primRound :: Float -> Int
+primRound = \a -> <<delta function with arity 1>>
+
+primSqrtFloat :: Float -> Float
+primSqrtFloat = \a -> <<delta function with arity 1>>
+
+primSubInt :: Int -> Int -> Int
+primSubInt = \a b -> <<delta function with arity 2>>
+
+t2C :: Unit -> Unit -> Unit
+t2C = \a b -> <<delta function with arity 2>>
+
+typeAnn :: forall a . a -> a
+typeAnn = \a b -> _rhs b
+
+undefined :: forall a . a
+undefined = \a -> <<builtin>>
+
+unsafeCoerce :: forall a b . a -> b
+unsafeCoerce = \a b c -> <<delta function with arity 3>>
+------------ tooltips
+6:1-6:8
+    forall a . a -> a
+6:13-6:14
+    _b
+9:1-9:7
+    forall a . a -> a
+9:12-9:13
+    _b
+11:1-11:10
+    forall a . a
+11:27-11:31
+    Type
+11:35-11:36
+    Type | Type
+13:1-13:8
+    forall a . (a -> a) -> a
+13:25-13:29
+    Type
+13:33-13:46
+    Type
+13:34-13:35
+    Type
+13:39-13:40
+    Type | Type
+13:45-13:46
+    Type | Type
+15:6-15:10
+    Type | Type | Type | Type | Type
+15:6-15:15
+    Type
+15:13-15:15
+    Unit
+16:6-16:12
+    Type | Type | Type | Type
+17:6-17:11
+    String -> Type | String -> Type | String -> Type | Type | Type
+17:18-17:24
+    Type | Type
+19:1-19:13
+    forall a b . a -> b
+19:30-19:31
+    _d
+19:30-19:36
+    Type | Type
+19:35-19:36
+    _c | Type
+21:6-21:16
+    Type | Type | Type | Type
+21:6-23:11
+    Type | Type
+22:5-22:10
+    Constraint
+22:14-22:24
+    Type
+23:5-23:11
+    String -> Constraint | Constraint | Type | Type
+23:15-23:21
+    Type
+23:25-23:35
+    Type | Type
+25:13-25:15
+    Constraint -> Type
+25:22-25:32
+    Type
+31:13-31:17
+    forall a -> a -> a -> Constraint
+31:24-31:28
+    Type
+31:36-31:37
+    Type
+31:36-31:61
+    Type
+31:45-31:46
+    Type
+31:45-31:61
+    Type
+31:51-31:61
+    Type | Type
+40:1-40:8
+    forall a -> a -> a -> a
+40:24-40:25
+    _b
+40:24-40:35
+    Type
+40:29-40:30
+    Type
+40:29-40:35
+    Type
+40:34-40:35
+    Type | Type
+43:13-43:15
+    Constraint -> Constraint -> Constraint
+43:22-43:32
+    Type
+43:40-43:50
+    Type
+43:40-43:65
+    Type
+43:55-43:65
+    Type | Type
+50:1-50:11
+    forall (a :: Type -> Type) -> a Type -> forall b -> a b -> a b
+50:28-50:32
+    Type
+50:36-50:40
+    Type | Type
+50:45-50:46
+    Type -> Type
+50:45-50:51
+    Type
+50:45-50:87
+    Type
+50:47-50:51
+    Type
+50:55-50:87
+    Type
+50:68-50:72
+    Type
+50:77-50:78
+    Type -> Type
+50:77-50:80
+    Type
+50:77-50:87
+    Type
+50:79-50:80
+    Type
+50:84-50:85
+    Type -> Type
+50:84-50:87
+    Type | Type
+50:86-50:87
+    Type
+52:6-52:11
+    forall a . a -> a -> Constraint
+52:14-52:18
+    forall a -> a -> a -> Constraint
+52:14-52:20
+    _a -> _a -> Constraint
+55:1-55:4
+    Unit -> Unit -> Unit
+55:8-55:12
+    Type
+55:16-55:20
+    Type
+55:16-55:28
+    Type
+55:24-55:28
+    Type | Type
+58:6-58:9
+    Type | Type | Type | Type
+59:6-59:10
+    Type | Type | Type | Type
+60:6-60:11
+    Type | Type | Type | Type
+61:6-61:10
+    Type | Type | Type | Type
+63:6-63:10
+    Type | Type | Type | Type | Type | Type
+63:6-63:25
+    Type | Type
+63:13-63:18
+    Bool
+63:21-63:25
+    Bool
+65:6-65:14
+    Type | Type | Type | Type | Type | Type | Type
+65:6-65:29
+    Type | Type | Type
+65:17-65:19
+    Ordering
+65:22-65:24
+    Ordering
+65:27-65:29
+    Ordering
+67:6-67:9
+    Type | Type | Type | Type | Type | Type | Type
+67:6-67:23
+    Type | Type
+67:12-67:16
+    Nat
+67:19-67:23
+    Nat -> Nat | Nat | Type | Type
+67:24-67:27
+    Type
+70:1-70:14
+    Int -> Word
+70:24-70:27
+    Type
+70:33-70:37
+    Type | Type
+71:1-71:15
+    Int -> Float
+71:24-71:27
+    Type
+71:33-71:38
+    Type | Type
+72:1-72:13
+    Int -> Nat
+72:24-72:27
+    Type
+72:33-72:36
+    Type | Type
+73:1-73:15
+    Int -> Int -> Ordering
+73:24-73:27
+    Type
+73:33-73:36
+    Type
+73:33-73:50
+    Type
+73:42-73:50
+    Type | Type
+74:1-74:16
+    Word -> Word -> Ordering
+74:24-74:28
+    Type
+74:33-74:37
+    Type
+74:33-74:50
+    Type
+74:42-74:50
+    Type | Type
+75:1-75:17
+    Float -> Float -> Ordering
+75:24-75:29
+    Type
+75:33-75:38
+    Type
+75:33-75:50
+    Type
+75:42-75:50
+    Type | Type
+76:1-76:16
+    Char -> Char -> Ordering
+76:24-76:28
+    Type
+76:33-76:37
+    Type
+76:33-76:50
+    Type
+76:42-76:50
+    Type | Type
+77:1-77:18
+    String -> String -> Ordering
+77:24-77:30
+    Type
+77:34-77:40
+    Type
+77:34-77:52
+    Type
+77:44-77:52
+    Type | Type
+78:1-78:14
+    Int -> Int
+78:24-78:27
+    Type
+78:33-78:36
+    Type | Type
+79:1-79:15
+    Word -> Word
+79:24-79:28
+    Type
+79:33-79:37
+    Type | Type
+80:1-80:16
+    Float -> Float
+80:24-80:29
+    Type
+80:33-80:38
+    Type | Type
+81:1-81:11
+    Int -> Int -> Int
+81:24-81:27
+    Type
+81:33-81:36
+    Type
+81:33-81:45
+    Type
+81:42-81:45
+    Type | Type
+82:1-82:11
+    Int -> Int -> Int
+82:24-82:27
+    Type
+82:33-82:36
+    Type
+82:33-82:45
+    Type
+82:42-82:45
+    Type | Type
+83:1-83:11
+    Int -> Int -> Int
+83:24-83:27
+    Type
+83:33-83:36
+    Type
+83:33-83:45
+    Type
+83:42-83:45
+    Type | Type
+84:1-84:14
+    Float -> Float
+84:24-84:29
+    Type
+84:33-84:38
+    Type | Type
+85:1-85:10
+    Float -> Int
+85:24-85:29
+    Type
+85:33-85:36
+    Type | Type
+88:19-88:23
+    Type
+88:19-88:38
+    Type
+88:27-88:28
+    _c
+88:27-88:38
+    Type
+88:32-88:33
+    Type
+88:32-88:38
+    Type
+88:37-88:38
+    Type | Type
+89:1-89:15
+    forall a . Bool -> a -> a -> a
+89:28-89:29
+    _d
+89:28-90:29
+    Bool -> _d | _d
+90:28-90:29
+    _e
+92:1-92:5
+    Ordering -> Bool
+92:11-92:15
+    Bool
+92:11-93:15
+    Bool -> Ordering -> Bool
+93:10-93:15
+    Bool | Bool
+96:7-96:10
+    Type -> Constraint | Type -> Constraint | Constraint | Type
+      -> Constraint | Constraint | Type -> Constraint | Constraint
+96:7-97:22
+    Type
+96:7-98:32
+    Type
+96:7-99:19
+    Type
+97:3-97:10
+    forall a . Num a => Int -> a
+97:14-97:17
+    Type
+97:14-97:22
+    Type
+97:21-97:22
+    Type | Type
+98:3-98:10
+    forall a . Num a => a -> a -> Ordering
+98:14-98:15
+    Type
+98:14-98:32
+    Type
+98:19-98:20
+    Type
+98:19-98:32
+    Type
+98:24-98:32
+    Type | Type
+99:3-99:9
+    forall a . Num a => a -> a
+99:13-99:14
+    Type
+99:13-99:19
+    Type
+99:18-99:19
+    Type | Type
+102:13-114:25
+    Int -> _b
+102:19-102:20
+    _b
+103:13-103:27
+    Int -> Int -> Ordering
+103:13-115:22
+    _b -> _b -> Ordering
+104:13-104:26
+    Int -> Int
+104:13-116:22
+    _b -> _b
+106:13-106:26
+    Int -> Word
+106:13-114:25
+    Int -> _b
+107:13-107:28
+    Word -> Word -> Ordering
+107:13-115:22
+    _b -> _b -> Ordering
+108:13-108:27
+    Word -> Word
+108:13-116:22
+    _b -> _b
+110:13-110:27
+    Int -> Float
+110:13-114:25
+    Int -> _b
+111:13-111:29
+    Float -> Float -> Ordering
+111:13-115:22
+    _b -> _b -> Ordering
+112:13-112:28
+    Float -> Float
+112:13-116:22
+    _b -> _b
+114:13-114:25
+    Int -> Nat
+115:13-115:22
+    forall a . a
+116:13-116:22
+    forall a . a
+118:7-118:9
+    Type -> Constraint | Type -> Constraint | Constraint
+118:7-119:27
+    Type
+119:6-119:8
+    forall a . Eq a => a -> a -> Bool
+119:13-119:14
+    Type
+119:13-119:27
+    Type
+119:18-119:19
+    Type
+119:18-119:27
+    Type
+119:23-119:27
+    Type | Type
+123:35-123:39
+    Ordering -> Bool
+123:35-123:63
+    Bool
+123:35-134:29
+    _b -> _b -> Bool
+123:41-123:58
+    String -> String -> Ordering
+123:41-123:60
+    String -> Ordering
+123:41-123:62
+    Ordering
+123:59-123:60
+    _d
+123:61-123:62
+    _b
+124:33-124:37
+    Ordering -> Bool
+124:33-124:59
+    Bool
+124:33-134:29
+    _b -> _b -> Bool
+124:39-124:54
+    Char -> Char -> Ordering
+124:39-124:56
+    Char -> Ordering
+124:39-124:58
+    Ordering
+124:55-124:56
+    _d
+124:57-124:58
+    _b
+125:32-125:36
+    Ordering -> Bool
+125:32-125:57
+    Bool
+125:32-134:29
+    _b -> _b -> Bool
+125:38-125:52
+    Int -> Int -> Ordering
+125:38-125:54
+    Int -> Ordering
+125:38-125:56
+    Ordering
+125:53-125:54
+    _d
+125:55-125:56
+    _b
+126:34-126:38
+    Ordering -> Bool
+126:34-126:61
+    Bool
+126:34-134:29
+    _b -> _b -> Bool
+126:40-126:56
+    Float -> Float -> Ordering
+126:40-126:58
+    Float -> Ordering
+126:40-126:60
+    Ordering
+126:57-126:58
+    _d
+126:59-126:60
+    _b
+128:20-128:24
+    Bool
+128:20-130:19
+    Bool -> Bool | Bool
+128:20-134:29
+    _b -> _b -> Bool
+129:22-129:26
+    Bool
+129:22-130:19
+    Bool -> Bool | Bool
+130:14-130:19
+    Bool | Bool
+132:24-132:28
+    Bool
+132:24-134:29
+    Nat -> Bool
+133:24-133:25
+    Nat
+133:24-133:28
+    Nat -> Bool
+133:24-133:30
+    Bool
+133:24-134:29
+    Nat -> Bool
+133:26-133:28
+    forall a . Eq a => a -> a -> Bool
+133:29-133:30
+    Nat
+134:24-134:29
+    Bool | Bool
+136:6-136:10
+    Type -> Type | Type -> Type | Type -> Type | Type -> Type | Type -> Type | Type
+136:6-136:12
+    Type | Type | Type | Type
+136:6-136:23
+    Type | Type | Type
+136:6-136:35
+    Type | Type
+136:11-136:12
+    Type | Type
+136:15-136:18
+    forall a . [a] | [_b]
+136:22-136:23
+    forall a . a -> [a] -> [a] | [_e] | Type | Type | Type
+136:25-136:26
+    Type
+136:28-136:32
+    Type -> Type
+136:28-136:34
+    Type
+136:33-136:34
+    Type
+140:6-140:11
+    [Type] -> Type | [Type] -> Type | Type | [Type] -> Type | Type | Type
+140:6-142:45
+    Type | Type
+140:15-140:21
+    Type
+140:16-140:20
+    Type
+140:25-140:29
+    Type | Type
+141:5-141:9
+    ()
+141:5-141:22
+    Type
+141:13-141:18
+    [Type] -> Type
+141:13-141:22
+    Type
+141:19-141:22
+    forall a . [a] | forall a . [a]
+142:5-142:10
+    forall a (b :: [Type]) . a -> HList b -> HList (a : b) | HList (_d : _c)
+142:5-142:45
+    Type | Type | Type | Type | Type
+142:14-142:15
+    _d
+142:14-142:45
+    Type | Type
+142:19-142:24
+    [Type] -> Type
+142:19-142:27
+    Type
+142:19-142:45
+    Type
+142:25-142:27
+    _c
+142:31-142:36
+    [Type] -> Type
+142:31-142:45
+    Type | Type
+142:39-142:40
+    Type | Type
+142:39-142:41
+    [Type] -> [Type] | [Type] -> [Type]
+142:39-142:44
+    [Type] | [Type]
+142:40-142:41
+    forall a . a -> [a] -> [a] | forall a . a -> [a] -> [a]
+142:42-142:44
+    [Type] | [Type]
+144:1-144:13
+    forall a -> a -> () -> a
+144:29-144:30
+    _b
+144:29-144:48
+    Type
+144:34-144:39
+    [Type] -> Type
+144:34-144:43
+    Type
+144:34-144:48
+    Type
+144:40-144:43
+    forall a . [a]
+144:47-144:48
+    Type | Type
+145:1-145:14
+    forall a (b :: [Type]) . forall c -> (a -> HList b -> c) -> HList (a : b) -> c
+146:21-146:25
+    Type
+146:33-146:37
+    Type -> Type
+146:33-146:42
+    Type
+146:33-150:9
+    Type
+146:38-146:42
+    Type
+147:8-150:9
+    Type
+148:8-150:9
+    Type
+148:9-148:10
+    Type
+148:14-148:19
+    [Type] -> Type
+148:14-148:21
+    Type
+148:14-148:26
+    Type
+148:20-148:21
+    [Type]
+148:25-148:26
+    _d | Type
+149:8-149:13
+    [Type] -> Type
+149:8-149:20
+    Type
+149:8-150:9
+    Type
+149:15-149:16
+    Type
+149:15-149:17
+    [Type] -> [Type]
+149:15-149:19
+    [Type]
+149:16-149:17
+    forall a . a -> [a] -> [a]
+149:18-149:19
+    [Type]
+150:8-150:9
+    Type | Type

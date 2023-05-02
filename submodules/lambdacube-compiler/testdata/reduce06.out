@@ -1,0 +1,33 @@
+main :: Bool
+main = True
+------------ desugared source code
+constf = _lhs constf (_rhs \(a :: _) (_ :: _) -> a)
+
+main = _lhs main (_rhs ((\(a :: _) -> constf a False) True))
+------------ core code
+constf :: forall a b . a -> b -> a
+constf = \a b -> _rhs \c _ -> c
+
+main :: Bool
+main = _rhs True
+------------ tooltips
+1:1-1:7
+    forall a b . a -> b -> a
+1:18-1:19
+    _d
+3:1-3:5
+    Bool
+3:8-3:35
+    Bool
+3:15-3:21
+    forall a b . a -> b -> a
+3:15-3:23
+    _a -> _c
+3:15-3:29
+    _b
+3:22-3:23
+    _d
+3:24-3:29
+    Bool
+3:31-3:35
+    Bool

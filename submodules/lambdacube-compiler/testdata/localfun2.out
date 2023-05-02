@@ -1,0 +1,90 @@
+main is not found
+------------ desugared source code
+split
+  = primFix
+    \(a :: _) -> _lhs
+      split
+      \(b :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs ([], []))
+        (\(c :: _) (d :: _) -> _rhs
+          let
+            e = a d;
+            f
+              = (\(h :: _) -> hlistConsCase
+                  _
+                  (\(_ :: _) (i :: _) -> hlistConsCase
+                    _
+                    (\(j :: _) (k :: _) -> hlistNilCase _ j k)
+                    i)
+                  h)
+                e;
+            g
+              = (\(l :: _) -> hlistConsCase
+                  _
+                  (\(m :: _) (n :: _) -> hlistConsCase
+                    _
+                    (\(_ :: _) (o :: _) -> hlistNilCase _ m o)
+                    n)
+                  l)
+                e
+            in (c : f, g))
+        b
+------------ core code
+split :: forall a . [a] -> ([a], [a])
+split
+  = \a -> primFix
+    _
+    \b c -> case'List
+      (\_ -> ' ([a], [a]))
+      (_rhs ([], []))
+      (\d e -> _rhs
+        (d
+          : hlistConsCase
+            [a]
+            [[a]]
+            [a]
+            (\_ f -> hlistConsCase [a] [] [a] (\g h -> hlistNilCase [a] g h) f)
+            (b e)
+        , hlistConsCase
+          [a]
+          [[a]]
+          [a]
+          (\i j -> hlistConsCase [a] [] [a] (\_ k -> hlistNilCase [a] i k) j)
+          (b e)))
+      c
+------------ tooltips
+4:1-4:6
+    forall a . [a] -> ([a], [a])
+4:12-4:20
+    ([_b], [_a])
+4:12-5:55
+    [_b] -> ([_b], [_a])
+4:13-4:15
+    forall a . [a]
+4:17-4:19
+    forall a . [a] | (([_a]))
+5:17-5:28
+    ([_i], _c)
+5:18-5:19
+    _m
+5:18-5:20
+    [_l] -> [_l]
+5:18-5:23
+    [_j]
+5:19-5:20
+    forall a . a -> [a] -> [a]
+5:21-5:23
+    _d
+5:25-5:27
+    _f | ((_c))
+5:37-5:39
+    _k | _h | _d
+5:37-5:43
+    _d | (_e, _d)
+5:41-5:43
+    _f | _c | _c
+5:47-5:52
+    _i
+5:53-5:55
+    [_h]

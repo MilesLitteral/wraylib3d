@@ -1,0 +1,624 @@
+Pipeline
+  { info = ""
+  , backend = OpenGL33
+  , textures = []
+  , samplers = []
+  , targets =
+      [ RenderTarget
+          { renderTargets =
+              [ TargetItem
+                  { targetSemantic = Depth , targetRef = Just (Framebuffer Depth) }
+              , TargetItem
+                  { targetSemantic = Color , targetRef = Just (Framebuffer Color) }
+              ]
+          }
+      ]
+  , programs =
+      [ Program
+          { programUniforms =
+              fromList [ ( "MVP" , M44F ) , ( "Time" , Float ) ]
+          , programStreams =
+              fromList
+                [ ( "vi1" , Parameter { name = "position4" , ty = V4F } ) ]
+          , programInTextures = fromList []
+          , programOutput = [ Parameter { name = "f0" , ty = V4F } ]
+          , vertexShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              uniform mat4 MVP;
+              uniform float Time;
+              in vec4 vi1;
+              smooth out vec4 vo1;
+              mat4 rotMatrixX(float z0) {
+                  return mat4 (vec4 (1.0,0.0,0.0,0.0)
+                              ,vec4 (0.0,cos (z0),sin (z0),0.0)
+                              ,vec4 (0.0,(0.0) - (sin (z0)),cos (z0),0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              mat4 rotMatrixZ(float z0) {
+                  return mat4 (vec4 (cos (z0),sin (z0),0.0,0.0)
+                              ,vec4 ((0.0) - (sin (z0)),cos (z0),0.0,0.0)
+                              ,vec4 (0.0,0.0,1.0,0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              vec4 scale(float z0,vec4 z1) {
+                  return (z1) * (vec4 (z0,z0,z0,1.0));
+              }
+              vec4 trMat_Float_4_4(mat4 z0,vec4 z1) {
+                  return (z0) * (z1);
+              }
+              vec4 trX(float z0,vec4 z1) {
+                  return (vec4 (z0,0.0,0.0,0.0)) + (z1);
+              }
+              void main() {
+                  gl_Position = trMat_Float_4_4 (rotMatrixZ ((Time) * (2.0))
+                                                ,(MVP) * (trX ((1.0) + ((sin (Time)) * (0.1))
+                                                              ,scale (4.0e-2,trMat_Float_4_4 (rotMatrixX (((Time) * (2.0)) * (2.0)),vi1)))));
+                  vo1 = vi1;
+              }
+              """
+          , geometryShader = Nothing
+          , fragmentShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              smooth in vec4 vo1;
+              out vec4 f0;
+              void main() {
+                  f0 = vo1;
+              }
+              """
+          }
+      , Program
+          { programUniforms =
+              fromList [ ( "MVP" , M44F ) , ( "Time" , Float ) ]
+          , programStreams =
+              fromList
+                [ ( "vi1" , Parameter { name = "position4" , ty = V4F } ) ]
+          , programInTextures = fromList []
+          , programOutput = [ Parameter { name = "f0" , ty = V4F } ]
+          , vertexShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              uniform mat4 MVP;
+              uniform float Time;
+              in vec4 vi1;
+              smooth out vec4 vo1;
+              mat4 rotMatrixX(float z0) {
+                  return mat4 (vec4 (1.0,0.0,0.0,0.0)
+                              ,vec4 (0.0,cos (z0),sin (z0),0.0)
+                              ,vec4 (0.0,(0.0) - (sin (z0)),cos (z0),0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              mat4 rotMatrixZ(float z0) {
+                  return mat4 (vec4 (cos (z0),sin (z0),0.0,0.0)
+                              ,vec4 ((0.0) - (sin (z0)),cos (z0),0.0,0.0)
+                              ,vec4 (0.0,0.0,1.0,0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              vec4 scale(float z0,vec4 z1) {
+                  return (z1) * (vec4 (z0,z0,z0,1.0));
+              }
+              vec4 trMat_Float_4_4(mat4 z0,vec4 z1) {
+                  return (z0) * (z1);
+              }
+              vec4 trX(float z0,vec4 z1) {
+                  return (vec4 (z0,0.0,0.0,0.0)) + (z1);
+              }
+              void main() {
+                  gl_Position = trMat_Float_4_4 (rotMatrixZ ((Time) * (1.0))
+                                                ,(MVP) * (trX ((0.5) + ((sin (Time)) * (0.1))
+                                                              ,scale (4.0e-2,trMat_Float_4_4 (rotMatrixX (((Time) * (2.0)) * (1.0)),vi1)))));
+                  vo1 = vi1;
+              }
+              """
+          , geometryShader = Nothing
+          , fragmentShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              smooth in vec4 vo1;
+              out vec4 f0;
+              void main() {
+                  f0 = vo1;
+              }
+              """
+          }
+      , Program
+          { programUniforms =
+              fromList [ ( "MVP" , M44F ) , ( "Time" , Float ) ]
+          , programStreams =
+              fromList
+                [ ( "vi1" , Parameter { name = "position4" , ty = V4F } ) ]
+          , programInTextures = fromList []
+          , programOutput = [ Parameter { name = "f0" , ty = V4F } ]
+          , vertexShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              uniform mat4 MVP;
+              uniform float Time;
+              in vec4 vi1;
+              smooth out vec4 vo1;
+              mat4 rotMatrixX(float z0) {
+                  return mat4 (vec4 (1.0,0.0,0.0,0.0)
+                              ,vec4 (0.0,cos (z0),sin (z0),0.0)
+                              ,vec4 (0.0,(0.0) - (sin (z0)),cos (z0),0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              mat4 rotMatrixZ(float z0) {
+                  return mat4 (vec4 (cos (z0),sin (z0),0.0,0.0)
+                              ,vec4 ((0.0) - (sin (z0)),cos (z0),0.0,0.0)
+                              ,vec4 (0.0,0.0,1.0,0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              vec4 scale(float z0,vec4 z1) {
+                  return (z1) * (vec4 (z0,z0,z0,1.0));
+              }
+              vec4 trMat_Float_4_4(mat4 z0,vec4 z1) {
+                  return (z0) * (z1);
+              }
+              vec4 trX(float z0,vec4 z1) {
+                  return (vec4 (z0,0.0,0.0,0.0)) + (z1);
+              }
+              void main() {
+                  gl_Position = trMat_Float_4_4 (rotMatrixZ ((Time) * (0.0))
+                                                ,(MVP) * (trX ((0.0) + ((sin (Time)) * (0.1))
+                                                              ,scale (4.0e-2,trMat_Float_4_4 (rotMatrixX (((Time) * (2.0)) * (0.0)),vi1)))));
+                  vo1 = vi1;
+              }
+              """
+          , geometryShader = Nothing
+          , fragmentShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              smooth in vec4 vo1;
+              out vec4 f0;
+              void main() {
+                  f0 = vo1;
+              }
+              """
+          }
+      , Program
+          { programUniforms =
+              fromList [ ( "MVP" , M44F ) , ( "Time" , Float ) ]
+          , programStreams =
+              fromList
+                [ ( "vi1" , Parameter { name = "position4" , ty = V4F } ) ]
+          , programInTextures = fromList []
+          , programOutput = [ Parameter { name = "f0" , ty = V4F } ]
+          , vertexShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              uniform mat4 MVP;
+              uniform float Time;
+              in vec4 vi1;
+              smooth out vec4 vo1;
+              mat4 rotMatrixX(float z0) {
+                  return mat4 (vec4 (1.0,0.0,0.0,0.0)
+                              ,vec4 (0.0,cos (z0),sin (z0),0.0)
+                              ,vec4 (0.0,(0.0) - (sin (z0)),cos (z0),0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              mat4 rotMatrixZ(float z0) {
+                  return mat4 (vec4 (cos (z0),sin (z0),0.0,0.0)
+                              ,vec4 ((0.0) - (sin (z0)),cos (z0),0.0,0.0)
+                              ,vec4 (0.0,0.0,1.0,0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              vec4 scale(float z0,vec4 z1) {
+                  return (z1) * (vec4 (z0,z0,z0,1.0));
+              }
+              vec4 trMat_Float_4_4(mat4 z0,vec4 z1) {
+                  return (z0) * (z1);
+              }
+              vec4 trX(float z0,vec4 z1) {
+                  return (vec4 (z0,0.0,0.0,0.0)) + (z1);
+              }
+              void main() {
+                  gl_Position = trMat_Float_4_4 (rotMatrixZ ((Time) * (-1.0))
+                                                ,(MVP) * (trX ((-0.5) + ((sin (Time)) * (0.1))
+                                                              ,scale (4.0e-2,trMat_Float_4_4 (rotMatrixX (((Time) * (2.0)) * (-1.0)),vi1)))));
+                  vo1 = vi1;
+              }
+              """
+          , geometryShader = Nothing
+          , fragmentShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              smooth in vec4 vo1;
+              out vec4 f0;
+              void main() {
+                  f0 = vo1;
+              }
+              """
+          }
+      , Program
+          { programUniforms =
+              fromList [ ( "MVP" , M44F ) , ( "Time" , Float ) ]
+          , programStreams =
+              fromList
+                [ ( "vi1" , Parameter { name = "position4" , ty = V4F } ) ]
+          , programInTextures = fromList []
+          , programOutput = [ Parameter { name = "f0" , ty = V4F } ]
+          , vertexShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              uniform mat4 MVP;
+              uniform float Time;
+              in vec4 vi1;
+              smooth out vec4 vo1;
+              mat4 rotMatrixX(float z0) {
+                  return mat4 (vec4 (1.0,0.0,0.0,0.0)
+                              ,vec4 (0.0,cos (z0),sin (z0),0.0)
+                              ,vec4 (0.0,(0.0) - (sin (z0)),cos (z0),0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              mat4 rotMatrixZ(float z0) {
+                  return mat4 (vec4 (cos (z0),sin (z0),0.0,0.0)
+                              ,vec4 ((0.0) - (sin (z0)),cos (z0),0.0,0.0)
+                              ,vec4 (0.0,0.0,1.0,0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              vec4 scale(float z0,vec4 z1) {
+                  return (z1) * (vec4 (z0,z0,z0,1.0));
+              }
+              vec4 trMat_Float_4_4(mat4 z0,vec4 z1) {
+                  return (z0) * (z1);
+              }
+              vec4 trX(float z0,vec4 z1) {
+                  return (vec4 (z0,0.0,0.0,0.0)) + (z1);
+              }
+              void main() {
+                  gl_Position = trMat_Float_4_4 (rotMatrixZ ((Time) * (0.75))
+                                                ,(MVP) * (trX ((0.375) + ((sin (Time)) * (0.1))
+                                                              ,scale (4.0e-2,trMat_Float_4_4 (rotMatrixX (((Time) * (2.0)) * (0.75)),vi1)))));
+                  vo1 = vi1;
+              }
+              """
+          , geometryShader = Nothing
+          , fragmentShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              smooth in vec4 vo1;
+              out vec4 f0;
+              void main() {
+                  f0 = vo1;
+              }
+              """
+          }
+      , Program
+          { programUniforms =
+              fromList [ ( "MVP" , M44F ) , ( "Time" , Float ) ]
+          , programStreams =
+              fromList
+                [ ( "vi1" , Parameter { name = "position4" , ty = V4F } ) ]
+          , programInTextures = fromList []
+          , programOutput = [ Parameter { name = "f0" , ty = V4F } ]
+          , vertexShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              uniform mat4 MVP;
+              uniform float Time;
+              in vec4 vi1;
+              smooth out vec4 vo1;
+              mat4 rotMatrixX(float z0) {
+                  return mat4 (vec4 (1.0,0.0,0.0,0.0)
+                              ,vec4 (0.0,cos (z0),sin (z0),0.0)
+                              ,vec4 (0.0,(0.0) - (sin (z0)),cos (z0),0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              mat4 rotMatrixZ(float z0) {
+                  return mat4 (vec4 (cos (z0),sin (z0),0.0,0.0)
+                              ,vec4 ((0.0) - (sin (z0)),cos (z0),0.0,0.0)
+                              ,vec4 (0.0,0.0,1.0,0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              vec4 scale(float z0,vec4 z1) {
+                  return (z1) * (vec4 (z0,z0,z0,1.0));
+              }
+              vec4 trMat_Float_4_4(mat4 z0,vec4 z1) {
+                  return (z0) * (z1);
+              }
+              vec4 trX(float z0,vec4 z1) {
+                  return (vec4 (z0,0.0,0.0,0.0)) + (z1);
+              }
+              void main() {
+                  gl_Position = trMat_Float_4_4 (rotMatrixZ ((Time) * (0.3))
+                                                ,(MVP) * (trX ((0.15) + ((sin (Time)) * (0.1))
+                                                              ,scale (4.0e-2,trMat_Float_4_4 (rotMatrixX (((Time) * (2.0)) * (0.3)),vi1)))));
+                  vo1 = vi1;
+              }
+              """
+          , geometryShader = Nothing
+          , fragmentShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              smooth in vec4 vo1;
+              out vec4 f0;
+              void main() {
+                  f0 = vo1;
+              }
+              """
+          }
+      , Program
+          { programUniforms =
+              fromList [ ( "MVP" , M44F ) , ( "Time" , Float ) ]
+          , programStreams =
+              fromList
+                [ ( "vi1" , Parameter { name = "position4" , ty = V4F } ) ]
+          , programInTextures = fromList []
+          , programOutput = [ Parameter { name = "f0" , ty = V4F } ]
+          , vertexShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              uniform mat4 MVP;
+              uniform float Time;
+              in vec4 vi1;
+              smooth out vec4 vo1;
+              mat4 rotMatrixX(float z0) {
+                  return mat4 (vec4 (1.0,0.0,0.0,0.0)
+                              ,vec4 (0.0,cos (z0),sin (z0),0.0)
+                              ,vec4 (0.0,(0.0) - (sin (z0)),cos (z0),0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              mat4 rotMatrixZ(float z0) {
+                  return mat4 (vec4 (cos (z0),sin (z0),0.0,0.0)
+                              ,vec4 ((0.0) - (sin (z0)),cos (z0),0.0,0.0)
+                              ,vec4 (0.0,0.0,1.0,0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              vec4 scale(float z0,vec4 z1) {
+                  return (z1) * (vec4 (z0,z0,z0,1.0));
+              }
+              vec4 trMat_Float_4_4(mat4 z0,vec4 z1) {
+                  return (z0) * (z1);
+              }
+              vec4 trX(float z0,vec4 z1) {
+                  return (vec4 (z0,0.0,0.0,0.0)) + (z1);
+              }
+              void main() {
+                  gl_Position = trMat_Float_4_4 (rotMatrixZ ((Time) * (0.5))
+                                                ,(MVP) * (trX ((0.25) + ((sin (Time)) * (0.1))
+                                                              ,scale (4.0e-2,trMat_Float_4_4 (rotMatrixX (((Time) * (2.0)) * (0.5)),vi1)))));
+                  vo1 = vi1;
+              }
+              """
+          , geometryShader = Nothing
+          , fragmentShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              smooth in vec4 vo1;
+              out vec4 f0;
+              void main() {
+                  f0 = vo1;
+              }
+              """
+          }
+      , Program
+          { programUniforms =
+              fromList [ ( "MVP" , M44F ) , ( "Time" , Float ) ]
+          , programStreams =
+              fromList
+                [ ( "vi1" , Parameter { name = "position4" , ty = V4F } ) ]
+          , programInTextures = fromList []
+          , programOutput = [ Parameter { name = "f0" , ty = V4F } ]
+          , vertexShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              uniform mat4 MVP;
+              uniform float Time;
+              in vec4 vi1;
+              smooth out vec4 vo1;
+              mat4 rotMatrixX(float z0) {
+                  return mat4 (vec4 (1.0,0.0,0.0,0.0)
+                              ,vec4 (0.0,cos (z0),sin (z0),0.0)
+                              ,vec4 (0.0,(0.0) - (sin (z0)),cos (z0),0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              mat4 rotMatrixZ(float z0) {
+                  return mat4 (vec4 (cos (z0),sin (z0),0.0,0.0)
+                              ,vec4 ((0.0) - (sin (z0)),cos (z0),0.0,0.0)
+                              ,vec4 (0.0,0.0,1.0,0.0)
+                              ,vec4 (0.0,0.0,0.0,1.0));
+              }
+              vec4 scale(float z0,vec4 z1) {
+                  return (z1) * (vec4 (z0,z0,z0,1.0));
+              }
+              vec4 trMat_Float_4_4(mat4 z0,vec4 z1) {
+                  return (z0) * (z1);
+              }
+              vec4 trX(float z0,vec4 z1) {
+                  return (vec4 (z0,0.0,0.0,0.0)) + (z1);
+              }
+              void main() {
+                  gl_Position = trMat_Float_4_4 (rotMatrixZ ((Time) * (-0.5))
+                                                ,(MVP) * (trX ((-0.25) + ((sin (Time)) * (0.1))
+                                                              ,scale (4.0e-2,trMat_Float_4_4 (rotMatrixX (((Time) * (2.0)) * (-0.5)),vi1)))));
+                  vo1 = vi1;
+              }
+              """
+          , geometryShader = Nothing
+          , fragmentShader =
+              """
+              #version 330 core
+              vec4 texture2D(sampler2D s,vec2 uv) {
+                  return texture(s,uv);
+              }
+              smooth in vec4 vo1;
+              out vec4 f0;
+              void main() {
+                  f0 = vo1;
+              }
+              """
+          }
+      ]
+  , slots =
+      [ Slot
+          { slotName = "stream4"
+          , slotStreams = fromList [ ( "position4" , V4F ) ]
+          , slotUniforms = fromList [ ( "MVP" , M44F ) , ( "Time" , Float ) ]
+          , slotPrimitive = Triangles
+          , slotPrograms = [ 0 , 1 , 2 , 3 , 4 , 5 , 6 , 2 , 7 ]
+          }
+      ]
+  , streams = []
+  , commands =
+      [ SetRenderTarget 0
+      , ClearRenderTarget
+          [ ClearImage { imageSemantic = Depth , clearValue = VFloat 1000.0 }
+          , ClearImage
+              { imageSemantic = Color , clearValue = VV4F (V4 0.0 0.0 0.5 1.0) }
+          ]
+      , SetProgram 7
+      , SetRasterContext
+          (TriangleCtx CullNone PolygonFill NoOffset LastVertex)
+      , SetAccumulationContext
+          AccumulationContext
+            { accViewportName = Nothing
+            , accOperations =
+                [ DepthOp Less True
+                , ColorOp NoBlending (VV4B (V4 True True True True))
+                ]
+            }
+      , RenderSlot 0
+      , SetProgram 2
+      , SetRasterContext
+          (TriangleCtx CullNone PolygonFill NoOffset LastVertex)
+      , SetAccumulationContext
+          AccumulationContext
+            { accViewportName = Nothing
+            , accOperations =
+                [ DepthOp Less True
+                , ColorOp NoBlending (VV4B (V4 True True True True))
+                ]
+            }
+      , RenderSlot 0
+      , SetProgram 6
+      , SetRasterContext
+          (TriangleCtx CullNone PolygonFill NoOffset LastVertex)
+      , SetAccumulationContext
+          AccumulationContext
+            { accViewportName = Nothing
+            , accOperations =
+                [ DepthOp Less True
+                , ColorOp NoBlending (VV4B (V4 True True True True))
+                ]
+            }
+      , RenderSlot 0
+      , SetProgram 5
+      , SetRasterContext
+          (TriangleCtx CullNone PolygonFill NoOffset LastVertex)
+      , SetAccumulationContext
+          AccumulationContext
+            { accViewportName = Nothing
+            , accOperations =
+                [ DepthOp Less True
+                , ColorOp NoBlending (VV4B (V4 True True True True))
+                ]
+            }
+      , RenderSlot 0
+      , SetProgram 4
+      , SetRasterContext
+          (TriangleCtx CullNone PolygonFill NoOffset LastVertex)
+      , SetAccumulationContext
+          AccumulationContext
+            { accViewportName = Nothing
+            , accOperations =
+                [ DepthOp Less True
+                , ColorOp NoBlending (VV4B (V4 True True True True))
+                ]
+            }
+      , RenderSlot 0
+      , SetProgram 3
+      , SetRasterContext
+          (TriangleCtx CullNone PolygonFill NoOffset LastVertex)
+      , SetAccumulationContext
+          AccumulationContext
+            { accViewportName = Nothing
+            , accOperations =
+                [ DepthOp Less True
+                , ColorOp NoBlending (VV4B (V4 True True True True))
+                ]
+            }
+      , RenderSlot 0
+      , SetProgram 2
+      , SetRasterContext
+          (TriangleCtx CullNone PolygonFill NoOffset LastVertex)
+      , SetAccumulationContext
+          AccumulationContext
+            { accViewportName = Nothing
+            , accOperations =
+                [ DepthOp Less True
+                , ColorOp NoBlending (VV4B (V4 True True True True))
+                ]
+            }
+      , RenderSlot 0
+      , SetProgram 1
+      , SetRasterContext
+          (TriangleCtx CullNone PolygonFill NoOffset LastVertex)
+      , SetAccumulationContext
+          AccumulationContext
+            { accViewportName = Nothing
+            , accOperations =
+                [ DepthOp Less True
+                , ColorOp NoBlending (VV4B (V4 True True True True))
+                ]
+            }
+      , RenderSlot 0
+      , SetProgram 0
+      , SetRasterContext
+          (TriangleCtx CullNone PolygonFill NoOffset LastVertex)
+      , SetAccumulationContext
+          AccumulationContext
+            { accViewportName = Nothing
+            , accOperations =
+                [ DepthOp Less True
+                , ColorOp NoBlending (VV4B (V4 True True True True))
+                ]
+            }
+      , RenderSlot 0
+      ]
+  }

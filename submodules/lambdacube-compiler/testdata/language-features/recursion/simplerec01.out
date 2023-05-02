@@ -1,0 +1,32 @@
+main is not found
+------------ desugared source code
+fun
+  = primFix
+    \(a :: _) -> _lhs
+      fun
+      \(b :: _) -> case'Bool
+        (\(_ :: _) -> _)
+        (_rhs (a (fromInt 0)))
+        (_rhs 'a')
+        (fromInt 0 == b)
+------------ core code
+fun :: forall a . (Num a, Eq a, Num a) => a -> Char
+fun
+  = \a b c d -> primFix
+    _
+    \e f -> case'Bool
+      (\_ -> 'Char)
+      (_rhs (e (fromInt a b 0)))
+      (_rhs 'a')
+      ((a == c) (fromInt a d 0) f)
+------------ tooltips
+1:1-1:4
+    forall a . (Num a, Eq a, Num a) => a -> Char
+1:9-1:12
+    Char
+1:9-2:14
+    Bool -> Char
+2:9-2:12
+    _e
+2:13-2:14
+    _b

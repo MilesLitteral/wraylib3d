@@ -1,0 +1,25 @@
+main is not found
+------------ desugared source code
+value
+  = _lhs
+    value
+    \(a :: _) -> _rhs
+      ((\(b :: _) -> case'Bool (\(_ :: _) -> _) '_' '1' (fromInt 1 == b)) a)
+------------ core code
+value :: forall a . (Eq a, Num a) => a -> Char
+value
+  = \a b c d -> _rhs
+    (case'Bool (\_ -> 'Char) '_' '1' ((a == b) (fromInt a c 1) d))
+------------ tooltips
+1:1-1:6
+    forall a . (Eq a, Num a) => a -> Char
+1:11-3:11
+    Char
+1:16-1:17
+    _e
+2:8-2:11
+    Char
+2:8-3:11
+    Bool -> Char
+3:8-3:11
+    Char

@@ -1,0 +1,11 @@
+illegal data definition (parameters are not uniform)
+------------ trace
+'M3 :: Type -> String -> Type
+!illegal data definition (parameters are not uniform)
+------------ tooltips
+5:6-5:8
+    Type -> String -> Type
+5:15-5:19
+    Type
+5:27-5:33
+    Type | Type

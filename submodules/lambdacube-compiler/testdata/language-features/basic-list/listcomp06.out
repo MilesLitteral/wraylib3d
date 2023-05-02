@@ -1,0 +1,73 @@
+main is not found
+------------ desugared source code
+value1
+  = _lhs
+    value1
+    (_rhs
+      (concatMap
+        (\(_ :: _) -> let
+          a = _lhs _u (_rhs ()); b = _lhs u (_rhs ((\(c :: _) -> c) a))
+          in primIfThenElse True [b] [])
+        [(), ()]))
+
+value2
+  = _lhs
+    value2
+    (_rhs
+      (concatMap
+        (\(_ :: _) -> primIfThenElse
+          True
+          (let a = _lhs _u (_rhs ()); b = _lhs u (_rhs ((\(c :: _) -> c) a)) in [b])
+          [])
+        [(), ()]))
+------------ core code
+value1 :: [()]
+value1
+  = _rhs
+    (u : [] ++ foldr (++) [] (map (\_ -> primIfThenElse [' ()] True [u] []) [()]))
+
+value2 :: [()]
+value2
+  = _rhs
+    (u : [] ++ foldr (++) [] (map (\_ -> primIfThenElse [' ()] True [u] []) [()]))
+------------ tooltips
+1:1-1:7
+    [()]
+1:10-1:46
+    [()]
+1:11-1:12
+    () | [()]
+1:11-1:45
+    [()] -> [()]
+1:20-1:27
+    [()]
+1:21-1:23
+    ()
+1:24-1:26
+    () | [()]
+1:33-1:34
+    _b | ()
+1:37-1:39
+    ()
+1:41-1:45
+    Bool
+3:1-3:7
+    [()]
+3:10-3:46
+    [()]
+3:11-3:12
+    ()
+3:11-3:45
+    [()]
+3:20-3:27
+    [()]
+3:21-3:23
+    ()
+3:24-3:26
+    () | [()]
+3:29-3:33
+    Bool
+3:39-3:40
+    _b | ()
+3:43-3:45
+    ()

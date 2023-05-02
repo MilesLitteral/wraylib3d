@@ -1,0 +1,33 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+-- {-# LANGUAGE TraceTypeCheck #-}
+import Internals
+
+data Inf = Inf Inf
+
+inf = Inf inf
+
+main' = case inf of
+    Inf _ -> True
+
+
+inf2 = inf
+
+(-) = primSubInt
+
+repeat n = (n :: Bool): repeat n
+
+repeatT = True: repeatT
+
+--primes :: [Bool]
+primes = repeatT
+
+
+
+(x: _) !! 0 = x
+(_ : xs) !! n = xs !! (n-1)
+
+main = -- case 3: [] of x : xs -> x
+    primes !! 20 -- TODO: 100
+
+
+

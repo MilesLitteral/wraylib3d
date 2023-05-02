@@ -1,0 +1,187 @@
+main is not found
+------------ desugared source code
+infix 4 ==
+
+infix 4 /=
+
+infix 4 <
+
+infixr 3 &&
+
+infixr 2 ||
+
+not
+  = _lhs not \(a :: _) -> case'Bool (\(_ :: _) -> _) (_rhs True) (_rhs False) a
+
+(&&)
+  = _lhs
+    (&&)
+    \(a :: _) (b :: _) -> case'Bool (\(_ :: _) -> _) (_rhs False) (_rhs b) a
+
+(||)
+  = _lhs
+    (||)
+    \(a :: _) (b :: _) -> case'Bool (\(_ :: _) -> _) (_rhs b) (_rhs True) a
+
+'Eq :: Type -> Constraint
+'Eq
+  = _lhs
+    'Eq
+    \(a :: _) -> match'Bool
+      (\(_ :: _) -> _)
+      (_rhs CUnit)
+      a
+      (_rhs (CEmpty "no instance of 'Eq on ???"))
+
+(==) :: forall a . Eq a => a -> a -> Bool
+(==)
+  = _lhs
+    (==)
+    \ @a @(_ :: _) -> match'Bool
+      (\(_ :: _) -> _)
+      (_rhs
+        let
+          b
+            = _lhs
+              (==)
+              \(c :: _) (d :: _) -> case'Bool (\(_ :: _) -> _) (_rhs (not d)) (_rhs d) c
+          in b)
+      a
+      (_rhs undefined)
+
+(/=) = _lhs (/=) \(a :: _) (b :: _) -> _rhs (not (a == b))
+
+(==.)
+  = primFix
+    \(a :: _) -> _lhs
+      (==.)
+      \(b :: _) (c :: _) -> case'List
+        (\(_ :: _) -> _)
+        (case'List (\(_ :: _) -> _) (_rhs True) (\(_ :: _) (_ :: _) -> _rhs False) c)
+        (\(_ :: _) (d :: _) -> case'List
+          (\(_ :: _) -> _)
+          (_rhs False)
+          (\(_ :: _) (e :: _) -> _rhs (a d e))
+          c)
+        b
+------------ core code
+&& :: Bool -> Bool -> Bool
+&& = \a b -> case'Bool (\_ -> 'Bool) (_rhs False) (_rhs b) a
+
+'Eq :: Type -> Constraint
+'Eq
+  = \a -> match'Bool
+    (\_ -> 'Constraint)
+    (_rhs CUnit)
+    a
+    (_rhs (CEmpty "no instance of 'Eq on ???"))
+
+/= :: forall a . Eq a => a -> a -> Bool
+/= = \a b c d -> _rhs (not ((a == b) c d))
+
+== :: forall a . Eq a => a -> a -> Bool
+==
+  = \a _ -> match'Bool
+    (\b -> b -> b -> 'Bool)
+    (_rhs (==))
+    a
+    (_rhs (undefined (a -> a -> 'Bool)))
+
+==. :: forall a b . [a] -> [b] -> Bool
+==.
+  = \a b -> primFix
+    _
+    \c d e -> case'List
+      (\_ -> 'Bool)
+      (case'List (\_ -> 'Bool) (_rhs True) (\_ _ -> _rhs False) e)
+      (\_ f -> case'List (\_ -> 'Bool) (_rhs False) (\_ g -> _rhs (c f g)) e)
+      d
+
+not :: Bool -> Bool
+not = \a -> case'Bool (\_ -> 'Bool) (_rhs True) (_rhs False) a
+
+|| :: Bool -> Bool -> Bool
+|| = \a b -> case'Bool (\_ -> 'Bool) (_rhs b) (_rhs True) a
+------------ tooltips
+8:1-8:4
+    Bool -> Bool
+8:12-8:17
+    Bool
+8:12-9:17
+    Bool -> Bool
+9:13-9:17
+    Bool
+11:6-11:8
+    Bool -> Bool -> Bool
+11:13-11:14
+    _b
+11:13-12:19
+    Bool -> Bool
+12:14-12:19
+    Bool
+14:7-14:9
+    Bool -> Bool -> Bool
+14:14-14:15
+    _c
+14:14-15:17
+    Bool -> Bool
+15:13-15:17
+    Bool
+17:7-17:9
+    Type -> Constraint | Type -> Constraint | Constraint
+17:7-18:27
+    Type
+18:6-18:8
+    forall a . Eq a => a -> a -> Bool
+18:13-18:14
+    Type
+18:13-18:27
+    Type
+18:18-18:19
+    Type
+18:18-18:27
+    Type
+18:23-18:27
+    Type | Type
+20:3-20:5
+    forall a . Eq a => a -> a -> Bool
+20:10-20:13
+    Bool -> Bool
+20:10-20:22
+    Bool
+20:15-20:16
+    _f
+20:15-20:19
+    _e -> Bool
+20:15-20:21
+    Bool
+20:17-20:19
+    forall a . Eq a => a -> a -> Bool
+20:20-20:21
+    _c
+23:17-23:18
+    Bool
+23:17-24:23
+    Bool -> Bool
+24:18-24:21
+    Bool -> Bool
+24:18-24:23
+    Bool
+24:22-24:23
+    _b
+26:6-26:9
+    forall a b . [a] -> [b] -> Bool
+26:17-26:21
+    Bool
+26:17-28:22
+    [_a] -> Bool | Bool
+27:36-27:38
+    [_j]
+27:36-28:22
+    [_a] -> Bool | Bool
+27:39-27:42
+    _l
+27:43-27:45
+    [_g]
+28:17-28:22
+    Bool | Bool

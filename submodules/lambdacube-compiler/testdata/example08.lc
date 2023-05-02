@@ -1,0 +1,40 @@
+time = Uniform "Time" :: Float
+
+image color = FrameBuffer (DepthImage @1 1000.0, ColorImage @1 (color :: Vec 4 Float))
+
+triangleRasterCtx = TriangleCtx CullNone PolygonFill NoOffset LastVertex
+colorFragmentCtx = (DepthOp Less True, ColorOp NoBlending (V4 True True True True))
+
+rasterizeWith = rasterizePrimitives
+triangles = triangleRasterCtx
+
+cubeVertexStream = fetch "stream4" ((Attribute "position4" :: Vec 4 Float))
+mapFragments2 s fs bg = accumulate colorFragmentCtx (\((a)) -> ((fs a))) s bg
+
+cube fv f bg = (cubeVertexStream         -- cube vertices
+     &  mapPrimitives (\((v)) -> (fv v, v))
+     &             rasterizeWith triangles ((Smooth))  -- rasterize
+    `mapFragments2` f) bg
+
+trMat a b = a *. b
+rotate' v = (Uniform "MVP" :: Mat 4 4 Float) *. v
+trX a b = V4 (a :: Float) 0 0.0 0 + b
+
+main = ScreenOut $ 
+    foldl' (\fb a -> cube (
+        trMat (rotMatrixZ $ time *! a) .
+        rotate' .
+        (trX (0.5 *! a +! sin time *! 0.1)) . 
+        (scale 0.04) . 
+        trMat (rotMatrixX (time *! 2.0 *! a))
+        ) id fb)
+    (image navy)
+    [ a | x <- [ (-0.5,True)
+               , (0.0,True)
+               , (0.5,True)
+               , (0.3,True)
+               , (0.75,True)
+               ] ++ [(a,True) | a <- [(-1.0)..2.0]]
+    , let (a,b) = x
+    , b
+    ]

@@ -1,0 +1,78 @@
+renderWire fb = let
+  modelViewProj = Uniform "MVP2" :: Mat 4 4 Float
+  blendFun x = Blend x ((SrcAlpha,OneMinusSrcAlpha),(SrcAlpha,OneMinusSrcAlpha)) (V4 1.0 1.0 1.0 1.0)
+  blend'' = blendFun (FuncAdd,FuncAdd)
+  blend = Blend (FuncSubtract,FuncAdd) ((SrcColor,SrcColor),(SrcColor,OneMinusSrcAlpha)) (V4 0.0 1.0 0.0 0.0)
+  blend' = NoBlending
+  polyMode          = PolygonLine 20.0
+  polyMode'         = PolygonFill
+  polyMode''        = PolygonPoint (PointSize 10.0)
+  cull = CullNone
+  cull' = CullFront
+  rasterCtx         = TriangleCtx cull polyMode NoOffset FirstVertex
+  fragmentCtx       = (DepthOp Always False, ColorOp blend' (V4 True True False False))
+  vertexShader ((v))    = let v2 = v3FToV4F v in ((PrimMulMatVec modelViewProj v2))
+  vertexStream      = fetch "stream" ((Attribute "position" :: Vec 3 Float))
+  primitiveStream   = mapPrimitives vertexShader vertexStream
+  fragmentStream    = rasterizePrimitives rasterCtx () primitiveStream
+  fragmentShader' = \_ -> ((V4 1.0 0.4 0.0 0.2))
+  fragmentShader = \_ -> ((V4 0.0 0.4 0.0 1.0))
+  frame             = accumulate fragmentCtx fragmentShader fragmentStream fb
+  in frame
+
+render fb = let
+  modelViewProj = Uniform "MVP2" :: Mat 4 4 Float
+  blendFun x = Blend x ((SrcAlpha,OneMinusSrcAlpha),(SrcAlpha,OneMinusSrcAlpha)) (V4 1.0 1.0 1.0 1.0)
+  blend'' = blendFun (FuncAdd,FuncAdd)
+  blend = Blend (Max,FuncAdd) ((SrcColor,SrcColor),(SrcColor,OneMinusSrcAlpha)) (V4 0.0 1.0 0.0 0.0)
+  blend' = NoBlending
+  polyMode          = PolygonLine 20.0
+  polyMode'         = PolygonFill
+  polyMode''        = PolygonPoint (PointSize 10.0)
+  cull = CullNone
+  cull' = CullFront
+  rasterCtx         = TriangleCtx cull polyMode' NoOffset FirstVertex
+  fragmentCtx       = accumulationContext (DepthOp Less False, ColorOp blend' (V4 True True False False))
+  vertexShader ((v))    = let v2 = v3FToV4F v in (PrimMulMatVec modelViewProj v2, v2)
+  vertexStream      = fetch "stream" ((Attribute "position" :: Vec 3 Float))
+  primitiveStream   = mapPrimitives vertexShader vertexStream
+  fragmentStream    = rasterizePrimitives rasterCtx ((Smooth)) primitiveStream
+  fragmentShader'   = \((v)) -> ((V4 1.0 0.4 0.0 0.2))
+  fragmentShader    = \((v)) -> ((PrimAdd v (V4 1.0 1.4 1.0 0.6)))
+  frame             = accumulate fragmentCtx fragmentShader fragmentStream fb
+  in frame
+
+render' fb = let
+  modelViewProj = Uniform "MVP" :: Mat 4 4 Float
+  blendFun x = Blend x ((SrcAlpha,OneMinusSrcAlpha),(SrcAlpha,OneMinusSrcAlpha)) (V4 1.0 1.0 1.0 1.0)
+  blend'' = blendFun (FuncAdd,FuncAdd)
+  blend = Blend (FuncAdd,FuncAdd) ((SrcAlpha,OneMinusSrcAlpha),(SrcAlpha,OneMinusSrcAlpha)) (V4 1.0 1.0 1.0 1.0)
+  blend' = NoBlending
+  polyMode          = PolygonLine 20.0
+  polyMode'         = PolygonFill
+  polyMode''        = PolygonPoint (PointSize 10.0)
+  cull = CullNone
+  cull' = CullFront
+  rasterCtx         = TriangleCtx cull polyMode' NoOffset LastVertex
+  fragmentCtx       = (DepthOp Less False, ColorOp blend (V4 True True True True))
+  vertexShader' v    = let v2 = v3FToV4F v in (PrimMulMatVec modelViewProj v2, v2)
+  vertexShader ((v))    = (PrimMulMatVec modelViewProj v, v)
+  vertexStream      = fetch "stream4" ((Attribute "position4" :: Vec 4 Float))
+  primitiveStream   = mapPrimitives vertexShader vertexStream
+  fragmentStream    = rasterizePrimitives rasterCtx ((Flat)) primitiveStream
+  fragmentShader' = \((v)) -> ((V4 1.0 0.4 0.0 0.2))
+  fragmentShader = \((v)) -> ((PrimMul v (V4 1.0 1.4 1.0 0.6)))
+  frame             = accumulate fragmentCtx fragmentShader fragmentStream fb
+  in frame
+
+main = let
+  bgColor = V4 0.5 0.0 0.4 1.0
+  bgColor' = V4 0.2 0.2 0.4 1.0
+  emptyFB = FrameBuffer (depthImage1 1000.0,colorImage1 bgColor)
+  modelViewProj = Uniform "MVP" :: Mat 4 4 Float
+  --fx a = render modelViewProj a
+  --out = fx (fx emptyFB)
+  --out = fx emptyFB
+  --out = render modelViewProj emptyFB
+  out = renderWire (render (render' emptyFB))
+  in ScreenOut out

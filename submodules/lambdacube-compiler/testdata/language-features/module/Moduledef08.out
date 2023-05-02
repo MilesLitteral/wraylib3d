@@ -1,0 +1,9 @@
+main is not found
+------------ desugared source code
+hello = _lhs hello (_rhs "hello")
+------------ core code
+------------ tooltips
+5:1-5:6
+    String
+5:9-5:16
+    String

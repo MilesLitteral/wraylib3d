@@ -1,0 +1,306 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           hraylib3d
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/hraylib3d#readme>
+homepage:       https://github.com/githubuser/hraylib3d#readme
+bug-reports:    https://github.com/githubuser/hraylib3d/issues
+author:         Miles J. Litteral
+maintainer:     mandaloe2@example.com
+copyright:      2023 Miles J. Litteral
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/hraylib3d
+
+library
+  exposed-modules:
+      HRayLib3d
+      HRayLib3d.Benchmarks
+      HRayLib3d.Core
+      HRayLib3d.Core.BuildBundler
+      HRayLib3d.Core.ResourceBundler
+      HRayLib3d.Core.StructuredData
+      HRayLib3d.GameEngine.Collision
+      HRayLib3d.GameEngine.Content
+      HRayLib3d.GameEngine.Data.BSP
+      HRayLib3d.GameEngine.Data.GameCharacter
+      HRayLib3d.GameEngine.Data.GLB
+      HRayLib3d.GameEngine.Data.GLTF
+      HRayLib3d.GameEngine.Data.Material
+      HRayLib3d.GameEngine.Data.MD3
+      HRayLib3d.GameEngine.Graphics.BezierSurface
+      HRayLib3d.GameEngine.Graphics.BSP
+      HRayLib3d.GameEngine.Graphics.Culling
+      HRayLib3d.GameEngine.Graphics.Frustum
+      HRayLib3d.GameEngine.Graphics.GameCharacter
+      HRayLib3d.GameEngine.Graphics.GLTF
+      HRayLib3d.GameEngine.Graphics.MD3
+      HRayLib3d.GameEngine.Graphics.Quad
+      HRayLib3d.GameEngine.Graphics.Storage
+      HRayLib3d.GameEngine.Loader.BSP
+      HRayLib3d.GameEngine.Loader.Entity
+      HRayLib3d.GameEngine.Loader.GameCharacter
+      HRayLib3d.GameEngine.Loader.GLB
+      HRayLib3d.GameEngine.Loader.GLTF
+      HRayLib3d.GameEngine.Loader.Image
+      HRayLib3d.GameEngine.Loader.MD3
+      HRayLib3d.GameEngine.Loader.ShaderParser
+      HRayLib3d.GameEngine.Loader.Zip
+      HRayLib3d.GameEngine.MapViewer.Camera
+      HRayLib3d.GameEngine.MapViewer.Content
+      HRayLib3d.GameEngine.MapViewer.Engine
+      HRayLib3d.GameEngine.MapViewer.Entity
+      HRayLib3d.GameEngine.MapViewer.ItemsMV
+      HRayLib3d.GameEngine.MapViewer.Main
+      HRayLib3d.GameEngine.Realm.CodeSample
+      HRayLib3d.GameEngine.Realm.Collision
+      HRayLib3d.GameEngine.Realm.Entities
+      HRayLib3d.GameEngine.Realm.GameLogic
+      HRayLib3d.GameEngine.Realm.Items
+      HRayLib3d.GameEngine.Realm.LoadEntities
+      HRayLib3d.GameEngine.Realm.LoadResources
+      HRayLib3d.GameEngine.Realm.Main
+      HRayLib3d.GameEngine.Realm.Monads
+      HRayLib3d.GameEngine.Realm.Movers
+      HRayLib3d.GameEngine.Realm.Physics
+      HRayLib3d.GameEngine.Realm.Player
+      HRayLib3d.GameEngine.Realm.RenderGame
+      HRayLib3d.GameEngine.Realm.Visuals
+      HRayLib3d.GameEngine.Realm.World
+      HRayLib3d.GameEngine.RenderSystem
+      HRayLib3d.GameEngine.Scene
+      HRayLib3d.GameEngine.Utils
+      HRayLib3d.Network
+      HRayLib3d.Network.Database
+      HRayLib3d.Network.Realms
+      HRayLib3d.Network.Requests
+      HRayLib3d.ScriptEngine
+      HRayLib3d.ScriptEngine.Bindings
+      HRayLib3d.ScriptEngine.Functions
+      HRayLib3d.ScriptEngine.HRubyHS
+      HRayLib3d.ScriptEngine.Instances
+      HRayLib3d.ScriptEngine.Internal
+      HRayLib3d.Utils.Md3Show
+      HRayLib3d.Utils.PrettyPrint
+      HRayLib3d.Utils.Project
+      HRayLib3d.Utils.Reporting
+  other-modules:
+      Paths_hraylib3d
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  cc-options: -fPIC
+  include-dirs:
+      cbits
+  install-includes:
+      ruby.h
+      shim.h
+      stb_image.h
+  c-sources:
+      cbits/shim.c
+      cbits/stb_image.c
+  extra-lib-dirs:
+      cbits/x64-mingw-ucrt
+  extra-libraries:
+      libx64-ucrt-ruby320.dll.a
+      x64-ucrt-ruby320.dll
+  build-tools:
+      c2hs
+  build-depends:
+      GLFW-b
+    , JuicyPixels
+    , MonadRandom
+    , OpenGLRaw
+    , aeson
+    , attoparsec
+    , base >=4.7 && <5
+    , binary
+    , bytestring
+    , containers
+    , criterion
+    , data-binary-ieee754
+    , deepseq
+    , digest
+    , directory
+    , elerea
+    , extra
+    , filepath
+    , gltf-codec
+    , gltf-loader
+    , hashable
+    , http-client
+    , lambdacube-compiler
+    , lambdacube-gl
+    , lambdacube-ir
+    , lambdacube-vulkan
+    , lambdacube-xr
+    , language-glsl
+    , lens
+    , linear
+    , megaparsec
+    , megastore
+    , mersenne-random-pure64
+    , microlens-platform
+    , modern-uri
+    , mtl
+    , nsis
+    , parsec
+    , postgresql-simple
+    , pretty-show
+    , process
+    , proteaaudio
+    , req
+    , scientific
+    , stm
+    , text
+    , time
+    , transformers
+    , unordered-containers
+    , uuid
+    , vect
+    , vector
+    , vulkan-api
+    , zlib
+  default-language: Haskell2010
+
+executable hraylib3d-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_hraylib3d
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      GLFW-b
+    , JuicyPixels
+    , MonadRandom
+    , OpenGLRaw
+    , aeson
+    , attoparsec
+    , base >=4.7 && <5
+    , binary
+    , bytestring
+    , containers
+    , criterion
+    , data-binary-ieee754
+    , deepseq
+    , digest
+    , directory
+    , elerea
+    , extra
+    , filepath
+    , gltf-codec
+    , gltf-loader
+    , hashable
+    , hraylib3d
+    , http-client
+    , lambdacube-compiler
+    , lambdacube-gl
+    , lambdacube-ir
+    , lambdacube-vulkan
+    , lambdacube-xr
+    , language-glsl
+    , lens
+    , linear
+    , megaparsec
+    , megastore
+    , mersenne-random-pure64
+    , microlens-platform
+    , modern-uri
+    , mtl
+    , nsis
+    , parsec
+    , postgresql-simple
+    , pretty-show
+    , process
+    , proteaaudio
+    , req
+    , scientific
+    , stm
+    , text
+    , time
+    , transformers
+    , unordered-containers
+    , uuid
+    , vect
+    , vector
+    , vulkan-api
+    , zlib
+  default-language: Haskell2010
+
+test-suite hraylib3d-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_hraylib3d
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      GLFW-b
+    , JuicyPixels
+    , MonadRandom
+    , OpenGLRaw
+    , aeson
+    , attoparsec
+    , base >=4.7 && <5
+    , binary
+    , bytestring
+    , containers
+    , criterion
+    , data-binary-ieee754
+    , deepseq
+    , digest
+    , directory
+    , elerea
+    , extra
+    , filepath
+    , gltf-codec
+    , gltf-loader
+    , hashable
+    , hraylib3d
+    , http-client
+    , lambdacube-compiler
+    , lambdacube-gl
+    , lambdacube-ir
+    , lambdacube-vulkan
+    , lambdacube-xr
+    , language-glsl
+    , lens
+    , linear
+    , megaparsec
+    , megastore
+    , mersenne-random-pure64
+    , microlens-platform
+    , modern-uri
+    , mtl
+    , nsis
+    , parsec
+    , postgresql-simple
+    , pretty-show
+    , process
+    , proteaaudio
+    , req
+    , scientific
+    , stm
+    , text
+    , time
+    , transformers
+    , unordered-containers
+    , uuid
+    , vect
+    , vector
+    , vulkan-api
+    , zlib
+  default-language: Haskell2010

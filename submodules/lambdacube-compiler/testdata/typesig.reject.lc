@@ -1,0 +1,9 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+import Internals
+
+data X = X
+
+x :: x
+x = X
+
+

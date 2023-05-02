@@ -1,0 +1,10 @@
+--{-# LANGUAGE TraceTypeCheck #-}
+
+type B = Bool
+
+type F a b = (a, b)
+
+main = (True :: B) && fst ((True, 'c') :: F Bool Char)
+
+
+

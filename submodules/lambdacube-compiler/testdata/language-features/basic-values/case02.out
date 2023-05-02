@@ -1,0 +1,61 @@
+main is not found
+------------ desugared source code
+value1
+  = _lhs
+    value1
+    (_rhs
+      ((\(a :: _) -> case'Bool (\(_ :: _) -> _) () () (fromInt 1 == a)) (fromInt 1)))
+
+value2
+  = _lhs
+    value2
+    (_rhs
+      ((\(a :: _) -> case'Bool
+          (\(_ :: _) -> _)
+          (case'Bool (\(_ :: _) -> _) "_" "2" (fromInt 2 == a))
+          "1"
+          (fromInt 1 == a))
+        (fromInt 2)))
+------------ core code
+value1 :: forall a . (Eq a, Num a) => ()
+value1
+  = \a b c -> _rhs
+    (case'Bool (\_ -> ' ()) () () ((a == b) (fromInt a c 1) (fromInt a c 1)))
+
+value2 :: forall a . (Eq a, Num a, Eq a, Num a) => String
+value2
+  = \a b c d e -> _rhs
+    (case'Bool
+      (\_ -> 'String)
+      (case'Bool (\_ -> 'String) "_" "2" ((a == b) (fromInt a c 2) (fromInt a e 2)))
+      "1"
+      ((a == d) (fromInt a e 1) (fromInt a e 2)))
+------------ tooltips
+1:1-1:7
+    forall a . (Eq a, Num a) => ()
+1:10-3:10
+    ()
+1:15-1:16
+    _b
+2:8-2:10
+    ()
+2:8-3:10
+    Bool -> ()
+3:8-3:10
+    ()
+5:1-5:7
+    forall a . (Eq a, Num a, Eq a, Num a) => String
+5:10-8:11
+    String
+5:15-5:16
+    _b
+6:8-6:11
+    String
+6:8-8:11
+    Bool -> String
+7:8-7:11
+    String
+7:8-8:11
+    Bool -> String | String
+8:8-8:11
+    String

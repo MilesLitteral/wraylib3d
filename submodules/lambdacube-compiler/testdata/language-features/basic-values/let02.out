@@ -1,0 +1,31 @@
+main is not found
+------------ desugared source code
+value
+  = _lhs
+    value
+    (_rhs
+      let
+        a = (); b = let d = 'A' in (); c = let e = (); f = fromInt 1; g = "hello" in 'B'
+        in ())
+------------ core code
+value :: ()
+value = _rhs ()
+------------ tooltips
+1:1-1:6
+    ()
+2:11-2:13
+    ()
+3:19-3:22
+    Char
+3:26-3:28
+    ()
+5:17-5:19
+    ()
+6:17-6:18
+    _b
+7:17-7:24
+    String
+8:12-8:15
+    Char
+9:6-9:8
+    ()

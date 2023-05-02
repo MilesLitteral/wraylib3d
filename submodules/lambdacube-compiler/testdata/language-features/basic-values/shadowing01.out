@@ -1,0 +1,40 @@
+main is not found
+------------ desugared source code
+value
+  = _lhs
+    value
+    (_rhs
+      let
+        a = 'A';
+        b = "hello";
+        c
+          = let
+            d = fromInt 1; e = 2.12; f = let g = (); h = 'C'; i = 3.12 in "world"
+            in ()
+        in '7')
+------------ core code
+value :: Char
+value = _rhs '7'
+------------ tooltips
+1:1-1:6
+    Char
+2:11-2:14
+    Char
+3:11-3:18
+    String
+5:17-5:18
+    _b
+6:17-6:21
+    Float
+7:25-7:27
+    ()
+8:25-8:28
+    Char
+9:25-9:29
+    Float
+10:20-10:27
+    String
+11:14-11:16
+    ()
+12:6-12:9
+    Char

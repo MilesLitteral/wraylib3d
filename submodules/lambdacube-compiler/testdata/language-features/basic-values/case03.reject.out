@@ -1,0 +1,22 @@
+type error: no instance of 'Num on ???
+in testdata/language-features/basic-values/case03.reject.lc:1:10:
+value1 = case () of
+  1 -> ()
+  _ -> ()
+------------ trace
+!type error: no instance of 'Num on ???
+in testdata/language-features/basic-values/case03.reject.lc:1:10:
+value1 = case () of
+  1 -> ()
+  _ -> ()
+------------ tooltips
+1:10-3:10
+    ()
+1:15-1:17
+    ()
+2:8-2:10
+    ()
+2:8-3:10
+    Bool -> ()
+3:8-3:10
+    ()

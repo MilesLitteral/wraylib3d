@@ -1,0 +1,4 @@
+main' = 
+    let
+      id' = \x -> x
+    in (id' 4.0, id' True)

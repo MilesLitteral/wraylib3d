@@ -1,0 +1,19 @@
+main is not found
+------------ desugared source code
+value = _lhs value (_rhs [fromInt 1])
+------------ core code
+value :: forall a . Num a => [a]
+value = \a b -> _rhs [fromInt a b 1]
+------------ tooltips
+1:1-1:6
+    forall a . Num a => [a]
+1:9-1:10
+    _b
+1:9-1:11
+    [_b] -> [_b]
+1:9-1:13
+    [_b]
+1:10-1:11
+    forall a . a -> [a] -> [a]
+1:11-1:13
+    forall a . [a]

@@ -1,0 +1,58 @@
+illegal data definition (parameters are not uniform)
+------------ trace
+'M2 :: Type -> String -> Type
+Value2 :: forall a . a -> forall (b :: String) . M2 a b
+case'M2
+  :: forall a
+    . forall (b :: forall (c :: String) -> M2 a c -> Type)
+      -> (forall (d :: a) -> forall (e :: String) . b e ('Value2 d e))
+        -> forall (f :: String) . forall (g :: M2 a f) -> b f g
+match'M2
+  :: forall (a :: Type -> Type)
+    -> (forall b (c :: String) -> a (M2 b c)) -> forall d -> a d -> a d
+'M3 :: Type -> String -> Type
+!illegal data definition (parameters are not uniform)
+------------ tooltips
+2:6-2:8
+    Type -> String -> Type | Type -> String -> Type | Type | Type
+      -> String -> Type | Type | Type
+2:6-3:35
+    Type | Type
+2:15-2:19
+    Type | Type | Type
+2:24-2:30
+    Type
+2:24-2:38
+    Type
+2:34-2:38
+    Type | Type
+3:3-3:9
+    forall a . a -> forall (b :: String) . M2 a b | M2 _d _a
+3:3-3:35
+    Type | Type | Type
+3:13-3:14
+    Type
+3:13-3:35
+    Type
+3:18-3:35
+    Type
+3:29-3:31
+    Type -> String -> Type
+3:29-3:33
+    String -> Type
+3:29-3:35
+    Type | Type
+3:32-3:33
+    Type
+3:34-3:35
+    _b | String
+5:6-5:8
+    Type -> String -> Type
+5:15-5:19
+    Type
+5:24-5:30
+    Type
+5:24-5:38
+    Type
+5:34-5:38
+    Type | Type

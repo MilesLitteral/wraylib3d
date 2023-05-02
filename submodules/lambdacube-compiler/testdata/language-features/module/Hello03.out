@@ -1,0 +1,17 @@
+main is not found
+------------ desugared source code
+greeting = _lhs greeting (_rhs 'G')
+
+value = _lhs value (_rhs 12.2)
+------------ core code
+greeting :: Char
+greeting = _rhs 'G'
+------------ tooltips
+7:1-7:9
+    Char
+7:12-7:15
+    Char
+9:1-9:6
+    Float
+9:9-9:13
+    Float

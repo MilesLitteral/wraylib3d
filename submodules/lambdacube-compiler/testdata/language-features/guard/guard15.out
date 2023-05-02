@@ -1,0 +1,25 @@
+main is not found
+------------ desugared source code
+value
+  = _lhs
+    value
+    (_rhs
+      let a = _lhs x (case'Bool (\(_ :: _) -> _) (_rhs ()) (_rhs ()) True) in ())
+------------ core code
+value :: ()
+value = _rhs ()
+------------ tooltips
+1:1-1:6
+    ()
+1:9-1:11
+    ()
+2:13-2:17
+    Bool
+2:13-3:27
+    ()
+2:20-2:22
+    ()
+2:20-3:27
+    Bool -> ()
+3:25-3:27
+    ()

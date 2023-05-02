@@ -1,0 +1,14 @@
+resolver: lts-10.4
+packages:
+- '.'
+
+extra-deps:
+- vect-0.4.7
+- github: lambdacube3d/lambdacube-ir
+  commit: 8a0a17abedc9d6b46b41d744c1a2be53efa6336b
+  subdirs:
+    - lambdacube-ir.haskell
+
+flags:
+  lambdacube-compiler:
+    alltest: true

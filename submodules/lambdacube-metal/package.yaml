@@ -1,0 +1,67 @@
+name:                lambdacube-metal
+version:             0.0.1.0
+github:              "MilesLitteral/lambdacube-metal"
+license:             BSD3
+author:              Miles J. Litteral
+maintainer:          "mandaloe2@gmail.com"
+copyright:           "2023 Miles J. Litteral"     
+
+extra-source-files:
+- README.md
+- CHANGELOG.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:  Apple Metal 3 Core Profile Backend for LambdaCube 3D
+
+dependencies:
+  - base       >=4.7  && <5
+  - containers >=0.5  && <0.7
+  - mtl        >=2.2  && <2.3
+  - bytestring >=0.10 && <0.12
+  - vector     >=0.11 && <0.13
+  - vector-algorithms >=0.7   && <0.9
+  - JuicyPixels       >=3.2.7 && <3.4
+  - lambdacube-ir == 0.3.*
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs:  src
+  include-dirs: cbits
+  install-includes:
+    - mtlpp.hpp
+  c-sources:
+    - mtlpp.mm
+  extra-source-files: CHANGELOG.md
+                      examples/Hello.hs
+                      examples/HelloEmbedded.hs
+                      examples/HelloOBJ.hs
+                      examples/MtlParser.hs
+                      examples/hello.json
+                      examples/hello.lc
+                      examples/hello_obj.json
+                      examples/hello_obj.lc
+                      examples/logo.png
+                      examples/cube.obj
+                      examples/cube.mtl
+  build-tools: c2hs
+
+  #TODO: Add C source/headers
+  # include-dirs: cbits 
+  # install-includes:
+  # build-tools: c2hs

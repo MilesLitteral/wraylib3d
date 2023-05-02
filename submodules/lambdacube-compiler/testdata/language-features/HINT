@@ -1,0 +1,117 @@
+  ok
+  wrong
+
+X
+
+  syntactic
+    semantic - reduced properly
+      usage in values, functions, expressions, types
+
+type inference test
+reduction tests
+graphics features tests
+
+performance tests
+  - reduction
+  - graphics
+
+language features:
+  done - comment
+  done - language pragma
+  syntax:
+    definition:
+      done - global value defs
+      done - definition order
+    expression:
+      done - literals
+      done - tuples
+      done - let in
+      done - if then else
+      done - lambda expression
+      done - case of
+      done - basic list - :[] [,,]
+      done - list comprehension
+      done - operators
+      done - `infix` notation 
+
+    guards - in expressions
+      done - def
+      done - let in
+      done - where
+      done - case of
+
+    where - in value, in expressions
+      done - global def
+      done - let in
+      done - case of
+
+    simple recursion
+      done - def
+      done - let in
+      done - where
+      case of
+
+    type signature
+      done - global
+      done - local
+      done - type parameters
+      done - multi value type signature (e.g. fun1, fun2 :: Int -> Int)
+      done - operator type sig (e.g. (+) :: Int -> Int)
+      forall
+      hidden parameters
+      wildcard
+      context
+      @ type parameters
+
+    module name where
+      done - with and without export list
+      done - including exporing itself and other imported modules
+      done - submodule def (e.g. module Foo.Bar)
+      export data with/without constructors () or (..)
+
+    import
+      done - hiding list
+      done - import list
+      done - submodule import (e.g. import Foo.Bar)
+      qualified import
+      qualified import as
+      import as
+      import data with/without constructors () or (..)
+
+    valid indentation
+      done - global defs
+      multiline def
+      multi equation function def
+      let in
+      where
+      case
+      data def
+      if then else
+      list comprehension
+
+    patterns
+      def
+      case of
+      literals
+      variables
+      nested
+      data constructors
+      wildcard
+      @ patterns
+
+    nested expressions:
+      let in
+      where
+      def
+      case of
+
+    fixity - operators and `infix`
+    records
+    reserved keywords
+    type synonyms
+    swizzling
+    data GADT and ADT
+    mutual recursion - vary def order, vary on def placing (insert other code between mutual rec functions"
+
+    parenthesis - nested
+    builtins

@@ -1,0 +1,19 @@
+main is not found
+------------ desugared source code
+fun = _lhs fun \(a :: _) -> case'Bool (\(_ :: _) -> _) (_rhs ()) (_rhs ()) a
+------------ core code
+fun :: Bool -> ()
+fun = \a -> case'Bool (\_ -> ' ()) (_rhs ()) (_rhs ()) a
+------------ tooltips
+1:1-1:4
+    Bool -> ()
+1:7-1:8
+    _b
+1:7-1:24
+    ()
+1:9-1:11
+    ()
+1:9-1:24
+    Bool -> ()
+1:22-1:24
+    ()

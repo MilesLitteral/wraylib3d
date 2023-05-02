@@ -1,0 +1,78 @@
+main is not found
+------------ desugared source code
+fun1
+  = _lhs
+    fun1
+    \(a :: _) -> case'Bool (\(_ :: _) -> _) (_rhs '_') (_rhs '0') (fromInt 0 == a)
+
+fun2
+  = _lhs
+    fun2
+    \(a :: _) -> case'Bool (\(_ :: _) -> _) (_rhs '_') (_rhs '0') ("0" == a)
+
+fun3
+  = _lhs
+    fun3
+    \(a :: _) -> case'Bool (\(_ :: _) -> _) (_rhs '_') (_rhs '0') ('0' == a)
+
+fun4 = _lhs fun4 \(a :: _) -> hlistNilCase _ (_rhs '0') a
+------------ core code
+fun1 :: forall a . (Eq a, Num a) => a -> Char
+fun1
+  = \a b c d -> case'Bool
+    (\_ -> 'Char)
+    (_rhs '_')
+    (_rhs '0')
+    ((a == b) (fromInt a c 0) d)
+
+fun2 :: String -> Char
+fun2
+  = \a -> case'Bool
+    (\_ -> 'Char)
+    (_rhs '_')
+    (_rhs '0')
+    (isEQ (primCompareString "0" a))
+
+fun3 :: Char -> Char
+fun3
+  = \a -> case'Bool
+    (\_ -> 'Char)
+    (_rhs '_')
+    (_rhs '0')
+    (isEQ (primCompareChar '0' a))
+
+fun4 :: () -> Char
+fun4 = \a -> hlistNilCase 'Char (_rhs '0') a
+------------ tooltips
+1:1-1:5
+    forall a . (Eq a, Num a) => a -> Char
+1:10-1:13
+    Char
+1:10-2:13
+    Bool -> Char
+2:10-2:13
+    Char
+4:1-4:5
+    String -> Char
+4:12-4:15
+    Char
+4:12-5:13
+    Bool -> Char
+5:10-5:13
+    Char
+7:1-7:5
+    Char -> Char
+7:12-7:15
+    Char
+7:12-8:13
+    Bool -> Char
+8:10-8:13
+    Char
+10:1-10:5
+    () -> Char
+10:11-10:14
+    Char
+------------ warnings
+Source code is not reachable: testdata/language-features/pattern/pattern01.lc:11:10:
+fun4 _ = '_'
+         ^^^

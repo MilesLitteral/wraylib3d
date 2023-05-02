@@ -1,0 +1,18 @@
+type error: can not unify
+  Float
+with
+  Char
+in []
+------------ trace
+!type error: can not unify
+  Float
+with
+  Char
+in []
+------------ tooltips
+1:10-1:11
+    _b
+1:12-1:15
+    Float
+1:16-1:19
+    Char

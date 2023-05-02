@@ -1,0 +1,22 @@
+main is not found
+------------ desugared source code
+fun :: forall (a :: _) . a -> MyUnit -> MyUnit
+fun = _lhs fun \(_ :: _) (a :: _) -> hlistNilCase _ (_rhs ()) a
+------------ core code
+fun :: forall a . a -> MyUnit -> ()
+fun = \_ _ a -> hlistNilCase ' () (_rhs ()) a
+------------ tooltips
+3:8-3:9
+    _b
+3:8-3:29
+    Type
+3:13-3:19
+    Type
+3:13-3:29
+    Type
+3:23-3:29
+    Type | Type
+4:1-4:4
+    forall a . a -> MyUnit -> ()
+4:12-4:14
+    () | ()

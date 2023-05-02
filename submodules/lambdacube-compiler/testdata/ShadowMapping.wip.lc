@@ -1,0 +1,220 @@
+shadowMapSize = 512
+
+triangleCtx = TriangleCtx CullNone PolygonFill NoOffset LastVertex
+
+gaussFilter7 :: [(Float, Float)]
+gaussFilter7 = 
+    [ (-3.0,   0.015625)
+    , (-2.0,   0.09375)
+    , (-1.0,   0.234375)
+    , (0.0,    0.3125)
+    , (1.0,    0.234375)
+    , (2.0,    0.09375)
+    , (3.0,    0.015625)
+    ]
+
+gaussFilter9 :: [(Float, Float)]
+gaussFilter9 = 
+    [ (-4.0,   0.05)
+    , (-3.0,   0.09)
+    , (-2.0,   0.12)
+    , (-1.0,   0.15)
+    , (0.0,    0.16)
+    , (1.0,    0.15)
+    , (2.0,    0.12)
+    , (3.0,    0.09)
+    , (4.0,    0.05)
+    ]
+
+blurCoefficients :: [(Float, Float)]
+blurCoefficients = gaussFilter9
+
+blur :: [(Float, Float)] -> Image 1 ('Color (Vec 4 Float)) -> FrameBuffer 1 '[ 'Color (Vec 4 Float) ]
+blur coefficients img = filter1D dirH (PrjImage (filter1D dirV img))
+  where
+    dirH v = V2 (v / shadowMapSize) 0.0
+    dirV v = V2 0.0 (v / shadowMapSize)
+
+-- todo --    filter1D :: (Float -> Vec 2 Float) -> Image 1 ('Color (Vec 4 Float)) -> FrameBuffer 1 '[ 'Color (Vec 4 Float) ]
+    filter1D dir img = accumulate accCtx frag
+                                 (rasterizePrimitives triangleCtx ((NoPerspective)) prims) clearBuf
+      where
+        accCtx = ((ColorOp NoBlending (V4 True True True True)))
+        clearBuf = FrameBuffer ((ColorImage @1 (V4 0 0 0 0.0)))
+--        vert :: Vec 2 Float -> VertexOut (Vec 2 Float)
+        vert ((uv)) = (pos, uv')
+          where
+            uv'    = uv *! 0.5 +! 0.5
+            pos    = V4 uv%x uv%y 1.0 1.0
+
+        prims = mapPrimitives vert (fetch "postSlot" ((Attribute "position")) :: PrimitiveStream Triangle ((Vec 2 Float)))
+
+--        frag :: FragmentShader (Vec 2 Float -> Color (Vec 4 Float))
+        frag ((uv)) = ((sample))
+          where
+            tex = Texture2D (V2 shadowMapSize shadowMapSize) img
+            smp = Sampler LinearFilter ClampToEdge tex
+            sample = foldr1 (\a b -> a + b) [ texture2D smp (uv + dir ofs) *! coeff
+                                            | (ofs, coeff) <- coefficients
+                                            ]
+
+moments :: FrameBuffer 1 '[Depth Float, Color (Vec 4 Float)]
+moments = accumulate accCtx frag (rasterizePrimitives triangleCtx ((Smooth)) prims) clearBuf
+  where
+    accCtx = (DepthOp Less True, ColorOp NoBlending (V4 True True True True))
+    clearBuf = FrameBuffer (DepthImage @1 1000, ColorImage @1 (V4 0.0 0.0 0.0 1.0{-todo: use 1-}))
+
+    lightMatrix = Uniform "lightMatrix" :: Mat 4 4 Float
+    modelMatrix = Uniform "modelMatrix" :: Mat 4 4 Float
+
+--    vert :: ((Vec 3 Float)) -> ((Float
+    vert ((pos)) = (lightPos, depth)
+      where
+        lightPos = lightMatrix *. modelMatrix *. v3FToV4F pos
+        depth = lightPos%z
+
+    prims = mapPrimitives vert (fetch "geometrySlot" ((Attribute "position" :: Vec 3 Float)))
+
+--    frag :: Float -> (Depth Float,Color (Vec 4 Float))
+    frag ((depth)) = (depth, V4 moment1 moment2 0 1)
+      where
+        dx = dFdx depth
+        dy = dFdy depth
+        moment1 = depth
+        moment2 = depth *! depth +! 0.25 *! (dx *! dx +! dy *! dy)
+{-
+depth :: FrameBuffer 1 (Depth Float, Color (Vec 4 Float))
+depth = accumulate accCtx PassAll frag (Rasterize triangleCtx prims) clearBuf
+  where
+    accCtx = accumulationContext (DepthOp Less True, ColorOp NoBlending (V4 True True True True))
+    clearBuf = FrameBuffer (DepthImage @1 1000, ColorImage @1 (V4 0.0 0.0 0.0 1.0))
+
+    lightMatrix = Uniform "lightMatrix" :: Mat 4 4 Float
+    modelMatrix = Uniform "modelMatrix" :: Mat 4 4 Float
+
+    vert :: Vec 3 Float -> VertexOut Float
+    vert pos = VertexOut lightPos 1 () (Smooth depth)
+      where
+        lightPos = lightMatrix *. modelMatrix *. v3FToV4F pos
+        depth = lightPos%z
+
+    prims = Transform vert (fetch "geometrySlot" Triangle (Attribute "position" :: Vec 3 Float))
+
+    frag :: FragmentShader (Float -> (Depth Float, Color (Vec 4 Float)))
+    frag = FragmentShaderRastDepth $ \depth -> (V4 depth 0 0 1)
+
+vsm :: FrameBuffer 1 (Depth Float, Color (Vec 4 Float))
+vsm = accumulate accCtx PassAll frag (Rasterize triangleCtx prims) clearBuf
+  where
+    accCtx = accumulationContext (DepthOp Less True, ColorOp NoBlending (V4 True True True True))
+    cameraMatrix = Uniform "cameraMatrix" :: Mat 4 4 Float
+    lightMatrix = Uniform "lightMatrix" :: Mat 4 4 Float
+    modelMatrix = Uniform "modelMatrix" :: Mat 4 4 Float
+    lightPosition = Uniform "lightPosition" :: Vec 3 Float
+
+    shadowMap = Texture2D (V2 shadowMapSize shadowMapSize) (PrjImageColor moments)
+    shadowMapBlur = Texture2D (V2 shadowMapSize shadowMapSize) (PrjImage blurredMoments)
+      where
+        blurredMoments = blur blurCoefficients (PrjImageColor moments)
+    sampler = Sampler LinearFilter ClampToEdge shadowMapBlur
+
+    frag :: FragmentShader ((Vec 3 Float, Vec 4 Float, Vec 3 Float) -> (Depth Float, Color (Vec 4 Float)))
+    frag = FragmentShaderRastDepth $ \(worldPos, lightPos, worldNormal) -> (luminance)
+      where
+        clampUV x = clampS x 0.0 1.0
+        scaleUV x = x *! 0.5 +! 0.5
+        lightU = lightPos%x
+        lightV = lightPos%y
+        lightDepth = lightPos%z
+        lightW = lightPos%w
+        uv = clampUV (scaleUV ((V2 lightU lightV) /! lightW))
+        
+        val = texture2D sampler uv
+        moment1 = val%x
+        moment2 = val%y
+        variance = max 0.002 (moment2 -! moment1 *! moment1)
+        distance = max 0.0 (lightDepth -! moment1)
+        lightProbMax = variance /! (variance +! distance *! distance)
+        
+        lambert = max 0.0 (dot worldNormal (normalize (lightPosition - worldPos)))
+        
+        uv' = uv -! 0.5
+        spotShape = 1.0 -! length uv *! 4.0
+        intensity = max 0 (spotShape *! lambert)
+        
+        val2 = scaleUV (round (uv' *! 10.0)) *! intensity
+        spotR = val2%x
+        spotG = val2%y
+        
+        luminance = (V4 spotR spotG intensity 1.0) *! pow lightProbMax 2.0
+        
+
+    clearBuf = FrameBuffer ( DepthImage @1 1000
+                           , ColorImage @1 (V4 0.1 0.2 0.6 1))
+
+    vert :: (Vec 3 Float, Vec 3 Float) -> VertexOut (Vec 3 Float, Vec 4 Float, Vec 3 Float)
+    vert (localPos, localNormal) = VertexOut viewPos 1 () (Smooth worldPos%xyz, ((Smooth)) lightPos, ((Smooth)) worldNormal)
+      where
+        worldPos = modelMatrix *. v3FToV4F localPos
+        viewPos = cameraMatrix *. worldPos
+        lightPos = lightMatrix *. worldPos
+        worldNormal = normalize ((modelMatrix *. v3FToV4F localNormal)%xyz)
+
+    prims = Transform vert (fetch "geometrySlot" Triangle (Attribute "position" :: Vec 3 Float, Attribute "normal" :: Vec 3 Float))
+
+
+sm :: FrameBuffer 1 (Depth Float, Color (Vec 4 Float))
+sm = accumulate accCtx PassAll frag (Rasterize triangleCtx prims) clearBuf
+  where
+    accCtx = accumulationContext (DepthOp Less True, ColorOp NoBlending (V4 True True True True))
+    clearBuf = FrameBuffer (DepthImage @1 1000, ColorImage @1 (V4 0.1 0.2 0.6 1))
+    cameraMatrix = Uniform "cameraMatrix" :: Mat 4 4 Float
+    lightMatrix = Uniform "lightMatrix" :: Mat 4 4 Float
+    modelMatrix = Uniform "modelMatrix" :: Mat 4 4 Float
+    lightPosition = Uniform "lightPosition" :: Vec 3 Float
+
+    vert :: (Vec 3 Float, Vec 3 Float) -> VertexOut (Vec 3 Float, Vec 4 Float, Vec 3 Float)
+    vert (localPos, localNormal) = VertexOut viewPos 1 () (Smooth (worldPos%xyz), ((Smooth)) lightPos, ((Smooth)) worldNormal)
+      where
+        worldPos = modelMatrix *. v3FToV4F localPos
+        viewPos = cameraMatrix *. worldPos
+        lightPos = lightMatrix *. worldPos
+        worldNormal = normalize ((modelMatrix *. v3FToV4F localNormal)%xyz)
+
+    prims = Transform vert (fetch "geometrySlot" Triangle (Attribute "position" :: Vec 3 Float, Attribute "normal" :: Vec 3 Float))
+
+    --shadowMap :: Exp Obj (Texture Tex2D SingleTex (Regular Float) Red)
+    shadowMap = Texture2D (V2 shadowMapSize shadowMapSize) (PrjImageColor depth)
+    sampler = Sampler PointFilter ClampToEdge shadowMap
+    
+    frag :: FragmentShader ((Vec 3 Float, Vec 4 Float, Vec 3 Float) -> (Depth Float, Color (Vec 4 Float)))
+    frag = FragmentShaderRastDepth $ \(worldPos, lightPos, worldNormal) -> (luminance)
+      where
+        lightU = lightPos%x
+        lightV = lightPos%y
+        lightDepth = lightPos%z
+        lightW = lightPos%w
+        clampUV x = clampS x 0 1
+        scaleUV x = x *! 0.5 +! 0.5
+        uv = clampUV (scaleUV ((V2 lightU lightV) /! lightW))
+        
+        surfaceDistance = (texture2D sampler uv)%x
+        lightPortion = if (lightDepth <= surfaceDistance +! 0.01) then 1 else 0
+        
+        lambert = max 0 (dot worldNormal (normalize (lightPosition - worldPos)))
+        
+        --intensity = lambert @* lightPortion
+        --luminance = pack' (V4 intensity intensity intensity (floatF 1))
+        
+        uv' = uv -! 0.5
+        spotShape = 1 -! length uv' *! 4
+        intensity = max 0 (spotShape *! lambert)
+
+        val = scaleUV (round (uv' *! 10)) *! intensity
+        spotR = val%x
+        spotG = val%y
+        
+        luminance = (V4 spotR spotG intensity 1) *! lightPortion
+        
+main = ScreenOut sm
+-}

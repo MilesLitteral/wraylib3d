@@ -1,0 +1,8 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+import Internals
+
+h f y z = x
+  where
+    -- x :: 
+    x = (\(a, b) -> f a b) y
+

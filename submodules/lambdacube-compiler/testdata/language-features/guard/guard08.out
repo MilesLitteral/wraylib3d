@@ -1,0 +1,30 @@
+main is not found
+------------ desugared source code
+value
+  = _lhs
+    value
+    (case'Bool
+      (\(_ :: _) -> _)
+      (case'Bool (\(_ :: _) -> _) (_rhs undefined) (_rhs "False") False)
+      (_rhs "True")
+      True)
+------------ core code
+value :: String
+value = _rhs "True"
+------------ tooltips
+1:1-1:6
+    String
+1:7-1:11
+    Bool
+1:7-1:32
+    String
+1:12-1:18
+    String
+1:12-1:32
+    Bool -> String
+1:19-1:24
+    Bool
+1:19-1:32
+    String
+1:25-1:32
+    String

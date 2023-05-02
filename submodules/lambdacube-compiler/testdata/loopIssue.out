@@ -1,0 +1,195 @@
+main :: Bool
+main = True
+------------ desugared source code
+data Inf :: Type where
+    Inf :: Inf -> Inf
+
+inf = primFix \(a :: _) -> _lhs inf (_rhs (Inf a))
+
+main'
+  = _lhs
+    main'
+    (_rhs ((\(a :: _) -> case'Inf (\(_ :: _) -> _) (\(_ :: _) -> True) a) inf))
+
+inf2 = _lhs inf2 (_rhs inf)
+
+(-) = _lhs (-) (_rhs primSubInt)
+
+repeat = primFix \(a :: _) -> _lhs repeat \(b :: _) -> _rhs ((b :: Bool) : a b)
+
+repeatT = primFix \(a :: _) -> _lhs repeatT (_rhs (True : a))
+
+primes = _lhs primes (_rhs repeatT)
+
+(!!)
+  = primFix
+    \(a :: _) -> _lhs
+      (!!)
+      \(b :: _) (c :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs undefined)
+        (\(d :: _) (e :: _) -> case'Bool
+          (\(_ :: _) -> _)
+          (_rhs (a e (c - fromInt 1)))
+          (_rhs d)
+          (fromInt 0 == c))
+        b
+
+main = _lhs main (_rhs (primes !! fromInt 20))
+------------ core code
+!! :: forall a . [a] -> Int -> a
+!!
+  = \a -> primFix
+    _
+    \b c d -> case'List
+      (\_ -> a)
+      (_rhs (undefined a))
+      (\e f -> case'Bool
+        (\_ -> a)
+        (_rhs (b f (primSubInt d 1)))
+        (_rhs e)
+        (isEQ (primCompareInt 0 d)))
+      c
+
+'Inf :: Type
+'Inf = <<type constructor with 0 indices; constructors: Inf>>
+
+- :: Int -> Int -> Int
+- = _rhs \a b -> primSubInt a b
+
+Inf :: Inf -> Inf
+Inf = <<0th constructor of 'Inf>>
+
+case'Inf
+  :: forall (a :: Inf -> Type)
+    -> (forall (b :: Inf) -> a ('Inf b)) -> forall (c :: Inf) -> a c
+case'Inf = \a b c -> <<case function of a type with 0 parameters>>
+
+inf :: Inf
+inf = primFix _ \a -> _rhs (Inf a)
+
+inf2 :: Inf
+inf2 = _rhs (Inf inf)
+
+main :: Bool
+main = _rhs True
+
+main' :: Bool
+main' = _rhs True
+
+match'Inf :: forall (a :: Type -> Type) -> a Inf -> forall b -> a b -> a b
+match'Inf = \a b c d -> <<type case function>>
+
+primes :: [Bool]
+primes = _rhs (True : repeatT)
+
+repeat :: Bool -> [Bool]
+repeat = primFix _ \a b -> _rhs (typeAnn b : a b)
+
+repeatT :: [Bool]
+repeatT = primFix _ \a -> _rhs (True : a)
+------------ tooltips
+5:6-5:9
+    Type | Type | Type | Type | Type | Type
+5:6-5:15
+    Type
+5:12-5:15
+    Inf -> Inf | Inf | Type | Type
+5:16-5:19
+    Type
+7:1-7:4
+    Inf
+7:7-7:10
+    Inf -> Inf
+7:7-7:14
+    Inf
+7:11-7:14
+    Inf
+9:1-9:6
+    Bool
+9:9-10:18
+    Bool
+9:14-9:17
+    Inf
+10:14-10:18
+    Bool
+13:1-13:5
+    Inf
+13:8-13:11
+    Inf
+15:2-15:3
+    Int -> Int -> Int
+15:7-15:17
+    Int -> Int -> Int
+17:1-17:7
+    Bool -> [Bool]
+17:12-17:24
+    [Bool] -> [Bool]
+17:12-17:33
+    [Bool]
+17:13-17:14
+    _b
+17:13-17:22
+    Bool
+17:18-17:22
+    Type
+17:23-17:24
+    forall a . a -> [a] -> [a]
+17:25-17:31
+    _c
+17:32-17:33
+    Bool
+19:1-19:8
+    [Bool]
+19:11-19:15
+    Bool
+19:11-19:16
+    [Bool] -> [Bool]
+19:11-19:24
+    [Bool]
+19:15-19:16
+    forall a . a -> [a] -> [a]
+19:17-19:24
+    [Bool]
+22:1-22:7
+    [Bool]
+22:10-22:17
+    [Bool]
+26:8-26:10
+    forall a . [a] -> Int -> a
+26:15-26:16
+    _e
+26:15-27:28
+    Bool -> _d | _c
+27:17-27:19
+    [_h]
+27:20-27:22
+    _k
+27:24-27:25
+    _k
+27:24-27:26
+    Int -> Int
+27:24-27:27
+    Int
+27:25-27:26
+    Int -> Int -> Int
+27:26-27:27
+    _b
+29:1-29:5
+    Bool
+30:5-30:11
+    [Bool]
+30:5-30:14
+    Int -> Bool
+30:5-30:17
+    Bool
+30:12-30:14
+    forall a . [a] -> Int -> a
+30:15-30:17
+    _b
+------------ warnings
+Uncovered pattern(s) at testdata/loopIssue.lc:26:8:
+(x: _) !! 0 = x
+(_ : xs) !! n = xs !! (n-1)
+Missing case(s):
+    [] !! _

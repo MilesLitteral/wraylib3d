@@ -1,0 +1,11 @@
+main is not found
+------------ desugared source code
+fun = _lhs fun (_rhs hello)
+------------ core code
+fun :: String
+fun = _rhs "hello"
+------------ tooltips
+4:1-4:4
+    String
+4:7-4:12
+    String

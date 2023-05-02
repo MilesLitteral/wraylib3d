@@ -1,0 +1,66 @@
+main :: Bool
+main = True
+------------ desugared source code
+a :: [Float]
+a = _lhs a (_rhs (concatMap (\(a :: _) -> [a]) [1.0]))
+
+main :: Bool
+main
+  = _lhs
+    main
+    (_rhs
+      ((\(a :: _) -> case'List
+          (\(_ :: _) -> _)
+          undefined
+          (\(b :: _) (c :: _) -> case'Bool
+            (\(_ :: _) -> _)
+            undefined
+            (case'List (\(_ :: _) -> _) True (\(_ :: _) (_ :: _) -> undefined) c)
+            (1.0 == b))
+          a)
+        a))
+------------ core code
+a :: [Float]
+a = _rhs (1.0 : [] ++ foldr (++) [] (map (\a -> [a]) []))
+
+main :: Bool
+main = _rhs True
+------------ tooltips
+1:6-1:13
+    Type
+1:7-1:12
+    Type
+2:1-2:2
+    [Float]
+2:5-2:14
+    forall a b . (a -> [b]) -> [a] -> [b]
+2:5-2:26
+    [_a] -> [_a]
+2:5-2:32
+    [Float]
+2:22-2:25
+    [_b]
+2:23-2:24
+    _d
+2:27-2:32
+    [Float]
+2:28-2:31
+    Float
+4:9-4:13
+    Type
+5:1-5:5
+    Bool
+5:8-6:23
+    Bool
+5:13-5:14
+    [Float]
+6:19-6:23
+    Bool | Bool | Bool
+------------ warnings
+Uncovered pattern(s) at testdata/concatmap01.lc:5:13:
+main = case a of
+            ^
+Missing case(s):
+     []
+     (_ : _) | False <- 1.0 == _b
+     (_ : _ : _) | True <- 1.0 == _b

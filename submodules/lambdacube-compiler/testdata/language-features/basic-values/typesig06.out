@@ -1,0 +1,58 @@
+main is not found
+------------ desugared source code
+funL = _lhs funL \(a :: _) (_ :: _) -> _rhs a
+
+(<@) = _lhs (<@) \(a :: _) (_ :: _) -> _rhs a
+
+value1 = _lhs value1 (_rhs ("hi" <@ 1.2 :: String))
+
+value2 = _lhs value2 (_rhs ("hi" `funL` 1.2 :: String))
+------------ core code
+<@ :: forall a b . a -> b -> a
+<@ = \a b c _ -> _rhs c
+
+funL :: forall a b . a -> b -> a
+funL = \a b c _ -> _rhs c
+
+value1 :: String
+value1 = _rhs "hi"
+
+value2 :: String
+value2 = _rhs "hi"
+------------ tooltips
+1:1-1:5
+    forall a b . a -> b -> a
+1:12-1:13
+    _d
+2:3-2:5
+    forall a b . a -> b -> a
+2:10-2:11
+    _d
+4:1-4:7
+    String
+4:10-4:14
+    String
+4:10-4:17
+    _a -> String
+4:10-4:21
+    String
+4:15-4:17
+    forall a b . a -> b -> a
+4:18-4:21
+    Float
+4:25-4:31
+    Type
+5:1-5:7
+    String
+5:10-5:14
+    String
+5:10-5:21
+    _a -> String
+5:10-5:25
+    String
+5:15-5:21
+    forall a b . a -> b -> a
+5:22-5:25
+    Float
+5:29-5:35
+    Type

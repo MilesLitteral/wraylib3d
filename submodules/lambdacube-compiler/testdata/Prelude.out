@@ -1,0 +1,4486 @@
+main is not found
+------------ desugared source code
+infixr 9 .
+
+infixl 7 PrimMulMatVec
+
+infixl 7 PrimDot
+
+infixr 5 ++
+
+infixr 3 ***
+
+infixr 0 $
+
+const = _lhs const \(a :: _) (_ :: _) -> _rhs a
+
+otherwise = _lhs otherwise (_rhs True)
+
+(&) = _lhs (&) \(a :: _) (b :: _) -> _rhs (b a)
+
+($) = _lhs ($) (_rhs \(a :: _) (b :: _) -> a b)
+
+(.) = _lhs (.) (_rhs \(a :: _) (b :: _) (c :: _) -> a (b c))
+
+uncurry
+  = _lhs
+    uncurry
+    \(a :: _) (b :: _) -> hlistConsCase
+      _
+      (\(c :: _) (d :: _) -> hlistConsCase
+        _
+        (\(e :: _) (f :: _) -> hlistNilCase _ (_rhs (a c e)) f)
+        d)
+      b
+
+(***)
+  = _lhs
+    (***)
+    \(a :: _) (b :: _) (c :: _) -> hlistConsCase
+      _
+      (\(d :: _) (e :: _) -> hlistConsCase
+        _
+        (\(f :: _) (g :: _) -> hlistNilCase _ (_rhs (a d, b f)) g)
+        e)
+      c
+
+pi = _lhs pi (_rhs 3.141592653589793)
+
+zip :: forall (a :: _) (b :: _) . [a] -> [b] -> [(a, b)]
+zip
+  = primFix
+    \(a :: _) -> _lhs
+      zip
+      \(b :: _) (c :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs [])
+        (\(d :: _) (e :: _) -> case'List
+          (\(_ :: _) -> _)
+          (_rhs [])
+          (\(f :: _) (g :: _) -> _rhs ((d, f) : a e g))
+          c)
+        b
+
+unzip :: forall (a :: _) (b :: _) . [(a, b)] -> ([a], [b])
+unzip
+  = primFix
+    \(a :: _) -> _lhs
+      unzip
+      \(b :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs ([], []))
+        (\(c :: _) (d :: _) -> hlistConsCase
+          _
+          (\(e :: _) (f :: _) -> hlistConsCase
+            _
+            (\(g :: _) (h :: _) -> hlistNilCase
+              _
+              (_rhs
+                let
+                  i = a d;
+                  j
+                    = (\(l :: _) -> hlistConsCase
+                        _
+                        (\(_ :: _) (m :: _) -> hlistConsCase
+                          _
+                          (\(n :: _) (o :: _) -> hlistNilCase _ n o)
+                          m)
+                        l)
+                      i;
+                  k
+                    = (\(p :: _) -> hlistConsCase
+                        _
+                        (\(q :: _) (r :: _) -> hlistConsCase
+                          _
+                          (\(_ :: _) (s :: _) -> hlistNilCase _ q s)
+                          r)
+                        p)
+                      i
+                  in (e : k, g : j))
+              h)
+            f)
+          c)
+        b
+
+filter
+  = primFix
+    \(a :: _) -> _lhs
+      filter
+      \(b :: _) (c :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs [])
+        (\(d :: _) (e :: _) -> _rhs
+          ((\(f :: _) -> case'Bool (\(_ :: _) -> _) (a b e) (d : a b e) f) (b d)))
+        c
+
+tail :: forall (a :: _) . [a] -> [a]
+tail
+  = _lhs
+    tail
+    \(a :: _) -> case'List
+      (\(_ :: _) -> _)
+      (_rhs undefined)
+      (\(_ :: _) (b :: _) -> _rhs b)
+      a
+
+pairs :: forall (a :: _) . [a] -> [(a, a)]
+pairs = _lhs pairs \(a :: _) -> _rhs (zip a (tail a))
+
+foldl'
+  = primFix
+    \(a :: _) -> _lhs
+      foldl'
+      \(b :: _) (c :: _) (d :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs c)
+        (\(e :: _) (f :: _) -> _rhs (a b (b c e) f))
+        d
+
+foldr1
+  = _lhs
+    foldr1
+    \(a :: _) (b :: _) -> case'List
+      (\(_ :: _) -> _)
+      (_rhs undefined)
+      (\(c :: _) (d :: _) -> _rhs (foldr a c d))
+      b
+
+split
+  = primFix
+    \(a :: _) -> _lhs
+      split
+      \(b :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs ([], []))
+        (\(c :: _) (d :: _) -> _rhs
+          let
+            e = a d;
+            f
+              = (\(h :: _) -> hlistConsCase
+                  _
+                  (\(_ :: _) (i :: _) -> hlistConsCase
+                    _
+                    (\(j :: _) (k :: _) -> hlistNilCase _ j k)
+                    i)
+                  h)
+                e;
+            g
+              = (\(l :: _) -> hlistConsCase
+                  _
+                  (\(m :: _) (n :: _) -> hlistConsCase
+                    _
+                    (\(_ :: _) (o :: _) -> hlistNilCase _ m o)
+                    n)
+                  l)
+                e
+            in (c : f, g))
+        b
+
+mergeBy
+  = primFix
+    \(a :: _) -> _lhs
+      mergeBy
+      \(b :: _) (c :: _) (d :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs d)
+        (\(e :: _) (f :: _) -> case'List
+          (\(_ :: _) -> _)
+          (_rhs c)
+          (\(g :: _) (h :: _) -> _rhs
+            ((\(i :: _) -> case'Ordering
+                (\(_ :: _) -> _)
+                (e : a b f (g : h))
+                (g : a b (e : f) h)
+                (g : a b (e : f) h)
+                i)
+              (b e g)))
+          d)
+        c
+
+sortBy
+  = primFix
+    \(a :: _) -> _lhs
+      sortBy
+      \(b :: _) (c :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs [])
+        (\(d :: _) (e :: _) -> case'List
+          (\(_ :: _) -> _)
+          (_rhs [d])
+          (\(_ :: _) (_ :: _) -> _rhs (uncurry (mergeBy b) ((a b *** a b) (split c))))
+          e)
+        c
+
+iterate :: forall (a :: _) . (a -> a) -> a -> [a]
+iterate
+  = primFix \(a :: _) -> _lhs iterate \(b :: _) (c :: _) -> _rhs (c : a b (b c))
+
+fst
+  = _lhs
+    fst
+    \(a :: _) -> hlistConsCase
+      _
+      (\(b :: _) (c :: _) -> hlistConsCase
+        _
+        (\(_ :: _) (d :: _) -> hlistNilCase _ (_rhs b) d)
+        c)
+      a
+
+snd
+  = _lhs
+    snd
+    \(a :: _) -> hlistConsCase
+      _
+      (\(_ :: _) (b :: _) -> hlistConsCase
+        _
+        (\(c :: _) (d :: _) -> hlistNilCase _ (_rhs c) d)
+        b)
+      a
+
+(|||)
+  = _lhs
+    (|||)
+    \(a :: _) (b :: _) -> case'Bool (\(_ :: _) -> _) (_rhs b) (_rhs True) a
+
+infixr 2 |||
+
+(&&&)
+  = _lhs
+    (&&&)
+    \(a :: _) (b :: _) -> case'Bool (\(_ :: _) -> _) (_rhs False) (_rhs b) a
+
+infixr 3 &&&
+
+data RecItem :: Type where
+    RecItem :: String -> Type -> RecItem
+
+recItemType
+  = _lhs
+    recItemType
+    \(a :: _) -> case'RecItem (\(_ :: _) -> _) (\(_ :: _) (b :: _) -> _rhs b) a
+
+data RecordC (_ :: [RecItem]) :: Type where
+    RecordCons :: forall (a :: [RecItem]) . HList (map recItemType a) -> RecordC a
+
+isKeyC
+  = primFix
+    \(a :: _) -> _lhs
+      isKeyC
+      \(b :: _) (c :: _) (d :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs ('CEmpty ""))
+        (\(e :: _) (f :: _) -> case'RecItem
+          (\(_ :: _) -> _)
+          (\(g :: _) (h :: _) -> _rhs (primIfThenElse (b == g) (c `'EqCTt` h) (a b c f)))
+          e)
+        d
+
+fstTup = _lhs fstTup (_rhs (hlistConsCase (_ :: _) \(a :: _) (_ :: _) -> a))
+
+sndTup = _lhs sndTup (_rhs (hlistConsCase (_ :: _) \(_ :: _) (a :: _) -> a))
+
+project
+  :: forall (a :: _) (b :: [RecItem])
+    . forall (c :: String) -> isKeyC c a b => RecordC b -> a
+project
+  = primFix
+    \(a :: _) -> _lhs
+      project
+      \ @(b :: _) @(c :: _) (d :: _) @(_ :: _) (e :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs undefined)
+        (\(f :: _) (g :: _) -> case'RecItem
+          (\(_ :: _) -> _)
+          (\(h :: _) (_ :: _) -> case'RecordC
+            (\(_ :: _) -> _)
+            (\(i :: _) -> case'Bool
+              (\(_ :: _) -> _)
+              (_rhs
+                (a
+                  @b
+                  @g
+                  d
+                  @(undefined @('CW (isKeyC d b g)))
+                  (RecordCons
+                    (sndTup (unsafeCoerce @(_ :: _) @('HList (b : map recItemType g)) i)))))
+              (_rhs (fstTup (unsafeCoerce @(_ :: _) @('HList (b : map recItemType g)) i)))
+              (d == h))
+            e)
+          f)
+        c
+
+rgb = _lhs rgb \(a :: _) (b :: _) (c :: _) -> _rhs (V4 a b c 1.0)
+
+black = _lhs black (_rhs (rgb 0.0 0.0 0.0))
+
+gray = _lhs gray (_rhs (rgb 0.5 0.5 0.5))
+
+silver = _lhs silver (_rhs (rgb 0.75 0.75 0.75))
+
+white = _lhs white (_rhs (rgb 1.0 1.0 1.0))
+
+maroon = _lhs maroon (_rhs (rgb 0.5 0.0 0.0))
+
+red = _lhs red (_rhs (rgb 1.0 0.0 0.0))
+
+olive = _lhs olive (_rhs (rgb 0.5 0.5 0.0))
+
+yellow = _lhs yellow (_rhs (rgb 1.0 1.0 0.0))
+
+green = _lhs green (_rhs (rgb 0.0 0.5 0.0))
+
+lime = _lhs lime (_rhs (rgb 0.0 1.0 0.0))
+
+teal = _lhs teal (_rhs (rgb 0.0 0.5 0.5))
+
+aqua = _lhs aqua (_rhs (rgb 0.0 1.0 1.0))
+
+navy = _lhs navy (_rhs (rgb 0.0 0.0 0.5))
+
+blue = _lhs blue (_rhs (rgb 0.0 0.0 1.0))
+
+purple = _lhs purple (_rhs (rgb 0.5 0.0 0.5))
+
+fuchsia = _lhs fuchsia (_rhs (rgb 1.0 0.0 1.0))
+
+colorImage1 = _lhs colorImage1 (_rhs (ColorImage @(fromInt 1)))
+
+colorImage2 = _lhs colorImage2 (_rhs (ColorImage @(fromInt 2)))
+
+depthImage1 = _lhs depthImage1 (_rhs (DepthImage @(fromInt 1)))
+
+v3FToV4F :: Vec (fromInt 3) Float -> Vec (fromInt 4) Float
+v3FToV4F
+  = _lhs
+    v3FToV4F
+    \(a :: _) -> _rhs
+      (V4 (swizzscalar a Sx) (swizzscalar a Sy) (swizzscalar a Sz) (fromInt 1))
+
+radians = _lhs radians (_rhs PrimRadians)
+
+degrees = _lhs degrees (_rhs PrimDegrees)
+
+sin = _lhs sin (_rhs PrimSin)
+
+cos = _lhs cos (_rhs PrimCos)
+
+tan = _lhs tan (_rhs PrimTan)
+
+sinh = _lhs sinh (_rhs PrimSinH)
+
+cosh = _lhs cosh (_rhs PrimCosH)
+
+tanh = _lhs tanh (_rhs PrimTanH)
+
+asin = _lhs asin (_rhs PrimASin)
+
+asinh = _lhs asinh (_rhs PrimASinH)
+
+acos = _lhs acos (_rhs PrimACos)
+
+acosh = _lhs acosh (_rhs PrimACosH)
+
+atan = _lhs atan (_rhs PrimATan)
+
+atanh = _lhs atanh (_rhs PrimATanH)
+
+atan2 = _lhs atan2 (_rhs PrimATan2)
+
+pow = _lhs pow (_rhs PrimPow)
+
+exp = _lhs exp (_rhs PrimExp)
+
+log = _lhs log (_rhs PrimLog)
+
+exp2 = _lhs exp2 (_rhs PrimExp2)
+
+log2 = _lhs log2 (_rhs PrimLog2)
+
+sqrt = _lhs sqrt (_rhs PrimSqrt)
+
+inversesqrt = _lhs inversesqrt (_rhs PrimInvSqrt)
+
+abs = _lhs abs (_rhs PrimAbs)
+
+sign = _lhs sign (_rhs PrimSign)
+
+floor = _lhs floor (_rhs PrimFloor)
+
+trunc = _lhs trunc (_rhs PrimTrunc)
+
+round = _lhs round (_rhs PrimRound)
+
+roundEven = _lhs roundEven (_rhs PrimRoundEven)
+
+ceil = _lhs ceil (_rhs PrimCeil)
+
+fract = _lhs fract (_rhs PrimFract)
+
+mod = _lhs mod (_rhs PrimMod)
+
+min = _lhs min (_rhs PrimMin)
+
+max = _lhs max (_rhs PrimMax)
+
+modF = _lhs modF (_rhs PrimModF)
+
+clamp = _lhs clamp (_rhs PrimClamp)
+
+clampS = _lhs clampS (_rhs PrimClampS)
+
+mix = _lhs mix (_rhs PrimMix)
+
+mixS = _lhs mixS (_rhs PrimMixS)
+
+mixB = _lhs mixB (_rhs PrimMixB)
+
+step = _lhs step (_rhs PrimStep)
+
+stepS = _lhs stepS (_rhs PrimStepS)
+
+smoothstep = _lhs smoothstep (_rhs PrimSmoothStep)
+
+smoothstepS = _lhs smoothstepS (_rhs PrimSmoothStepS)
+
+isNan = _lhs isNan (_rhs PrimIsNan)
+
+isInf = _lhs isInf (_rhs PrimIsInf)
+
+dFdx = _lhs dFdx (_rhs PrimDFdx)
+
+dFdy = _lhs dFdy (_rhs PrimDFdy)
+
+fWidth = _lhs fWidth (_rhs PrimFWidth)
+
+noise1 = _lhs noise1 (_rhs PrimNoise1)
+
+noise2 = _lhs noise2 (_rhs PrimNoise2)
+
+noise3 = _lhs noise3 (_rhs PrimNoise3)
+
+noise4 = _lhs noise4 (_rhs PrimNoise4)
+
+length = _lhs length (_rhs PrimLength)
+
+distance = _lhs distance (_rhs PrimDistance)
+
+dot = _lhs dot (_rhs PrimDot)
+
+cross = _lhs cross (_rhs PrimCross)
+
+normalize = _lhs normalize (_rhs PrimNormalize)
+
+faceforward = _lhs faceforward (_rhs PrimFaceForward)
+
+reflect = _lhs reflect (_rhs PrimReflect)
+
+refract = _lhs refract (_rhs PrimRefract)
+
+transpose = _lhs transpose (_rhs PrimTranspose)
+
+det = _lhs det (_rhs PrimDeterminant)
+
+inv = _lhs inv (_rhs PrimInverse)
+
+outer = _lhs outer (_rhs PrimOuterProduct)
+
+bAnd = _lhs bAnd (_rhs PrimBAnd)
+
+bOr = _lhs bOr (_rhs PrimBOr)
+
+bXor = _lhs bXor (_rhs PrimBXor)
+
+bNot = _lhs bNot (_rhs PrimBNot)
+
+bAndS = _lhs bAndS (_rhs PrimBAndS)
+
+bOrS = _lhs bOrS (_rhs PrimBOrS)
+
+bXorS = _lhs bXorS (_rhs PrimBXorS)
+
+shiftL = _lhs shiftL (_rhs PrimBShiftL)
+
+shiftR = _lhs shiftR (_rhs PrimBShiftR)
+
+shiftLS = _lhs shiftLS (_rhs PrimBShiftLS)
+
+shiftRS = _lhs shiftRS (_rhs PrimBShiftRS)
+
+floatBitsToInt = _lhs floatBitsToInt (_rhs PrimFloatBitsToInt)
+
+floatBitsToWord = _lhs floatBitsToWord (_rhs PrimFloatBitsToUInt)
+
+intBitsToFloat = _lhs intBitsToFloat (_rhs PrimIntBitsToFloat)
+
+wordBitsToFloat = _lhs wordBitsToFloat (_rhs PrimUIntBitsToFloat)
+
+infixl 7 *
+
+infixl 7 /
+
+infixl 7 %
+
+infixl 6 +
+
+infixl 6 -
+
+infix 4 /=
+
+infix 4 <
+
+infix 4 <=
+
+infix 4 >=
+
+infix 4 >
+
+infixr 3 &&
+
+infixr 2 ||
+
+infix 7 dot
+
+infix 7 cross
+
+infixr 7 *.
+
+infixl 7 .*
+
+infixl 7 .*.
+
+(+) = _lhs (+) \(a :: _) (b :: _) -> _rhs (PrimAdd a b)
+
+(-) = _lhs (-) \(a :: _) (b :: _) -> _rhs (PrimSub a b)
+
+(*) = _lhs (*) \(a :: _) (b :: _) -> _rhs (PrimMul a b)
+
+(/) = _lhs (/) \(a :: _) (b :: _) -> _rhs (PrimDiv a b)
+
+(%) = _lhs (%) \(a :: _) (b :: _) -> _rhs (PrimMod a b)
+
+neg = _lhs neg \(a :: _) -> _rhs (PrimNeg a)
+
+(/=) = _lhs (/=) \(a :: _) (b :: _) -> _rhs (PrimNotEqual a b)
+
+(<) = _lhs (<) \(a :: _) (b :: _) -> _rhs (PrimLessThan a b)
+
+(<=) = _lhs (<=) \(a :: _) (b :: _) -> _rhs (PrimLessThanEqual a b)
+
+(>=) = _lhs (>=) \(a :: _) (b :: _) -> _rhs (PrimGreaterThanEqual a b)
+
+(>) = _lhs (>) \(a :: _) (b :: _) -> _rhs (PrimGreaterThan a b)
+
+(&&) = _lhs (&&) \(a :: _) (b :: _) -> _rhs (PrimAnd a b)
+
+(||) = _lhs (||) \(a :: _) (b :: _) -> _rhs (PrimOr a b)
+
+xor = _lhs xor (_rhs PrimXor)
+
+not = _lhs not \(a :: _) -> _rhs (PrimNot a)
+
+any = _lhs any \(a :: _) -> _rhs (PrimAny a)
+
+all = _lhs all \(a :: _) -> _rhs (PrimAll a)
+
+(.*.) = _lhs (.*.) \(a :: _) (b :: _) -> _rhs (PrimMulMatMat a b)
+
+(*.) = _lhs (*.) \(a :: _) (b :: _) -> _rhs (PrimMulMatVec a b)
+
+(.*) = _lhs (.*) \(a :: _) (b :: _) -> _rhs (PrimMulVecMat a b)
+
+infixl 7 *!
+
+infixl 7 /!
+
+infixl 7 %!
+
+infixl 6 +!
+
+infixl 6 -!
+
+(+!) = _lhs (+!) \(a :: _) (b :: _) -> _rhs (PrimAddS a b)
+
+(-!) = _lhs (-!) \(a :: _) (b :: _) -> _rhs (PrimSubS a b)
+
+(*!) = _lhs (*!) \(a :: _) (b :: _) -> _rhs (PrimMulS a b)
+
+(/!) = _lhs (/!) \(a :: _) (b :: _) -> _rhs (PrimDivS a b)
+
+(%!) = _lhs (%!) \(a :: _) (b :: _) -> _rhs (PrimModS a b)
+
+perspective
+  :: Float -> Float -> Float -> Float -> Mat (fromInt 4) (fromInt 4) Float
+perspective
+  = _lhs
+    perspective
+    \(a :: _) (b :: _) (c :: _) (d :: _) -> _rhs
+      let
+        e = a * tan (c / fromInt 2); f = fromInt 0 - e; g = d * e; h = fromInt 0 - g
+        in M44F
+        (V4 (fromInt 2 * a / (g - h)) (fromInt 0) (fromInt 0) (fromInt 0))
+        (V4 (fromInt 0) (fromInt 2 * a / (e - f)) (fromInt 0) (fromInt 0))
+        (V4
+          ((g + h) / (g - h))
+          ((e + f) / (e - f))
+          (fromInt 0 - (b + a) / (b - a))
+          (fromInt 0 - fromInt 1))
+        (V4
+          (fromInt 0)
+          (fromInt 0)
+          (fromInt 0 - fromInt 2 * b * a / (b - a))
+          (fromInt 0))
+
+rotMatrixZ
+  = _lhs
+    rotMatrixZ
+    \(a :: _) -> _rhs
+      let b = cos a; c = sin a in M44F
+        (V4 b c (fromInt 0) (fromInt 0))
+        (V4 (fromInt 0 - c) b (fromInt 0) (fromInt 0))
+        (V4 (fromInt 0) (fromInt 0) (fromInt 1) (fromInt 0))
+        (V4 (fromInt 0) (fromInt 0) (fromInt 0) (fromInt 1))
+
+rotMatrixY
+  = _lhs
+    rotMatrixY
+    \(a :: _) -> _rhs
+      let b = cos a; c = sin a in M44F
+        (V4 b (fromInt 0) (fromInt 0 - c) (fromInt 0))
+        (V4 (fromInt 0) (fromInt 1) (fromInt 0) (fromInt 0))
+        (V4 c (fromInt 0) b (fromInt 0))
+        (V4 (fromInt 0) (fromInt 0) (fromInt 0) (fromInt 1))
+
+rotMatrixX
+  = _lhs
+    rotMatrixX
+    \(a :: _) -> _rhs
+      let b = cos a; c = sin a in M44F
+        (V4 (fromInt 1) (fromInt 0) (fromInt 0) (fromInt 0))
+        (V4 (fromInt 0) b c (fromInt 0))
+        (V4 (fromInt 0) (fromInt 0 - c) b (fromInt 0))
+        (V4 (fromInt 0) (fromInt 0) (fromInt 0) (fromInt 1))
+
+rotationEuler
+  = _lhs
+    rotationEuler
+    \(a :: _) (b :: _) (c :: _) -> _rhs
+      (rotMatrixY a .*. rotMatrixX b .*. rotMatrixZ c)
+
+translateBefore4 :: Vec (fromInt 3) Float -> Mat (fromInt 4) (fromInt 4) Float
+translateBefore4
+  = _lhs
+    translateBefore4
+    \(a :: _) -> _rhs
+      let
+        b = V4 (fromInt 1) (fromInt 0) (fromInt 0) (fromInt 0);
+        c = V4 (fromInt 0) (fromInt 1) (fromInt 0) (fromInt 0);
+        d = V4 (fromInt 0) (fromInt 0) (fromInt 1) (fromInt 0);
+        e = V4 (swizzscalar a Sx) (swizzscalar a Sy) (swizzscalar a Sz) (fromInt 1)
+        in M44F b c d e
+
+lookat
+  :: Vec (fromInt 3) Float
+    -> Vec (fromInt 3) Float
+      -> Vec (fromInt 3) Float -> Mat (fromInt 4) (fromInt 4) Float
+lookat
+  = _lhs
+    lookat
+    \(a :: _) (b :: _) (c :: _) -> _rhs
+      let
+        d
+          = _lhs
+            ext0
+            \(i :: _) -> _rhs
+              (V4 (swizzscalar i Sx) (swizzscalar i Sy) (swizzscalar i Sz) (fromInt 0));
+        e = normalize $ a - b;
+        f = normalize $ c `cross` e;
+        g = e `cross` f;
+        h
+          = transpose
+            $ M44F (d f) (d g) (d e) (V4 (fromInt 0) (fromInt 0) (fromInt 0) (fromInt 1))
+        in h .*. translateBefore4 (neg a)
+
+scale = _lhs scale \(a :: _) (b :: _) -> _rhs (b * V4 a a a 1.0)
+
+fromTo :: Float -> Float -> [Float]
+fromTo
+  = primFix
+    \(a :: _) -> _lhs
+      fromTo
+      \(b :: _) (c :: _) -> case'Bool
+        (\(_ :: _) -> _)
+        (_rhs (b : a (b + fromInt 1) c))
+        (_rhs [])
+        (b > c)
+
+(!!) :: forall (a :: _) . [a] -> Int -> a
+(!!)
+  = primFix
+    \(a :: _) -> _lhs
+      (!!)
+      \(b :: _) (c :: _) -> case'List
+        (\(_ :: _) -> _)
+        (_rhs undefined)
+        (\(d :: _) (e :: _) -> case'Bool
+          (\(_ :: _) -> _)
+          (_rhs (a e (c - fromInt 1)))
+          (_rhs d)
+          (fromInt 0 == c))
+        b
+------------ core code
+!! :: forall a . [a] -> Int -> a
+!!
+  = primFix
+    _
+    \a b c d -> case'List
+      (\_ -> b)
+      (_rhs (undefined b))
+      (\e f -> case'Bool
+        (\_ -> b)
+        (_rhs (a b f (d - 1)))
+        (_rhs e)
+        (isEQ (primCompareInt 0 d)))
+      c
+
+$ :: forall a b . (a -> b) -> a -> b
+$ = \a b -> _rhs \c d -> c d
+
+%
+  :: forall a (b :: Nat)
+    . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+% = \a b c d e -> _rhs (PrimMod a ('VecScalar b a) b c TT d e)
+
+%! :: forall a (b :: Nat) . Num a => VecScalar b a -> a -> VecScalar b a
+%! = \a b c d e -> _rhs (PrimModS a ('VecScalar b a) b c TT d e)
+
+& :: forall a b . a -> (a -> b) -> b
+& = \a b c d -> _rhs (d c)
+
+&& :: Bool -> Bool -> Bool
+&& = \a b -> _rhs (PrimAnd a b)
+
+&&& :: Bool -> Bool -> Bool
+&&& = \a b -> case'Bool (\_ -> 'Bool) (_rhs False) (_rhs b) a
+
+'RecItem :: Type
+'RecItem = <<type constructor with 0 indices; constructors: RecItem>>
+
+'RecordC :: [RecItem] -> Type
+'RecordC = <<type constructor with 0 indices; constructors: RecordCons>>
+
+* :: forall a . Num (MatVecScalarElem a) => a -> a -> a
+* = \a b c d -> _rhs (PrimMul a b c d)
+
+*! :: forall a . Num (MatVecScalarElem a) => a -> MatVecScalarElem a -> a
+*! = \a b c d -> _rhs (PrimMulS ('MatVecScalarElem a) a TT b c d)
+
+*** :: forall a b c d . (a -> c) -> (b -> d) -> (a, b) -> (c, d)
+***
+  = \a b c d e f g -> hlistConsCase
+    a
+    [b]
+    ' (c, d)
+    (\h i -> hlistConsCase
+      b
+      []
+      ' (c, d)
+      (\j k -> hlistNilCase ' (c, d) (_rhs (e h, f j)) k)
+      i)
+    g
+
+*. :: forall (a :: Nat) (b :: Nat) c . Mat a b c -> VecS c b -> Vec a c
+*. = \a b c d e -> _rhs (PrimMulMatVec a b c d e)
+
++ :: forall a . Num (MatVecScalarElem a) => a -> a -> a
++ = \a b c d -> _rhs (PrimAdd a b c d)
+
++! :: forall a . Num (MatVecScalarElem a) => a -> MatVecScalarElem a -> a
++! = \a b c d -> _rhs (PrimAddS ('MatVecScalarElem a) a TT b c d)
+
+- :: forall a . Num (MatVecScalarElem a) => a -> a -> a
+- = \a b c d -> _rhs (PrimSub a b c d)
+
+-! :: forall a . Num (MatVecScalarElem a) => a -> MatVecScalarElem a -> a
+-! = \a b c d -> _rhs (PrimSubS ('MatVecScalarElem a) a TT b c d)
+
+. :: forall a b c . (b -> c) -> (a -> b) -> a -> c
+. = \a b c -> _rhs \d e f -> d (e f)
+
+.* :: forall (a :: Nat) b (c :: Nat) . VecS b a -> Mat a c b -> Vec c b
+.* = \a b c d e -> _rhs (PrimMulVecMat a b c d e)
+
+.*.
+  :: forall (a :: Nat) (b :: Nat) c (d :: Nat)
+    . Mat a b c -> Mat b d c -> Mat a d c
+.*. = \a b c d e f -> _rhs (PrimMulMatMat a b c d e f)
+
+/
+  :: forall a (b :: Nat)
+    . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+/ = \a b c d e -> _rhs (PrimDiv a ('VecScalar b a) b c TT d e)
+
+/! :: forall a (b :: Nat) . Num a => VecScalar b a -> a -> VecScalar b a
+/! = \a b c d e -> _rhs (PrimDivS a ('VecScalar b a) b c TT d e)
+
+/= :: forall a . a -> a -> Bool
+/= = \a b c -> _rhs (PrimNotEqual a ('MatVecScalarElem a) TT b c)
+
+<
+  :: forall (a :: Nat) b
+    . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+<
+  = \a b c d e -> _rhs
+    (PrimLessThan ('VecScalar a b) a b ('VecScalar a 'Bool) c TT TT d e)
+
+<=
+  :: forall (a :: Nat) b
+    . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+<=
+  = \a b c d e -> _rhs
+    (PrimLessThanEqual ('VecScalar a b) a b ('VecScalar a 'Bool) c TT TT d e)
+
+>
+  :: forall (a :: Nat) b
+    . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+>
+  = \a b c d e -> _rhs
+    (PrimGreaterThan ('VecScalar a b) a b ('VecScalar a 'Bool) c TT TT d e)
+
+>=
+  :: forall (a :: Nat) b
+    . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+>=
+  = \a b c d e -> _rhs
+    (PrimGreaterThanEqual ('VecScalar a b) a b ('VecScalar a 'Bool) c TT TT d e)
+
+RecItem :: String -> Type -> RecItem
+RecItem = <<0th constructor of 'RecItem>>
+
+RecordCons :: forall (a :: [RecItem]) . HList (map recItemType a) -> RecordC a
+RecordCons = <<0th constructor of 'RecordC>>
+
+abs :: forall a b (c :: Nat) . (Signed a, b ~ VecScalar c a) => b -> b
+abs = _rhs \a b c d e f -> PrimAbs a b c d e f
+
+acos :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+acos = _rhs \a b c d -> PrimACos a b c d
+
+acosh :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+acosh = _rhs \a b c d -> PrimACosH a b c d
+
+all :: forall (a :: Nat) . VecScalar a Bool -> Bool
+all = \a b -> _rhs (PrimAll a b)
+
+any :: forall (a :: Nat) . VecScalar a Bool -> Bool
+any = \a b -> _rhs (PrimAny a b)
+
+aqua :: VecS Float 4
+aqua = _rhs (V4 0.0 1.0 1.0 1.0)
+
+asin :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+asin = _rhs \a b c d -> PrimASin a b c d
+
+asinh :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+asinh = _rhs \a b c d -> PrimASinH a b c d
+
+atan :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+atan = _rhs \a b c d -> PrimATan a b c d
+
+atan2 :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a
+atan2 = _rhs \a b c d e -> PrimATan2 a b c d e
+
+atanh :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+atanh = _rhs \a b c d -> PrimATanH a b c d
+
+bAnd :: forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> b -> b
+bAnd = _rhs \a b c d e f g -> PrimBAnd a b c d e f g
+
+bAndS :: forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> a -> b
+bAndS = _rhs \a b c d e f g -> PrimBAndS a b c d e f g
+
+bNot :: forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> b
+bNot = _rhs \a b c d e f -> PrimBNot a b c d e f
+
+bOr :: forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> b -> b
+bOr = _rhs \a b c d e f g -> PrimBOr a b c d e f g
+
+bOrS :: forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> a -> b
+bOrS = _rhs \a b c d e f g -> PrimBOrS a b c d e f g
+
+bXor :: forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> b -> b
+bXor = _rhs \a b c d e f g -> PrimBXor a b c d e f g
+
+bXorS :: forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> a -> b
+bXorS = _rhs \a b c d e f g -> PrimBXorS a b c d e f g
+
+black :: VecS Float 4
+black = _rhs (V4 0.0 0.0 0.0 1.0)
+
+blue :: VecS Float 4
+blue = _rhs (V4 0.0 0.0 1.0 1.0)
+
+case'RecItem
+  :: forall (a :: RecItem -> Type)
+    -> (forall (b :: String) c -> a ('RecItem b c)) -> forall (d :: RecItem) -> a d
+case'RecItem = \a b c -> <<case function of a type with 0 parameters>>
+
+case'RecordC
+  :: forall (a :: [RecItem])
+    . forall (b :: RecordC a -> Type)
+      -> (forall (c :: HList (map recItemType a)) -> b ('RecordCons c))
+        -> forall (d :: RecordC a) -> b d
+case'RecordC = \_ a b c -> <<case function of a type with 1 parameters>>
+
+ceil :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+ceil = _rhs \a b c d -> PrimCeil a b c d
+
+clamp :: forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b -> b
+clamp = _rhs \a b c d e f g h -> PrimClamp a b c d e f g h
+
+clampS :: forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> a -> a -> b
+clampS = _rhs \a b c d e f g h -> PrimClampS a b c d e f g h
+
+colorImage1
+  :: forall (a :: Nat) b c . (Num b, c ~ VecScalar a b) => c -> Image 1 ('Color c)
+colorImage1 = _rhs \a b c d e f -> ColorImage 1 a b c d e f
+
+colorImage2
+  :: forall (a :: Nat) b c . (Num b, c ~ VecScalar a b) => c -> Image 2 ('Color c)
+colorImage2 = _rhs \a b c d e f -> ColorImage 2 a b c d e f
+
+const :: forall a b . a -> b -> a
+const = \a b c _ -> _rhs c
+
+cos :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+cos = _rhs \a b c d -> PrimCos a b c d
+
+cosh :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+cosh = _rhs \a b c d -> PrimCosH a b c d
+
+cross :: forall a . (a ~ VecS Float 3) => a -> a -> a
+cross = _rhs \a b c d -> PrimCross a b c d
+
+dFdx :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+dFdx = _rhs \a b c d -> PrimDFdx a b c d
+
+dFdy :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+dFdy = _rhs \a b c d -> PrimDFdy a b c d
+
+degrees :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+degrees = _rhs \a b c d -> PrimDegrees a b c d
+
+depthImage1 :: Float -> Image 1 'Depth
+depthImage1 = _rhs \a -> DepthImage 1 a
+
+det :: forall (a :: Nat) b . Mat a a b -> Float
+det = _rhs \a b c -> PrimDeterminant a b c
+
+distance :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> Float
+distance = _rhs \a b c d e -> PrimDistance a b c d e
+
+dot :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> Float
+dot = _rhs \a b c d e -> PrimDot a b c d e
+
+exp :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+exp = _rhs \a b c d -> PrimExp a b c d
+
+exp2 :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+exp2 = _rhs \a b c d -> PrimExp2 a b c d
+
+fWidth :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+fWidth = _rhs \a b c d -> PrimFWidth a b c d
+
+faceforward :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a -> a
+faceforward = _rhs \a b c d e f -> PrimFaceForward a b c d e f
+
+filter :: forall a . (a -> Bool) -> [a] -> [a]
+filter
+  = \a -> primFix
+    _
+    \b c d -> case'List
+      (\_ -> [a])
+      (_rhs [])
+      (\e f -> _rhs (case'Bool (\_ -> [a]) (b c f) (e : b c f) (c e)))
+      d
+
+floatBitsToInt :: forall (a :: Nat) . VecScalar a Float -> VecScalar a Int
+floatBitsToInt = _rhs \a b -> PrimFloatBitsToInt a b
+
+floatBitsToWord :: forall (a :: Nat) . VecScalar a Float -> VecScalar a Word
+floatBitsToWord = _rhs \a b -> PrimFloatBitsToUInt a b
+
+floor :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+floor = _rhs \a b c d -> PrimFloor a b c d
+
+foldl' :: forall a b . (a -> b -> a) -> a -> [b] -> a
+foldl'
+  = \a b -> primFix
+    _
+    \c d e f -> case'List (\_ -> a) (_rhs e) (\g h -> _rhs (c d (d e g) h)) f
+
+foldr1 :: forall a . (a -> a -> a) -> [a] -> a
+foldr1
+  = \a b c -> case'List
+    (\_ -> a)
+    (_rhs (undefined a))
+    (\d e -> _rhs (foldr b d e))
+    c
+
+fract :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+fract = _rhs \a b c d -> PrimFract a b c d
+
+fromTo :: Float -> Float -> [Float]
+fromTo
+  = primFix
+    _
+    \a b c -> case'Bool
+      (\_ -> ['Float])
+      (_rhs (b : a (b + 1.0) c))
+      (_rhs [])
+      (PrimGreaterThan
+        ('VecScalar 1 'Float)
+        1
+        'Float
+        ('VecScalar 1 'Bool)
+        TT
+        TT
+        TT
+        b
+        c)
+
+fst :: forall a b . (a, b) -> a
+fst
+  = \a b c -> hlistConsCase
+    a
+    [b]
+    a
+    (\d e -> hlistConsCase b [] a (\_ f -> hlistNilCase a (_rhs d) f) e)
+    c
+
+fstTup :: forall a (b :: [Type]) . HList (a : b) -> a
+fstTup = \a b -> _rhs \c -> hlistConsCase a b a (\d _ -> d) c
+
+fuchsia :: VecS Float 4
+fuchsia = _rhs (V4 1.0 0.0 1.0 1.0)
+
+gray :: VecS Float 4
+gray = _rhs (V4 0.5 0.5 0.5 1.0)
+
+green :: VecS Float 4
+green = _rhs (V4 0.0 0.5 0.0 1.0)
+
+intBitsToFloat :: forall (a :: Nat) . VecScalar a Int -> VecScalar a Float
+intBitsToFloat = _rhs \a b -> PrimIntBitsToFloat a b
+
+inv :: forall (a :: Nat) b . Mat a a b -> Mat a a b
+inv = _rhs \a b c -> PrimInverse a b c
+
+inversesqrt :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+inversesqrt = _rhs \a b c d -> PrimInvSqrt a b c d
+
+isInf
+  :: forall a (b :: Nat) c
+    . (a ~ VecScalar b Float, c ~ VecScalar b Bool) => a -> c
+isInf = _rhs \a b c d e f -> PrimIsInf a b c d e f
+
+isKeyC :: String -> Type -> [RecItem] -> Constraint
+isKeyC
+  = primFix
+    _
+    \a b c d -> case'List
+      (\_ -> 'Constraint)
+      (_rhs (CEmpty ""))
+      (\e f -> case'RecItem
+        (\_ -> 'Constraint)
+        (\g h -> _rhs (primIfThenElse 'Constraint (b == g) (c ~ h) (a b c f)))
+        e)
+      d
+
+isNan
+  :: forall a (b :: Nat) c
+    . (a ~ VecScalar b Float, c ~ VecScalar b Bool) => a -> c
+isNan = _rhs \a b c d e f -> PrimIsNan a b c d e f
+
+iterate :: forall a . (a -> a) -> a -> [a]
+iterate = primFix _ \a b c d -> _rhs (d : a b c (c d))
+
+length :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> Float
+length = _rhs \a b c d -> PrimLength a b c d
+
+lime :: VecS Float 4
+lime = _rhs (V4 0.0 1.0 0.0 1.0)
+
+log :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+log = _rhs \a b c d -> PrimLog a b c d
+
+log2 :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+log2 = _rhs \a b c d -> PrimLog2 a b c d
+
+lookat :: Vec 3 Float -> Vec 3 Float -> Vec 3 Float -> Mat 4 4 Float
+lookat
+  = \a b c -> _rhs
+    (PrimMulMatMat
+      4
+      4
+      'Float
+      4
+      (PrimTranspose
+        4
+        4
+        'Float
+        (M44F
+          (ext0
+            (PrimNormalize
+              ('VecScalar 3 'Float)
+              3
+              TT
+              (PrimCross
+                ('VecS 'Float 3)
+                TT
+                c
+                (PrimNormalize ('VecScalar 3 'Float) 3 TT (a - b)))))
+          (ext0
+            (PrimCross
+              ('VecS 'Float 3)
+              TT
+              (PrimNormalize ('VecScalar 3 'Float) 3 TT (a - b))
+              (PrimNormalize
+                ('VecScalar 3 'Float)
+                3
+                TT
+                (PrimCross
+                  ('VecS 'Float 3)
+                  TT
+                  c
+                  (PrimNormalize ('VecScalar 3 'Float) 3 TT (a - b))))))
+          (ext0 (PrimNormalize ('VecScalar 3 'Float) 3 TT (a - b)))
+          (V4 0.0 0.0 0.0 1.0)))
+      (translateBefore4 (neg a)))
+
+maroon :: VecS Float 4
+maroon = _rhs (V4 0.5 0.0 0.0 1.0)
+
+match'RecItem
+  :: forall (a :: Type -> Type) -> a RecItem -> forall b -> a b -> a b
+match'RecItem = \a b c d -> <<type case function>>
+
+match'RecordC
+  :: forall (a :: Type -> Type)
+    -> (forall (b :: [RecItem]) -> a (RecordC b)) -> forall c -> a c -> a c
+match'RecordC = \a b c d -> <<type case function>>
+
+max :: forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b
+max = _rhs \a b c d e f g -> PrimMax a b c d e f g
+
+mergeBy :: forall a . (a -> a -> Ordering) -> [a] -> [a] -> [a]
+mergeBy
+  = \a -> primFix
+    _
+    \b c d e -> case'List
+      (\_ -> [a])
+      (_rhs e)
+      (\f g -> case'List
+        (\_ -> [a])
+        (_rhs d)
+        (\h i -> _rhs
+          (case'Ordering
+            (\_ -> [a])
+            (f : b c g (h : i))
+            (h : b c (f : g) i)
+            (h : b c (f : g) i)
+            (c f h)))
+        e)
+      d
+
+min :: forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b
+min = _rhs \a b c d e f g -> PrimMin a b c d e f g
+
+mix :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a -> a
+mix = _rhs \a b c d e f -> PrimMix a b c d e f
+
+mixB
+  :: forall a (b :: Nat) c
+    . (a ~ VecScalar b Float, c ~ VecScalar b Bool) => a -> a -> c -> a
+mixB = _rhs \a b c d e f g h -> PrimMixB a b c d e f g h
+
+mixS :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> Float -> a
+mixS = _rhs \a b c d e f -> PrimMixS a b c d e f
+
+mod :: forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b
+mod = _rhs \a b c d e f g -> PrimMod a b c d e f g
+
+modF :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> (a, a)
+modF = _rhs \a b c d -> PrimModF a b c d
+
+navy :: VecS Float 4
+navy = _rhs (V4 0.0 0.0 0.5 1.0)
+
+neg :: forall a . Signed (MatVecScalarElem a) => a -> a
+neg = \a b c -> _rhs (PrimNeg a b c)
+
+noise1 :: forall (a :: Nat) . VecScalar a Float -> Float
+noise1 = _rhs \a b -> PrimNoise1 a b
+
+noise2 :: forall (a :: Nat) . VecScalar a Float -> Vec 2 Float
+noise2 = _rhs \a b -> PrimNoise2 a b
+
+noise3 :: forall (a :: Nat) . VecScalar a Float -> Vec 3 Float
+noise3 = _rhs \a b -> PrimNoise3 a b
+
+noise4 :: forall (a :: Nat) . VecScalar a Float -> Vec 4 Float
+noise4 = _rhs \a b -> PrimNoise4 a b
+
+normalize :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+normalize = _rhs \a b c d -> PrimNormalize a b c d
+
+not :: forall (a :: Nat) . VecScalar a Bool -> VecScalar a Bool
+not = \a b -> _rhs (PrimNot ('VecScalar a 'Bool) a TT b)
+
+olive :: VecS Float 4
+olive = _rhs (V4 0.5 0.5 0.0 1.0)
+
+otherwise :: Bool
+otherwise = _rhs True
+
+outer :: forall (a :: Nat) b (c :: Nat) . Vec a b -> Vec c b -> Mat c a b
+outer = _rhs \a b c d e -> PrimOuterProduct a b c d e
+
+pairs :: forall a . [a] -> [(a, a)]
+pairs = \a b -> _rhs (zip a a b (tail a b))
+
+perspective :: Float -> Float -> Float -> Float -> Mat 4 4 Float
+perspective
+  = \a b c d -> _rhs
+    (M44F
+      (V4
+        (2.0 * a
+          / (d * (a * PrimTan ('VecScalar 1 'Float) 1 TT (c / 2.0))
+            - (0.0 - (d * (a * PrimTan ('VecScalar 1 'Float) 1 TT (c / 2.0))))))
+        0.0
+        0.0
+        0.0)
+      (V4
+        0.0
+        (2.0 * a
+          / (a * PrimTan ('VecScalar 1 'Float) 1 TT (c / 2.0)
+            - (0.0 - (a * PrimTan ('VecScalar 1 'Float) 1 TT (c / 2.0)))))
+        0.0
+        0.0)
+      (V4
+        (d * (a * PrimTan ('VecScalar 1 'Float) 1 TT (c / 2.0))
+            + (0.0 - (d * (a * PrimTan ('VecScalar 1 'Float) 1 TT (c / 2.0))))
+          / (d * (a * PrimTan ('VecScalar 1 'Float) 1 TT (c / 2.0))
+            - (0.0 - (d * (a * PrimTan ('VecScalar 1 'Float) 1 TT (c / 2.0))))))
+        (a * PrimTan ('VecScalar 1 'Float) 1 TT (c / 2.0)
+            + (0.0 - (a * PrimTan ('VecScalar 1 'Float) 1 TT (c / 2.0)))
+          / (a * PrimTan ('VecScalar 1 'Float) 1 TT (c / 2.0)
+            - (0.0 - (a * PrimTan ('VecScalar 1 'Float) 1 TT (c / 2.0)))))
+        (0.0 - (b + a / (b - a)))
+        (0.0 - 1.0))
+      (V4 0.0 0.0 (0.0 - (2.0 * b * a / (b - a))) 0.0))
+
+pi :: Float
+pi = _rhs 3.141592653589793
+
+pow :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a
+pow = _rhs \a b c d e -> PrimPow a b c d e
+
+project
+  :: forall a (b :: [RecItem])
+    . forall (c :: String) -> isKeyC c a b => RecordC b -> a
+project
+  = primFix
+    _
+    \a b c d _ e -> case'List
+      (\_ -> b)
+      (_rhs (undefined b))
+      (\f g -> case'RecItem
+        (\_ -> b)
+        (\h _ -> case'RecordC
+          (\_ -> b)
+          (\i -> case'Bool
+            (\_ -> b)
+            (_rhs
+              (a
+                b
+                g
+                d
+                (undefined ('CW (isKeyC d b g)))
+                (RecordCons
+                  (hlistConsCase
+                    b
+                    (map recItemType g)
+                    ('HList (map recItemType g))
+                    (\_ j -> j)
+                    (unsafeCoerce
+                      ('HList (map recItemType c))
+                      ('HList (b : map recItemType g))
+                      i)))))
+            (_rhs
+              (hlistConsCase
+                b
+                (map recItemType g)
+                b
+                (\k _ -> k)
+                (unsafeCoerce ('HList (map recItemType c)) ('HList (b : map recItemType g)) i)))
+            (isEQ (primCompareString d h)))
+          e)
+        f)
+      c
+
+purple :: VecS Float 4
+purple = _rhs (V4 0.5 0.0 0.5 1.0)
+
+radians :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+radians = _rhs \a b c d -> PrimRadians a b c d
+
+recItemType :: RecItem -> Type
+recItemType = \a -> case'RecItem (\_ -> Type) (\_ b -> _rhs b) a
+
+red :: VecS Float 4
+red = _rhs (V4 1.0 0.0 0.0 1.0)
+
+reflect :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a
+reflect = _rhs \a b c d e -> PrimReflect a b c d e
+
+refract :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a -> a
+refract = _rhs \a b c d e f -> PrimRefract a b c d e f
+
+rgb :: Float -> Float -> Float -> VecS Float 4
+rgb = \a b c -> _rhs (V4 a b c 1.0)
+
+rotMatrixX :: VecScalar 1 Float -> Mat 4 4 Float
+rotMatrixX
+  = \a -> _rhs
+    (M44F
+      (V4 1.0 0.0 0.0 0.0)
+      (V4
+        0.0
+        (PrimCos ('VecScalar 1 'Float) 1 TT a)
+        (PrimSin ('VecScalar 1 'Float) 1 TT a)
+        0.0)
+      (V4
+        0.0
+        (0.0 - PrimSin ('VecScalar 1 'Float) 1 TT a)
+        (PrimCos ('VecScalar 1 'Float) 1 TT a)
+        0.0)
+      (V4 0.0 0.0 0.0 1.0))
+
+rotMatrixY :: VecScalar 1 Float -> Mat 4 4 Float
+rotMatrixY
+  = \a -> _rhs
+    (M44F
+      (V4
+        (PrimCos ('VecScalar 1 'Float) 1 TT a)
+        0.0
+        (0.0 - PrimSin ('VecScalar 1 'Float) 1 TT a)
+        0.0)
+      (V4 0.0 1.0 0.0 0.0)
+      (V4
+        (PrimSin ('VecScalar 1 'Float) 1 TT a)
+        0.0
+        (PrimCos ('VecScalar 1 'Float) 1 TT a)
+        0.0)
+      (V4 0.0 0.0 0.0 1.0))
+
+rotMatrixZ :: VecScalar 1 Float -> Mat 4 4 Float
+rotMatrixZ
+  = \a -> _rhs
+    (M44F
+      (V4
+        (PrimCos ('VecScalar 1 'Float) 1 TT a)
+        (PrimSin ('VecScalar 1 'Float) 1 TT a)
+        0.0
+        0.0)
+      (V4
+        (0.0 - PrimSin ('VecScalar 1 'Float) 1 TT a)
+        (PrimCos ('VecScalar 1 'Float) 1 TT a)
+        0.0
+        0.0)
+      (V4 0.0 0.0 1.0 0.0)
+      (V4 0.0 0.0 0.0 1.0))
+
+rotationEuler :: Float -> Float -> Float -> Mat 4 4 Float
+rotationEuler
+  = \a b c -> _rhs
+    (PrimMulMatMat 4 4 'Float 4 (rotMatrixY a .*. rotMatrixX b) (rotMatrixZ c))
+
+round :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+round = _rhs \a b c d -> PrimRound a b c d
+
+roundEven :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+roundEven = _rhs \a b c d -> PrimRoundEven a b c d
+
+scale :: Float -> VecS Float 4 -> VecS Float 4
+scale = \a b -> _rhs (PrimMul ('VecS 'Float 4) TT b (V4 a a a 1.0))
+
+shiftL
+  :: forall a b (c :: Nat) d
+    . (Integral a, b ~ VecScalar c a, d ~ VecScalar c Word) => b -> d -> b
+shiftL = _rhs \a b c d e f g h i -> PrimBShiftL a b c d e f g h i
+
+shiftLS
+  :: forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> Word -> b
+shiftLS = _rhs \a b c d e f g -> PrimBShiftLS a b c d e f g
+
+shiftR
+  :: forall a b (c :: Nat) d
+    . (Integral a, b ~ VecScalar c a, d ~ VecScalar c Word) => b -> d -> b
+shiftR = _rhs \a b c d e f g h i -> PrimBShiftR a b c d e f g h i
+
+shiftRS
+  :: forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> Word -> b
+shiftRS = _rhs \a b c d e f g -> PrimBShiftRS a b c d e f g
+
+sign :: forall a b (c :: Nat) . (Signed a, b ~ VecScalar c a) => b -> b
+sign = _rhs \a b c d e f -> PrimSign a b c d e f
+
+silver :: VecS Float 4
+silver = _rhs (V4 0.75 0.75 0.75 1.0)
+
+sin :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+sin = _rhs \a b c d -> PrimSin a b c d
+
+sinh :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+sinh = _rhs \a b c d -> PrimSinH a b c d
+
+smoothstep :: forall a (b :: Nat) . (a ~ VecS Float b) => a -> a -> a -> a
+smoothstep = _rhs \a b c d e f -> PrimSmoothStep a b c d e f
+
+smoothstepS
+  :: forall a (b :: Nat) . (a ~ VecScalar b Float) => Float -> Float -> a -> a
+smoothstepS = _rhs \a b c d e f -> PrimSmoothStepS a b c d e f
+
+snd :: forall a b . (a, b) -> b
+snd
+  = \a b c -> hlistConsCase
+    a
+    [b]
+    b
+    (\_ d -> hlistConsCase b [] b (\e f -> hlistNilCase b (_rhs e) f) d)
+    c
+
+sndTup :: forall a (b :: [Type]) . HList (a : b) -> HList b
+sndTup = \a b -> _rhs \c -> hlistConsCase a b ('HList b) (\_ d -> d) c
+
+sortBy :: forall a . (a -> a -> Ordering) -> [a] -> [a]
+sortBy
+  = \a -> primFix
+    _
+    \b c d -> case'List
+      (\_ -> [a])
+      (_rhs [])
+      (\e f -> case'List
+        (\_ -> [a])
+        (_rhs [e])
+        (\_ _ -> _rhs (uncurry (mergeBy c) ((b c *** b c) (split d))))
+        f)
+      d
+
+split :: forall a . [a] -> ([a], [a])
+split
+  = \a -> primFix
+    _
+    \b c -> case'List
+      (\_ -> ' ([a], [a]))
+      (_rhs ([], []))
+      (\d e -> _rhs
+        (d
+          : hlistConsCase
+            [a]
+            [[a]]
+            [a]
+            (\_ f -> hlistConsCase [a] [] [a] (\g h -> hlistNilCase [a] g h) f)
+            (b e)
+        , hlistConsCase
+          [a]
+          [[a]]
+          [a]
+          (\i j -> hlistConsCase [a] [] [a] (\_ k -> hlistNilCase [a] i k) j)
+          (b e)))
+      c
+
+sqrt :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+sqrt = _rhs \a b c d -> PrimSqrt a b c d
+
+step :: forall a (b :: Nat) . (a ~ VecS Float b) => a -> a -> a
+step = _rhs \a b c d e -> PrimStep a b c d e
+
+stepS :: forall a (b :: Nat) . (a ~ VecScalar b Float) => Float -> a -> a
+stepS = _rhs \a b c d e -> PrimStepS a b c d e
+
+tail :: forall a . [a] -> [a]
+tail = \a b -> case'List (\_ -> [a]) (_rhs (undefined [a])) (\_ c -> _rhs c) b
+
+tan :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+tan = _rhs \a b c d -> PrimTan a b c d
+
+tanh :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+tanh = _rhs \a b c d -> PrimTanH a b c d
+
+teal :: VecS Float 4
+teal = _rhs (V4 0.0 0.5 0.5 1.0)
+
+translateBefore4 :: Vec 3 Float -> Mat 4 4 Float
+translateBefore4
+  = \a -> _rhs
+    (M44F
+      (V4 1.0 0.0 0.0 0.0)
+      (V4 0.0 1.0 0.0 0.0)
+      (V4 0.0 0.0 1.0 0.0)
+      (V4
+        (swizzscalar 'Float 3 a Sx)
+        (swizzscalar 'Float 3 a Sy)
+        (swizzscalar 'Float 3 a Sz)
+        1.0))
+
+transpose :: forall (a :: Nat) (b :: Nat) c . Mat a b c -> Mat b a c
+transpose = _rhs \a b c d -> PrimTranspose a b c d
+
+trunc :: forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+trunc = _rhs \a b c d -> PrimTrunc a b c d
+
+uncurry :: forall a b c . (a -> c -> b) -> (a, c) -> b
+uncurry
+  = \a b c d e -> hlistConsCase
+    a
+    [c]
+    b
+    (\f g -> hlistConsCase c [] b (\h i -> hlistNilCase b (_rhs (d f h)) i) g)
+    e
+
+unzip :: forall a b . [(a, b)] -> ([a], [b])
+unzip
+  = primFix
+    _
+    \a b c d -> case'List
+      (\_ -> ' ([b], [c]))
+      (_rhs ([], []))
+      (\e f -> hlistConsCase
+        b
+        [c]
+        ' ([b], [c])
+        (\g h -> hlistConsCase
+          c
+          []
+          ' ([b], [c])
+          (\i j -> hlistNilCase
+            ' ([b], [c])
+            (_rhs
+              (g
+                : hlistConsCase
+                  [b]
+                  [[c]]
+                  [b]
+                  (\k l -> hlistConsCase [c] [] [b] (\_ m -> hlistNilCase [b] k m) l)
+                  (a b c f)
+              , i
+                : hlistConsCase
+                  [b]
+                  [[c]]
+                  [c]
+                  (\_ n -> hlistConsCase [c] [] [c] (\o p -> hlistNilCase [c] o p) n)
+                  (a b c f)))
+            j)
+          h)
+        e)
+      d
+
+v3FToV4F :: Vec 3 Float -> VecS Float 4
+v3FToV4F
+  = \a -> _rhs
+    (V4
+      (swizzscalar 'Float 3 a Sx)
+      (swizzscalar 'Float 3 a Sy)
+      (swizzscalar 'Float 3 a Sz)
+      1.0)
+
+white :: VecS Float 4
+white = _rhs (V4 1.0 1.0 1.0 1.0)
+
+wordBitsToFloat :: forall (a :: Nat) . VecScalar a Word -> VecScalar a Float
+wordBitsToFloat = _rhs \a b -> PrimUIntBitsToFloat a b
+
+xor :: Bool -> Bool -> Bool
+xor = _rhs \a b -> PrimXor a b
+
+yellow :: VecS Float 4
+yellow = _rhs (V4 1.0 1.0 0.0 1.0)
+
+zip :: forall a b . [a] -> [b] -> [(a, b)]
+zip
+  = primFix
+    _
+    \a b c d e -> case'List
+      (\_ -> [' (b, c)])
+      (_rhs [])
+      (\f g -> case'List
+        (\_ -> [' (b, c)])
+        (_rhs [])
+        (\h i -> _rhs ((f, h) : a b c g i))
+        e)
+      d
+
+|| :: Bool -> Bool -> Bool
+|| = \a b -> _rhs (PrimOr a b)
+
+||| :: Bool -> Bool -> Bool
+||| = \a b -> case'Bool (\_ -> 'Bool) (_rhs b) (_rhs True) a
+------------ tooltips
+16:1-16:6
+    forall a b . a -> b -> a
+16:13-16:14
+    _d
+18:1-18:10
+    Bool
+18:13-18:17
+    Bool
+20:3-20:4
+    forall a b . a -> (a -> b) -> b
+20:9-20:10
+    _b
+20:11-20:12
+    _g
+22:2-22:3
+    forall a b . (a -> b) -> a -> b
+22:15-22:16
+    _d
+22:17-22:18
+    _e
+23:2-23:3
+    forall a b c . (b -> c) -> (a -> b) -> a -> c
+23:17-23:18
+    _f
+23:20-23:21
+    _g
+23:22-23:23
+    _h
+25:1-25:8
+    forall a b c . (a -> c -> b) -> (a, c) -> b
+25:20-25:21
+    _o
+25:20-25:25
+    _c | _d
+25:22-25:23
+    _n
+25:24-25:25
+    _j
+27:2-27:5
+    forall a b c d . (a -> c) -> (b -> d) -> (a, b) -> (c, d)
+27:20-27:30
+    (_b, _a) | (_b, _a) | (_b, _a)
+27:21-27:22
+    _s
+27:23-27:24
+    _p
+27:26-27:27
+    _r
+27:26-27:29
+    ((_a))
+27:28-27:29
+    _l
+29:1-29:3
+    Float
+29:6-29:23
+    Float
+31:8-31:11
+    Type
+31:8-31:29
+    Type | Type
+31:9-31:10
+    _d
+31:15-31:18
+    Type
+31:15-31:29
+    Type
+31:16-31:17
+    _c
+31:22-31:29
+    Type | Type
+31:23-31:28
+    Type
+31:24-31:25
+    Type
+31:24-31:27
+    [Type]
+31:26-31:27
+    Type | [Type]
+32:1-32:4
+    forall a b . [a] -> [b] -> [(a, b)]
+32:22-32:24
+    forall a . [a]
+32:22-34:39
+    [_a] -> [(_a, _d)] | [(_d, _c)]
+33:22-33:24
+    forall a . [a]
+33:22-34:39
+    [_a] -> [(_e, _a)] | [(_c, _f)]
+34:23-34:28
+    (_h, _d)
+34:23-34:29
+    [(_h, _d)] -> [(_h, _d)]
+34:23-34:39
+    [(_g, _c)]
+34:24-34:25
+    _k
+34:26-34:27
+    _g | ((_d))
+34:28-34:29
+    forall a . a -> [a] -> [a]
+34:30-34:33
+    forall a b . [a] -> [b] -> [(a, b)]
+34:30-34:36
+    [_a] -> [(_h, _a)]
+34:30-34:39
+    [(_g, _c)]
+34:34-34:36
+    [_i]
+34:37-34:39
+    [_c]
+36:10-36:17
+    Type
+36:10-36:30
+    Type | Type
+36:11-36:16
+    Type
+36:12-36:13
+    _e
+36:12-36:15
+    [Type]
+36:14-36:15
+    _c | [Type]
+36:21-36:30
+    Type | Type
+36:22-36:25
+    Type
+36:22-36:29
+    [Type]
+36:23-36:24
+    Type
+36:26-36:29
+    Type | [Type]
+36:27-36:28
+    Type
+37:1-37:6
+    forall a b . [(a, b)] -> ([a], [b])
+37:12-37:19
+    ([_b], [_a])
+37:12-39:27
+    [(_b, _a)] -> ([_b], [_a]) | ([_c], [_b])
+37:13-37:15
+    forall a . [a]
+37:16-37:18
+    forall a . [a] | (([_a]))
+38:20-38:31
+    ([_n], [_i])
+38:20-39:27
+    ([_h], [_c]) | ([_d], [_a]) | ([_d], [_c])
+38:21-38:22
+    _s
+38:21-38:23
+    [_r] -> [_r]
+38:21-38:25
+    [_p]
+38:22-38:23
+    forall a . a -> [a] -> [a]
+38:23-38:25
+    [_f]
+38:26-38:27
+    _n
+38:26-38:28
+    [_m] -> [_m]
+38:26-38:30
+    [_k] | (([_i]))
+38:27-38:28
+    forall a . a -> [a] -> [a]
+38:28-38:30
+    [_f]
+39:10-39:12
+    _k | _h | _d
+39:10-39:15
+    ([_e], [_d]) | ([_f], [_e])
+39:13-39:15
+    _f | _c | _c
+39:19-39:24
+    forall a b . [(a, b)] -> ([a], [b])
+39:19-39:27
+    ([_b], [_a])
+39:25-39:27
+    [_r]
+41:1-41:7
+    forall a . (a -> Bool) -> [a] -> [a]
+41:21-41:23
+    forall a . [a]
+41:21-44:49
+    [_a] -> [_a]
+42:22-44:49
+    [_c]
+42:27-42:31
+    _g
+42:32-42:33
+    _f
+43:32-44:49
+    Bool -> [_f]
+43:33-43:34
+    _h
+43:33-43:36
+    [_g] -> [_g]
+43:33-43:51
+    [_f]
+43:35-43:36
+    forall a . a -> [a] -> [a]
+43:37-43:43
+    _j -> [_f] -> [_f]
+43:37-43:48
+    [_f] -> [_f]
+43:37-43:51
+    [_f]
+43:44-43:48
+    _j
+43:49-43:51
+    [_f]
+44:34-44:40
+    _m
+44:41-44:45
+    _n
+44:46-44:48
+    [_k]
+49:9-49:12
+    Type
+49:9-49:19
+    Type
+49:10-49:11
+    _b
+49:16-49:19
+    Type | Type
+49:17-49:18
+    Type
+50:1-50:5
+    forall a . [a] -> [a]
+50:16-50:18
+    [_d] | [_b]
+52:10-52:13
+    Type
+52:10-52:25
+    Type
+52:11-52:12
+    _b
+52:17-52:25
+    Type | Type
+52:18-52:24
+    Type
+52:19-52:20
+    Type
+52:19-52:23
+    [Type]
+52:22-52:23
+    Type | [Type]
+53:1-53:6
+    forall a . [a] -> [(a, a)]
+53:11-53:14
+    forall a b . [a] -> [b] -> [(a, b)]
+53:11-53:16
+    [_a] -> [(_c, _a)]
+53:11-53:25
+    [(_b, _b)]
+53:15-53:16
+    [_d]
+53:18-53:22
+    forall a . [a] -> [a]
+53:18-53:24
+    [_b]
+53:23-53:24
+    [_c]
+55:1-55:7
+    forall a b . (a -> b -> a) -> a -> [b] -> a
+55:17-55:18
+    _f
+55:17-56:41
+    [_b] -> _f
+56:22-56:28
+    _k
+56:29-56:30
+    _l
+56:32-56:33
+    _m
+56:34-56:35
+    _n
+56:36-56:37
+    _k
+56:39-56:41
+    [_h]
+58:1-58:7
+    forall a . (a -> a -> a) -> [a] -> a
+58:20-58:25
+    forall a b . (b -> a -> a) -> a -> [b] -> a
+58:20-58:27
+    _b -> [_a] -> _b
+58:20-58:29
+    [_a] -> _e
+58:20-58:32
+    _c
+58:26-58:27
+    _j
+58:28-58:29
+    _f
+58:30-58:32
+    [_d]
+60:1-60:6
+    forall a . [a] -> ([a], [a])
+60:12-60:20
+    ([_b], [_a])
+60:12-61:55
+    [_b] -> ([_b], [_a])
+60:13-60:15
+    forall a . [a]
+60:17-60:19
+    forall a . [a] | (([_a]))
+61:17-61:28
+    ([_i], _c)
+61:18-61:19
+    _m
+61:18-61:20
+    [_l] -> [_l]
+61:18-61:23
+    [_j]
+61:19-61:20
+    forall a . a -> [a] -> [a]
+61:21-61:23
+    _d
+61:25-61:27
+    _f | ((_c))
+61:37-61:39
+    _k | _h | _d
+61:37-61:43
+    _d | (_e, _d)
+61:41-61:43
+    _f | _c | _c
+61:47-61:52
+    _i
+61:53-61:55
+    [_h]
+63:1-63:8
+    forall a . (a -> a -> Ordering) -> [a] -> [a] -> [a]
+63:27-65:32
+    [_e]
+63:27-67:21
+    [_c] -> [_c] | [_c]
+63:32-63:33
+    _j
+63:34-63:35
+    _h
+63:36-63:37
+    _i
+64:11-64:12
+    _j
+64:11-64:13
+    [_i] -> [_i]
+64:11-64:33
+    [_h]
+64:11-65:32
+    [_g] -> Ordering -> [_g]
+64:12-64:13
+    forall a . a -> [a] -> [a]
+64:14-64:21
+    _p
+64:22-64:23
+    _q
+64:24-64:26
+    [_l]
+64:28-64:29
+    _j
+64:28-64:30
+    [_i] -> [_i]
+64:28-64:32
+    [_i]
+64:29-64:30
+    forall a . a -> [a] -> [a]
+64:30-64:32
+    [_i]
+65:10-65:11
+    _f | _h
+65:10-65:12
+    [_e] -> [_e] | [_g] -> [_g]
+65:10-65:32
+    [_g] | [_g]
+65:11-65:12
+    forall a . a -> [a] -> [a] | forall a . a -> [a] -> [a]
+65:13-65:20
+    _m -> [_g] -> [_g] -> [_g] | _m -> [_g] -> [_g] -> [_g]
+65:13-65:22
+    [_g] -> [_g] -> [_g] | [_g] -> [_g] -> [_g]
+65:13-65:29
+    [_g] -> [_g] | [_g] -> [_g]
+65:13-65:32
+    [_g] | [_g]
+65:21-65:22
+    _m | _m
+65:24-65:25
+    _h | _h
+65:24-65:26
+    [_g] -> [_g] | [_g] -> [_g]
+65:24-65:28
+    [_g] | [_g]
+65:25-65:26
+    forall a . a -> [a] -> [a] | forall a . a -> [a] -> [a]
+65:26-65:28
+    [_g] | [_g]
+65:30-65:32
+    [_g] | [_g]
+66:19-66:21
+    _d
+67:19-67:21
+    _i
+69:1-69:7
+    forall a . (a -> a -> Ordering) -> [a] -> [a]
+69:15-69:17
+    forall a . [a]
+69:15-71:71
+    [_b] -> [_b]
+70:16-70:19
+    [_e]
+70:16-71:71
+    [_b] -> [_f] | [_d]
+70:17-70:18
+    _g
+71:15-71:22
+    forall a b c . (a -> c -> b) -> (a, c) -> b
+71:15-71:34
+    ([_a], [_a]) -> [_a]
+71:15-71:71
+    [_h]
+71:24-71:31
+    forall a . (a -> a -> Ordering) -> [a] -> [a] -> [a]
+71:24-71:33
+    [_a] -> [_a] -> [_a]
+71:32-71:33
+    _o
+71:36-71:70
+    ([_h], [_h])
+71:37-71:43
+    _p
+71:37-71:49
+    (_c -> _a) -> (_d, _c) -> (_b, _a)
+71:37-71:58
+    (_b, _b) -> (_a, _a)
+71:44-71:45
+    _n -> _n -> Ordering
+71:46-71:49
+    forall a b c d . (a -> c) -> (b -> d) -> (a, b) -> (c, d)
+71:50-71:56
+    (_k -> _k -> Ordering) -> _d -> _b
+71:50-71:58
+    _b -> _a
+71:57-71:58
+    _i -> _i -> Ordering
+71:61-71:66
+    forall a . [a] -> ([a], [a])
+71:61-71:69
+    ([_a], [_a])
+71:67-71:69
+    _k
+73:12-73:32
+    Type
+73:13-73:14
+    _b
+73:18-73:19
+    Type | Type
+73:24-73:25
+    Type
+73:24-73:32
+    Type
+73:29-73:32
+    Type | Type
+73:30-73:31
+    Type
+74:1-74:8
+    forall a . (a -> a) -> a -> [a]
+74:16-74:17
+    _d
+74:16-74:19
+    [_c] -> [_c]
+74:16-74:35
+    [_c]
+74:18-74:19
+    forall a . a -> [a] -> [a]
+74:20-74:27
+    forall a . (a -> a) -> a -> [a]
+74:20-74:29
+    _c -> [_c]
+74:20-74:35
+    [_c]
+74:28-74:29
+    _d -> _d
+74:31-74:32
+    _c -> _c
+74:31-74:34
+    _c
+74:33-74:34
+    _c
+76:1-76:4
+    forall a b . (a, b) -> a
+76:14-76:15
+    _k | _h | _d
+77:1-77:4
+    forall a b . (a, b) -> b
+77:14-77:15
+    _f | _c | _c
+79:7-79:10
+    Bool -> Bool -> Bool
+79:15-79:16
+    _c
+79:15-80:18
+    Bool -> Bool
+80:14-80:18
+    Bool
+84:6-84:9
+    Bool -> Bool -> Bool
+84:14-84:15
+    _b
+84:14-85:20
+    Bool -> Bool
+85:15-85:20
+    Bool
+122:6-122:13
+    Type | Type | Type | Type | Type | Type
+122:6-122:23
+    Type
+122:6-122:35
+    Type
+122:16-122:23
+    String -> Type -> RecItem | RecItem | Type | Type | Type
+122:24-122:30
+    Type
+122:31-122:35
+    Type
+124:1-124:12
+    RecItem -> Type
+124:29-124:30
+    Type
+126:6-126:13
+    [RecItem] -> Type | [RecItem] -> Type | [RecItem] -> Type | [RecItem]
+      -> Type | Type
+126:6-126:17
+    Type | Type
+126:6-127:17
+    Type | Type
+126:6-127:46
+    Type
+126:15-126:17
+    [RecItem]
+126:21-126:30
+    Type | Type | Type
+126:22-126:29
+    Type | Type | Type
+127:7-127:17
+    forall (a :: [RecItem]) . HList (map recItemType a) -> RecordC a | RecordC
+      _c | Type | Type
+127:19-127:24
+    [Type] -> Type
+127:19-127:45
+    Type
+127:26-127:29
+    forall a b . (a -> b) -> [a] -> [b]
+127:26-127:41
+    [RecItem] -> [Type]
+127:26-127:44
+    [Type]
+127:30-127:41
+    RecItem -> Type
+127:42-127:44
+    [RecItem]
+129:1-129:7
+    String -> Type -> [RecItem] -> Constraint
+129:17-129:24
+    String -> Constraint
+129:17-129:27
+    Constraint
+129:17-130:75
+    [RecItem] -> Constraint
+129:25-129:27
+    String
+130:34-130:75
+    Constraint | Constraint
+130:37-130:38
+    _o
+130:37-130:41
+    _n -> Bool
+130:37-130:44
+    Bool
+130:37-130:56
+    Constraint -> Constraint
+130:39-130:41
+    forall a . Eq a => a -> a -> Bool
+130:42-130:44
+    String
+130:50-130:51
+    _l
+130:50-130:53
+    _k -> Constraint
+130:50-130:56
+    Constraint
+130:52-130:53
+    forall a . a -> a -> Constraint
+130:54-130:56
+    Type
+130:62-130:68
+    _k
+130:69-130:70
+    String
+130:71-130:72
+    Type
+130:73-130:75
+    [_i]
+132:1-132:7
+    forall a (b :: [Type]) . HList (a : b) -> a
+132:10-132:23
+    forall a (b :: [Type]) . forall c -> (a -> HList b -> c) -> HList (a : b) -> c
+132:10-132:25
+    (_c -> HList _b -> _a) -> HList (_c : _b) -> _a
+132:10-132:37
+    HList (_b : _a) -> _b
+132:35-132:36
+    _e
+133:1-133:7
+    forall a (b :: [Type]) . HList (a : b) -> HList b
+133:10-133:23
+    forall a (b :: [Type]) . forall c -> (a -> HList b -> c) -> HList (a : b) -> c
+133:10-133:25
+    (_c -> HList _b -> _a) -> HList (_c : _b) -> _a
+133:10-133:37
+    HList (_b : _a) -> HList _a
+133:35-133:36
+    HList _d
+136:28-136:37
+    Type
+136:28-136:97
+    Type
+136:29-136:36
+    Type
+136:41-136:97
+    Type
+136:54-136:60
+    Type
+136:65-136:71
+    String -> Type -> [RecItem] -> Constraint
+136:65-136:73
+    Type -> [RecItem] -> Constraint
+136:65-136:75
+    [RecItem] -> Constraint
+136:65-136:78
+    Constraint
+136:65-136:97
+    Type
+136:72-136:73
+    String
+136:74-136:75
+    _d
+136:76-136:78
+    [RecItem]
+136:82-136:89
+    [RecItem] -> Type
+136:82-136:92
+    Type
+136:82-136:97
+    Type
+136:90-136:92
+    [RecItem]
+136:96-136:97
+    Type | Type
+137:1-137:8
+    forall a (b :: [RecItem])
+      . forall (c :: String) -> isKeyC c a b => RecordC b -> a
+137:57-137:58
+    String
+137:57-137:61
+    String -> Bool
+137:57-137:64
+    Bool
+137:57-138:186
+    _m | _j | _g | _e
+137:59-137:61
+    forall a . Eq a => a -> a -> Bool
+137:62-137:64
+    String
+137:67-137:73
+    forall a (b :: [Type]) . HList (a : b) -> a
+137:67-137:129
+    _n
+137:67-138:186
+    Bool -> _n
+137:75-137:87
+    forall a b . a -> b
+137:75-137:90
+    forall a . _a -> a
+137:75-137:125
+    _a -> HList (_q : map recItemType _j)
+137:75-137:128
+    HList (_n : map recItemType _g)
+137:93-137:98
+    [Type] -> Type
+137:93-137:124
+    Type
+137:101-137:102
+    Type
+137:101-137:104
+    [Type] -> [Type]
+137:101-137:123
+    [Type]
+137:103-137:104
+    forall a . a -> [a] -> [a]
+137:105-137:108
+    forall a b . (a -> b) -> [a] -> [b]
+137:105-137:120
+    [RecItem] -> [Type]
+137:105-137:123
+    [Type]
+137:109-137:120
+    RecItem -> Type
+137:121-137:123
+    [RecItem]
+137:126-137:128
+    HList (map recItemType _d)
+138:57-138:64
+    forall a (b :: [RecItem])
+      . forall (c :: String) -> isKeyC c a b => RecordC b -> a
+138:57-138:67
+    forall (a :: [RecItem])
+      . forall (b :: String) -> isKeyC b _p a => RecordC a -> _p
+138:57-138:71
+    forall (a :: String) -> isKeyC a _o _h => RecordC _h -> _o
+138:57-138:73
+    isKeyC _m _o _h => RecordC _h -> _o
+138:57-138:108
+    RecordC _h -> _o
+138:57-138:186
+    _n
+138:66-138:67
+    Type
+138:69-138:71
+    [_k]
+138:72-138:73
+    String
+138:76-138:85
+    forall a . a
+138:76-138:107
+    CW (isKeyC _m _o _h)
+138:88-138:90
+    Constraint -> Type
+138:88-138:106
+    Type
+138:92-138:98
+    String -> Type -> [RecItem] -> Constraint
+138:92-138:100
+    Type -> [RecItem] -> Constraint
+138:92-138:102
+    [RecItem] -> Constraint
+138:92-138:105
+    Constraint
+138:99-138:100
+    String
+138:101-138:102
+    Type
+138:103-138:105
+    [RecItem]
+138:110-138:120
+    forall (a :: [RecItem]) . HList (map recItemType a) -> RecordC a
+138:110-138:185
+    RecordC _b
+138:122-138:128
+    forall a (b :: [Type]) . HList (a : b) -> HList b
+138:122-138:184
+    HList (map recItemType _h)
+138:130-138:142
+    forall a b . a -> b
+138:130-138:145
+    forall a . _a -> a
+138:130-138:180
+    _a -> HList (_r : map recItemType _k)
+138:130-138:183
+    HList (_o : map recItemType _h)
+138:148-138:153
+    [Type] -> Type
+138:148-138:179
+    Type
+138:156-138:157
+    Type
+138:156-138:159
+    [Type] -> [Type]
+138:156-138:178
+    [Type]
+138:158-138:159
+    forall a . a -> [a] -> [a]
+138:160-138:163
+    forall a b . (a -> b) -> [a] -> [b]
+138:160-138:175
+    [RecItem] -> [Type]
+138:160-138:178
+    [Type]
+138:164-138:175
+    RecItem -> Type
+138:176-138:178
+    [RecItem]
+138:181-138:183
+    HList (map recItemType _e)
+142:1-142:4
+    Float -> Float -> Float -> VecS Float 4
+142:13-142:15
+    forall a . a -> a -> a -> a -> VecS a 4
+142:13-142:17
+    _f -> _f -> _f -> VecS _f 4
+142:13-142:19
+    _e -> _e -> VecS _e 4
+142:13-142:21
+    _d -> VecS _d 4
+142:13-142:25
+    VecS Float 4
+142:16-142:17
+    _g
+142:18-142:19
+    _d
+142:20-142:21
+    _b
+142:22-142:25
+    Float
+144:1-144:6
+    VecS Float 4
+144:11-144:14
+    Float -> Float -> Float -> VecS Float 4
+144:11-144:18
+    Float -> Float -> VecS Float 4
+144:11-144:22
+    Float -> VecS Float 4
+144:11-144:26
+    VecS Float 4
+144:15-144:18
+    Float
+144:19-144:22
+    Float
+144:23-144:26
+    Float
+145:1-145:5
+    VecS Float 4
+145:11-145:14
+    Float -> Float -> Float -> VecS Float 4
+145:11-145:18
+    Float -> Float -> VecS Float 4
+145:11-145:22
+    Float -> VecS Float 4
+145:11-145:26
+    VecS Float 4
+145:15-145:18
+    Float
+145:19-145:22
+    Float
+145:23-145:26
+    Float
+146:1-146:7
+    VecS Float 4
+146:11-146:14
+    Float -> Float -> Float -> VecS Float 4
+146:11-146:19
+    Float -> Float -> VecS Float 4
+146:11-146:24
+    Float -> VecS Float 4
+146:11-146:29
+    VecS Float 4
+146:15-146:19
+    Float
+146:20-146:24
+    Float
+146:25-146:29
+    Float
+147:1-147:6
+    VecS Float 4
+147:11-147:14
+    Float -> Float -> Float -> VecS Float 4
+147:11-147:18
+    Float -> Float -> VecS Float 4
+147:11-147:22
+    Float -> VecS Float 4
+147:11-147:26
+    VecS Float 4
+147:15-147:18
+    Float
+147:19-147:22
+    Float
+147:23-147:26
+    Float
+148:1-148:7
+    VecS Float 4
+148:11-148:14
+    Float -> Float -> Float -> VecS Float 4
+148:11-148:18
+    Float -> Float -> VecS Float 4
+148:11-148:22
+    Float -> VecS Float 4
+148:11-148:26
+    VecS Float 4
+148:15-148:18
+    Float
+148:19-148:22
+    Float
+148:23-148:26
+    Float
+149:1-149:4
+    VecS Float 4
+149:11-149:14
+    Float -> Float -> Float -> VecS Float 4
+149:11-149:18
+    Float -> Float -> VecS Float 4
+149:11-149:22
+    Float -> VecS Float 4
+149:11-149:26
+    VecS Float 4
+149:15-149:18
+    Float
+149:19-149:22
+    Float
+149:23-149:26
+    Float
+150:1-150:6
+    VecS Float 4
+150:11-150:14
+    Float -> Float -> Float -> VecS Float 4
+150:11-150:18
+    Float -> Float -> VecS Float 4
+150:11-150:22
+    Float -> VecS Float 4
+150:11-150:26
+    VecS Float 4
+150:15-150:18
+    Float
+150:19-150:22
+    Float
+150:23-150:26
+    Float
+151:1-151:7
+    VecS Float 4
+151:11-151:14
+    Float -> Float -> Float -> VecS Float 4
+151:11-151:18
+    Float -> Float -> VecS Float 4
+151:11-151:22
+    Float -> VecS Float 4
+151:11-151:26
+    VecS Float 4
+151:15-151:18
+    Float
+151:19-151:22
+    Float
+151:23-151:26
+    Float
+152:1-152:6
+    VecS Float 4
+152:11-152:14
+    Float -> Float -> Float -> VecS Float 4
+152:11-152:18
+    Float -> Float -> VecS Float 4
+152:11-152:22
+    Float -> VecS Float 4
+152:11-152:26
+    VecS Float 4
+152:15-152:18
+    Float
+152:19-152:22
+    Float
+152:23-152:26
+    Float
+153:1-153:5
+    VecS Float 4
+153:11-153:14
+    Float -> Float -> Float -> VecS Float 4
+153:11-153:18
+    Float -> Float -> VecS Float 4
+153:11-153:22
+    Float -> VecS Float 4
+153:11-153:26
+    VecS Float 4
+153:15-153:18
+    Float
+153:19-153:22
+    Float
+153:23-153:26
+    Float
+154:1-154:5
+    VecS Float 4
+154:11-154:14
+    Float -> Float -> Float -> VecS Float 4
+154:11-154:18
+    Float -> Float -> VecS Float 4
+154:11-154:22
+    Float -> VecS Float 4
+154:11-154:26
+    VecS Float 4
+154:15-154:18
+    Float
+154:19-154:22
+    Float
+154:23-154:26
+    Float
+155:1-155:5
+    VecS Float 4
+155:11-155:14
+    Float -> Float -> Float -> VecS Float 4
+155:11-155:18
+    Float -> Float -> VecS Float 4
+155:11-155:22
+    Float -> VecS Float 4
+155:11-155:26
+    VecS Float 4
+155:15-155:18
+    Float
+155:19-155:22
+    Float
+155:23-155:26
+    Float
+156:1-156:5
+    VecS Float 4
+156:11-156:14
+    Float -> Float -> Float -> VecS Float 4
+156:11-156:18
+    Float -> Float -> VecS Float 4
+156:11-156:22
+    Float -> VecS Float 4
+156:11-156:26
+    VecS Float 4
+156:15-156:18
+    Float
+156:19-156:22
+    Float
+156:23-156:26
+    Float
+157:1-157:5
+    VecS Float 4
+157:11-157:14
+    Float -> Float -> Float -> VecS Float 4
+157:11-157:18
+    Float -> Float -> VecS Float 4
+157:11-157:22
+    Float -> VecS Float 4
+157:11-157:26
+    VecS Float 4
+157:15-157:18
+    Float
+157:19-157:22
+    Float
+157:23-157:26
+    Float
+158:1-158:7
+    VecS Float 4
+158:11-158:14
+    Float -> Float -> Float -> VecS Float 4
+158:11-158:18
+    Float -> Float -> VecS Float 4
+158:11-158:22
+    Float -> VecS Float 4
+158:11-158:26
+    VecS Float 4
+158:15-158:18
+    Float
+158:19-158:22
+    Float
+158:23-158:26
+    Float
+159:1-159:8
+    VecS Float 4
+159:11-159:14
+    Float -> Float -> Float -> VecS Float 4
+159:11-159:18
+    Float -> Float -> VecS Float 4
+159:11-159:22
+    Float -> VecS Float 4
+159:11-159:26
+    VecS Float 4
+159:15-159:18
+    Float
+159:19-159:22
+    Float
+159:23-159:26
+    Float
+161:1-161:12
+    forall (a :: Nat) b c . (Num b, c ~ VecScalar a b) => c -> Image 1 ('Color c)
+161:15-161:25
+    forall (a :: Nat) (b :: Nat) c d
+      . (Num c, d ~ VecScalar b c) => d -> Image a ('Color d)
+161:15-161:28
+    forall (a :: Nat) b c . (Num b, c ~ VecScalar a b) => c -> Image 1 ('Color c)
+161:27-161:28
+    _b
+162:1-162:12
+    forall (a :: Nat) b c . (Num b, c ~ VecScalar a b) => c -> Image 2 ('Color c)
+162:15-162:25
+    forall (a :: Nat) (b :: Nat) c d
+      . (Num c, d ~ VecScalar b c) => d -> Image a ('Color d)
+162:15-162:28
+    forall (a :: Nat) b c . (Num b, c ~ VecScalar a b) => c -> Image 2 ('Color c)
+162:27-162:28
+    _b
+164:1-164:12
+    Float -> Image 1 'Depth
+164:15-164:25
+    forall (a :: Nat) . Float -> Image a 'Depth
+164:15-164:28
+    Float -> Image 1 'Depth
+164:27-164:28
+    _b
+166:13-166:16
+    Nat -> Type -> Type
+166:13-166:18
+    Type -> Type
+166:13-166:24
+    Type
+166:17-166:18
+    _b
+166:19-166:24
+    Type
+166:28-166:31
+    Nat -> Type -> Type
+166:28-166:33
+    Type -> Type
+166:28-166:39
+    Type | Type
+166:32-166:33
+    _b
+166:34-166:39
+    Type
+167:1-167:9
+    Vec 3 Float -> VecS Float 4
+167:14-167:16
+    forall a . a -> a -> a -> a -> VecS a 4
+167:14-167:20
+    Float -> Float -> Float -> VecS Float 4
+167:14-167:24
+    Float -> Float -> VecS Float 4
+167:14-167:28
+    Float -> VecS Float 4
+167:14-167:30
+    VecS Float 4
+167:17-167:18
+    Vec 3 Float
+167:17-167:20
+    Float
+167:21-167:22
+    Vec 3 Float
+167:21-167:24
+    Float
+167:25-167:26
+    Vec 3 Float
+167:25-167:28
+    Float
+167:29-167:30
+    _b
+174:1-174:8
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+174:11-174:22
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+175:1-175:8
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+175:11-175:22
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+176:1-176:4
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+176:7-176:14
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+177:1-177:4
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+177:7-177:14
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+178:1-178:4
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+178:7-178:14
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+179:1-179:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+179:8-179:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+180:1-180:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+180:8-180:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+181:1-181:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+181:8-181:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+182:1-182:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+182:8-182:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+183:1-183:6
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+183:9-183:18
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+184:1-184:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+184:8-184:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+185:1-185:6
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+185:9-185:18
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+186:1-186:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+186:8-186:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+187:1-187:6
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+187:9-187:18
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+188:1-188:6
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a
+188:9-188:18
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a
+191:1-191:4
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a
+191:7-191:14
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a
+192:1-192:4
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+192:7-192:14
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+193:1-193:4
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+193:7-193:14
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+194:1-194:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+194:8-194:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+195:1-195:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+195:8-195:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+196:1-196:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+196:8-196:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+197:1-197:12
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+197:15-197:26
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+200:1-200:4
+    forall a b (c :: Nat) . (Signed a, b ~ VecScalar c a) => b -> b
+200:7-200:14
+    forall a b (c :: Nat) . (Signed a, b ~ VecScalar c a) => b -> b
+201:1-201:5
+    forall a b (c :: Nat) . (Signed a, b ~ VecScalar c a) => b -> b
+201:8-201:16
+    forall a b (c :: Nat) . (Signed a, b ~ VecScalar c a) => b -> b
+202:1-202:6
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+202:9-202:18
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+203:1-203:6
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+203:9-203:18
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+204:1-204:6
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+204:9-204:18
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+205:1-205:10
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+205:13-205:26
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+206:1-206:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+206:8-206:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+207:1-207:6
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+207:9-207:18
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+208:1-208:4
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b
+208:7-208:14
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b
+209:1-209:4
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b
+209:7-209:14
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b
+210:1-210:4
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b
+210:7-210:14
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b
+211:1-211:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> (a, a)
+211:8-211:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> (a, a)
+212:1-212:6
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b -> b
+212:9-212:18
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b -> b
+213:1-213:7
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> a -> a -> b
+213:10-213:20
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> a -> a -> b
+214:1-214:4
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a -> a
+214:7-214:14
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a -> a
+215:1-215:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> Float -> a
+215:8-215:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> Float -> a
+216:1-216:5
+    forall a (b :: Nat) c
+      . (a ~ VecScalar b Float, c ~ VecScalar b Bool) => a -> a -> c -> a
+216:8-216:16
+    forall a (b :: Nat) c
+      . (a ~ VecScalar b Float, c ~ VecScalar b Bool) => a -> a -> c -> a
+217:1-217:5
+    forall a (b :: Nat) . (a ~ VecS Float b) => a -> a -> a
+217:8-217:16
+    forall a (b :: Nat) . (a ~ VecS Float b) => a -> a -> a
+218:1-218:6
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => Float -> a -> a
+218:9-218:18
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => Float -> a -> a
+219:1-219:11
+    forall a (b :: Nat) . (a ~ VecS Float b) => a -> a -> a -> a
+219:14-219:28
+    forall a (b :: Nat) . (a ~ VecS Float b) => a -> a -> a -> a
+220:1-220:12
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => Float -> Float -> a -> a
+220:15-220:30
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => Float -> Float -> a -> a
+221:1-221:6
+    forall a (b :: Nat) c . (a ~ VecScalar b Float, c ~ VecScalar b Bool) => a -> c
+221:9-221:18
+    forall a (b :: Nat) c . (a ~ VecScalar b Float, c ~ VecScalar b Bool) => a -> c
+222:1-222:6
+    forall a (b :: Nat) c . (a ~ VecScalar b Float, c ~ VecScalar b Bool) => a -> c
+222:9-222:18
+    forall a (b :: Nat) c . (a ~ VecScalar b Float, c ~ VecScalar b Bool) => a -> c
+224:1-224:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+224:8-224:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+225:1-225:5
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+225:8-225:16
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+226:1-226:7
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+226:10-226:20
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+228:1-228:7
+    forall (a :: Nat) . VecScalar a Float -> Float
+228:10-228:20
+    forall (a :: Nat) . VecScalar a Float -> Float
+229:1-229:7
+    forall (a :: Nat) . VecScalar a Float -> Vec 2 Float
+229:10-229:20
+    forall (a :: Nat) . VecScalar a Float -> Vec 2 Float
+230:1-230:7
+    forall (a :: Nat) . VecScalar a Float -> Vec 3 Float
+230:10-230:20
+    forall (a :: Nat) . VecScalar a Float -> Vec 3 Float
+231:1-231:7
+    forall (a :: Nat) . VecScalar a Float -> Vec 4 Float
+231:10-231:20
+    forall (a :: Nat) . VecScalar a Float -> Vec 4 Float
+234:1-234:7
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> Float
+234:10-234:20
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> Float
+235:1-235:9
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> Float
+235:12-235:24
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> Float
+236:1-236:4
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> Float
+236:7-236:14
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> Float
+237:1-237:6
+    forall a . (a ~ VecS Float 3) => a -> a -> a
+237:9-237:18
+    forall a . (a ~ VecS Float 3) => a -> a -> a
+238:1-238:10
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+238:13-238:26
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+239:1-239:12
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a -> a
+239:15-239:30
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a -> a
+240:1-240:8
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a
+240:11-240:22
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a
+241:1-241:8
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a -> a
+241:11-241:22
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a -> a -> a
+243:1-243:10
+    forall (a :: Nat) (b :: Nat) c . Mat a b c -> Mat b a c
+243:13-243:26
+    forall (a :: Nat) (b :: Nat) c . Mat a b c -> Mat b a c
+244:1-244:4
+    forall (a :: Nat) b . Mat a a b -> Float
+244:7-244:22
+    forall (a :: Nat) b . Mat a a b -> Float
+245:1-245:4
+    forall (a :: Nat) b . Mat a a b -> Mat a a b
+245:7-245:18
+    forall (a :: Nat) b . Mat a a b -> Mat a a b
+246:1-246:6
+    forall (a :: Nat) b (c :: Nat) . Vec a b -> Vec c b -> Mat c a b
+246:9-246:25
+    forall (a :: Nat) b (c :: Nat) . Vec a b -> Vec c b -> Mat c a b
+248:1-248:5
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> b -> b
+248:11-248:19
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> b -> b
+249:1-249:4
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> b -> b
+249:11-249:18
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> b -> b
+250:1-250:5
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> b -> b
+250:11-250:19
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> b -> b
+251:1-251:5
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> b
+251:11-251:19
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> b
+252:1-252:6
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> a -> b
+252:11-252:20
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> a -> b
+253:1-253:5
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> a -> b
+253:11-253:19
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> a -> b
+254:1-254:6
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> a -> b
+254:11-254:20
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> a -> b
+255:1-255:7
+    forall a b (c :: Nat) d
+      . (Integral a, b ~ VecScalar c a, d ~ VecScalar c Word) => b -> d -> b
+255:11-255:22
+    forall a b (c :: Nat) d
+      . (Integral a, b ~ VecScalar c a, d ~ VecScalar c Word) => b -> d -> b
+256:1-256:7
+    forall a b (c :: Nat) d
+      . (Integral a, b ~ VecScalar c a, d ~ VecScalar c Word) => b -> d -> b
+256:11-256:22
+    forall a b (c :: Nat) d
+      . (Integral a, b ~ VecScalar c a, d ~ VecScalar c Word) => b -> d -> b
+257:1-257:8
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> Word -> b
+257:11-257:23
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> Word -> b
+258:1-258:8
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> Word -> b
+258:11-258:23
+    forall a b (c :: Nat) . (Integral a, b ~ VecScalar c a) => b -> Word -> b
+260:1-260:15
+    forall (a :: Nat) . VecScalar a Float -> VecScalar a Int
+260:19-260:37
+    forall (a :: Nat) . VecScalar a Float -> VecScalar a Int
+261:1-261:16
+    forall (a :: Nat) . VecScalar a Float -> VecScalar a Word
+261:19-261:38
+    forall (a :: Nat) . VecScalar a Float -> VecScalar a Word
+262:1-262:15
+    forall (a :: Nat) . VecScalar a Int -> VecScalar a Float
+262:19-262:37
+    forall (a :: Nat) . VecScalar a Int -> VecScalar a Float
+263:1-263:16
+    forall (a :: Nat) . VecScalar a Word -> VecScalar a Float
+263:19-263:38
+    forall (a :: Nat) . VecScalar a Word -> VecScalar a Float
+281:3-281:4
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+281:9-281:16
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+281:9-281:18
+    _e -> _e
+281:9-281:20
+    _d
+281:17-281:18
+    _f
+281:19-281:20
+    _c
+282:3-282:4
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+282:9-282:16
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+282:9-282:18
+    _e -> _e
+282:9-282:20
+    _d
+282:17-282:18
+    _f
+282:19-282:20
+    _c
+283:3-283:4
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+283:9-283:16
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+283:9-283:18
+    _e -> _e
+283:9-283:20
+    _d
+283:17-283:18
+    _f
+283:19-283:20
+    _c
+284:3-284:4
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+284:9-284:16
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b
+284:9-284:18
+    VecScalar _b _c -> VecScalar _b _c
+284:9-284:20
+    VecScalar _b _c
+284:17-284:18
+    _g
+284:19-284:20
+    _e
+285:3-285:4
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+285:9-285:16
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> b -> b
+285:9-285:18
+    VecScalar _b _c -> VecScalar _b _c
+285:9-285:20
+    VecScalar _b _c
+285:17-285:18
+    _g
+285:19-285:20
+    _e
+287:1-287:4
+    forall a . Signed (MatVecScalarElem a) => a -> a
+287:9-287:16
+    forall a . Signed (MatVecScalarElem a) => a -> a
+287:9-287:18
+    _c
+287:17-287:18
+    _d
+291:3-291:5
+    forall a . a -> a -> Bool
+291:10-291:22
+    forall a b . (b ~ MatVecScalarElem a) => a -> a -> Bool
+291:10-291:24
+    _d -> Bool
+291:10-291:26
+    Bool
+291:23-291:24
+    _e
+291:25-291:26
+    _b
+292:3-292:4
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+292:9-292:21
+    forall a (b :: Nat) c d
+      . (Num c, a ~ VecScalar b c, d ~ VecScalar b Bool) => a -> a -> d
+292:9-292:23
+    VecScalar _c _b -> VecScalar _c Bool
+292:9-292:25
+    VecScalar _c Bool
+292:22-292:23
+    _g
+292:24-292:25
+    _e
+293:3-293:5
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+293:10-293:27
+    forall a (b :: Nat) c d
+      . (Num c, a ~ VecScalar b c, d ~ VecScalar b Bool) => a -> a -> d
+293:10-293:29
+    VecScalar _c _b -> VecScalar _c Bool
+293:10-293:31
+    VecScalar _c Bool
+293:28-293:29
+    _g
+293:30-293:31
+    _e
+294:3-294:5
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+294:10-294:30
+    forall a (b :: Nat) c d
+      . (Num c, a ~ VecScalar b c, d ~ VecScalar b Bool) => a -> a -> d
+294:10-294:32
+    VecScalar _c _b -> VecScalar _c Bool
+294:10-294:34
+    VecScalar _c Bool
+294:31-294:32
+    _g
+294:33-294:34
+    _e
+295:3-295:4
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+295:9-295:24
+    forall a (b :: Nat) c d
+      . (Num c, a ~ VecScalar b c, d ~ VecScalar b Bool) => a -> a -> d
+295:9-295:26
+    VecScalar _c _b -> VecScalar _c Bool
+295:9-295:28
+    VecScalar _c Bool
+295:25-295:26
+    _g
+295:27-295:28
+    _e
+298:3-298:5
+    Bool -> Bool -> Bool
+298:10-298:17
+    Bool -> Bool -> Bool
+298:10-298:19
+    Bool -> Bool
+298:10-298:21
+    Bool
+298:18-298:19
+    _d
+298:20-298:21
+    _b
+299:3-299:5
+    Bool -> Bool -> Bool
+299:10-299:16
+    Bool -> Bool -> Bool
+299:10-299:18
+    Bool -> Bool
+299:10-299:20
+    Bool
+299:17-299:18
+    _d
+299:19-299:20
+    _b
+300:1-300:4
+    Bool -> Bool -> Bool
+300:7-300:14
+    Bool -> Bool -> Bool
+301:1-301:4
+    forall (a :: Nat) . VecScalar a Bool -> VecScalar a Bool
+301:9-301:16
+    forall a (b :: Nat) . (a ~ VecScalar b Bool) => a -> a
+301:9-301:18
+    VecScalar _a Bool
+301:17-301:18
+    _c
+302:1-302:4
+    forall (a :: Nat) . VecScalar a Bool -> Bool
+302:9-302:16
+    forall (a :: Nat) . VecScalar a Bool -> Bool
+302:9-302:18
+    Bool
+302:17-302:18
+    _c
+303:1-303:4
+    forall (a :: Nat) . VecScalar a Bool -> Bool
+303:9-303:16
+    forall (a :: Nat) . VecScalar a Bool -> Bool
+303:9-303:18
+    Bool
+303:17-303:18
+    _c
+306:3-306:6
+    forall (a :: Nat) (b :: Nat) c (d :: Nat) . Mat a b c -> Mat b d c -> Mat a d c
+306:11-306:24
+    forall (a :: Nat) (b :: Nat) c (d :: Nat) . Mat a b c -> Mat b d c -> Mat a d c
+306:11-306:26
+    Mat _c _a _b -> Mat _d _a _b
+306:11-306:28
+    Mat _d _a _b
+306:25-306:26
+    _h
+306:27-306:28
+    _f
+307:3-307:5
+    forall (a :: Nat) (b :: Nat) c . Mat a b c -> VecS c b -> Vec a c
+307:10-307:23
+    forall (a :: Nat) (b :: Nat) c . Mat a b c -> Vec b c -> Vec a c
+307:10-307:25
+    Vec _b _a -> Vec _c _a
+307:10-307:27
+    Vec _c _a
+307:24-307:25
+    _g
+307:26-307:27
+    _e
+308:3-308:5
+    forall (a :: Nat) b (c :: Nat) . VecS b a -> Mat a c b -> Vec c b
+308:10-308:23
+    forall (a :: Nat) b (c :: Nat) . Vec a b -> Mat a c b -> Vec c b
+308:10-308:25
+    Mat _c _a _b -> Vec _a _b
+308:10-308:27
+    Vec _a _b
+308:24-308:25
+    _g
+308:26-308:27
+    _e
+315:3-315:5
+    forall a . Num (MatVecScalarElem a) => a -> MatVecScalarElem a -> a
+315:10-315:18
+    forall a b . (a ~ MatVecScalarElem b, Num a) => b -> a -> b
+315:10-315:20
+    MatVecScalarElem _e -> _e
+315:10-315:22
+    _d
+315:19-315:20
+    _f
+315:21-315:22
+    _c
+316:3-316:5
+    forall a . Num (MatVecScalarElem a) => a -> MatVecScalarElem a -> a
+316:10-316:18
+    forall a b . (a ~ MatVecScalarElem b, Num a) => b -> a -> b
+316:10-316:20
+    MatVecScalarElem _e -> _e
+316:10-316:22
+    _d
+316:19-316:20
+    _f
+316:21-316:22
+    _c
+317:3-317:5
+    forall a . Num (MatVecScalarElem a) => a -> MatVecScalarElem a -> a
+317:10-317:18
+    forall a b . (a ~ MatVecScalarElem b, Num a) => b -> a -> b
+317:10-317:20
+    MatVecScalarElem _e -> _e
+317:10-317:22
+    _d
+317:19-317:20
+    _f
+317:21-317:22
+    _c
+318:3-318:5
+    forall a (b :: Nat) . Num a => VecScalar b a -> a -> VecScalar b a
+318:10-318:18
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> a -> b
+318:10-318:20
+    _c -> VecScalar _b _c
+318:10-318:22
+    VecScalar _b _d
+318:19-318:20
+    _g
+318:21-318:22
+    _e
+319:3-319:5
+    forall a (b :: Nat) . Num a => VecScalar b a -> a -> VecScalar b a
+319:10-319:18
+    forall a b (c :: Nat) . (Num a, b ~ VecScalar c a) => b -> a -> b
+319:10-319:20
+    _c -> VecScalar _b _c
+319:10-319:22
+    VecScalar _b _d
+319:19-319:20
+    _g
+319:21-319:22
+    _e
+326:16-326:21
+    Type
+327:16-327:21
+    Type
+327:16-330:29
+    Type
+328:16-328:21
+    Type
+328:16-330:29
+    Type
+329:16-329:21
+    Type
+329:16-330:29
+    Type
+330:16-330:19
+    Nat -> Nat -> Type -> Type
+330:16-330:21
+    Nat -> Type -> Type
+330:16-330:23
+    Type -> Type
+330:16-330:29
+    Type | Type
+330:20-330:21
+    _b
+330:22-330:23
+    _b
+330:24-330:29
+    Type
+331:1-331:12
+    Float -> Float -> Float -> Float -> Mat 4 4 Float
+332:5-332:9
+    Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+332:5-332:59
+    Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+332:5-333:59
+    Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+332:5-334:62
+    Vec 4 Float -> Mat 4 4 Float
+332:5-335:59
+    Mat 4 4 Float
+332:11-332:13
+    forall a . a -> a -> a -> a -> VecS a 4
+332:11-332:25
+    Float -> Float -> Float -> VecS Float 4
+332:11-332:29
+    Float -> Float -> VecS Float 4
+332:11-332:43
+    Float -> VecS Float 4
+332:11-332:58
+    VecS Float 4
+332:15-332:16
+    _b
+332:15-332:17
+    _c -> _c
+332:15-332:18
+    VecScalar 1 Float
+332:15-332:19
+    VecScalar 1 Float -> VecScalar 1 Float
+332:15-332:24
+    VecScalar 1 Float
+332:16-332:17
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+332:17-332:18
+    Float
+332:18-332:19
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+332:20-332:21
+    Float
+332:20-332:22
+    Float -> Float
+332:20-332:23
+    Float
+332:21-332:22
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+332:22-332:23
+    Float
+332:28-332:29
+    _b
+332:42-332:43
+    _b
+332:57-332:58
+    _b
+333:11-333:13
+    forall a . a -> a -> a -> a -> VecS a 4
+333:11-333:15
+    _b -> _b -> _b -> VecS _b 4
+333:11-333:39
+    Float -> Float -> VecS Float 4
+333:11-333:43
+    Float -> VecS Float 4
+333:11-333:58
+    VecS Float 4
+333:14-333:15
+    _b
+333:29-333:30
+    _b
+333:29-333:31
+    _c -> _c
+333:29-333:32
+    VecScalar 1 Float
+333:29-333:33
+    VecScalar 1 Float -> VecScalar 1 Float
+333:29-333:38
+    VecScalar 1 Float
+333:30-333:31
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+333:31-333:32
+    Float
+333:32-333:33
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+333:34-333:35
+    Float
+333:34-333:36
+    Float -> Float
+333:34-333:37
+    Float
+333:35-333:36
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+333:36-333:37
+    Float
+333:42-333:43
+    _b
+333:57-333:58
+    _b
+334:11-334:13
+    forall a . a -> a -> a -> a -> VecS a 4
+334:11-334:27
+    Float -> Float -> Float -> VecS Float 4
+334:11-334:41
+    Float -> Float -> VecS Float 4
+334:11-334:56
+    Float -> VecS Float 4
+334:11-334:61
+    VecS Float 4
+334:15-334:21
+    VecScalar 1 Float -> VecScalar 1 Float
+334:15-334:26
+    VecScalar 1 Float
+334:16-334:17
+    Float
+334:16-334:18
+    Float -> Float
+334:16-334:19
+    Float
+334:17-334:18
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+334:18-334:19
+    Float
+334:20-334:21
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+334:22-334:23
+    Float
+334:22-334:24
+    Float -> Float
+334:22-334:25
+    Float
+334:23-334:24
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+334:24-334:25
+    Float
+334:29-334:35
+    VecScalar 1 Float -> VecScalar 1 Float
+334:29-334:40
+    VecScalar 1 Float
+334:30-334:31
+    Float
+334:30-334:32
+    Float -> Float
+334:30-334:33
+    Float
+334:31-334:32
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+334:32-334:33
+    Float
+334:34-334:35
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+334:36-334:37
+    Float
+334:36-334:38
+    Float -> Float
+334:36-334:39
+    Float
+334:37-334:38
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+334:38-334:39
+    Float
+334:43-334:44
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+334:43-334:55
+    Float
+334:44-334:50
+    VecScalar 1 Float -> VecScalar 1 Float
+334:44-334:55
+    VecScalar 1 Float
+334:45-334:46
+    Float
+334:45-334:47
+    Float -> Float
+334:45-334:48
+    Float
+334:46-334:47
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+334:47-334:48
+    Float
+334:49-334:50
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+334:51-334:52
+    Float
+334:51-334:53
+    Float -> Float
+334:51-334:54
+    Float
+334:52-334:53
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+334:53-334:54
+    Float
+334:58-334:59
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+334:58-334:60
+    Float
+334:59-334:60
+    _b
+335:11-335:13
+    forall a . a -> a -> a -> a -> VecS a 4
+335:11-335:15
+    _b -> _b -> _b -> VecS _b 4
+335:11-335:29
+    _c -> _c -> VecS _c 4
+335:11-335:56
+    Float -> VecS Float 4
+335:11-335:58
+    VecS Float 4
+335:14-335:15
+    _b
+335:28-335:29
+    _b
+335:43-335:44
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+335:43-335:55
+    Float
+335:44-335:45
+    _b
+335:44-335:46
+    _c -> _c
+335:44-335:47
+    Float
+335:44-335:48
+    Float -> Float
+335:44-335:49
+    Float
+335:44-335:50
+    VecScalar 1 Float -> VecScalar 1 Float
+335:44-335:55
+    VecScalar 1 Float
+335:45-335:46
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+335:46-335:47
+    Float
+335:47-335:48
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+335:48-335:49
+    Float
+335:49-335:50
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+335:51-335:52
+    Float
+335:51-335:53
+    Float -> Float
+335:51-335:54
+    Float
+335:52-335:53
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+335:53-335:54
+    Float
+335:57-335:58
+    _b
+337:9-337:10
+    Float
+337:9-337:11
+    Float -> Float
+337:9-337:22
+    Float
+337:10-337:11
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+337:11-337:14
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+337:11-337:22
+    VecScalar 1 Float
+337:15-337:19
+    Float
+337:15-337:20
+    VecScalar 1 Float -> VecScalar 1 Float
+337:15-337:21
+    VecScalar 1 Float
+337:19-337:20
+    forall a (b :: Nat) . Num a => VecScalar b a -> VecScalar b a -> VecScalar b a
+337:20-337:21
+    _b
+338:9-338:10
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+338:9-338:11
+    Float
+338:10-338:11
+    Float
+339:9-339:15
+    Float
+339:9-339:16
+    Float -> Float
+339:9-339:17
+    Float
+339:15-339:16
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+339:16-339:17
+    Float
+340:9-340:10
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+340:9-340:11
+    Float
+340:10-340:11
+    Float
+342:1-342:11
+    VecScalar 1 Float -> Mat 4 4 Float
+342:16-342:20
+    Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+342:16-342:33
+    Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+342:16-342:49
+    Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+342:16-342:62
+    Vec 4 Float -> Mat 4 4 Float
+342:16-342:75
+    Mat 4 4 Float
+342:22-342:24
+    forall a . a -> a -> a -> a -> VecS a 4
+342:22-342:26
+    VecScalar _c Float
+      -> VecScalar _c Float -> VecScalar _c Float -> VecS (VecScalar _c Float) 4
+342:22-342:28
+    VecScalar _c Float -> VecScalar _c Float -> VecS (VecScalar _c Float) 4
+342:22-342:30
+    VecScalar _d Float -> VecS (VecScalar _d Float) 4
+342:22-342:32
+    VecS (VecScalar 1 Float) 4
+342:25-342:26
+    VecScalar _d Float
+342:27-342:28
+    VecScalar _c Float
+342:29-342:30
+    _b
+342:31-342:32
+    _b
+342:35-342:37
+    forall a . a -> a -> a -> a -> VecS a 4
+342:35-342:42
+    Float -> Float -> Float -> VecS Float 4
+342:35-342:44
+    Float -> Float -> VecS Float 4
+342:35-342:46
+    Float -> VecS Float 4
+342:35-342:48
+    VecS Float 4
+342:39-342:40
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+342:39-342:41
+    Float
+342:40-342:41
+    VecScalar 1 Float
+342:43-342:44
+    VecScalar 1 Float
+342:45-342:46
+    _b
+342:47-342:48
+    _b
+342:51-342:53
+    forall a . a -> a -> a -> a -> VecS a 4
+342:51-342:55
+    _b -> _b -> _b -> VecS _b 4
+342:51-342:57
+    _c -> _c -> VecS _c 4
+342:51-342:59
+    _c -> VecS _c 4
+342:51-342:61
+    VecS Float 4
+342:54-342:55
+    _b
+342:56-342:57
+    _b
+342:58-342:59
+    _b
+342:60-342:61
+    _b
+342:64-342:66
+    forall a . a -> a -> a -> a -> VecS a 4
+342:64-342:68
+    _b -> _b -> _b -> VecS _b 4
+342:64-342:70
+    _c -> _c -> VecS _c 4
+342:64-342:72
+    _c -> VecS _c 4
+342:64-342:74
+    VecS Float 4
+342:67-342:68
+    _b
+342:69-342:70
+    _b
+342:71-342:72
+    _b
+342:73-342:74
+    _b
+344:9-344:12
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+344:9-344:14
+    VecScalar _a Float
+344:13-344:14
+    _c
+345:9-345:12
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+345:9-345:14
+    VecScalar _b Float
+345:13-345:14
+    VecScalar _c Float
+347:1-347:11
+    VecScalar 1 Float -> Mat 4 4 Float
+347:16-347:20
+    Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+347:16-347:36
+    Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+347:16-347:49
+    Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+347:16-347:62
+    Vec 4 Float -> Mat 4 4 Float
+347:16-347:75
+    Mat 4 4 Float
+347:22-347:24
+    forall a . a -> a -> a -> a -> VecS a 4
+347:22-347:26
+    VecScalar _c Float
+      -> VecScalar _c Float -> VecScalar _c Float -> VecS (VecScalar _c Float) 4
+347:22-347:28
+    VecScalar _d Float -> VecScalar _d Float -> VecS (VecScalar _d Float) 4
+347:22-347:33
+    VecScalar _f Float -> VecS (VecScalar _f Float) 4
+347:22-347:35
+    VecS (VecScalar 1 Float) 4
+347:25-347:26
+    VecScalar _d Float
+347:27-347:28
+    _b
+347:30-347:31
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+347:30-347:32
+    VecScalar _f Float
+347:31-347:32
+    VecScalar _f Float
+347:34-347:35
+    _b
+347:38-347:40
+    forall a . a -> a -> a -> a -> VecS a 4
+347:38-347:42
+    _b -> _b -> _b -> VecS _b 4
+347:38-347:44
+    _c -> _c -> VecS _c 4
+347:38-347:46
+    _c -> VecS _c 4
+347:38-347:48
+    VecS Float 4
+347:41-347:42
+    _b
+347:43-347:44
+    _b
+347:45-347:46
+    _b
+347:47-347:48
+    _b
+347:51-347:53
+    forall a . a -> a -> a -> a -> VecS a 4
+347:51-347:55
+    Float -> Float -> Float -> VecS Float 4
+347:51-347:57
+    Float -> Float -> VecS Float 4
+347:51-347:59
+    Float -> VecS Float 4
+347:51-347:61
+    VecS Float 4
+347:54-347:55
+    VecScalar 1 Float
+347:56-347:57
+    _b
+347:58-347:59
+    VecScalar 1 Float
+347:60-347:61
+    _b
+347:64-347:66
+    forall a . a -> a -> a -> a -> VecS a 4
+347:64-347:68
+    _b -> _b -> _b -> VecS _b 4
+347:64-347:70
+    _c -> _c -> VecS _c 4
+347:64-347:72
+    _c -> VecS _c 4
+347:64-347:74
+    VecS Float 4
+347:67-347:68
+    _b
+347:69-347:70
+    _b
+347:71-347:72
+    _b
+347:73-347:74
+    _b
+349:9-349:12
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+349:9-349:14
+    VecScalar _a Float
+349:13-349:14
+    _c
+350:9-350:12
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+350:9-350:14
+    VecScalar _b Float
+350:13-350:14
+    VecScalar _c Float
+352:1-352:11
+    VecScalar 1 Float -> Mat 4 4 Float
+352:16-352:20
+    Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+352:16-352:33
+    Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+352:16-352:46
+    Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+352:16-352:62
+    Vec 4 Float -> Mat 4 4 Float
+352:16-352:75
+    Mat 4 4 Float
+352:22-352:24
+    forall a . a -> a -> a -> a -> VecS a 4
+352:22-352:26
+    _b -> _b -> _b -> VecS _b 4
+352:22-352:28
+    _c -> _c -> VecS _c 4
+352:22-352:30
+    _c -> VecS _c 4
+352:22-352:32
+    VecS Float 4
+352:25-352:26
+    _b
+352:27-352:28
+    _b
+352:29-352:30
+    _b
+352:31-352:32
+    _b
+352:35-352:37
+    forall a . a -> a -> a -> a -> VecS a 4
+352:35-352:39
+    _b -> _b -> _b -> VecS _b 4
+352:35-352:41
+    VecScalar _d Float -> VecScalar _d Float -> VecS (VecScalar _d Float) 4
+352:35-352:43
+    VecScalar _d Float -> VecS (VecScalar _d Float) 4
+352:35-352:45
+    VecS (VecScalar 1 Float) 4
+352:38-352:39
+    _b
+352:40-352:41
+    VecScalar _e Float
+352:42-352:43
+    VecScalar _d Float
+352:44-352:45
+    _b
+352:48-352:50
+    forall a . a -> a -> a -> a -> VecS a 4
+352:48-352:52
+    _b -> _b -> _b -> VecS _b 4
+352:48-352:57
+    Float -> Float -> VecS Float 4
+352:48-352:59
+    Float -> VecS Float 4
+352:48-352:61
+    VecS Float 4
+352:51-352:52
+    _b
+352:54-352:55
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+352:54-352:56
+    Float
+352:55-352:56
+    VecScalar 1 Float
+352:58-352:59
+    VecScalar 1 Float
+352:60-352:61
+    _b
+352:64-352:66
+    forall a . a -> a -> a -> a -> VecS a 4
+352:64-352:68
+    _b -> _b -> _b -> VecS _b 4
+352:64-352:70
+    _c -> _c -> VecS _c 4
+352:64-352:72
+    _c -> VecS _c 4
+352:64-352:74
+    VecS Float 4
+352:67-352:68
+    _b
+352:69-352:70
+    _b
+352:71-352:72
+    _b
+352:73-352:74
+    _b
+354:9-354:12
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+354:9-354:14
+    VecScalar _a Float
+354:13-354:14
+    _c
+355:9-355:12
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+355:9-355:14
+    VecScalar _b Float
+355:13-355:14
+    VecScalar _c Float
+357:1-357:14
+    Float -> Float -> Float -> Mat 4 4 Float
+357:23-357:33
+    VecScalar 1 Float -> Mat 4 4 Float
+357:23-357:35
+    Mat 4 4 Float
+357:23-357:39
+    Mat 4 _a Float -> Mat 4 _a Float
+357:23-357:52
+    Mat 4 4 Float
+357:23-357:56
+    Mat 4 _a Float -> Mat 4 _a Float
+357:23-357:69
+    Mat 4 4 Float
+357:34-357:35
+    _k
+357:36-357:39
+    forall (a :: Nat) (b :: Nat) c (d :: Nat) . Mat a b c -> Mat b d c -> Mat a d c
+357:40-357:50
+    VecScalar 1 Float -> Mat 4 4 Float
+357:40-357:52
+    Mat 4 4 Float
+357:51-357:52
+    _e
+357:53-357:56
+    forall (a :: Nat) (b :: Nat) c (d :: Nat) . Mat a b c -> Mat b d c -> Mat a d c
+357:57-357:67
+    VecScalar 1 Float -> Mat 4 4 Float
+357:57-357:69
+    Mat 4 4 Float
+357:68-357:69
+    _b
+359:21-359:24
+    Nat -> Type -> Type
+359:21-359:26
+    Type -> Type
+359:21-359:32
+    Type
+359:25-359:26
+    _b
+359:27-359:32
+    Type
+359:36-359:39
+    Nat -> Nat -> Type -> Type
+359:36-359:41
+    Nat -> Type -> Type
+359:36-359:43
+    Type -> Type
+359:36-359:49
+    Type | Type
+359:40-359:41
+    _b
+359:42-359:43
+    _b
+359:44-359:49
+    Type
+360:1-360:17
+    Vec 3 Float -> Mat 4 4 Float
+360:22-360:26
+    Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+360:22-360:29
+    Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+360:22-360:32
+    Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+360:22-360:35
+    Vec 4 Float -> Mat 4 4 Float
+360:22-360:38
+    Mat 4 4 Float
+360:27-360:29
+    forall a . Num a => VecS a 4
+360:30-360:32
+    forall a . Num a => VecS a 4
+360:33-360:35
+    forall a . Num a => VecS a 4
+360:36-360:38
+    VecS Float 4
+362:9-362:11
+    forall a . a -> a -> a -> a -> VecS a 4
+362:9-362:13
+    _b -> _b -> _b -> VecS _b 4
+362:9-362:15
+    _c -> _c -> VecS _c 4
+362:9-362:17
+    _c -> VecS _c 4
+362:9-362:19
+    VecS _c 4
+362:12-362:13
+    _b
+362:14-362:15
+    _b
+362:16-362:17
+    _b
+362:18-362:19
+    _b
+363:9-363:11
+    forall a . a -> a -> a -> a -> VecS a 4
+363:9-363:13
+    _b -> _b -> _b -> VecS _b 4
+363:9-363:15
+    _c -> _c -> VecS _c 4
+363:9-363:17
+    _c -> VecS _c 4
+363:9-363:19
+    VecS _c 4
+363:12-363:13
+    _b
+363:14-363:15
+    _b
+363:16-363:17
+    _b
+363:18-363:19
+    _b
+364:9-364:11
+    forall a . a -> a -> a -> a -> VecS a 4
+364:9-364:13
+    _b -> _b -> _b -> VecS _b 4
+364:9-364:15
+    _c -> _c -> VecS _c 4
+364:9-364:17
+    _c -> VecS _c 4
+364:9-364:19
+    VecS _c 4
+364:12-364:13
+    _b
+364:14-364:15
+    _b
+364:16-364:17
+    _b
+364:18-364:19
+    _b
+365:9-365:11
+    forall a . a -> a -> a -> a -> VecS a 4
+365:9-365:15
+    Float -> Float -> Float -> VecS Float 4
+365:9-365:19
+    Float -> Float -> VecS Float 4
+365:9-365:23
+    Float -> VecS Float 4
+365:9-365:25
+    VecS Float 4
+365:12-365:13
+    Vec 3 Float
+365:12-365:15
+    Float
+365:16-365:17
+    Vec 3 Float
+365:16-365:19
+    Float
+365:20-365:21
+    Vec 3 Float
+365:20-365:23
+    Float
+365:24-365:25
+    _b
+368:11-368:14
+    Nat -> Type -> Type
+368:11-368:16
+    Type -> Type
+368:11-368:22
+    Type
+368:15-368:16
+    _b
+368:17-368:22
+    Type
+369:11-369:14
+    Nat -> Type -> Type
+369:11-369:16
+    Type -> Type
+369:11-369:22
+    Type
+369:11-371:24
+    Type
+369:15-369:16
+    _b
+369:17-369:22
+    Type
+370:11-370:14
+    Nat -> Type -> Type
+370:11-370:16
+    Type -> Type
+370:11-370:22
+    Type
+370:11-371:24
+    Type
+370:15-370:16
+    _b
+370:17-370:22
+    Type
+371:11-371:14
+    Nat -> Nat -> Type -> Type
+371:11-371:16
+    Nat -> Type -> Type
+371:11-371:18
+    Type -> Type
+371:11-371:24
+    Type | Type
+371:15-371:16
+    _b
+371:17-371:18
+    _b
+371:19-371:24
+    Type
+372:1-372:7
+    Vec 3 Float -> Vec 3 Float -> Vec 3 Float -> Mat 4 4 Float
+372:24-372:25
+    Mat 4 4 Float
+372:24-372:29
+    Mat 4 _a Float -> Mat 4 _a Float
+372:24-372:56
+    Mat 4 4 Float
+372:26-372:29
+    forall (a :: Nat) (b :: Nat) c (d :: Nat) . Mat a b c -> Mat b d c -> Mat a d c
+372:30-372:46
+    Vec 3 Float -> Mat 4 4 Float
+372:30-372:56
+    Mat 4 4 Float
+372:48-372:51
+    forall a . Signed (MatVecScalarElem a) => a -> a
+372:48-372:55
+    VecS Float 3
+372:52-372:55
+    Vec 3 Float
+374:14-374:16
+    forall a . a -> a -> a -> a -> VecS a 4
+374:14-374:20
+    _b -> _b -> _b -> VecS _b 4
+374:14-374:24
+    _b -> _b -> VecS _b 4
+374:14-374:28
+    _b -> VecS _b 4
+374:14-374:30
+    VecS _c 4
+374:17-374:18
+    _e
+374:17-374:20
+    _b
+374:21-374:22
+    VecS _d _c
+374:21-374:24
+    _b
+374:25-374:26
+    VecS _d _c
+374:25-374:28
+    _b
+374:29-374:30
+    _b
+375:9-375:18
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+375:9-375:20
+    VecScalar _a Float -> VecScalar _a Float
+375:9-375:33
+    VecScalar 3 Float
+375:19-375:20
+    forall a b . (a -> b) -> a -> b
+375:21-375:24
+    Vec 3 Float
+375:21-375:26
+    VecS Float 3 -> VecS Float 3
+375:21-375:33
+    VecS Float 3
+375:25-375:26
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+375:27-375:33
+    Vec 3 Float
+376:9-376:18
+    forall a (b :: Nat) . (a ~ VecScalar b Float) => a -> a
+376:9-376:20
+    VecScalar _a Float -> VecScalar _a Float
+376:9-376:33
+    VecScalar 3 Float
+376:19-376:20
+    forall a b . (a -> b) -> a -> b
+376:21-376:23
+    Vec 3 Float
+376:21-376:31
+    VecS Float 3 -> VecS Float 3
+376:21-376:33
+    VecS Float 3
+376:24-376:31
+    forall a . (a ~ VecS Float 3) => a -> a -> a
+376:32-376:33
+    VecScalar 3 Float
+377:9-377:10
+    VecScalar 3 Float
+377:9-377:18
+    VecS Float 3 -> VecS Float 3
+377:9-377:20
+    VecS Float 3
+377:11-377:18
+    forall a . (a ~ VecS Float 3) => a -> a -> a
+377:19-377:20
+    VecScalar 3 Float
+378:9-378:18
+    forall (a :: Nat) (b :: Nat) c . Mat a b c -> Mat b a c
+378:9-378:20
+    Mat _c _b _a -> Mat _b _c _a
+378:9-378:65
+    Mat 4 4 Float
+378:19-378:20
+    forall a b . (a -> b) -> a -> b
+378:21-378:25
+    Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+378:21-378:34
+    Vec 4 Float -> Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+378:21-378:43
+    Vec 4 Float -> Vec 4 Float -> Mat 4 4 Float
+378:21-378:52
+    Vec 4 Float -> Mat 4 4 Float
+378:21-378:65
+    Mat 4 4 Float
+378:27-378:31
+    forall a (b :: Nat) . Num a => VecS a b -> VecS a 4
+378:27-378:33
+    VecS Float 4
+378:32-378:33
+    VecScalar 3 Float
+378:36-378:40
+    forall a (b :: Nat) . Num a => VecS a b -> VecS a 4
+378:36-378:42
+    VecS Float 4
+378:41-378:42
+    VecS Float 3
+378:45-378:49
+    forall a (b :: Nat) . Num a => VecS a b -> VecS a 4
+378:45-378:51
+    VecS Float 4
+378:50-378:51
+    VecScalar 3 Float
+378:54-378:56
+    forall a . a -> a -> a -> a -> VecS a 4
+378:54-378:58
+    _b -> _b -> _b -> VecS _b 4
+378:54-378:60
+    _c -> _c -> VecS _c 4
+378:54-378:62
+    _c -> VecS _c 4
+378:54-378:64
+    VecS Float 4
+378:57-378:58
+    _b
+378:59-378:60
+    _b
+378:61-378:62
+    _b
+378:63-378:64
+    _b
+380:1-380:6
+    Float -> VecS Float 4 -> VecS Float 4
+380:13-380:14
+    _d
+380:13-380:16
+    _c -> _c
+380:13-380:29
+    VecS Float 4
+380:15-380:16
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+380:17-380:19
+    forall a . a -> a -> a -> a -> VecS a 4
+380:17-380:21
+    _e -> _e -> _e -> VecS _e 4
+380:17-380:23
+    _e -> _e -> VecS _e 4
+380:17-380:25
+    _e -> VecS _e 4
+380:17-380:29
+    VecS Float 4
+380:20-380:21
+    _f
+380:22-380:23
+    _e
+380:24-380:25
+    _e
+380:26-380:29
+    Float
+382:11-382:16
+    Type
+382:20-382:25
+    Type
+382:20-382:36
+    Type
+382:29-382:36
+    Type | Type
+382:30-382:35
+    Type
+383:1-383:7
+    Float -> Float -> [Float]
+384:7-384:8
+    Float
+384:7-384:10
+    VecScalar 1 Float -> VecScalar 1 Bool
+384:7-384:12
+    VecScalar 1 Bool
+384:7-385:38
+    [Float]
+384:9-384:10
+    forall (a :: Nat) b
+      . Num b => VecScalar a b -> VecScalar a b -> VecScalar a Bool
+384:11-384:12
+    Float
+384:15-384:17
+    forall a . [a]
+384:15-385:38
+    Bool -> [Float]
+385:19-385:20
+    Float
+385:19-385:21
+    [Float] -> [Float]
+385:19-385:38
+    [Float]
+385:20-385:21
+    forall a . a -> [a] -> [a]
+385:22-385:28
+    Float -> Float -> [Float]
+385:22-385:36
+    Float -> [Float]
+385:22-385:38
+    [Float]
+385:30-385:31
+    Float
+385:30-385:33
+    Float -> Float
+385:30-385:35
+    Float
+385:32-385:33
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+385:34-385:35
+    _b
+385:37-385:38
+    Float
+387:9-387:12
+    Type
+387:9-387:24
+    Type
+387:10-387:11
+    _b
+387:16-387:19
+    Type
+387:16-387:24
+    Type
+387:23-387:24
+    Type | Type
+388:10-388:12
+    forall a . [a] -> Int -> a
+388:19-388:20
+    _d
+388:19-389:30
+    Bool -> _d | _c | _c
+389:19-389:21
+    [_f]
+389:19-389:24
+    Int -> _e
+389:19-389:30
+    _d
+389:22-389:24
+    forall a . [a] -> Int -> a
+389:26-389:27
+    Int
+389:26-389:28
+    Int -> Int
+389:26-389:29
+    Int
+389:27-389:28
+    forall a . Num (MatVecScalarElem a) => a -> a -> a
+389:28-389:29
+    _b
+------------ warnings
+Uncovered pattern(s) at testdata/Prelude.lc:50:1:
+tail (_: xs) = xs
+^^^^
+Missing case(s):
+    tail []
+Uncovered pattern(s) at testdata/Prelude.lc:58:1:
+foldr1 f (x: xs) = foldr f x xs
+^^^^^^
+Missing case(s):
+    foldr1 _ []
+Uncovered pattern(s) at testdata/Prelude.lc:137:1:
+project @a @('RecItem s' a': xs) s @_ (RecordCons ts) | s == s' = fstTup (unsafeCoerce @_ @(HList '(a : map recItemType xs)) ts)
+project @a @('RecItem s' a': xs) s @_ (RecordCons ts) = project @a @xs s @(undefined @(CW (isKeyC s a xs))) (RecordCons (sndTup (unsafeCoerce @_ @(HList '(a : map recItemType xs)) ts)))
+Missing case(s):
+    project _ [] _ _ _
+Uncovered pattern(s) at testdata/Prelude.lc:388:10:
+(x : _)  !! 0  =  x
+(_ : xs) !! n  =  xs !! (n-1)
+Missing case(s):
+    [] !! _

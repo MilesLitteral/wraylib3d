@@ -1,0 +1,22 @@
+main is not found
+------------ desugared source code
+value1
+  = _lhs value1 (_rhs let a = _lhs (+=+) \(_ :: _) (_ :: _) -> _rhs () in a () ())
+------------ core code
+value1 :: ()
+value1 = _rhs ()
+------------ tooltips
+1:1-1:7
+    ()
+1:24-1:26
+    ()
+2:13-2:15
+    ()
+2:13-2:19
+    _a -> ()
+2:13-2:22
+    ()
+2:16-2:19
+    forall a b . a -> b -> ()
+2:20-2:22
+    ()

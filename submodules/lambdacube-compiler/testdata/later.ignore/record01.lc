@@ -1,0 +1,26 @@
+main = let
+  blendFun x = Blend x ((SrcAlpha,OneMinusSrcAlpha),(SrcAlpha,OneMinusSrcAlpha)) (V4 1.0 1.0 1.0 1.0)
+  blend'' = blendFun (FuncAdd,FuncAdd)
+  blend = Blend (FuncAdd,FuncAdd) ((SrcAlpha,OneMinusSrcAlpha),(SrcAlpha,OneMinusSrcAlpha)) (V4 1.0 1.0 1.0 1.0)
+  blend' = NoBlending
+  bgColor = V4 0.5 0.0 0.4 1.0
+  bgColor' = V4 0.2 0.2 0.4 1.0
+  emptyFB           = FrameBuffer (depthImage1 1000.0,colorImage1 bgColor)
+  polyMode          = PolygonLine 20.0
+  polyMode'         = PolygonFill
+  polyMode''        = PolygonPoint (PointSize 10.0)
+  cull = CullNone
+  cull' = CullFront
+  rasterCtx         = TriangleCtx cull polyMode' NoOffset FirstVertex
+  fragmentCtx       = (DepthOp Less True, ColorOp blend (V4 True True True True))
+  modelViewProj     = Uniform "MVP" :: Mat 4 4 Float
+  vertexShader ((v))    = (PrimMulMatVec modelViewProj v, v)
+  vertexStream      = fetch "stream4" (Attribute "position4" :: ((Vec 4 Float)))
+  primitiveStream   = mapPrimitives vertexShader vertexStream
+  fragmentStream    = rasterizePrimitives rasterCtx ((Smooth)) primitiveStream
+  fragmentShader'   = \((v)) -> (V4 1.0 0.4 0.0 0.2)
+  fragmentShader    = \((v)) -> (PrimMul v (V4 1.0 0.4 0.0 0.2))
+  frame             = accumulate fragmentCtx fragmentShader fragmentStream emptyFB
+  record = {fieldA: 1.0, fieldB: frame, fieldC: blendFun}
+  field = record.fieldA
+ in ScreenOut record.fieldB

@@ -1,0 +1,33 @@
+main is not found
+------------ desugared source code
+value
+  = _lhs
+    value
+    (_rhs
+      let
+        a
+          = primFix
+            \(b :: _) -> _lhs
+              fun
+              \(c :: _) -> case'Bool
+                (\(_ :: _) -> _)
+                (_rhs (b (fromInt 0)))
+                (_rhs 'a')
+                (fromInt 0 == c)
+        in ())
+------------ core code
+value :: ()
+value = _rhs ()
+------------ tooltips
+1:1-1:6
+    ()
+1:9-1:11
+    ()
+3:13-3:16
+    Char
+3:13-4:18
+    Bool -> Char
+4:13-4:16
+    _e
+4:17-4:18
+    _b

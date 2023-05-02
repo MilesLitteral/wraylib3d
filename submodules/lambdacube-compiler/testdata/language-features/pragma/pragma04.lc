@@ -1,0 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude, TraceTypeCheck #-}
+
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TraceTypeCheck #-}

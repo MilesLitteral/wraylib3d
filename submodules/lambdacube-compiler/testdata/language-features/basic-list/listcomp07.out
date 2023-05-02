@@ -1,0 +1,122 @@
+main is not found
+------------ desugared source code
+value1
+  = _lhs
+    value1
+    (_rhs
+      (concatMap
+        (\(_ :: _) -> let
+          a = _lhs _u (_rhs ()); b = _lhs u (_rhs ((\(c :: _) -> c) a))
+          in primIfThenElse
+          True
+          (let d = _lhs _v (_rhs b); e = _lhs v (_rhs ((\(f :: _) -> f) d)) in [b])
+          [])
+        [(), ()]))
+
+value2
+  = _lhs
+    value2
+    (_rhs
+      (concatMap
+        (\(_ :: _) -> let
+          a = _lhs _u (_rhs ()); b = _lhs u (_rhs ((\(c :: _) -> c) a))
+          in primIfThenElse
+          True
+          (let d = _lhs _v (_rhs b); e = _lhs v (_rhs ((\(f :: _) -> f) d)) in [b])
+          [])
+        [(), ()]))
+
+value3
+  = _lhs
+    value3
+    (_rhs
+      (concatMap
+        (\(_ :: _) -> let
+          a = _lhs _u (_rhs ()); b = _lhs u (_rhs ((\(c :: _) -> c) a))
+          in primIfThenElse
+          True
+          (let d = _lhs _v (_rhs b); e = _lhs v (_rhs ((\(f :: _) -> f) d)) in [b])
+          [])
+        [(), ()]))
+------------ core code
+value1 :: [()]
+value1
+  = _rhs
+    (u : [] ++ foldr (++) [] (map (\_ -> primIfThenElse [' ()] True [u] []) [()]))
+
+value2 :: [()]
+value2
+  = _rhs
+    (u : [] ++ foldr (++) [] (map (\_ -> primIfThenElse [' ()] True [u] []) [()]))
+
+value3 :: [()]
+value3
+  = _rhs
+    (u : [] ++ foldr (++) [] (map (\_ -> primIfThenElse [' ()] True [u] []) [()]))
+------------ tooltips
+1:1-1:7
+    [()]
+1:10-6:11
+    [()]
+1:12-1:13
+    ()
+2:17-2:24
+    [()]
+2:18-2:20
+    ()
+2:21-2:23
+    () | [()]
+3:16-3:17
+    _b | ()
+3:20-3:22
+    ()
+4:12-4:16
+    Bool
+5:16-5:17
+    _b | ()
+5:20-5:21
+    ()
+8:1-8:7
+    [()]
+8:10-12:11
+    [()]
+8:12-8:13
+    ()
+8:21-8:28
+    [()]
+8:22-8:24
+    ()
+8:25-8:27
+    () | [()]
+9:16-9:17
+    _b | ()
+9:20-9:22
+    ()
+10:12-10:16
+    Bool
+11:16-11:17
+    _b | ()
+11:20-11:21
+    ()
+14:1-14:7
+    [()]
+14:10-20:3
+    [()]
+14:12-14:13
+    ()
+15:15-15:22
+    [()]
+15:16-15:18
+    ()
+15:19-15:21
+    () | [()]
+17:2-17:3
+    _b | ()
+17:6-17:8
+    ()
+18:7-18:11
+    Bool
+19:10-19:11
+    _b | ()
+19:14-19:15
+    ()

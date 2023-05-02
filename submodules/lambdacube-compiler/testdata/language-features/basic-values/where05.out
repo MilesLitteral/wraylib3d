@@ -1,0 +1,106 @@
+main is not found
+------------ desugared source code
+value1
+  = _lhs
+    value1
+    (_rhs
+      ((\(a :: _) -> case'Bool (\(_ :: _) -> _) () (let b = () in b) (fromInt 1 == a))
+        (fromInt 1)))
+
+value2
+  = _lhs
+    value2
+    (_rhs
+      ((\(a :: _) -> case'Bool (\(_ :: _) -> _) () (let b = () in b) (fromInt 1 == a))
+        (fromInt 1)))
+
+value3
+  = _lhs
+    value3
+    (_rhs
+      ((\(a :: _) -> case'Bool (\(_ :: _) -> _) () (let b = () in b) (fromInt 1 == a))
+        (fromInt 1)))
+
+value4
+  = _lhs
+    value4
+    (_rhs
+      let a = () in (\(b :: _) -> case'Bool (\(_ :: _) -> _) () a (fromInt 1 == b))
+        (fromInt 1))
+------------ core code
+value1 :: forall a . (Eq a, Num a) => ()
+value1
+  = \a b c -> _rhs
+    (case'Bool (\_ -> ' ()) () () ((a == b) (fromInt a c 1) (fromInt a c 1)))
+
+value2 :: forall a . (Eq a, Num a) => ()
+value2
+  = \a b c -> _rhs
+    (case'Bool (\_ -> ' ()) () () ((a == b) (fromInt a c 1) (fromInt a c 1)))
+
+value3 :: forall a . (Eq a, Num a) => ()
+value3
+  = \a b c -> _rhs
+    (case'Bool (\_ -> ' ()) () () ((a == b) (fromInt a c 1) (fromInt a c 1)))
+
+value4 :: forall a . (Eq a, Num a) => ()
+value4
+  = \a b c -> _rhs
+    (case'Bool (\_ -> ' ()) () () ((a == b) (fromInt a c 1) (fromInt a c 1)))
+------------ tooltips
+1:1-1:7
+    forall a . (Eq a, Num a) => ()
+1:10-3:10
+    ()
+1:15-1:16
+    _b
+2:8-2:9
+    ()
+2:8-3:10
+    Bool -> ()
+2:20-2:22
+    ()
+3:8-3:10
+    ()
+5:1-5:7
+    forall a . (Eq a, Num a) => ()
+5:10-8:10
+    ()
+5:15-5:16
+    _b
+6:8-6:9
+    ()
+6:8-8:10
+    Bool -> ()
+7:14-7:16
+    ()
+8:8-8:10
+    ()
+10:1-10:7
+    forall a . (Eq a, Num a) => ()
+10:10-14:10
+    ()
+10:15-10:16
+    _b
+11:8-11:9
+    ()
+11:8-14:10
+    Bool -> ()
+13:8-13:10
+    ()
+14:8-14:10
+    ()
+16:1-16:7
+    forall a . (Eq a, Num a) => ()
+16:10-18:10
+    ()
+16:15-16:16
+    _b
+17:8-17:9
+    ()
+17:8-18:10
+    Bool -> ()
+18:8-18:10
+    ()
+21:6-21:8
+    ()

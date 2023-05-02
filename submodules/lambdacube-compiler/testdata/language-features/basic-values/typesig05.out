@@ -1,0 +1,98 @@
+main is not found
+------------ desugared source code
+funL = _lhs funL \(a :: _) (_ :: _) -> _rhs a
+
+funR = _lhs funR \(_ :: _) (a :: _) -> _rhs a
+
+value1 = _lhs value1 (_rhs (funL 'a' "b" :: Char))
+
+value2 = _lhs value2 (_rhs (funR 'a' "b" :: String))
+
+value3 :: Char
+value3 = _lhs value3 (_rhs (funL 'a' "b"))
+
+value4 :: String
+value4 = _lhs value4 (_rhs (funR 'a' "b"))
+------------ core code
+funL :: forall a b . a -> b -> a
+funL = \a b c _ -> _rhs c
+
+funR :: forall a b . a -> b -> b
+funR = \a b _ c -> _rhs c
+
+value1 :: Char
+value1 = _rhs 'a'
+
+value2 :: String
+value2 = _rhs "b"
+
+value3 :: Char
+value3 = _rhs 'a'
+
+value4 :: String
+value4 = _rhs "b"
+------------ tooltips
+1:1-1:5
+    forall a b . a -> b -> a
+1:12-1:13
+    _d
+2:1-2:5
+    forall a b . a -> b -> b
+2:12-2:13
+    _b
+4:1-4:7
+    Char
+4:10-4:14
+    forall a b . a -> b -> a
+4:10-4:18
+    _a -> Char
+4:10-4:22
+    Char
+4:15-4:18
+    Char
+4:19-4:22
+    String
+4:26-4:30
+    Type
+5:1-5:7
+    String
+5:10-5:14
+    forall a b . a -> b -> b
+5:10-5:18
+    _a -> _a
+5:10-5:22
+    String
+5:15-5:18
+    Char
+5:19-5:22
+    String
+5:26-5:32
+    Type
+7:11-7:15
+    Type
+8:1-8:7
+    Char
+8:10-8:14
+    forall a b . a -> b -> a
+8:10-8:18
+    _a -> Char
+8:10-8:22
+    Char
+8:15-8:18
+    Char
+8:19-8:22
+    String
+10:11-10:17
+    Type
+11:1-11:7
+    String
+11:10-11:14
+    forall a b . a -> b -> b
+11:10-11:18
+    _a -> _a
+11:10-11:22
+    String
+11:15-11:18
+    Char
+11:19-11:22
+    String

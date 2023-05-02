@@ -1,0 +1,72 @@
+main is not found
+------------ desugared source code
+value1 :: Int
+value1 = _lhs value1 (_rhs (fromInt 1))
+
+value2 :: Int
+value2 = _lhs value2 (_rhs (fromInt 2))
+
+value3 :: Int
+value3 = _lhs value3 (_rhs (fromInt 3))
+
+value4 :: () -> () -> ()
+value4 = _lhs value4 \(_ :: _) (_ :: _) -> _rhs ()
+
+(@@@) :: () -> () -> ()
+(@@@) = _lhs (@@@) \(_ :: _) (_ :: _) -> _rhs ()
+
+value6 :: () -> () -> ()
+value6 = _lhs value6 \(_ :: _) (_ :: _) -> _rhs ()
+------------ core code
+@@@ :: () -> () -> ()
+@@@ = \_ _ -> _rhs ()
+
+value1 :: Int
+value1 = _rhs 1
+
+value2 :: Int
+value2 = _rhs 2
+
+value3 :: Int
+value3 = _rhs 3
+
+value4 :: () -> () -> ()
+value4 = \_ _ -> _rhs ()
+
+value6 :: () -> () -> ()
+value6 = \_ _ -> _rhs ()
+------------ tooltips
+1:27-1:30
+    Type | Type | Type
+3:1-3:7
+    Int
+3:10-3:11
+    _b
+4:1-4:7
+    Int
+4:10-4:11
+    _b
+5:1-5:7
+    Int
+5:10-5:11
+    _b
+8:12-8:14
+    Type | Type | Type
+8:18-8:20
+    Type | Type | Type
+8:18-8:26
+    Type | Type | Type
+8:24-8:26
+    Type | Type | Type | Type | Type | Type
+10:1-10:7
+    () -> () -> ()
+10:14-10:16
+    ()
+11:3-11:6
+    () -> () -> ()
+11:11-11:13
+    ()
+12:1-12:7
+    () -> () -> ()
+12:14-12:16
+    ()

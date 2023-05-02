@@ -1,0 +1,44 @@
+main is not found
+------------ desugared source code
+h
+  = _lhs
+    h
+    \(a :: _) (b :: _) (_ :: _) -> _rhs
+      let
+        c
+          = (\(d :: _) -> hlistConsCase
+              _
+              (\(e :: _) (f :: _) -> hlistConsCase
+                _
+                (\(g :: _) (h :: _) -> hlistNilCase _ (a e g) h)
+                f)
+              d)
+            b
+        in c
+------------ core code
+h :: forall a b c d . (b -> d -> c) -> (b, d) -> a -> c
+h
+  = \a b c d e f _ -> _rhs
+    (hlistConsCase
+      b
+      [d]
+      c
+      (\g h -> hlistConsCase d [] c (\i j -> hlistNilCase c (e g i) j) h)
+      f)
+------------ tooltips
+4:1-4:2
+    forall a b c d . (b -> d -> c) -> (b, d) -> a -> c
+4:11-4:12
+    _c
+7:9-7:29
+    _b
+7:21-7:22
+    _s
+7:21-7:26
+    _c | _d
+7:23-7:24
+    _n
+7:25-7:26
+    _j
+7:28-7:29
+    _g

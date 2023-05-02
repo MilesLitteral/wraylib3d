@@ -1,0 +1,18 @@
+can't find: x in testdata/typesig.reject.lc:6:6:
+x :: x
+     ^
+------------ trace
+'X :: Type
+X :: X
+case'X :: forall (a :: X -> Type) -> a 'X -> forall (b :: X) -> a b
+match'X :: forall (a :: Type -> Type) -> a X -> forall b -> a b -> a b
+!can't find: x in testdata/typesig.reject.lc:6:6:
+x :: x
+     ^
+------------ tooltips
+4:6-4:7
+    Type | Type | Type | Type | Type
+4:6-4:11
+    Type
+4:10-4:11
+    X

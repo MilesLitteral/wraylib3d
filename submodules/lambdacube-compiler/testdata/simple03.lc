@@ -1,0 +1,34 @@
+
+renderWire fb = let
+  blend = Blend (FuncSubtract,FuncAdd) ((SrcColor,SrcColor),(SrcColor,OneMinusSrcAlpha)) (V4 0.0 1.0 0.0 0.0)
+  modelViewProj = Uniform "viewProj" :: Mat 4 4 Float
+  polyMode          = PolygonLine 20.0
+  polyMode'        = PolygonPoint (PointSize 10.0)
+  polyMode''         = PolygonFill
+  rasterCtx         = TriangleCtx CullNone polyMode (Offset (-1) 0) FirstVertex
+  fragmentCtx       = (DepthOp Lequal True,ColorOp NoBlending (V4 True True True True))
+  vertexShader (v,n)    = (PrimMulMatVec modelViewProj (v3FToV4F v), v3FToV4F n)
+  vertexStream      = fetch "missing shader" (Attribute "position" :: Vec 3 Float,Attribute "color" :: Vec 3 Float)
+  primitiveStream   = mapPrimitives vertexShader vertexStream
+  fragmentStream    = rasterizePrimitives rasterCtx ((Smooth)) primitiveStream
+  fragmentShader = \((f)) -> ((V4 1.0 1.0 1.0 1.0))
+ in accumulate fragmentCtx fragmentShader fragmentStream fb
+
+render fb = let
+  blend = Blend (FuncSubtract,FuncAdd) ((SrcColor,SrcColor),(SrcColor,OneMinusSrcAlpha)) (V4 0.0 1.0 0.0 0.0)
+  modelViewProj = Uniform "viewProj" :: Mat 4 4 Float
+  polyMode          = PolygonLine 20.0
+  polyMode'        = PolygonPoint (PointSize 10.0)
+  polyMode''         = PolygonFill
+  rasterCtx         = TriangleCtx CullNone polyMode'' NoOffset FirstVertex
+  fragmentCtx       = accumulationContext (DepthOp Less True,ColorOp NoBlending (V4 True True True True))
+  vertexShader (v,n)    = (PrimMulMatVec modelViewProj (v3FToV4F v), v3FToV4F n)
+  vertexStream      = fetch "missing shader" (Attribute "position" :: Vec 3 Float,Attribute "color" :: Vec 3 Float)
+  primitiveStream   = mapPrimitives vertexShader vertexStream
+  fragmentStream    = rasterizePrimitives rasterCtx ((Smooth)) primitiveStream
+  fragmentShader = \((f)) -> ((f))-- (V4 1.0 1.0 1.0 0.2)
+ in accumulate fragmentCtx fragmentShader fragmentStream fb
+
+main = let
+  emptyFB = FrameBuffer (DepthImage @1 1000,ColorImage @1 (V4 0.0 0.0 0.4 1.0))
+ in ScreenOut $ renderWire $ render emptyFB

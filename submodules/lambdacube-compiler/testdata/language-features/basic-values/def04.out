@@ -1,0 +1,60 @@
+main is not found
+------------ desugared source code
+fun
+  = _lhs
+    fun
+    \(a :: _) -> case'Bool
+      (\(_ :: _) -> _)
+      (case'Bool (\(_ :: _) -> _) (_rhs '_') (_rhs '2') (fromInt 2 == a))
+      (_rhs '1')
+      (fromInt 1 == a)
+
+fun2
+  = _lhs
+    fun2
+    \(a :: _) (_ :: _) -> case'Bool
+      (\(_ :: _) -> _)
+      (case'Bool (\(_ :: _) -> _) (_rhs '_') (_rhs '2') (fromInt 2 == a))
+      (_rhs '1')
+      (fromInt 1 == a)
+------------ core code
+fun :: forall a . (Eq a, Num a, Eq a, Num a) => a -> Char
+fun
+  = \a b c d e f -> case'Bool
+    (\_ -> 'Char)
+    (case'Bool (\_ -> 'Char) (_rhs '_') (_rhs '2') ((a == b) (fromInt a c 2) f))
+    (_rhs '1')
+    ((a == d) (fromInt a e 1) f)
+
+fun2 :: forall a b . (Eq a, Num a, Eq a, Num a) => a -> b -> Char
+fun2
+  = \a b c d e f g _ -> case'Bool
+    (\_ -> 'Char)
+    (case'Bool (\_ -> 'Char) (_rhs '_') (_rhs '2') ((a == c) (fromInt a d 2) g))
+    (_rhs '1')
+    ((a == e) (fromInt a f 1) g)
+------------ tooltips
+1:1-1:4
+    forall a . (Eq a, Num a, Eq a, Num a) => a -> Char
+1:9-1:12
+    Char
+1:9-3:12
+    Bool -> Char
+2:9-2:12
+    Char
+2:9-3:12
+    Bool -> Char | Char
+3:9-3:12
+    Char
+5:1-5:5
+    forall a b . (Eq a, Num a, Eq a, Num a) => a -> b -> Char
+5:12-5:15
+    Char
+5:12-7:15
+    Bool -> Char
+6:12-6:15
+    Char
+6:12-7:15
+    Bool -> Char | Char
+7:12-7:15
+    Char

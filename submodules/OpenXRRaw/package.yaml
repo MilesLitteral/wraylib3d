@@ -1,0 +1,42 @@
+name:                OpenXRRaw
+version:             0.1.0.0
+github:              "MilesLitteral/OpenXRRaw"
+license:             BSD3
+author:              Miles J. Litteral
+maintainer:          "mandaloe2@gmail.com"
+copyright:           "2023 Miles J. Litteral"
+
+extra-source-files:
+- README.md
+- CHANGELOG.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:  OpenXR 1.0 Specification adaptation in Haskell
+
+dependencies:
+- base  >= 4.7 && < 5
+- bytestring
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs:  src
+  # include-dirs: cbits #TODO: Add C source/headers
+  # install-includes:
+  # build-tools: c2hs
+

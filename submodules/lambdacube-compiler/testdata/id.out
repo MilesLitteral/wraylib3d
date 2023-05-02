@@ -1,0 +1,25 @@
+main is not found
+------------ desugared source code
+main' = _lhs main' (_rhs let a = \(b :: _) -> b in (a 4.0, a True))
+------------ core code
+main' :: (Float, Bool)
+main' = _rhs (4.0, True)
+------------ tooltips
+1:1-1:6
+    (Float, Bool)
+3:19-3:20
+    _b
+4:8-4:27
+    (Float, Bool)
+4:9-4:12
+    forall a . a -> a
+4:9-4:16
+    Float
+4:13-4:16
+    Float
+4:18-4:21
+    forall a . a -> a
+4:18-4:26
+    Bool | ((Bool))
+4:22-4:26
+    Bool

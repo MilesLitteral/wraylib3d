@@ -1,0 +1,27 @@
+main is not found
+------------ desugared source code
+value
+  = _lhs
+    value
+    \(a :: _) -> _rhs
+      ((\(b :: _) -> case'Bool (\(_ :: _) -> _) undefined '1' (fromInt 1 == b)) a)
+------------ core code
+value :: forall a . (Eq a, Num a) => a -> Char
+value
+  = \a b c d -> _rhs
+    (case'Bool (\_ -> 'Char) (undefined 'Char) '1' ((a == b) (fromInt a c 1) d))
+------------ tooltips
+1:1-1:6
+    forall a . (Eq a, Num a) => a -> Char
+1:11-2:11
+    Char
+1:16-1:17
+    _e
+2:8-2:11
+    Char
+------------ warnings
+Uncovered pattern(s) at testdata/language-features/basic-values/case05.lc:1:16:
+value x = case x of
+               ^
+Missing case(s):
+     _ | False <- fromInt 1 == _a

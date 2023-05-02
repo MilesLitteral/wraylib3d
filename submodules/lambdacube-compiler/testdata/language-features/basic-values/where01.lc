@@ -1,0 +1,45 @@
+value1 = () where x = ()
+
+value2 = x
+ where x = ()
+
+value3 = x
+ where x = ()
+       y = ()
+
+value4 = y
+ where
+ x = ()
+ y = ()
+
+value5 = x
+ where
+  x = ()
+  y = ()
+
+value6 = () where
+
+value7 = ()
+ where
+
+value8 = ()
+
+
+ where
+
+value9 = x
+
+
+ where
+  x = ()
+  y = ()
+
+value10 = x
+  where
+ x = ()
+ y = ()
+
+value11 = x where
+ x = ()
+ y = ()
+
