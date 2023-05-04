@@ -97,7 +97,7 @@ ghc-options:
 - -Wredundant-constraints
 
 library:
-  source-dirs: src
+  source-dirs:  src
   include-dirs: cbits
   install-includes:
     - ruby.h
@@ -108,10 +108,10 @@ library:
     - cbits/stb_image.c
   cc-options:
     - -fPIC
-  extra-lib-dirs:  cbits/x64-mingw-ucrt
-  extra-libraries: 
-    - libx64-ucrt-ruby320.dll.a
-    - x64-ucrt-ruby320.dll
+  #extra-lib-dirs:  cbits/x64-mingw-ucrt
+  extra-libraries:  ruby #LINUX TEST
+    #- libx64-ucrt-ruby320.dll.a
+    #- x64-ucrt-ruby320.dll
   build-tools: c2hs
 
 executables:
