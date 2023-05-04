@@ -33,11 +33,11 @@ packages:
 - .
 - ./submodules/lambdacube-ir
 - ./submodules/lambdacube-gl
-- ./submodules/lambdacube-xr
-- ./submodules/lambdacube-vulkan
+#- ./submodules/lambdacube-xr
+#- ./submodules/lambdacube-vulkan
 - ./submodules/lambdacube-compiler
 - ./submodules/megastore
-- ./submodules/OpenXRRaw
+#- ./submodules/OpenXRRaw
 
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
