@@ -1,12 +1,16 @@
 module HRayLib3d.Core.ResourceBundler (loadBundle) where
 
+import Data.Aeson
+import Data.Binary
 import MegaStore
 import Codec.GLB
 import Codec.GlTF
+import Codec.GlTF.Prelude
 import Data.Binary.Get
 import System.Directory
 import qualified Data.Text as T 
 import qualified Data.ByteString as BS 
+import qualified Data.ByteString.Lazy as BL
 
 type AssetBundle = MegaStore
 
@@ -23,11 +27,16 @@ loadGLTF = Codec.GlTF.fromByteString
 withGLBAsGLTF :: Chunk -> Either String GlTF
 withGLBAsGLTF = fromChunk 
 
+-- writeGLB :: FilePath -> GLB -> IO ()
+-- writeGLB  path glb  = BL.writeFile  path $ Data.Binary.encode glb
+
+-- writeGLTF :: FilePath -> GlTF -> IO ()
+-- writeGLTF path gltf = BL.writeFile path $ Data.Aeson.encode $ Codec.GlTF.Prelude.toJSON gltf   
+
 saveBundle :: [(T.Text, BS.ByteString)] -> Bool -> String -> IO ()
 saveBundle paths makeDir outpath = do
     createDirectoryIfMissing makeDir outpath
     saveStore (outpath) $ MegaStore paths 
 
-loadBundle :: FilePath -> IO MegaStore
+loadBundle :: FilePath -> IO AssetBundle
 loadBundle path = do loadStore path
-

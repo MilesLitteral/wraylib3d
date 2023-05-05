@@ -8,134 +8,225 @@ module HRayLib3d.GameEngine.Graphics.GLTF (
   -- , GLTFInstance(..)
   ) where
 
-import Control.Monad
-import Data.HashSet (HashSet)
+import Foreign
 import Data.Map (Map)
+import Data.Vector (Vector)
+import Data.HashSet (HashSet)
 import qualified Data.Map as Map
 import qualified Data.HashSet as HashSet
-import Data.Vector (Vector)
 import qualified Data.Vector as V
 import qualified Data.Vector.Storable as SV
 import qualified Data.ByteString.Char8 as SB8
-import Foreign
+import qualified Data.ByteString.Base64 as B64
+import qualified Data.ByteString.Lazy as BL
+import qualified Data.Text as T
 
+import Control.Monad
 import LambdaCube.GL
 import LambdaCube.GL.Mesh
-
 import HRayLib3d.GameEngine.Data.GLTF
 import HRayLib3d.GameEngine.Graphics.Storage
 import HRayLib3d.GameEngine.Utils
 
--- data GlTFInstance
---   = GlTFInstance
---   { gltfInstanceObject :: [Object]
---   , gltfInstanceBuffer :: Buffer
---   , gltfInstanceFrames :: Vector [(Int,Array)]
---   , gltfInstanceModel  :: GlTFModel
---   }
+data GlTFInstance
+  = GlTFInstance
+  { gltfInstanceObject :: [Object]
+  , gltfInstanceBuffer :: LambdaCube.GL.Buffer
+  , gltfInstanceFrames :: Vector [(Int, Array)]
+  , gltfInstanceModel  :: GLTFModel
+  }
 
--- data GPUGlTF
---   = GPUGlTF
---   { gpuGlTFBuffer    :: Buffer
---   , gpuGlTFSurfaces  :: [(IndexStream Buffer,Map String (Stream Buffer))] -- index stream, attribute streams
---   , gpuGlTFFrames    :: Vector [(Int,Array)]
---   , gpuGlTFModel     :: GlTFModel
---   , gpuGlTFShaders   :: HashSet String
---   }
+data GPUGlTF
+  = GPUGlTF
+  { gpuGlTFBuffer    :: LambdaCube.GL.Buffer
+  , gpuGlTFSurfaces  :: [(IndexStream LambdaCube.GL.Buffer, Map String (Stream LambdaCube.GL.Buffer))] -- index stream, attribute streams
+  , gpuGlTFFrames    :: Vector [(Int,Array)]
+  , gpuGlTFModel     :: GLTFModel
+  , gpuGlTFShaders   :: HashSet String
+  }
 
--- setGlTFFrame :: GlTFInstance -> Int -> IO ()
--- setGlTFFrame (GlTFInstance{..}) idx = case gltfInstanceFrames V.!? idx of
---   Just frame  -> updateBuffer gltfInstanceBuffer frame
---   Nothing     -> pure ()
+setGlTFFrame :: GlTFInstance -> Int -> IO ()
+setGlTFFrame (GlTFInstance{..}) idx = case gltfInstanceFrames V.!? idx of
+  Just frame  -> updateBuffer gltfInstanceBuffer frame
+  Nothing     -> pure ()
 
--- {-
---     buffer layout
---       index arrays for surfaces         [index array of surface 0,          index array of surface 1,         ...]
---       texture coord arrays for surfaces [texture coord array of surface 0,  texture coord array of surface 1, ...]
---       position arrays for surfaces      [position array of surface 0,       position array of surface 1,      ...]
---       normal arrays for surfaces        [normal array of surface 0,         normal array of surface 1,        ...]
---     in short: [ surf1_idx..surfN_idx
---               , surf1_tex..surfN_tex
---               , surf1_pos..surfN_pos
---               , surf1_norm..surfN_norm
---               ]
--- -}
--- uploadGlTF :: GlTFModel -> IO GPUGlTF
--- uploadGlTF model@GlTFModel{..} = do
---   let cvtSurface :: Surface -> (Array,Array,Vector (Array,Array))
---       cvtSurface Surface{..} =
---         ( Array ArrWord32 (SV.length srTriangles) (withV srTriangles)
---         , Array ArrFloat (2 * SV.length srTexCoords) (withV srTexCoords)
---         , V.map cvtPosNorm srXyzNormal
---         )
---         where
---           withV a f = SV.unsafeWith a (\p -> f $ castPtr p)
---           cvtPosNorm (p,n) = (f p, f n) where f sv = Array ArrFloat (3 * SV.length sv) $ withV sv
+{-
+    buffer layout
+      index arrays for surfaces         [index array of surface 0,          index array of surface 1,         ...]
+      texture coord arrays for surfaces [texture coord array of surface 0,  texture coord array of surface 1, ...]
+      position arrays for surfaces      [position array of surface 0,       position array of surface 1,      ...]
+      normal arrays for surfaces        [normal array of surface 0,         normal array of surface 1,        ...]
+    in short: [ surf1_idx..surfN_idx
+              , surf1_tex..surfN_tex
+              , surf1_pos..surfN_pos
+              , surf1_norm..surfN_norm
+              ]
+-}
 
---       addSurface sf (il,tl,pl,nl,pnl) = (i:il,t:tl,p:pl,n:nl,pn:pnl) where
---         (i,t,pn) = cvtSurface sf
---         (p,n)    = V.head pn
+-- GlTF	 
+-- asset :: Asset	 
+-- extensionsUsed :: Maybe (Vector Text)	 
+-- extensionsRequired :: Maybe (Vector Text)	 
+-- accessors :: Maybe (Vector Accessor)	 
+-- animations :: Maybe (Vector Animation)	 
+-- buffers :: Maybe (Vector Buffer)	 
+-- bufferViews :: Maybe (Vector BufferView)	 
+-- cameras :: Maybe (Vector Camera)	 
+-- images :: Maybe (Vector Image)	 
+-- materials :: Maybe (Vector Material)	 
+-- meshes :: Maybe (Vector Mesh)	 
+-- nodes :: Maybe (Vector Node)	 
+-- samplers :: Maybe (Vector Sampler)	 
+-- scenes :: Maybe (Vector Scene)	 
+-- skins :: Maybe (Vector Skin)	 
+-- textures :: Maybe (Vector Texture)	 
+-- extensions :: Maybe Object	 
+-- extras :: Maybe Value
 
---       (il,tl,pl,nl,pnl) = V.foldr addSurface ([],[],[],[],[]) mdSurfaces
+-- byteLength :: Size	 
+-- uri :: Maybe URI	 
+-- name :: Maybe Text	 
+-- extensions :: Maybe Object	 
+-- extras :: Maybe Value
+            -- bufferData = BL.fromStrict (SB8.drop byteOffset decodedData)
+            -- binaryData = BL.take byteLength bufferData
+        --return binaryData
 
---   buffer <- compileBuffer (concat [il,tl,pl,nl])
+decodeBase64 :: ByteString -> Maybe ByteString
+decodeBase64 bs = B64.decode bs >>= return . C8.dropWhile (== '\NUL')
 
---   let numSurfaces = V.length mdSurfaces
---       surfaceData idx Surface{..} = (index,attributes) where
---         index = IndexStream buffer idx 0 (SV.length srTriangles)
---         countV = SV.length srTexCoords
---         attributes = Map.fromList $
---           [ ("diffuseUV",   Stream Attribute_V2F buffer (1 * numSurfaces + idx) 0 countV)
---           , ("position",    Stream Attribute_V3F buffer (2 * numSurfaces + idx) 0 countV)
---           , ("normal",      Stream Attribute_V3F buffer (3 * numSurfaces + idx) 0 countV)
---           , ("color",       ConstV4F (V4 1 1 1 1))
---           , ("lightmapUV",  ConstV2F (V2 0 0))
---           ]
+extractData :: Accessor -> ByteString -> Maybe [Float]
+extractData accessor buffer = do
+  let count         = fromIntegral (accessorCount accessor)
+      byteOffset    = fromIntegral (accessorByteOffset accessor)
+      byteStride    = fromIntegral <$> accessorByteStride accessor
+      componentType = accessorComponentType accessor
+      dataType = case accessorType accessor of
+        "SCALAR" -> 1
+        "VEC2" -> 2
+        "VEC3" -> 3
+        "VEC4" -> 4
+        _ -> error "Unsupported accessor type"
+  let bytes = C8.unpack (BL.toStrict (BL.drop byteOffset buffer))
+      dataChunks = case byteStride of
+        Nothing -> chunksOf (dataType * count) bytes
+        Just stride -> chunksOf stride bytes
+  case componentType of
+    5120 -> Just (map fromIntegral (concatMap readInt8 dataChunks))
+    5121 -> Just (map fromIntegral (concatMap readUInt8 dataChunks))
+    5122 -> Just (map fromIntegral (concatMap readInt16LE dataChunks))
+    5123 -> Just (map fromIntegral (concatMap readUInt16LE dataChunks))
+    5124 -> Just (concatMap readInt32LE  dataChunks)
+    5125 -> Just (concatMap readUInt32LE dataChunks)
+    5126 -> Just (concatMap readFloatLE  dataChunks)
+    _ -> Nothing
+  where
+    readInt8 :: String -> [Int8]
+    readInt8 = map read . chunksOf 1
+    readUInt8 :: String -> [Word8]
+    readUInt8 = map read . chunksOf 1
+    readInt16LE :: String -> [Int16]
+    readInt16LE = map (fromIntegral . toInt16LE . fromIntegral . read) . chunksOf 2
+    readUInt16LE :: String -> [Word16]
+    readUInt16LE = map (toWord16LE . fromIntegral . read) . chunksOf 2
+    readInt32LE :: String -> [Int32]
+    readInt32LE = map (fromIntegral . toInt32LE . fromIntegral . read) . chunksOf 4
+    readUInt32LE :: String -> [Word32]
+    readUInt32LE = map (toWord32LE . fromIntegral . read) . chunksOf 4
+    readFloatLE :: String -> [Float]
+    readFloatLE = map toFloatLE . chunksOf 4 . map (toWord8 . fromIntegral . read)
 
---       frames = foldr addSurfaceFrames emptyFrame $ zip [0..] pnl where
---         emptyFrame = V.replicate (V.length mdFrames) []
---         addSurfaceFrames (idx,pn) f = V.zipWith (\l (p,n) -> (2 * numSurfaces + idx,p):(3 * numSurfaces + idx,n):l) f pn
+uploadGlTF :: GLTFModel -> IO GPUGlTF
+uploadGlTF model@GLTFModel{..} = do
+  let cvtGlTFBuffer :: HRayLib3d.GameEngine.Data.GLTF.Buffer -> (Array,Array,Vector (Array,Array))
+      cvtGlTFBuffer HRayLib3d.GameEngine.Data.GLTF.Buffer{..} =
+        -- Data.ByteString.Base64.decode $ URI fromJust uri
+        --Extract ByteString from Base64 URI
+        let decodedData = fromJust (T.unpack $ B64.decode $ URI $ fromJust uri) -- encodedData = C8.dropWhile (/= ',') (C8.pack $ URI $ fromJust uri) (C8.unpack encodedData) 
+            bufferData  = BL.fromStrict      decodedData
+            binaryData  = BL.take byteLength bufferData
+        
+        -- Establish named Accessors, which will extract the appropriate Binary data
+        let rawAccessors    = fromJust accessors 
+            vertexPositions = extractData (rawAccessors V.! 0) binaryData
+            normals         = extractData (rawAccessors V.! 1) binaryData
+            texCoords       = extractData (rawAccessors V.! 2) binaryData
+            indices         = extractData (rawAccessors V.! 3) binaryData
 
---   return $ GPUGlTF
---     { gpuGlTFBuffer    = buffer
---     , gpuGlTFSurfaces  = zipWith surfaceData [0..] (V.toList mdSurfaces)
---     , gpuGlTFFrames    = frames
---     , gpuGlTFModel     = model
---     , gpuGlTFShaders   = HashSet.fromList $ concat [map (SB8.unpack . shName) $ V.toList srShaders | Surface{..} <- V.toList mdSurfaces]
---     }
+        -- The accessors describe the specific data stored in the buffer view 
+        -- such as vertex positions, normals, texture coordinates, or indices
+        -- they correspond with the "attributes" section of a GlTF
+        ( Array ArrWord32 (SV.length indices)       (withV indices) -- there may need to be a step which creates tris from either the indicies, or the vertex positions
+        , Array ArrFloat  (2 * SV.length texCoords) (withV texCoords)
+        , V.map cvtPosNorm normals --srXyzNormal
+        )
+        where
+          withV a f = SV.unsafeWith a (\p -> f $ castPtr p)
+          cvtPosNorm (p,n) = (f p, f n) where f sv = Array ArrFloat (3 * SV.length sv) $ withV sv
 
--- addGPUGlTF :: GLStorage -> GPUGlTF -> GlTFSkin -> [String] -> IO GlTFInstance
--- addGPUGlTF r GPUGlTF{..} skin unis = do
---   let GlTFModel{..} = gpuGlTFModel
---   objs <- forM (zip gpuGlTFSurfaces $ V.toList mdSurfaces) $ \((index,attrs),sf) -> do
---     let materialName s = case Map.lookup (SB8.unpack $ srName sf) skin of
---           Nothing -> SB8.unpack $ shName s
---           Just a  -> a
---     objList <- concat <$> forM (V.toList $ srShaders sf) (\s -> do
---       a <- addObjectWithMaterial r (materialName s) TriangleList (Just index) attrs $ setNub $ "worldMat":unis
---       b <- addObject r "LightMapOnly" TriangleList (Just index) attrs $ setNub $ "worldMat":unis
---       return [a,b])
+      addSurface sf (il,tl,pl,nl,pnl) = (i:il,t:tl,p:pl,n:nl,pn:pnl) where
+        (i, t, pn) = cvtGlTFBuffer sf
+        (p, n)    = V.head pn
 
---     -- add collision geometry
---     collisionObjs <- case V.toList mdFrames of
---       (Frame{..}:_) -> do
---         sphereObj <- uploadMeshToGPU (sphere (V4 1 0 0 1) 4 frRadius) >>= addMeshToObjectArray r "CollisionShape" (setNub $ ["worldMat","origin"] ++ unis)
---         boxObj    <- uploadMeshToGPU (bbox (V4 0 0 1 1) frMins frMaxs) >>= addMeshToObjectArray r "CollisionShape" (setNub $ ["worldMat","origin"] ++ unis)
---         --when (frOrigin /= zero) $ putStrLn $ "frOrigin: " ++ show frOrigin
---         return [sphereObj,boxObj]
---       _ -> return []
+      (il,tl,pl,nl,pnl) = V.foldr addSurface ([],[],[],[],[]) gltfSurfaces
 
---     return $ objList ++ collisionObjs
---   -- question: how will be the referred shaders loaded?
---   --           general problem: should the gfx network contain all passes (every possible materials)?
---   return $ GlTFInstance
---     { gltfInstanceObject = concat objs
---     , gltfInstanceBuffer = gpuGlTFBuffer
---     , gltfInstanceFrames = gpuGlTFFrames
---     , gltfInstanceModel  = gpuGlTFModel
---     }
+  buffer <- compileBuffer (concat [il, tl, pl, nl]) 
+  let numSurfaces = V.length gltfSurfaces
+      surfaceData idx Surface{..} = (index,attributes) where
+        index = IndexStream buffer idx 0 (SV.length srGlTFTriangles)
+        countV = SV.length srGlTFTexCoords
+        attributes = Map.fromList $
+          [ ("diffuseUV",   Stream Attribute_V2F buffer (1 * numSurfaces + idx) 0 countV)
+          , ("position",    Stream Attribute_V3F buffer (2 * numSurfaces + idx) 0 countV)
+          , ("normal",      Stream Attribute_V3F buffer (3 * numSurfaces + idx) 0 countV)
+          , ("color",       ConstV4F (V4 1 1 1 1))
+          , ("lightmapUV",  ConstV2F (V2 0 0))
+          ]
 
--- addGlTF :: GLStorage -> GlTFModel -> GlTFSkin -> [String] -> IO GlTFInstance
--- addGlTF r model skin unis = do
---   gpuGlTF <- uploadGlTF model
---   addGPUGlTF r gpuGlTF skin unis
+      frames = foldr addSurfaceFrames emptyFrame $ zip [0..] pnl where
+        emptyFrame = V.replicate (V.length gltfFrames) []
+        addSurfaceFrames (idx,pn) f = V.zipWith (\l (p,n) -> (2 * numSurfaces + idx,p):(3 * numSurfaces + idx,n):l) f pn
+
+  return $ GPUGlTF
+    { gpuGlTFBuffer    = buffer
+    , gpuGlTFSurfaces  = zipWith surfaceData [0..] (V.toList gltfSurfaces)
+    , gpuGlTFFrames    = frames
+    , gpuGlTFModel     = model
+    , gpuGlTFShaders   = HashSet.fromList $ concat [map (SB8.unpack . fromJust . name) $ V.toList srGlTFMaterials | Surface{..} <- V.toList gltfSurfaces]
+    }
+
+addGPUGlTF :: GLStorage -> GPUGlTF -> GLTFSkin -> [String] -> IO GlTFInstance
+addGPUGlTF r GPUGlTF{..} skin unis = do
+  let GLTFModel{..} = gpuGlTFModel
+  objs <- forM (zip gpuGlTFSurfaces $ V.toList gltfSurfaces) $ \((index,attrs),sf) -> do
+    let materialName s = case Map.lookup (SB8.unpack $ srName sf) skin of
+          Nothing -> SB8.unpack $ shName s
+          Just a  -> a
+    objList <- concat <$> forM (V.toList $ srShaders sf) (\s -> do
+      a <- addObjectWithMaterial r (materialName s) TriangleList (Just index) attrs $ setNub $ "worldMat":unis
+      b <- addObject r "LightMapOnly" TriangleList (Just index) attrs $ setNub $ "worldMat":unis
+      return [a,b])
+
+    -- add collision geometry
+    collisionObjs <- case V.toList mdFrames of
+      (Frame{..}:_) -> do
+        sphereObj <- uploadMeshToGPU (sphere (V4 1 0 0 1) 4 frRadius) >>= addMeshToObjectArray r "CollisionShape" (setNub $ ["worldMat","origin"] ++ unis)
+        boxObj    <- uploadMeshToGPU (bbox (V4 0 0 1 1) frMins frMaxs) >>= addMeshToObjectArray r "CollisionShape" (setNub $ ["worldMat","origin"] ++ unis)
+        --when (frOrigin /= zero) $ putStrLn $ "frOrigin: " ++ show frOrigin
+        return [sphereObj,boxObj]
+      _ -> return []
+
+    return $ objList ++ collisionObjs
+  -- question: how will be the referred shaders loaded?
+  --           general problem: should the gfx network contain all passes (every possible materials)?
+  return $ GlTFInstance
+    { gltfInstanceObject = concat objs
+    , gltfInstanceBuffer = gpuGlTFBuffer
+    , gltfInstanceFrames = gpuGlTFFrames
+    , gltfInstanceModel  = gpuGlTFModel
+    }
+
+addGlTF :: GLStorage -> GLTFModel -> GLTFSkin -> [String] -> IO GlTFInstance
+addGlTF r model skin unis = do
+  gpuGlTF <- uploadGlTF model
+  addGPUGlTF r gpuGlTF skin unis

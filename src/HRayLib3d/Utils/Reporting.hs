@@ -5,9 +5,12 @@ module HRayLib3d.Utils.Reporting where
 import Data.Map (union)
 import Data.Monoid(getSum)
 import HRayLib3d.Utils.Project
--- import qualified HRayLib3d.Utils.Database as DB
-import qualified Control.Applicative as S
+import GHC.Conc.Sync (unsafeIOToSTM) -- WARNING: This is only for testing STM functions, and even then, to experiment
+import Control.Concurrent.STM.TMVar (TMVar(..))
 import qualified Data.Map as S
+import qualified Control.Applicative     as S
+import qualified Control.Concurrent.STM  as T
+-- import qualified HRayLib3d.Utils.Database as DB
 
 -- data Report
 --     = Report {   
@@ -43,3 +46,18 @@ import qualified Data.Map as S
 --     where
 --         calc(Project p _ _) = calculateReport <$> DB.getLoss p <*> DB.getTraining p
 --         calc(ProjectGroup _ projects) = foldMap calc projects
+
+-- DB Reporting, STM Version (Has Issues)
+-- openRSTM :: ForeignToRuby   a => RubyInterpreter -> a -> RubyValueSTM
+-- openRSTM irb value     = do 
+--     rb <- unsafeIOToSTM $ toRubyForeign irb value
+--     T.newTMVar (rb)
+--     -- T.putTMVar value rb
+--     -- T.takeTMVar 
+
+-- runScriptServiceSTM :: Int -> IO ()
+-- runScriptServiceSTM value = do
+--     irb        <- startRubyScriptService
+--     rbSTM      <- T.atomically  (openRSTM irb  value)
+--     output     <- T.atomically  (T.takeTMVar rbSTM)
+--     print $ rvalueOrError output

@@ -1,3 +1,12 @@
+module HRayLib3d.GameEngine.Realm.Physics where 
+
+import HRayLib3d.GameEngine.Realm.World (World)
+
+type GravityConstant = Float
+data Physics = Physics {world :: World, const :: GravityConstant} deriving (Eq, Show)
+
+instance Eq   World
+
 -- // Copyright (c) 2020-2021 the Mondradiko contributors.
 -- // SPDX-License-Identifier: LGPL-3.0-or-later
 
@@ -7,14 +16,6 @@
 -- #include "core/components/synchronized/RigidBodyComponent.h"
 -- #include "core/world/World.h"
 -- #include "log/log.h"
-
-module HRayLib3d.GameEngine.Realm.Physics where 
-
-import HRayLib3d.GameEngine.Realm.World (World)
-
-instance Eq   World
-newtype Physics = Physics {world :: World} deriving (Eq, Show)
-
 
 -- update :: Double -> IO () 
 -- update dt = do

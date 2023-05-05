@@ -36,7 +36,7 @@ dependencies:
 - deepseq
 - zlib
 - filepath
-- linear #This will replace both vect and Vector, or Vector will do so
+- linear                 #This will replace both vect and Vector, or Vector will do so
 - mersenne-random-pure64 #wtf XD, it's from 2008 but maybe that's okay because it's RNG
 - data-binary-ieee754    #wtf x2, atleast its an IEEE standard
 - elerea                 # ??? DCT? DWT? FRP??? Signals??? https://hackage.haskell.org/package/elerea-2.9.0/docs/FRP-Elerea-Param.html#t:Signal
@@ -58,8 +58,9 @@ dependencies:
 - digest
 - OpenGLRaw
 - GLFW-b
-- vulkan-api
-#- vulkan
+#- vulkan-api
+- vulkan
+- vulkan-utils
 - proteaaudio
 - MonadRandom
 - attoparsec
@@ -69,8 +70,8 @@ dependencies:
 - lambdacube-compiler
 - lambdacube-ir
 - lambdacube-gl
-- lambdacube-xr
-- lambdacube-vulkan
+#- lambdacube-xr
+#- lambdacube-vulkan
 #- lambdacube-metal
 #- lambdacube-renderer # obligatory
 - gltf-loader
@@ -78,6 +79,7 @@ dependencies:
 # - lambdacube-loader # create a model type loader
 - language-glsl
 - extra
+- prettyclass
 #- language-vulkan
 #- language-metal
 #- lambdacube-shaderlanguage # can entail all shader dialect stuff (including Q3SS)
@@ -87,6 +89,8 @@ dependencies:
 
 ghc-options:
 - -Wall
+# - -shared
+# - -fno-shared-implib
 - -Wcompat
 - -Widentities
 - -Wincomplete-record-updates
@@ -97,22 +101,15 @@ ghc-options:
 - -Wredundant-constraints
 
 library:
-  source-dirs: src
-  include-dirs: cbits
+  source-dirs:     src
+  include-dirs:    cbits
   install-includes:
-    - ruby.h
-    - shim.h
     - stb_image.h
   c-sources:
-    - cbits/shim.c
-    - cbits/stb_image.c
+    - cbits/stb_image.c 
   cc-options:
     - -fPIC
-  extra-lib-dirs:  cbits/x64-mingw-ucrt
-  extra-libraries: 
-    - libx64-ucrt-ruby320.dll.a
-    - x64-ucrt-ruby320.dll
-  build-tools: c2hs
+  build-tools:     c2hs
 
 executables:
   hraylib3d-exe:

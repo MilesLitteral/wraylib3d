@@ -6,23 +6,22 @@ import Data.IORef
 import Data.Maybe
 import Data.Char (toLower)
 import qualified Data.Map as Map
-import Control.Concurrent
 import Control.Monad
+import Control.Concurrent
 
-import System.Environment
-import System.FilePath
-import System.Directory
 import System.IO
 import System.Exit
+import System.FilePath
+import System.Directory
+import System.Environment
 import qualified System.Mem
 
-import Graphics.UI.GLFW as GLFW
-import Graphics.GL.Core33
 import FRP.Elerea.Param
-import LambdaCube.GL as GL
-
 import Sound.ProteaAudio
+import Graphics.GL.Core33
+import Graphics.UI.GLFW as GLFW
 
+import LambdaCube.GL as GL
 import HRayLib3d.GameEngine.Loader.Zip
 import HRayLib3d.GameEngine.MapViewer.Camera
 import HRayLib3d.GameEngine.MapViewer.Engine
@@ -47,7 +46,7 @@ withFrameBuffer x y w h fn = allocaBytes (w*h*4) $ \p -> do
 captureRate :: Double
 captureRate = 30
 
-run :: IO ()
+--run :: IO ()
 run = do
     hSetBuffering stdout NoBuffering
     --hSetBuffering stdin NoBuffering
@@ -59,7 +58,7 @@ run = do
     when noPak0_pk3 $ die "Could not find pak0.pk3. See how to run: https://github.com/lambdacube3d/lambdacube-quake3/blob/master/README.md"
 
     pk3Data <- loadPK3
-    args <- getArgs
+    args    <- getArgs
     let bspNames = [n | n <- Map.keys pk3Data, ".bsp" == takeExtension n]
     fullBSPName <- head <$> case args of
       (n:xs) -> return $ filter ((== n) . takeBaseName) bspNames
@@ -76,7 +75,7 @@ run = do
 
     -- loading screen
     loadingScreen <- createLoadingScreen
-    (w,h) <- getFramebufferSize win
+    (w,h)         <- getFramebufferSize win
     drawLoadingScreen w h loadingScreen pk3Data bspName
     swapBuffers win
     pollEvents
@@ -88,7 +87,7 @@ run = do
     -- compile graphics pipeline
     let pplName = bspName ++ "_ppl.json"
     compileRequest <- newIORef False
-    compileReady <- newIORef False
+    compileReady   <- newIORef False
     _ <- forkIO $ forever $ do -- start compile thread
       putStrLn "start to compile"
       writeIORef compileRequest False
@@ -118,8 +117,8 @@ run = do
                               f c = c
                           in case Map.lookup musicFName pk3Data of
         Nothing -> return ()
-        Just e -> do
-          buf <- readEntry e
+        Just e  -> do
+          buf  <- readEntry e
           -- load from memory buffer
           smp' <- case takeExtension musicFName of
            ".ogg" -> sampleFromMemoryOgg buf 1
@@ -174,7 +173,7 @@ upEdge :: Signal Bool -> SignalGen p (Signal Bool)
 upEdge s = transfer2 False (\_ cur prev _ -> cur && prev == False) s =<< delay False s
 
 scene win levelData graphicsData mousePosition fblrPress capturePress waypointPress capRef = do
-    time <- stateful 0 (+)
+    time  <- stateful 0 (+)
     last2 <- transfer ((0,0),(0,0)) (\_ n (_,b) -> (b,n)) mousePosition
     let mouseMove = (\((ox,oy),(nx,ny)) -> (nx-ox,ny-oy)) <$> last2
         bsp = getBSP levelData
@@ -267,7 +266,6 @@ driveNetwork network driver = do
         Nothing -> return ()
 
 -- OpenGL/GLFW boilerplate
-
 initWindow :: String -> Int -> Int -> IO Window
 initWindow title width height = do
     GLFW.init

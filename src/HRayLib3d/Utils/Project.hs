@@ -41,7 +41,6 @@ data Project
 
 data MLRegimen = Regimen  Architecture LossType deriving(Generic, ToJSON, FromJSON, Show, Eq, Num)
 
-
 appendProjectToGroup :: Project -> [Project] -> Project
 appendProjectToGroup project projects = do
     let pg = [project]

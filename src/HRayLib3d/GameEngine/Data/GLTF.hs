@@ -1,4 +1,16 @@
-module HRayLib3d.GameEngine.Data.GLTF where
+module HRayLib3d.GameEngine.Data.GLTF (
+    module Codec.GlTF.Buffer
+    ,module Codec.GlTF.Texture
+    ,module Codec.GlTF.Material
+    ,module Codec.GlTF.Animation
+    ,Frame(..)
+    ,Tag(..)
+    ,Shader(..)
+    ,Surface(..)
+    ,GLTFModel(..)
+    ,GLTFSkin
+    ,GLTFAnimation
+)where
 
 import Data.Int
 import Data.Map (Map)
@@ -11,6 +23,27 @@ import Codec.GlTF
 import Codec.GlTF.Texture
 import Codec.GlTF.Material
 import Codec.GlTF.Animation
+import Codec.GlTF.Buffer
+
+-- GlTF	 
+-- asset :: Asset	 
+-- extensionsUsed :: Maybe (Vector Text)	 
+-- extensionsRequired :: Maybe (Vector Text)	 
+-- accessors :: Maybe (Vector Accessor)	 
+-- animations :: Maybe (Vector Animation)	 
+-- buffers :: Maybe (Vector Buffer)	 
+-- bufferViews :: Maybe (Vector BufferView)	 
+-- cameras :: Maybe (Vector Camera)	 
+-- images :: Maybe (Vector Image)	 
+-- materials :: Maybe (Vector Material)	 
+-- meshes :: Maybe (Vector Mesh)	 
+-- nodes :: Maybe (Vector Node)	 
+-- samplers :: Maybe (Vector Sampler)	 
+-- scenes :: Maybe (Vector Scene)	 
+-- skins :: Maybe (Vector Skin)	 
+-- textures :: Maybe (Vector Texture)	 
+-- extensions :: Maybe Object	 
+-- extras :: Maybe Value
 
 data Frame
     = Frame
@@ -28,7 +61,50 @@ data Tag
     , tgGlTFRotationMat  :: !Mat3
     } deriving Show
 
--- Codec.GlTF Material -> Shader
+-- (One Day) Codec.GlTF Material -> Shader (Material?)
+-- Shaders can be pulled out of GLTFs from:
+-- GlTF.extensionsUsed  
+-- GlTF.extensionsRequired
+-- The necessary data looks like this:
+-- {
+--     "extensions": {
+--         "KHR_techniques_webgl": {
+--             "programs": [
+--                 {
+--                     "fragmentShader": 0,
+--                     "vertexShader": 1
+--                 }
+--             ],
+--             "shaders": [
+--                 {
+--                     "type": 35632,
+--                     "uri": "duck0FS.glsl"
+--                 },
+--                 {
+--                     "type": 35633,
+--                     "uri": "duck0VS.glsl"
+--                 }
+--             ],
+--             "techniques": [
+--                 {
+--                     "program": 0,
+--                     "attributes": {
+--                         "a_position": {
+--                             "semantic": "POSITION"
+--                         }
+--                     },
+--                     "uniforms": {
+--                         "u_modelViewMatrix": {
+--                             "type": 35676,
+--                             "semantic": "MODELVIEW"
+--                         }
+--                     }
+--                 }
+--             ]
+--         }
+--     }
+-- }
+
 data Shader
     = Shader
     { shGlTFName    :: !ByteString
@@ -38,7 +114,7 @@ data Shader
 data Surface
     = Surface
     { srGlTFName        :: !ByteString
-    , srGlTFMaterials   :: !(Vector Material)
+    , srGlTFMaterials   :: !(Vector Material) -- apply a generic, applicable, glsl shader for now
     , srGlTFTriangles   :: !(SV.Vector Int32)
     , srGlTFTexCoords   :: !(SV.Vector Vec2)
     , srGlTFXyzNormal   :: !(Vector (SV.Vector Vec3,SV.Vector Vec3))
@@ -46,7 +122,7 @@ data Surface
 
 data GLTFModel
     = GLTFModel
-    { gltfFrames      :: !(Vector Frame)
+    { gltfFrames      :: !(Vector Frame) -- GlTF.accessors :: Maybe (Vector Accessor) -> gltfFrames :: !(Vector Frame)
     , gltfTags        :: !(Vector (HashMap ByteString Tag))
     , gltfSurfaces    :: !(Vector Surface)
     } deriving Show

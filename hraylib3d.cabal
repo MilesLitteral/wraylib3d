@@ -31,6 +31,7 @@ library
       HRayLib3d.Core.BuildBundler
       HRayLib3d.Core.ResourceBundler
       HRayLib3d.Core.StructuredData
+      HRayLib3d.GameEngine
       HRayLib3d.GameEngine.Collision
       HRayLib3d.GameEngine.Content
       HRayLib3d.GameEngine.Data.BSP
@@ -44,6 +45,7 @@ library
       HRayLib3d.GameEngine.Graphics.Culling
       HRayLib3d.GameEngine.Graphics.Frustum
       HRayLib3d.GameEngine.Graphics.GameCharacter
+      HRayLib3d.GameEngine.Graphics.GLB
       HRayLib3d.GameEngine.Graphics.GLTF
       HRayLib3d.GameEngine.Graphics.MD3
       HRayLib3d.GameEngine.Graphics.Quad
@@ -86,11 +88,14 @@ library
       HRayLib3d.Network.Realms
       HRayLib3d.Network.Requests
       HRayLib3d.ScriptEngine
-      HRayLib3d.ScriptEngine.Bindings
-      HRayLib3d.ScriptEngine.Functions
+      HRayLib3d.ScriptEngine.HRuby
+      HRayLib3d.ScriptEngine.HRuby.Parser
+      HRayLib3d.ScriptEngine.HRuby.Pretty
+      HRayLib3d.ScriptEngine.HRuby.Syntax
       HRayLib3d.ScriptEngine.HRubyHS
-      HRayLib3d.ScriptEngine.Instances
-      HRayLib3d.ScriptEngine.Internal
+      HRayLib3d.ScriptEngine.HRubyHSInterface
+      HRayLib3d.Utils
+      HRayLib3d.Utils.LogMessage
       HRayLib3d.Utils.Md3Show
       HRayLib3d.Utils.PrettyPrint
       HRayLib3d.Utils.Project
@@ -104,17 +109,9 @@ library
   include-dirs:
       cbits
   install-includes:
-      ruby.h
-      shim.h
       stb_image.h
   c-sources:
-      cbits/shim.c
       cbits/stb_image.c
-  extra-lib-dirs:
-      cbits/x64-mingw-ucrt
-  extra-libraries:
-      libx64-ucrt-ruby320.dll.a
-      x64-ucrt-ruby320.dll
   build-tools:
       c2hs
   build-depends:
@@ -143,8 +140,6 @@ library
     , lambdacube-compiler
     , lambdacube-gl
     , lambdacube-ir
-    , lambdacube-vulkan
-    , lambdacube-xr
     , language-glsl
     , lens
     , linear
@@ -158,6 +153,7 @@ library
     , parsec
     , postgresql-simple
     , pretty-show
+    , prettyclass
     , process
     , proteaaudio
     , req
@@ -170,7 +166,8 @@ library
     , uuid
     , vect
     , vector
-    , vulkan-api
+    , vulkan
+    , vulkan-utils
     , zlib
   default-language: Haskell2010
 
@@ -208,8 +205,6 @@ executable hraylib3d-exe
     , lambdacube-compiler
     , lambdacube-gl
     , lambdacube-ir
-    , lambdacube-vulkan
-    , lambdacube-xr
     , language-glsl
     , lens
     , linear
@@ -223,6 +218,7 @@ executable hraylib3d-exe
     , parsec
     , postgresql-simple
     , pretty-show
+    , prettyclass
     , process
     , proteaaudio
     , req
@@ -235,7 +231,8 @@ executable hraylib3d-exe
     , uuid
     , vect
     , vector
-    , vulkan-api
+    , vulkan
+    , vulkan-utils
     , zlib
   default-language: Haskell2010
 
@@ -274,8 +271,6 @@ test-suite hraylib3d-test
     , lambdacube-compiler
     , lambdacube-gl
     , lambdacube-ir
-    , lambdacube-vulkan
-    , lambdacube-xr
     , language-glsl
     , lens
     , linear
@@ -289,6 +284,7 @@ test-suite hraylib3d-test
     , parsec
     , postgresql-simple
     , pretty-show
+    , prettyclass
     , process
     , proteaaudio
     , req
@@ -301,6 +297,7 @@ test-suite hraylib3d-test
     , uuid
     , vect
     , vector
-    , vulkan-api
+    , vulkan
+    , vulkan-utils
     , zlib
   default-language: Haskell2010
