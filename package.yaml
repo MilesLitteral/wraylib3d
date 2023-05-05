@@ -101,8 +101,8 @@ ghc-options:
 - -Wredundant-constraints
 
 library:
-  source-dirs:     src
-  include-dirs:    cbits
+  source-dirs:  src
+  include-dirs: cbits
   install-includes:
     - stb_image.h
   c-sources:
