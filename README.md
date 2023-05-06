@@ -151,11 +151,11 @@ Config.Yaml
 Stack.Yaml
     used to control which extra modules are being built like which lambdacude backend the Application will
     build with (currently it only builds with lc-gl) in the future availalbe backends will be:
-    * opengl (legacy)
-    * vulkan (default, includes xr and metal-api)
-    * metal  (apple only, optional for apple users)
-    * sdl2   (software renderer)
-    * ~~xr     (deprecated for vulkan instead)~~
+        * opengl (legacy)
+        * vulkan (default, includes xr and metal-api)
+        * metal  (apple only, optional for apple users)
+        * sdl2   (software renderer)
+        * ~~xr     (deprecated for vulkan instead)~~
     
     
     
