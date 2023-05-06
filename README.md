@@ -157,11 +157,9 @@ https://github.com/patdohere/dockerfiles/raw/master/quakejs-stack/quakejs/base/b
 Place "pak0.pk3" in the root directory (./WRaylib3d)
 stack run mapviewer-debug
 
-Notes:
-M) lambdacube-metal requires mtlpp 
-   https://github.com/MilesLitteral/mtlpp
-W) Note if you wish to test the WebAssembly module you will need wasmtime installed on your machine
-   https://wasmtime.dev/
+### Notes:
+*  lambdacube-metal requires mtlpp:https://github.com/MilesLitteral/mtlpp
+*  Note if you wish to test the WebAssembly module you will need wasmtime installed on your machine: https://wasmtime.dev/
 
 ## How would exported games look in terms of exported filesystems?
    ```Windows:
