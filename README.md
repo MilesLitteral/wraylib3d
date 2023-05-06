@@ -237,7 +237,7 @@ stack run mapviewer-debug
      WRL3D.so/dll
      YourGame.wasm
    
-  WebGL (TBA)
+  WebGL (TBA, See Also: https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html)
     -- (Data URI)  AssetBundle(s)
     -- (Data URI)  ShaderCache(s)
     -- (DB Tunnel) Realm(s)
