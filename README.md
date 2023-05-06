@@ -214,7 +214,7 @@ stack run mapviewer-debug
      ShaderCaches/shader.metallib(s), shader.metaldysm(s)
      WRL3D.so
      Realms.db
-     <vcproj/xcworkspace files>
+     <xcproj/xcworkspace files>
      YourGame.xcproj -> ./build/YourGame.app
 
   Linux
