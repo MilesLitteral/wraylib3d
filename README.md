@@ -60,9 +60,9 @@
             At some point, it will have a full Front-End Interface to create Widgets in Window with
             scriptable UIs
             WRayLib uses Protea Audio and therefore can use OGGs and WAVs, there is an interest
-            in maybe making an Audio System to go along with it built with SDL2.      
+            in maybe making an Audio System to go along with it built on top of SDL2.      
 
-            When this exists fully, SDL2 will handle Input, Audio, Windowing, and Widgets therefore 
+            When this exists fully, SDL2 will handle Input (Controllers), Audio, Windowing, and Widgets therefore 
             separating concerns in terms of which modules handle what, its currently a bit of a mess
             
     + Game Engine (Module)
@@ -83,38 +83,40 @@
             bottleneck in Vulkan) thus LambdaCube-Metal is somewhat necessitated by comparison
             Related Projects: LambdaCube-Vulkan, LambdaCube-Metal, LambdaCube-XR, LambdaCube-GL (The Backends)
 
-            There's also a desire to upgrade LambdaCube-IR to use GraphQL as a querying language rather than JSON as it's currently using as GraphQL is incredibly flexible
+            There's also a desire to upgrade LambdaCube-IR to use GraphQL as a querying language rather than JSON 
+            as it's currently using this is because GraphQL is incredibly flexible, and will need to be explored
 
         - Loader
             Contains functions for reading the Binary File Types into their Logical Data Types, a GLB and GLTF Loader
-            is in Progress
+            is in Progress.
 
         - MapViewer
             Module for Loading Levels and viewing them, Full of QoL TODOs that will be addressed later on in
-            development
+            development.
             
             There is a desire to create a MapMaker, I'm not saying this should be Blender-HS but I am interested in Map Making 
-            functionality similar to Unity/Unreal Engine
+            functionality similar to Unity/Unreal Engine.
             
         - Realm
             Module for Games and their Definition, here game logic, entities, levels, physics, and all are defined
             This class is what users build via the UI and is actually "Compiled" by WRL3D when the user exports 
             their game, rather, the assets here and logic here is what will be compiled as an executable with dlls, 
             assetBundles,  and binaries. There is an interest here to add the DB Module connections, and a module for reading
-            a companion .db file
+            a companion .db file.
 
         - All Other files in here relate to core Game Engine functions, Render System, Scene (Manager), and Utils will stay whereas 
-          there is a desire to work Collision and Content into their own Modules (Physics, and Content respectively)
+          there is a desire to work Collision and Content into their own Modules (Physics, and Content respectively).
 
     + Network
         - Database
             Low level Postgres-SQL Functions, so far it only contains Query, which is all that is necessary
             for Realm purposes; you are required to have PostgresSQL installed on your system to use pgl
-            if you want to use this module and it is bound to pgl otherwise thise module creates segfaults
+            if you want to use this module and it is bound to pgl otherwise this module creates segfaults.
 
         - Requests
             Low Level HTTP Functions, it can query web addressed in terms of HTTPS, JSON, or Binary and can handle all
-            those responses, in the future any UDP Streaming functions will be described here for Multiplayer functionality as will any SSH or Tunneling functions that are of future interest
+            those responses, in the future any UDP Streaming functions will be described here for Multiplayer functionality 
+            as will any SSH or Tunneling functions that are of future interest
 
         - Realms
             Levels as described in their Web format, Levels can be queried and their assets downloaded.
@@ -134,7 +136,7 @@
 
         ? There is a desire to make visualization functions so that benchmarking can be presented Graphically or non Graphically 
 
-    + Guides (TBA)
+    + GuideWriter (TBA)
         - A Module for Generating LaTeX PDFs via HaTeX (haskell latex)
         - This will be a general utility that could evolve into other
           notation forms for UI etc
@@ -142,9 +144,21 @@
     + Utils
         - Misc Application Utils, all Logging functions for example are here, as is prettyPrinting and Md3Show.
           the PrettyPrinter is entirely broken and needs to be fixed for generalized use
+
 Config.Yaml
     Will be expanded to include Tests, examples, and alternative builds based on simple flags passed
-
+    
+Stack.Yaml
+    used to control which extra modules are being built like which lambdacude backend the Application will
+    build with (currently it only builds with lc-gl) in the future availalbe backends will be:
+    opengl (legacy)
+    vulkan (default, includes xr and metal-api)
+    metal  (apple only, optional for apple users)
+    sdl2   (software renderer)
+    ~~xr     (deprecated for vulkan instead)~~
+    
+    
+    
 ### How To Run WRayLib3d
 
     -  System Prerequisites: ghc, stack, cabal (ghcup toolchain), opengl
