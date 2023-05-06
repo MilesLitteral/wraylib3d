@@ -206,6 +206,7 @@ stack run mapviewer-debug
    UWP
    C:/WRL/Games/<YourGame>
      <vcproj files>
+     WRL3D.dll
      YourGame.vcproj -> ./build/YourGame.uwp
    
    MacOS:
