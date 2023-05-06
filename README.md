@@ -1,8 +1,8 @@
 # hraylib3d
 
 ## Project Structure
-WRayLib3d (Unity-Like Application)
 
+WRayLib3d (Unity-Like Application)
     + Core  (Module)
         - Build Manager
             Handles the Building of Projects (WRLP) Into
