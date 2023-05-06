@@ -212,6 +212,7 @@ stack run mapviewer-debug
    /user/WRL/Games/<YourGame>
      AssetBundles/assets.AssetBundle(s)
      ShaderCaches/shader.metallib(s), shader.metaldysm(s)
+     WRL3D.so
      Realms.db
      <vcproj/xcworkspace files>
      YourGame.xcproj -> ./build/YourGame.app
