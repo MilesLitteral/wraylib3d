@@ -5,7 +5,7 @@
         - Build Manager
             Handles the Building of Projects (WRLP) Into
             full native executables (planned support: Win32/64 (NSIS Executable), UWP, MacOS, iOS*, Linux      
-            Application, Android*, Wasm), It may need a companion Launcer Manager.
+            Application, Android*, Wasm, XR*), It may need** a companion Launcer Manager.
             
             * = iOS Support is _theoretical_ whereas Android is possible but would require generating an
                 Android Studio Project, this is a similar issue currently facing the UWP functionality
@@ -14,7 +14,18 @@
                 Djinni (https://github.com/MilesLitteral/djinni) may be an interesting tool to help with translating 
                 code for making iOS and Android Project I will have to explore what is to be done for VS and XC though 
                 I am sure they have, atleast, means of generation through Command-Line, the question is then linking
-                
+
+             ** = besides a Launcher it may also need a Cross Compiler (Xross is the working title)
+             
+        - Xross (TBA)
+          a Cross Compiler for making sure any necessary generated code is produced and applicable projects are created 
+          (vsproj, xcproj, gradles, etc). It is built ontop of a Interface known as Djinni for maximized Mac and Android
+          support. On Windows it generates vsprojs and links them to ghc compiled .dlls (when making a uwp project)
+          otherwise ghc will simply generate a windows executable and wrap it up with NSIS to create an executable with all
+          the applicables in the right place. This is the same on Linux though in Linux's case there is also a generation 
+          stage necessary to produce the configure, makefile, and autogen.sh so make can work an gcc can link the correct
+          libraries
+
         - Resource Bundler
             Handles The compiling of all project 3d Assets (and associated assets) into .AssetBundles which are 
             accessed at runtime. AssetBundles can be thought of like onion data structure, 
@@ -63,6 +74,11 @@
             read into lists of GLTFs then the GLTFs are loaded and read into OpenGL Buffers, at a later point in 
             Development the Rendering Pipeline will be backend agnostic and the Buffers will instead be a kind of 
             Intermediate Representation (IR), expanding on LambdaCube-IR and probably LambdaCube-Compiler
+
+            There was a time that I entertained creating a LambdaCube-DX for DirectX but I instead decided Vulkan
+            would maximize platform support and save time, additionally, Vulkan can use native D311 and D312.dll
+            where as it CANNOT do native Metal rendering (it can only communicate with metal-api which creates a 
+            bottleneck in Vulkan) thus LambdaCube-Metal is somewhat necessitated by comparison
             Related Projects: LambdaCube-Vulkan, LambdaCube-Metal, LambdaCube-XR, LambdaCube-GL (The Backends)
 
             There's also a desire to upgrade LambdaCube-IR to use GraphQL as a querying language rather than JSON as it's currently using as GraphQL is incredibly flexible
@@ -154,7 +170,6 @@ W) Note if you wish to test the WebAssembly module you will need wasmtime instal
      AssetBundles/assets.AssetBundle(s)
      ShaderCaches/shader.ShaderCache(s)
      WRL3D.dll
-     Vulkan.dll (TBA)
      Realms.db
      YourGame.exe
 
@@ -188,10 +203,14 @@ W) Note if you wish to test the WebAssembly module you will need wasmtime instal
      -- (Data URI)  AssetBundle(s)
      -- (Data URI)  ShaderCache(s)
      -- (DB Tunnel) Realm(s)
-     WebGL.so/dll (would it just link this?)
      WRL3D.so/dll
      YourGame.wasm
-
+   
+   WebGL (TBA)
+    Build
+    TemplateData
+    index.html
+    
    iOS
    /user/WRL/Games/Mobile/<YourGame>
      AssetBundles/assets.AssetBundle(s)
