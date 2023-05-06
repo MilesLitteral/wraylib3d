@@ -48,7 +48,9 @@
             
             These caches will be used by the renderer cross-referenced against .gltf file specific  'extensions' which would then load the applicable shader
             if this is not present the cache has a "default shader" that will be fallen back to
-                      
+            
+            This module also contains the language-glsl, language-metal, and language-spir-v parsers used to validate all shaders
+            
             ? There is a Format the engine uses called "LC" a kind of custom scripting language that largely is used in relation to Engine Graphics, 
             I desire to replace Quake Shaders and (perhaps) LC as well or re appropriate it so that shaders are instead GLSL, or some other format 
             which can be used rather than emulating to make Quake happy, It also is a kind of future proofing, where LC is then a Rendering Pipeline Language
