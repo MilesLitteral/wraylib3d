@@ -105,8 +105,8 @@
 Config.Yaml
     Will be expanded to include Tests, examples, and alternative builds based on simple flags passed
 
-HOWTOs:
-How To Run WRayLib3d
+### How To Run WRayLib3d
+
     -  System Prerequisites: ghc, stack, cabal (ghcup toolchain), opengl
     -  Core Dependencies: lambdacube-compiler, lambdacube-ir, lambdacube-gl (There is no need to satisfy optionals, and 
        they all come in the project anyway, enable and disable them with the config.yaml)
@@ -117,13 +117,12 @@ First Download This .pk3 (In the future it will be replaced by an "AssetBundle" 
 https://github.com/patdohere/dockerfiles/raw/master/quakejs-stack/quakejs/base/baseq3/pak0.pk3
 
 Place "pak0.pk3" in the root directory (./WRaylib3d)
-
 stack run mapviewer-debug
 
-    Notes:
-    M) lambdacube-metal requires mtlpp 
-       https://github.com/MilesLitteral/mtlpp
-    W) Note if you wish to test the WebAssembly module you will need wasmtime installed on your machine
-       https://wasmtime.dev/
+Notes:
+M) lambdacube-metal requires mtlpp 
+   https://github.com/MilesLitteral/mtlpp
+W) Note if you wish to test the WebAssembly module you will need wasmtime installed on your machine
+   https://wasmtime.dev/
 
 
