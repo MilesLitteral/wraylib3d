@@ -161,7 +161,10 @@ stack run mapviewer-debug
 *  lambdacube-metal requires mtlpp:https://github.com/MilesLitteral/mtlpp
 *  Note if you wish to test the WebAssembly module you will need wasmtime installed on your machine: https://wasmtime.dev/
 
-## How would exported games look in terms of exported filesystems?
+## How would exported games look in terms of exported filesystems?*
+   * = There is a possibility for CMake support, this has to be explored
+       as it could also be the answer for generating vcprojs or xcprojs
+       
    ```Windows:
    NSIS (Standard)
    C:/WRL/Games/<YourGame>
@@ -175,7 +178,7 @@ stack run mapviewer-debug
    C:/WRL/Games/<YourGame>
      <vcproj files>
      YourGame.vcproj -> ./build/YourGame.uwp
-
+   
    MacOS:
    /user/WRL/Games/<YourGame>
      AssetBundles/assets.AssetBundle(s)
