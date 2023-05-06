@@ -158,7 +158,6 @@ build with (currently it only builds with lc-gl) in the future availalbe backend
 * ~~xr     (deprecated for vulkan instead)~~
     
     
-    
 ### How To Run WRayLib3d
 
     -  System Prerequisites: ghc, stack, cabal (ghcup toolchain), opengl
@@ -177,6 +176,10 @@ stack run mapviewer-debug
 *  lambdacube-metal requires mtlpp:https://github.com/MilesLitteral/mtlpp
 *  Note if you wish to test the WebAssembly module you will need wasmtime installed on your machine: https://wasmtime.dev/
 
+## Will WRayLib3d have companion apps?
+   Yes, they will be written with the fjvallarino/monomer library exclusively,
+   one that could be made now is the Multiplayer launcher, the rest are TBA
+   
 ## How would exported games look in terms of exported filesystems?*
    * = There is a possibility for CMake support, this has to be explored
        as it could also be the answer for generating vcprojs or xcprojs
