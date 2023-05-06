@@ -15,6 +15,10 @@
             Handles The compiling of all project 3d Assets (and associated assets) into .AssetBundles which are 
             accessed at runtime. AssetBundles can be thought of like onion data structure, 
             ie: AssetBundle([(Key, GLB(Header, [GLTF]))])
+            
+            Currently, The engine handles this with .PK3 files that bundle everything, they are basically glorified
+            zips and there is an active desire to eliminate them from the code base. By comparison maps are represented
+            by Binary Space Partitions (BSPs) and will remain their format but be stored within a MegaStore
 
         - Structured Data 
             Descriptions of All ingame classes as JSON data structures, these are then used for serialzing the game
@@ -60,7 +64,10 @@
         - MapViewer
             Module for Loading Levels and viewing them, Full of QoL TODOs that will be addressed later on in
             development
-
+            
+            There is a desire to create a MapMaker, I'm not saying this should be Blender-HS but I am interested in Map Making 
+            functionality similar to Unity/Unreal Engine
+            
         - Realm
             Module for Games and their Definition, here game logic, entities, levels, physics, and all are defined
             This class is what users build via the UI and is actually "Compiled" by WRL3D when the user exports 
