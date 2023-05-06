@@ -181,7 +181,8 @@ stack run mapviewer-debug
    * = There is a possibility for CMake support, this has to be explored
        as it could also be the answer for generating vcprojs or xcprojs
        
-   ```Windows:
+   ```
+   Windows:
    NSIS (Standard)
    C:/WRL/Games/<YourGame>
      AssetBundles/assets.AssetBundle(s)
@@ -260,4 +261,5 @@ stack run mapviewer-debug
      gradle/
      <gradle_files>
      settings.localproperties
-     build.gradle -> ./build/YourGame.app```
+     build.gradle -> ./build/YourGame.app
+  ```
