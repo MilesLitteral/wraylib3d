@@ -1,0 +1,3 @@
+AUTOMAKE_OPTIONS = foreign
+bin_PROGRAMS = game
+game_SOURCES = main.c

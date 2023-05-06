@@ -17,34 +17,33 @@ module HRayLib3d.GameEngine.RenderSystem
   , lookupAnimationData
   ) where
 
-import Control.Monad
-import Control.Monad.State.Strict
 import Data.Vect hiding (Vector)
 import Data.Maybe (fromJust, mapMaybe)
 import Data.IORef
 import Data.List (foldl')
 import Data.Hashable
 import Data.HashSet (HashSet)
-import qualified Data.HashSet as HashSet
-import qualified Data.Set as Set
-import Data.HashMap.Strict (HashMap)
-import qualified Data.HashMap.Strict as HashMap
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import qualified Data.ByteString.Lazy as LB
-import qualified Data.ByteString.Char8 as BS8
+
 import Codec.Picture
 import Data.Vector (Vector)
-import qualified Data.Vector as V
+import Data.Map.Strict (Map)
 import Data.Digest.CRC32 (crc32)
+import Data.HashMap.Strict (HashMap)
+
+import qualified Data.Set as Set
+import qualified Data.Vector as V
+import qualified Data.Map.Strict as Map
+import qualified Data.HashSet as HashSet
+import qualified Data.ByteString.Lazy as LB
+import qualified Data.ByteString.Char8 as BS8
+import qualified Data.HashMap.Strict as HashMap
+
 import Text.Printf
+import Control.Monad
+import Control.Monad.State.Strict
 import Lens.Micro.Platform hiding (_4)
 
 import LambdaCube.GL
-
-import qualified HRayLib3d.GameEngine.Data.BSP as BSP
-import qualified HRayLib3d.GameEngine.Data.MD3 as MD3
-import qualified HRayLib3d.GameEngine.Data.GameCharacter as GCH
 import HRayLib3d.GameEngine.Data.Material hiding (Vec3)
 import HRayLib3d.GameEngine.Graphics.Storage
 import HRayLib3d.GameEngine.Graphics.Frustum
@@ -61,6 +60,9 @@ import HRayLib3d.GameEngine.Content
 import HRayLib3d.GameEngine.Scene
 import HRayLib3d.GameEngine.Utils
 import HRayLib3d.GameEngine.Data.MD3
+import qualified HRayLib3d.GameEngine.Data.BSP as BSP
+import qualified HRayLib3d.GameEngine.Data.MD3 as MD3
+import qualified HRayLib3d.GameEngine.Data.GameCharacter as GCH
 
 type AnimationCache   = HashMap String GCH.Character
 type BSPCache         = HashMap String GPUBSP

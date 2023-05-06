@@ -117,6 +117,12 @@ module HRayLib3d.Core.BuildBundler (
         (_, Just hout, _, _) <- createProcess (proc "wasm32-wasi-ghc" [(appName ++ ".hs"), "-o", (appName ++ ".wasm")]){ cwd = Just "./", std_out = CreatePipe }
         return hout
 
+    -- https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html
+    buildWebGL :: String -> IO Handle
+    buildWebGL appName = do
+        (_, Just hout, _, _) <- createProcess (proc "wasm32-wasi-ghc" [(appName ++ ".hs"), "-o", (appName ++ ".wasm")]){ cwd = Just "./", std_out = CreatePipe }
+        return hout
+
     -- Linux Build
     -- ./project/configure
     configureLinux :: IO Handle

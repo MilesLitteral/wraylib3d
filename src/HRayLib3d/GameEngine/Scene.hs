@@ -19,12 +19,12 @@ import Data.Vect.Float.Instances
 import HRayLib3d.GameEngine.Graphics.Frustum
 import Data.ByteString (ByteString)
 
-type Scale = Float
-type Position = Vec3
+type Scale       = Float
+type Position    = Vec3
 type Orientation = UnitQuaternion
-type RGBA = Vec4
-type SkinName = String
-type ShaderName = String
+type RGBA        = Vec4
+type SkinName    = String
+type ShaderName  = String
 
 newtype Tag = Tag ByteString
   deriving (Show)

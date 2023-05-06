@@ -200,7 +200,7 @@ scene win levelData graphicsData mousePosition fblrPress capturePress waypointPr
                 Just camData -> return camData
     -}
     let activeCamera = controlledCamera
-    let setupGFX (camPos,camTarget,camUp,brushIndex) time (capturing,frameCount) = do
+        setupGFX (camPos,camTarget,camUp,brushIndex) time (capturing,frameCount) = do
             (w,h) <- getFramebufferSize win
             -- hack
             let keyIsPressed k = fmap (==KeyState'Pressed) $ getKey win k
@@ -211,7 +211,7 @@ scene win levelData graphicsData mousePosition fblrPress capturePress waypointPr
             when (not $ null brushIndex) $ do
               putStrLn $ "brush collision: " ++ show (map (getModelIndexFromBrushIndex levelData) brushIndex)
             -}
-            let captureA = do
+                captureA = do
 #ifdef CAPTURE
                   when capturing $ do
                       glFinish

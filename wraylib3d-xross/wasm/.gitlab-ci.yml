@@ -1,0 +1,129 @@
+variables:
+  DOCKER_REV: b58ecd021c2533f0f0d0b1c9109200a69506d2b7
+  GIT_DEPTH: 1
+  GIT_STRATEGY: clone
+
+.x86_64-linux-alpine:
+  tags:
+    - x86_64-linux
+  image: registry.gitlab.haskell.org/ghc/ci-images/x86_64-linux-alpine3_17:$DOCKER_REV
+  before_script:
+    - |
+      pushd "$(mktemp -d)"
+      sudo curl -f -L --retry 5 https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub -o /etc/apk/keys/sgerrand.rsa.pub
+      sudo curl -f -L --retry 5 https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.34-r0/glibc-2.34-r0.apk -O
+      sudo curl -f -L --retry 5 https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.34-r0/glibc-bin-2.34-r0.apk -O
+      sudo apk add --force-overwrite glibc-2.34-r0.apk
+      sudo apk add --force-overwrite glibc-bin-2.34-r0.apk
+      sudo apk fix --force-overwrite alpine-baselayout-data
+      popd
+    - sudo chown ghc:ghc -R .
+  script:
+    - |
+      PREFIX=/tmp/.ghc-wasm ./setup.sh
+      . /tmp/.ghc-wasm/env
+
+      pushd "$(mktemp -d)"
+      echo "import System.Environment.Blank" >> hello.hs
+      echo 'main = print =<< getArgs' >> hello.hs
+      wasm32-wasi-ghc hello.hs -o hello.wasm
+      $CROSS_EMULATOR ./hello.wasm "114 514" 233
+      wasm-run ./hello.wasm "114 514" 233
+      popd
+
+x86_64-linux-alpine-gmp:
+  extends: .x86_64-linux-alpine
+  variables:
+    FLAVOUR: gmp
+
+x86_64-linux-alpine-native:
+  extends: .x86_64-linux-alpine
+  variables:
+    FLAVOUR: native
+
+x86_64-linux-alpine-unreg:
+  extends: .x86_64-linux-alpine
+  variables:
+    FLAVOUR: unreg
+
+x86_64-linux-alpine-9.6:
+  extends: .x86_64-linux-alpine
+  variables:
+    FLAVOUR: "9.6"
+
+x86_64-linux-ubuntu:
+  tags:
+    - x86_64-linux
+  image: registry.gitlab.haskell.org/ghc/ci-images/x86_64-linux-ubuntu20_04:$DOCKER_REV
+  before_script:
+    - |
+      mkdir -p ~/.local
+      curl -f -L --retry 5 https://unofficial-builds.nodejs.org/download/release/v20.0.0/node-v20.0.0-linux-x64-pointer-compression.tar.xz | tar xJ --strip-components=1 -C ~/.local
+      export PATH=~/.local/bin:$PATH
+    - sudo chown ghc:ghc -R .
+  script:
+    - |
+      PREFIX=/tmp/.ghc-wasm ./setup.sh
+      . /tmp/.ghc-wasm/env
+    - |
+      pushd "$(mktemp -d)"
+      curl -f -L --retry 5 https://github.com/haskell/time/archive/refs/heads/master.tar.gz | tar xz --strip-components=1
+      sed -i '/tasty/d' time.cabal
+      echo "package QuickCheck" >> cabal.project.local
+      echo "  flags: -templatehaskell" >> cabal.project.local
+      autoreconf -i
+      wasm32-wasi-cabal build test:ShowDefaultTZAbbreviations
+      wasmtime run $(wasm32-wasi-cabal list-bin test:ShowDefaultTZAbbreviations)
+      wasm32-wasi-cabal build test:ShowTime
+      wasmtime run $(wasm32-wasi-cabal list-bin test:ShowTime)
+      popd
+    - |
+      pushd "$(mktemp -d)"
+      curl -f -L --retry 5 https://github.com/haskell/unix/archive/refs/heads/master.tar.gz | tar xz --strip-components=1
+      cp /tmp/.ghc-wasm/wasi-sdk/share/misc/config.* .
+      autoreconf -i
+      wasm32-wasi-cabal --project-file=cabal.project.wasm32-wasi build
+      ./test-wasm32-wasi.mjs
+      popd
+    - |
+      pushd "$(mktemp -d)"
+      curl -f -L --retry 5 https://github.com/UnkindPartition/tasty/archive/refs/heads/master.tar.gz | tar xz --strip-components=1
+      wasm32-wasi-cabal build all
+
+      readonly TEST_WRAPPERS="$(mktemp -d -p /tmp)"
+      export PATH=$TEST_WRAPPERS:$PATH
+      wasm32-wasi-cabal install ./core-tests
+      for test in tasty-core-tests exit-status-test resource-release-test failing-pattern-test; do
+        echo '#!/usr/bin/env bash' > "$TEST_WRAPPERS/$test"
+        echo "wasmtime run --mapdir /::/ --env PWD=\"\$PWD\" -- /tmp/.ghc-wasm/.cabal/bin/$test.wasm \"\$@\"" \
+          >> "$TEST_WRAPPERS/$test"
+        chmod +x "$TEST_WRAPPERS/$test"
+      done
+
+      (cd core-tests && tasty-core-tests)
+      core-tests/exit-status-tests.sh
+      core-tests/failing-pattern-test.sh
+
+      popd
+
+x86_64-linux-nix:
+  tags:
+    - x86_64-linux
+  image: nixos/nix:2.15.0
+  before_script:
+    - echo "experimental-features = nix-command flakes" >> /etc/nix/nix.conf
+  script:
+    - |
+      nix build --json --no-link . .#all_native .#all_unreg .#all_9_6
+    - |
+      pushd "$(mktemp -d)"
+      curl -f -L --retry 5 https://github.com/tweag/ormolu/archive/refs/heads/master.tar.gz | tar xz --strip-components=1
+      cd ormolu-live
+      nix shell $CI_PROJECT_DIR -c sh -c "wasm32-wasi-cabal update && exec ./build-wasm.sh"
+      popd
+    - |
+      pushd "$(mktemp -d)"
+      curl -f -L --retry 5 https://github.com/fourmolu/fourmolu/archive/refs/heads/main.tar.gz | tar xz --strip-components=1
+      nix shell $CI_PROJECT_DIR -c sh -c "cd web/fourmolu-wasm && exec ./build.sh"
+      popd
+  retry: 2

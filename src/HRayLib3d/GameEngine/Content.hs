@@ -1,14 +1,16 @@
 {-# LANGUAGE ViewPatterns #-}
 module HRayLib3d.GameEngine.Content where
 
-import MegaStore
-import Control.Monad
 import Data.Char
+import Data.Map (Map)
 import Data.List (isPrefixOf,elemIndex,stripPrefix)
+
+import MegaStore
+import Text.Printf
+import Control.Monad
 import System.Directory
 import System.FilePath
-import Text.Printf
-import Data.Map (Map)
+
 import qualified Data.Map as Map
 import qualified Data.ByteString.Char8 as BS8
 import qualified Data.ByteString       as BS
@@ -22,6 +24,21 @@ loadPK3 :: IO (Map String Entry)
 loadPK3 = do
   let takeExtensionCI = map toLower . takeExtension
   Map.unions <$> (mapM readArchive =<< filter (\n -> ".pk3" == takeExtensionCI n) <$> getDirectoryContents ".")
+
+loadMegaStore :: IO (Map String Entry)
+loadMegaStore = do
+  let takeExtensionCI = map toLower . takeExtension
+  Map.unions <$> (mapM loadStore =<< filter (\n -> ".megastore"   == takeExtensionCI n) <$> getDirectoryContents ".")
+
+loadAssetBundle :: IO (Map String Entry)
+loadAssetBundle = do
+  let takeExtensionCI = map toLower . takeExtension
+  Map.unions <$> (mapM loadStore =<< filter (\n -> ".assetBundle" == takeExtensionCI n) <$> getDirectoryContents ".")
+
+loadShaderCache :: IO (Map String Entry)
+loadShaderCache = do
+  let takeExtensionCI = map toLower . takeExtension
+  Map.unions <$> (mapM loadStore =<< filter (\n -> ".shaderCache" == takeExtensionCI n) <$> getDirectoryContents ".")
 
 -- loadMegaStore :: IO (Map String BS.ByteString)
 -- loadMegaStore = do Map.unions <$> (mapM loadStore =<< filter (\n -> fst n) <$> _contents (\b -> snd b))

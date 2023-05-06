@@ -1,16 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 module HRayLib3d.Network.Database (sendDBQuery, Query(..)) where
-    
-    -- import System.IO
-    -- import System.Process 
+
     import Database.PostgreSQL.Simple
     import qualified Data.ByteString as BS
-
-    -- startPostgresService, 
-    -- startPostgresService :: IO Handle
-    -- startPostgresService = do
-    --     (_, Just hout, _, _) <- createProcess (proc "ls" []){ cwd = Just "./", std_out = CreatePipe }
-    --     return hout
         
     -- the PostgresSQL Service must be installed (running)
     -- this is otherwise something of an internal function

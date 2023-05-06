@@ -7,14 +7,14 @@ import Data.Monoid(getSum)
 import HRayLib3d.Utils.Project
 import GHC.Conc.Sync (unsafeIOToSTM) -- WARNING: This is only for testing STM functions, and even then, to experiment
 import Control.Concurrent.STM.TMVar (TMVar(..))
-import qualified Data.Map as S
+import qualified Data.Map                as S
 import qualified Control.Applicative     as S
 import qualified Control.Concurrent.STM  as T
 -- import qualified HRayLib3d.Utils.Database as DB
 
 -- data Report
 --     = Report {   
---         --lossType     :: L.Loss, 
+--         lossType     :: L.Loss, 
 --         loss         :: LossMetric,  
 --         startingLoss :: LossMetric,   
 --         difference   :: LossMetric

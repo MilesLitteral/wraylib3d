@@ -6,10 +6,10 @@ import Text.Printf
 import Data.Set (Set)
 import Data.Map (Map)
 import Data.ByteString.Char8 (ByteString)
-import qualified Data.ByteString.Lazy as LB
+import qualified Data.ByteString.Lazy  as LB
 import qualified Data.ByteString.Char8 as SB
-import qualified Data.Map as Map
-import qualified Data.Set as Set
+import qualified Data.Map    as Map
+import qualified Data.Set    as Set
 import qualified Data.Vector as V
 import System.FilePath
 import System.Directory
@@ -30,8 +30,9 @@ import HRayLib3d.GameEngine.Loader.ShaderParser
 import HRayLib3d.GameEngine.Loader.Zip
 import HRayLib3d.GameEngine.Utils
 import qualified HRayLib3d.GameEngine.Loader.Entity as E
-import qualified HRayLib3d.GameEngine.Data.MD3 as MD3
-import qualified HRayLib3d.GameEngine.Loader.MD3 as MD3
+import qualified HRayLib3d.GameEngine.Data.MD3      as MD3
+import qualified HRayLib3d.GameEngine.Loader.MD3    as MD3
+
 mkWorldMat :: Float -> Float -> Float -> Proj4
 mkWorldMat x y z = translation $ Vec3 x y z
 

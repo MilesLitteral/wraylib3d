@@ -1,0 +1,53 @@
+# Multi-line comments can be added here. This comment will be propagated
+# to each generated definition.
+my_enum = enum {
+    option1;
+    option2;
+    option3;
+}
+
+my_flags = flags {
+    flag1;
+    flag2;
+    flag3;
+    no_flags = none;
+    all_flags = all;
+}
+
+my_record = record {
+    id:    i32;
+    info:  string;
+    store: set<string>;
+    hash:  map<string, i32>;
+
+    values: list<another_record>;
+
+    # Comments can also be put here
+
+    # Constants can be included
+    const string_const: string = "Constants can be put here";
+    const min_value: another_record = {
+        key1 = 0,
+        key2 = ""
+    };
+}
+
+another_record = record {
+    key1: i32;
+    key2: string;
+} deriving (eq, ord)
+
+# This interface will be implemented in C++ and can be called from any language.
+my_cpp_interface = interface +c {
+    method_returning_nothing(value: i32);
+    method_returning_some_type(key: string): another_record;
+    static get_version(): i32;
+
+    # Interfaces can also have constants
+    const version: i32 = 1;
+}
+
+# This interface will be implemented in Java and ObjC and can be called from C++.
+my_client_interface = interface +j +o {
+    log_string(str: string): bool;
+}

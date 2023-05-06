@@ -85,6 +85,7 @@ library
       HRayLib3d.GameEngine.RenderSystem
       HRayLib3d.GameEngine.Scene
       HRayLib3d.GameEngine.Utils
+      HRayLib3d.GuideWriter
       HRayLib3d.Network
       HRayLib3d.Network.Cloud
       HRayLib3d.Network.Database
@@ -98,6 +99,8 @@ library
       HRayLib3d.ScriptEngine.HRubyHS
       HRayLib3d.ScriptEngine.HRubyHSInterface
       HRayLib3d.Utils
+      HRayLib3d.Utils.GLBShow
+      HRayLib3d.Utils.GLTFShow
       HRayLib3d.Utils.LogMessage
       HRayLib3d.Utils.Md3Show
       HRayLib3d.Utils.PrettyPrint

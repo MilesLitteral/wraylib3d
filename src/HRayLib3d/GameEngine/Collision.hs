@@ -14,11 +14,12 @@ module HRayLib3d.GameEngine.Collision
 
 -- TODO - for box-box, etc collision see: code/qcommon/cm_trace.c
 
+import Data.Bits
 import Data.Vector ((!))
-import qualified Data.Vector as V
 import Data.Vect.Float
 import Data.Vect.Float.Instances
-import Data.Bits
+import qualified Data.Vector as V
+
 import HRayLib3d.GameEngine.Data.BSP
 
 data TraceHit
