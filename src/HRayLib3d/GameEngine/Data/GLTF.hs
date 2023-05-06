@@ -1,9 +1,5 @@
 module HRayLib3d.GameEngine.Data.GLTF (
-    module Codec.GlTF.Buffer
-    ,module Codec.GlTF.Texture
-    ,module Codec.GlTF.Material
-    ,module Codec.GlTF.Animation
-    ,Frame(..)
+    Frame(..)
     ,Tag(..)
     ,Shader(..)
     ,Surface(..)
@@ -19,12 +15,13 @@ import Data.Vect hiding (Vector)
 import Data.Vector (Vector)
 import Data.ByteString (ByteString)
 import qualified Data.Vector.Storable as SV
+
 import Codec.GlTF
 import Codec.GlTF.Texture
 import Codec.GlTF.Material
 import Codec.GlTF.Animation
 import Codec.GlTF.Buffer
-
+import Codec.GlTF.Accessor
 -- GlTF	 
 -- asset :: Asset	 
 -- extensionsUsed :: Maybe (Vector Text)	 
@@ -114,7 +111,7 @@ data Shader
 data Surface
     = Surface
     { srGlTFName        :: !ByteString
-    , srGlTFMaterials   :: !(Vector Material) -- apply a generic, applicable, glsl shader for now
+    , srGlTFShaders     :: !(Vector Shader) -- apply a generic, applicable, glsl shader for now -- Materials come later
     , srGlTFTriangles   :: !(SV.Vector Int32)
     , srGlTFTexCoords   :: !(SV.Vector Vec2)
     , srGlTFXyzNormal   :: !(Vector (SV.Vector Vec3,SV.Vector Vec3))

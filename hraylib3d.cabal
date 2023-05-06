@@ -30,7 +30,9 @@ library
       HRayLib3d.Core
       HRayLib3d.Core.BuildBundler
       HRayLib3d.Core.ResourceBundler
+      HRayLib3d.Core.ShaderPrecompilerPipeline
       HRayLib3d.Core.StructuredData
+      HRayLib3d.Core.WindowSystem
       HRayLib3d.GameEngine
       HRayLib3d.GameEngine.Collision
       HRayLib3d.GameEngine.Content
@@ -84,6 +86,7 @@ library
       HRayLib3d.GameEngine.Scene
       HRayLib3d.GameEngine.Utils
       HRayLib3d.Network
+      HRayLib3d.Network.Cloud
       HRayLib3d.Network.Database
       HRayLib3d.Network.Realms
       HRayLib3d.Network.Requests
@@ -122,6 +125,7 @@ library
     , aeson
     , attoparsec
     , base >=4.7 && <5
+    , base64-bytestring
     , binary
     , bytestring
     , containers
@@ -186,6 +190,7 @@ executable hraylib3d-exe
     , aeson
     , attoparsec
     , base >=4.7 && <5
+    , base64-bytestring
     , binary
     , bytestring
     , containers
@@ -252,6 +257,7 @@ test-suite hraylib3d-test
     , aeson
     , attoparsec
     , base >=4.7 && <5
+    , base64-bytestring
     , binary
     , bytestring
     , containers

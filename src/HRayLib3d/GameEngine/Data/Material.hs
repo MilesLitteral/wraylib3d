@@ -3,7 +3,6 @@ module HRayLib3d.GameEngine.Data.Material where
 
 import Data.Binary
 import GHC.Generics (Generic)
-
 import LambdaCube.Linear
 
 type Vec3 = V3 Float

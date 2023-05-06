@@ -28,10 +28,10 @@ parseCharacter fname src = case parse (spaceConsumer *> character <* eof) fname 
 
 animation :: Parser Animation
 animation = do
-  first <- decimal
-  num <- signedDecimal
+  first   <- decimal
+  num     <- signedDecimal
   looping <- decimal
-  fps <- decimal
+  fps     <- decimal
   spaceConsumer
   return $ Animation
     { aFirstFrame = first

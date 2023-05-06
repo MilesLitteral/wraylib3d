@@ -24,6 +24,7 @@ import Control.Monad.Trans.Writer.Strict
 
 instance ShowErrorComponent (ErrorFancy Void)
 type Parser = WriterT [String] (Parsec (ErrorFancy Void) String)
+
 --https://gamedev.stackexchange.com/questions/44420/opengl-quake-3-shader-file-for-objects-for-trees
 parseShaders :: String -> String -> Either String ([(String,CommonAttrs)],[String])
 parseShaders fname src = case parse (runWriterT $ newlineConsumer *> many shader <* eof) fname $ map toLower src of

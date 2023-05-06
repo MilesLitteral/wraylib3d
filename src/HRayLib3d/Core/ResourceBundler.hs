@@ -25,18 +25,18 @@ loadGLTF :: BS.ByteString  -> Either String GlTF
 loadGLTF = Codec.GlTF.fromByteString 
 
 withGLBAsGLTF :: Chunk -> Either String GlTF
-withGLBAsGLTF = fromChunk 
+withGLBAsGLTF = Codec.GlTF.fromChunk 
 
--- writeGLB :: FilePath -> GLB -> IO ()
--- writeGLB  path glb  = BL.writeFile  path $ Data.Binary.encode glb
-
--- writeGLTF :: FilePath -> GlTF -> IO ()
--- writeGLTF path gltf = BL.writeFile path $ Data.Aeson.encode $ Codec.GlTF.Prelude.toJSON gltf   
+loadBundle :: FilePath -> IO AssetBundle
+loadBundle path = do loadStore path
 
 saveBundle :: [(T.Text, BS.ByteString)] -> Bool -> String -> IO ()
 saveBundle paths makeDir outpath = do
     createDirectoryIfMissing makeDir outpath
     saveStore (outpath) $ MegaStore paths 
 
-loadBundle :: FilePath -> IO AssetBundle
-loadBundle path = do loadStore path
+-- writeGLB :: FilePath -> GLB -> IO ()
+-- writeGLB  path glb  = BL.writeFile  path $ Data.Binary.encode glb
+
+-- writeGLTF :: FilePath -> GlTF -> IO ()
+-- writeGLTF path gltf = BL.writeFile path $ Data.Aeson.encode $ Codec.GlTF.Prelude.toJSON gltf   

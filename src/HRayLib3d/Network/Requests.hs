@@ -16,6 +16,10 @@ module HRayLib3d.Network.Requests where
     import Control.Monad.IO.Class
     import Control.Exception (catch, SomeException)
     import Control.Lens hiding ((.=))
+
+    -- import Network.Socket hiding (send, sendTo, recv, recvFrom)
+    -- import Network.Socket.ByteString
+
     import Numeric (showHex)
     import qualified Text.URI  as URI
     import qualified Data.UUID as UD
@@ -173,3 +177,67 @@ module HRayLib3d.Network.Requests where
                 case serverResponse of
                     ErrorServerResponse msg  -> return $ ErrorServerResponse ("Server returned error: " ++ msg)
                     ValidServerResponse resp -> return $ ValidServerResponse resp
+
+
+--TCP
+-- procRequests :: MVar () -> Socket -> IO ()
+-- procRequests lock mastersock = do
+--   (connsock, clientaddr) <- accept mastersock
+--   forkIO $ procMessages lock connsock clientaddr
+--   procRequests lock mastersock
+
+-- -- Use a file handle instead of a socket. Because we keep a stick connection, we can use a file handle to abstract the reading from the socket.
+-- -- Each thread reads the message from the connection
+
+-- -- Converts a socket (connsock) to a handle
+-- connhdl <- socketToHandle connsock ReadMode
+-- -- Set handle to buffering mode
+-- hSetBuffering connhdl LineBuffering
+-- -- Read contents
+-- messages <- hGetContents connhdl
+-- -- Print messages
+-- mapM_ (handle lock clientaddr) (lines messages)
+-- -- Close connection
+-- hClose connhdl
+
+-- UDP
+-- addrinfos <- getAddrInfo
+--                (Just (defaultHints {addrFlags = [AI_PASSIVE]}))
+--                Nothing
+--                (Just port)
+-- For the publishing mode, the docs say:
+
+-- If the AI_PASSIVE flag is not set in hints.ai_flags, then the returned socket addresses will be suitable for use with connect(2), sendto(2), or sendmsg(2)
+
+-- In our client code we then do:
+
+-- addrinfos <- getAddrInfo
+--                Nothing
+--                (Just hostname)
+--                (Just port)
+-- The socket() function
+
+-- A socket is like a network file descriptor. The socket() function takes the family domain, type of socket and the protocol. It’s not clear from the docs what this protocol refers to, expect that 0 is the default protocol and it’s dependent of the address family (first parameter). [3] Suggests it’s the application layer protocol (e.g. HTTP, POP3).
+
+-- Since we’re going to use UDP, the arguments passed to the socket function in our Haskell code are:
+
+-- sock <- socket
+--           (addrFamily serveraddr)
+--           Datagram
+--           defaultProtocol
+-- Server: Listening
+-- With the socket file descriptor, we can bind an address to it using the bind function. It takes a socket file descriptor and the address and returns 0 on success or -1 on error.
+-- To receive the messages, we use the recvfrom() function, which takes the socket, the maximum size of the packet and will return the message and the address of the sender. In the Haskell version, we have recvFrom implemented in Network.Socket. The documentation has the following warning though:
+-- Do not use the send and recv functions defined in this module in new code, as they incorrectly represent binary data as a Unicode string. As a result, these functions are inefficient and may lead to bugs in the program. Instead use the send and recv functions defined in the ByteString module.
+-- We can use the ByteString version by doing
+
+
+-- We also need to update all the places we use Strings with ByteString.
+
+--Client: Sending data
+-- From the client side, we can use the sendto() function, providing the socket file descriptor, 
+--the data and the address of the server. The function will return the number of bytes sent.
+-- In our Haskell code, we have:
+
+-- sendTo (slSocket syslogh) omsg (slAddress syslogh)
+

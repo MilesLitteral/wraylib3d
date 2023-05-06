@@ -76,13 +76,13 @@ dependencies:
 #- lambdacube-renderer # obligatory
 - gltf-loader
 - gltf-codec
-# - lambdacube-loader # create a model type loader
 - language-glsl
 - extra
 - prettyclass
+- base64-bytestring
 #- language-vulkan
 #- language-metal
-#- lambdacube-shaderlanguage # can entail all shader dialect stuff (including Q3SS)
+#- lambdacube-sl # can entail all shader dialect stuff (including Q3SS)
 - megastore
 - criterion
 - nsis
