@@ -54,6 +54,7 @@
             ? There is a Format the engine uses called "LC" a kind of custom scripting language that largely is used in relation to Engine Graphics, 
             I desire to replace Quake Shaders and (perhaps) LC as well or re appropriate it so that shaders are instead GLSL, or some other format 
             which can be used rather than emulating to make Quake happy, It also is a kind of future proofing, where LC is then a Rendering Pipeline Language
+            LC may be the language of LambdaCube, the renderer this Application is built ontop 
             
         - Window System
             Handles SDL2 Windowing and User Interface Creation at Application level
@@ -142,8 +143,10 @@
           notation forms for UI etc
 
     + Utils
-        - Misc Application Utils, all Logging functions for example are here, as is prettyPrinting and Md3Show.
-          the PrettyPrinter is entirely broken and needs to be fixed for generalized use
+        - Misc Application Utils, all Logging functions for example are here, as is prettyPrinting and Md3Show;
+          the PrettyPrinter is entirely broken and needs to be fixed for generalized use. There needs to be an 
+          added GlTFShow, and GLBShow utility (perhaps it could be called ModelViewer), there is also the
+          small need for a MegaStore Printer,  ConfigShow, and a tracer (stack trace?)
 
 Config.Yaml
 Will be expanded to include Tests, examples, and alternative builds based on simple flags passed
