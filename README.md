@@ -164,8 +164,8 @@ W) Note if you wish to test the WebAssembly module you will need wasmtime instal
    https://wasmtime.dev/
 
 ## How would exported games look in terms of exported filesystems?
-   Windows:
-   ```YourGame.nsis (expands to)
+   ```Windows:
+   YourGame.nsis (expands to)
    C:/WRL/Games/<YourGame>
      AssetBundles/assets.AssetBundle(s)
      ShaderCaches/shader.ShaderCache(s)
