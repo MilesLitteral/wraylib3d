@@ -29,7 +29,7 @@
         - Resource Bundler
             Handles The compiling of all project 3d Assets (and associated assets) into .AssetBundles which are 
             accessed at runtime. AssetBundles can be thought of like onion data structure, 
-            ie: AssetBundle([(Key, GLB(Header, [GLTF]))])
+            ie: AssetBundle ([(Key, GLB(Header, [GLTF]))])
             
             Currently, The engine handles this with .PK3 files that bundle everything, they are basically glorified
             zips and there is an active desire to eliminate them from the code base. By comparison maps are represented
