@@ -165,30 +165,29 @@ W) Note if you wish to test the WebAssembly module you will need wasmtime instal
 
 ## How would exported games look in terms of exported filesystems?
    ```Windows:
-   YourGame.nsis (expands to)
+   NSIS (Standard)
    C:/WRL/Games/<YourGame>
      AssetBundles/assets.AssetBundle(s)
      ShaderCaches/shader.ShaderCache(s)
      WRL3D.dll
      Realms.db
-     YourGame.exe```
+     YourGame.exe
 
-   YourGame.uwp (expands to)
-   ```C:/WRL/Games/<YourGame>
+   UWP
+   C:/WRL/Games/<YourGame>
      <vcproj files>
-     YourGame.vcproj -> ./build/YourGame.uwp```
+     YourGame.vcproj -> ./build/YourGame.uwp
 
    MacOS:
-   ```YourGame.app (expands to)
    /user/WRL/Games/<YourGame>
      AssetBundles/assets.AssetBundle(s)
      ShaderCaches/shader.metallib(s), shader.metaldysm(s)
      Realms.db
      <vcproj/xcworkspace files>
-     YourGame.xcproj -> ./build/YourGame.app```
+     YourGame.xcproj -> ./build/YourGame.app
 
-   Linux
-  ``` /user/WRL/Games/<YourGame>
+  Linux
+  /user/WRL/Games/<YourGame>
      AssetBundles/assets.AssetBundle(s)
      ShaderCaches/shader.ShaderCache(s)
      configure
@@ -196,34 +195,34 @@ W) Note if you wish to test the WebAssembly module you will need wasmtime instal
      WRL3D.so
      autogen.sh
      Realms.db
-     YourGame.o```
+     YourGame.o
 
    wasm
-   ```ftp://127.0.0.1/YourGame/
+   ftp://127.0.0.1/YourGame/
      -- (Data URI)  AssetBundle(s)
      -- (Data URI)  ShaderCache(s)
      -- (DB Tunnel) Realm(s)
      WRL3D.so/dll
-     YourGame.wasm```
+     YourGame.wasm
    
-   WebGL (TBA)
-    ``` -- (Data URI)  AssetBundle(s)
+  WebGL (TBA)
+    -- (Data URI)  AssetBundle(s)
     -- (Data URI)  ShaderCache(s)
     -- (DB Tunnel) Realm(s)
     Build
     TemplateData
-    index.html```
+    index.html
     
-   iOS
-  ```/user/WRL/Games/Mobile/<YourGame>
+  iOS
+  /user/WRL/Games/Mobile/<YourGame>
      AssetBundles/assets.AssetBundle(s)
      ShaderCaches/shader.metallib(s), shader.metaldysm(s)
      Realms.db
      <vcproj/xcworkspace files>
-     YourGame.xcproj -> ./build/YourGame.app (iOS)```          
+     YourGame.xcproj -> ./build/YourGame.app (iOS)          
      
   Android
-  ```../user/WRL/Games/Mobile/<YourGame>
+  ../user/WRL/Games/Mobile/<YourGame>
      AssetBundles/assets.HSAssetBundle(s)
      ShaderCaches/shader.ShaderCache(s)
      app/
@@ -232,10 +231,10 @@ W) Note if you wish to test the WebAssembly module you will need wasmtime instal
      <gradle_files>
      Realms.db
      settings.localproperties
-     build.gradle -> ./build/YourGame.app```
+     build.gradle -> ./build/YourGame.app
 
   XR Headsets
-  ```../user/WRL/Games/Mobile/<YourGame>
+  ../user/WRL/Games/Mobile/<YourGame>
      -- (Data URI)  AssetBundle(s)
      -- (Data URI)  ShaderCache(s)
      -- (DB Tunnel) Realm(s)
