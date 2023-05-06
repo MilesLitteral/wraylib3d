@@ -107,10 +107,10 @@ Config.Yaml
 
 HOWTOs:
 How To Run WRayLib3d
-    1) System Prerequisites: ghc, stack, cabal (ghcup toolchain), opengl
-    2) Core Dependencies: lambdacube-compiler, lambdacube-ir, lambdacube-gl (There is no need to satisfy optionals, and 
+    -  System Prerequisites: ghc, stack, cabal (ghcup toolchain), opengl
+    -  Core Dependencies: lambdacube-compiler, lambdacube-ir, lambdacube-gl (There is no need to satisfy optionals, and 
        they all come in the project anyway, enable and disable them with the config.yaml)
-    4) in commandline: stack run/stack build
+    - in commandline: stack run/stack build
 
 ### How To Run The MapViewer or Demo
 First Download This .pk3 (In the future it will be replaced by an "AssetBundle" (MegaStore):
