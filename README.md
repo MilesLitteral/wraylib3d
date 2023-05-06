@@ -11,6 +11,10 @@
                 Android Studio Project, this is a similar issue currently facing the UWP functionality
                 which similarly has to convert this project into a functioning VS Solution/Project
                 
+                Djinni (https://github.com/MilesLitteral/djinni) may be an interesting tool to help with translating 
+                code for making iOS and Android Project I will have to explore what is to be done for VS and XC though 
+                I am sure they have, atleast, means of generation through Command-Line, the question is then linking
+                
         - Resource Bundler
             Handles The compiling of all project 3d Assets (and associated assets) into .AssetBundles which are 
             accessed at runtime. AssetBundles can be thought of like onion data structure, 
@@ -18,25 +22,31 @@
             
             Currently, The engine handles this with .PK3 files that bundle everything, they are basically glorified
             zips and there is an active desire to eliminate them from the code base. By comparison maps are represented
-            by Binary Space Partitions (BSPs) and will remain their format but be stored within a MegaStore
+            by Binary Space Partitions (BSPs) and will remain their format but be stored within a MegaStore. It is recognized
+            that BSPs could be turned into GLBs or GLTFs into themselves. Audio could even be stored in the gltfs with the
+            KHR_Audio extension but this needs to be explored.
 
         - Structured Data 
             Descriptions of All ingame classes as JSON data structures, these are then used for serialzing the game
             as save files or transmittable data. It could also be expanded to support XMLSerialization and Deserialization
 
         - Shader Precompiler Pipeline
-            Handles packaging of applicable Shaders to ShaderCaches which are accessed at runtime
+            Handles packaging of applicable Shaders to ShaderCaches (MegaStores) which are accessed at runtime
             this system is part of an ongoing process to completely deprecate the use of Quake3
-            Shaders and move to a modern shader system
+            Shaders and move to a modern shader system (SPIR-V support? MLIR?).
+            
+            These caches will be used by the renderer cross-referenced against .gltf file specific  'extensions' which would then load the applicable shader
+            if this is not present the cache has a "default shader" that will be fallen back to
                       
             ? There is a Format the engine uses called "LC" a kind of custom scripting language that largely is used in relation to Engine Graphics, 
             I desire to replace Quake Shaders and (perhaps) LC as well or re appropriate it so that shaders are instead GLSL, or some other format 
-            which can be used rather than emulating to make Quake happy. It also is a kind of future proofing
+            which can be used rather than emulating to make Quake happy, It also is a kind of future proofing, where LC is then a Rendering Pipeline Language
             
         - Window System
             Handles SDL2 Windowing and User Interface Creation at Application level
-            At some point, it will have a full Front-End Interface to create Widgets in Window  
-            this library uses Protea Audio and therefore can use OGGs and WAVs, there is an interest
+            At some point, it will have a full Front-End Interface to create Widgets in Window with
+            scriptable UIs
+            WRayLib uses Protea Audio and therefore can use OGGs and WAVs, there is an interest
             in maybe making an Audio System to go along with it.      
 
             When this exists fully, SDL2 will handle Input, Audio, Windowing, and Widgets therefore 
@@ -75,7 +85,8 @@
             assetBundles,  and binaries. There is an interest here to add the DB Module connections, and a module for reading
             a companion .db file
 
-        - All Other files in here relate to core Game Engine functions, Render System, Scene (Manager), and Utils will stay whereas there is a desire to work Collision and Content into their own Modules (Physics, and Content respectively)
+        - All Other files in here relate to core Game Engine functions, Render System, Scene (Manager), and Utils will stay whereas 
+          there is a desire to work Collision and Content into their own Modules (Physics, and Content respectively)
 
     + Network
         - Database
@@ -124,7 +135,7 @@ Config.Yaml
     - in commandline: stack run/stack build
 
 ### How To Run The MapViewer or Demo
-First Download This .pk3 (In the future it will be replaced by an "AssetBundle" (MegaStore):
+First download this .pk3 (In the future it will be replaced by an "AssetBundle" (MegaStore):
 https://github.com/patdohere/dockerfiles/raw/master/quakejs-stack/quakejs/base/baseq3/pak0.pk3
 
 Place "pak0.pk3" in the root directory (./WRaylib3d)
@@ -136,4 +147,79 @@ M) lambdacube-metal requires mtlpp
 W) Note if you wish to test the WebAssembly module you will need wasmtime installed on your machine
    https://wasmtime.dev/
 
+## How would exported games look in terms of exported filesystems?
+   Windows:
+   YourGame.nsis (expands to)
+   C:/WRL/Games/<YourGame>
+     AssetBundles/assets.AssetBundle(s)
+     ShaderCaches/shader.ShaderCache(s)
+     WRL3D.dll
+     Vulkan.dll (TBA)
+     Realms.db
+     YourGame.exe
 
+   YourGame.uwp (expands to)
+   C:/WRL/Games/<YourGame>
+     <vcproj files>
+     YourGame.vcproj -> ./build/YourGame.uwp
+
+   MacOS:
+   YourGame.app (expands to)
+   /user/WRL/Games/<YourGame>
+     AssetBundles/assets.AssetBundle(s)
+     ShaderCaches/shader.metallib(s), shader.metaldysm(s)
+     Realms.db
+     <vcproj/xcworkspace files>
+     YourGame.xcproj -> ./build/YourGame.app
+
+   Linux
+   /user/WRL/Games/<YourGame>
+     AssetBundles/assets.AssetBundle(s)
+     ShaderCaches/shader.ShaderCache(s)
+     configure
+     Makefile 
+     WRL3D.so
+     autogen.sh
+     Realms.db
+     YourGame.o
+
+   wasm
+   ftp://127.0.0.1/YourGame/
+     -- (Data URI)  AssetBundle(s)
+     -- (Data URI)  ShaderCache(s)
+     -- (DB Tunnel) Realm(s)
+     WebGL.so/dll (would it just link this?)
+     WRL3D.so/dll
+     YourGame.wasm
+
+   iOS
+   /user/WRL/Games/Mobile/<YourGame>
+     AssetBundles/assets.AssetBundle(s)
+     ShaderCaches/shader.metallib(s), shader.metaldysm(s)
+     Realms.db
+     <vcproj/xcworkspace files>
+     YourGame.xcproj -> ./build/YourGame.app (iOS)
+     
+  Android
+  ../user/WRL/Games/Mobile/<YourGame>
+     AssetBundles/assets.HSAssetBundle(s)
+     ShaderCaches/shader.ShaderCache(s)
+     app/
+     build/
+     gradle/
+     <gradle_files>
+     Realms.db
+     settings.localproperties
+     build.gradle -> ./build/YourGame.app
+
+  XR Headsets
+  ../user/WRL/Games/Mobile/<YourGame>
+     -- (Data URI)  AssetBundle(s)
+     -- (Data URI)  ShaderCache(s)
+     -- (DB Tunnel) Realm(s)
+     app/
+     build/
+     gradle/
+     <gradle_files>
+     settings.localproperties
+     build.gradle -> ./build/YourGame.app
