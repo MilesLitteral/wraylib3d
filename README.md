@@ -20,11 +20,12 @@
              
         - Xross 
           a "Cross Compiler" full of low level functions and templates for generating the appropriate code to run the game on the applicable 
-          platform when building. Xross is more like a set of tools the engine contains that are especially for condoning code function;
-          in this sense Xross is not really a Compiler so much as it is:
+          platform when building, it is designed to be used in conjunction with the native build environment. Xross is more like a set of tools 
+          the engine contains that are especially for condoning build function; in this sense Xross is not really a Compiler so much as it is:
           * template scripts for creating CMake, Make(via AutoMake), or WebGL Projects
           * an interface class (hs2c.cpp) which runs hs_init and allows c++ to boot the Engine rather than a haskell script
           * ghc-wasm-meta for generating WebAssembly code from haskell scripts 
+          * ghc-js for generating JavaScript from Haskell
           * djinni for generating C++ code that can then be compiled to Objective-C or Java, 
             critical for mobile development support. 
           
@@ -36,18 +37,20 @@
           ghc for compilation to an NSIS executable which simply bundles what GHC builds and Xross would not
           be used in this case, only the build manager and ghc would be (ghc can build exes on all platforms)
           
+          Xross is imperative to building for Web or Mobile as it's functions are required for turning the Haskell
+          Code into something applicable to web/mobile (where Haskell is not applicable, only it's c code or dlls would be)
+          
           Xross would be used when generating C++ interfaces for all necessary code on mobile which can also use
           hs_init to run wraylib3d. haskell and mobile is a new frontier and how well the engine works on mobile
-          is yet to be seen
+          is yet to be seen (elaborate C++ interfaces may exist in the future in general that can be allow for hs<->c++ 
+          communication)
           
           Xross would also utilize hs2c which is imperative to getting the engine to work in vscode or other system
           contexts.
           
-        On Windows it generates vsprojs and links them to ghc compiled .dlls (when making a uwp project)
-          otherwise ghc will simply generate a windows executable and wrap it up with NSIS to create an executable with all
-          the applicables in the right place. This is the same on Linux though in Linux's case there is also a generation 
-          stage necessary to produce the configure, makefile, and autogen.sh so make can work an gcc can link the correct
-          libraries
+          It's possible to beef this portion up so it can access package managers and build tools for better linking,
+          Xross will contain Linking module in the future for making sure AssetBundles and ShaderCaches
+          aren't lost and the appropriate libraries (like wrl3d.dll or wrl3d.exe ) aren't lost in the build process
 
         - Resource Bundler
             Handles The compiling of all project 3d Assets (and associated assets) into .AssetBundles which are 
@@ -260,7 +263,9 @@ stack run mapviewer-debug
      WRL3D.so/dll
      YourGame.wasm
    
+  (ghcjs?)
   WebGL (TBA, See Also: https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html)
+    ftp://127.0.0.1/YourGame/
     -- (Data URI)  AssetBundle(s)
     -- (Data URI)  ShaderCache(s)
     -- (DB Tunnel) Realm(s)
