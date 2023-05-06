@@ -60,7 +60,7 @@
             At some point, it will have a full Front-End Interface to create Widgets in Window with
             scriptable UIs
             WRayLib uses Protea Audio and therefore can use OGGs and WAVs, there is an interest
-            in maybe making an Audio System to go along with it.      
+            in maybe making an Audio System to go along with it built with SDL2.      
 
             When this exists fully, SDL2 will handle Input, Audio, Windowing, and Widgets therefore 
             separating concerns in terms of which modules handle what, its currently a bit of a mess
