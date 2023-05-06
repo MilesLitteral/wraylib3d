@@ -83,6 +83,11 @@
             where as it CANNOT do native Metal rendering (it can only communicate with metal-api which creates a 
             bottleneck in Vulkan) thus LambdaCube-Metal is somewhat necessitated by comparison
             Related Projects: LambdaCube-Vulkan, LambdaCube-Metal, LambdaCube-XR, LambdaCube-GL (The Backends)
+            (all will be renamed to eclipse-x)
+
+            lambdacube will be renamed to eclipse
+            in the interest of this, lambdacube-gl should be replaced
+            with eclipse-gles whic has to be written
 
             There's also a desire to upgrade LambdaCube-IR to use GraphQL as a querying language rather than JSON 
             as it's currently using this is because GraphQL is incredibly flexible, and will need to be explored
