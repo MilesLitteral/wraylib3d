@@ -37,7 +37,6 @@ import Graphics.UI.TinyFileDialogs
 type BooksWenv = WidgetEnv BooksModel BooksEvt
 type BooksNode = WidgetNode BooksModel BooksEvt
 
-
 type TodoWenv = WidgetEnv TodoModel TodoEvt
 type TodoNode = WidgetNode TodoModel TodoEvt
 

@@ -52,7 +52,7 @@ dependencies:
 - utf8-string
 - HaTeX
 - OpenGLRaw
-- GLFW-b
+- GLFW-b 
 #- sdl2
 #- vulkan-api
 - vulkan
@@ -65,13 +65,13 @@ dependencies:
 - lambdacube-compiler
 - lambdacube-ir
 - lambdacube-gl
-#- lambdacube-xr
+#- lambdacube-xr 
 #- lambdacube-vulkan
 #- lambdacube-metal
 #- lambdacube-renderer # obligatory
 - gltf-loader
 - gltf-codec
-- language-glsl
+- language-glsl # move to core
 - extra
 - prettyclass
 - base64-bytestring
@@ -79,7 +79,7 @@ dependencies:
 #- language-metal
 #- lambdacube-sl # can entail all shader dialect stuff (including Q3SS)
 - data-default
-- megastore
+- megastore # move to core
 - monomer
 - tinyfiledialogs
 - adjunctions
@@ -126,6 +126,8 @@ executables:
     dependencies:
     - hraylib3d
 
+  # These all require a class of Widgets and Logic Objects (Components) to represent Script Objects
+  # Attached to Entities and even the UI itself
   RealmViewer-FE-Demo:
     main:                Main.hs
     source-dirs:         app/RealmViewer-FE-Demo/
@@ -149,6 +151,16 @@ executables:
   RB-ProjectManager-FE-Demo:
     main:                Main.hs
     source-dirs:         app/RB-ProjectManager-FE-Demo/
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - hraylib3d
+
+  RealmModelViewer-Demo:
+    main:                Main.hs
+    source-dirs:         app/RealmModelViewer-Demo/
     ghc-options:
     - -threaded
     - -rtsopts
