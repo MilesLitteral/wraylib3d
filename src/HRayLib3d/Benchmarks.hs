@@ -7,12 +7,12 @@ module HRayLib3d.Benchmarks (
 
 import Criterion.Main
 import HRayLib3d.GameEngine.Realm.Main
-import HRayLib3d.GameEngine.MapViewer.Main
+import HRayLib3d.GameEngine.RealmViewer.Main
 
 -- Our benchmark harness.
 mapViewerBenchmark :: IO ()
 mapViewerBenchmark = defaultMain [
-  bgroup "MapViewer.Main" [ bench "Run"  $ whnfIO  HRayLib3d.GameEngine.MapViewer.Main.run]
+  bgroup "MapViewer.Main" [ bench "Run"  $ whnfIO  HRayLib3d.GameEngine.RealmViewer.Main.run]
   ]
 
 -- Game and Realm refer to the same thing in engine

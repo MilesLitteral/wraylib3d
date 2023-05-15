@@ -8,7 +8,6 @@ module HRayLib3d.Core.BuildBundler (
     , buildMetalDyLib
     , configureMacOs
     , buildMacOs
-    , configureLinux
     , configureAutoLinux
     , buildLinux
     ) where
@@ -17,20 +16,53 @@ module HRayLib3d.Core.BuildBundler (
     import System.IO
     import System.Process 
     import Development.NSIS
+    -- import System.Info
 
-    buildWin64 :: String -> String -> IO()
+    compileCMakeProject :: String -> String
+    compileCMakeProject projectName = ("cmake_minimum_required(VERSION 3.23)              \n"
+                                    ++ "project("  ++ projectName ++ " LANGUAGES CXX)     \n"
+                                        
+                                    ++   "if (MSVC)                                       \n"
+                                    ++   "\tset(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)      \n"
+                                    ++   "endif()                                         \n"
+
+                                    ++   "add_library(vulkan    SHARED IMPORTED [GLOBAL]) \n"
+                                    ++   "add_library(wraylib3d SHARED IMPORTED [GLOBAL]) \n"
+
+                                    ++   "add_executable(app)                             \n"
+                                    ++   "target_sources(app PRIVATE \"app/hs2c.cpp\")    \n"
+                                    ++   "target_link_libraries(app PUBLIC vulkan)        \n"
+                                    ++   "target_link_libraries(app PUBLIC wraylib3d)     \n")
+
+
+    compileAutoMakeProject :: String -> String 
+    compileAutoMakeProject projectName = ("AC_INIT(["++ projectName ++"], [0.1], [author@mail.com]) \n"
+                                          ++ "AM_INIT_AUTOMAKE                                      \n"
+                                          ++ "AC_PROG_CC                                            \n" 
+                                          ++ "AC_CONFIG_FILES([Makefile])                           \n"
+                                          ++ "AC_OUTPUT                                             \n")
+
+    compileAutoMakeConfigureProject :: String -> String
+    compileAutoMakeConfigureProject projectName = "AUTOMAKE_OPTIONS  = foreign                  \n"
+                                                   ++ "bin_PROGRAMS      = "++ projectName ++ " \n"
+                                                   ++ (projectName ++ "_SOURCES  = main.c       \n")
+
+    buildWin64 :: String ->  String -> IO ()
     buildWin64 filename title = writeFile (filename ++ ".nsi") $ nsis $ do
-        name       (str  $ title ++ "-Game")            -- The name of the installer
-        outFile    (str  $ title ++ ".exe")             -- Where to produce the installer
-        installDir (str  $ "$DESKTOP/" ++ title)        -- The default installation directory
-        requestExecutionLevel User               -- Request application privileges for Windows Vista
-        -- Pages to display
-        page Directory                           -- Pick where to install
-        page InstFiles                           -- Give a progress bar while installing
-        -- Groups fo files to install
-        section "" [] $ do
-            setOutPath "$INSTDIR"                -- Where to install files in this section
-            file []    "app.hs"                  -- File to put into this section
+                                    name       (str  $ title ++ "-Game")     -- The name of the installer
+                                    outFile    (str  $ title ++ ".exe")      -- Where to produce the installer
+                                    installDir (str  $ "$DESKTOP/" ++ title) -- The default installation directory
+                                    requestExecutionLevel User               -- Request application privileges for Windows Vista
+                                    -- Pages to display
+                                    page Directory                           -- Pick where to install
+                                    page InstFiles                           -- Give a progress bar while installing
+                                    -- Groups fo files to install
+                                    section "wraylib3d" []     $ do
+                                        setOutPath "$INSTDIR"                -- Where to install files in this section
+                                        file []    "wraylib3d.dll"           -- File to put into this section
+                                    section (str filename) []  $ do
+                                        setOutPath "$INSTDIR"                -- Where to install files in this section
+                                        file []    "app.hs"                  -- File to put into this section
 
     --  Presumed Path of MSBUILD: C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319>msbuild.exe 
     --  Example slnPath: "./projects/game/app/Hello.sln"
@@ -42,6 +74,7 @@ module HRayLib3d.Core.BuildBundler (
     --                   B) The Haskell somehow can interface with .NET
     --                   in a way, all the underlying components can be linked
     --                   with minimum pain (opengl.dll, vulkan.dll, sdl2.dll etc)
+    -- Run CMake first
     buildUWP :: String -> IO Handle
     buildUWP slnPath = do
         (_, Just hout, _, _) <- createProcess (proc "msbuild.exe" [ slnPath ]){ cwd = Just "./", std_out = CreatePipe }
@@ -118,18 +151,13 @@ module HRayLib3d.Core.BuildBundler (
         return hout
 
     -- https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html
+    -- https://github.com/emscripten-core/emsdk Required
+    -- GHCJS builds WebGL games
     buildWebGL :: String -> IO Handle
     buildWebGL appName = do
-        (_, Just hout, _, _) <- createProcess (proc "wasm32-wasi-ghc" [(appName ++ ".hs"), "-o", (appName ++ ".wasm")]){ cwd = Just "./", std_out = CreatePipe }
+        (_, Just hout, _, _) <- createProcess (proc "ghcjs" [(appName ++ ".hs"), "-o", (appName ++ ".js")]){ cwd = Just "./", std_out = CreatePipe }
         return hout
 
-    -- Linux Build
-    -- ./project/configure
-    configureLinux :: IO Handle
-    configureLinux = do
-        (_, Just hout, _, _) <- createProcess (proc "./configure" []){ cwd = Just "./", std_out = CreatePipe }
-        return hout
-    
     -- ./autogen.sh
     configureAutoLinux :: IO Handle
     configureAutoLinux = do
@@ -141,3 +169,58 @@ module HRayLib3d.Core.BuildBundler (
     buildLinux = do
         (_, Just hout, _, _) <- createProcess (proc "make" []){ cwd = Just "./", std_out = CreatePipe }
         return hout
+
+-- Build for Mobile Functions (EXPERIMENTAL)
+-- # Multi-line comments can be added here. This comment will be propagated
+-- # to each generated definition.
+-- my_enum = enum {
+--     option1;
+--     option2;
+--     option3;
+-- }
+
+-- my_flags = flags {
+--     flag1;
+--     flag2;
+--     flag3;
+--     no_flags = none;
+--     all_flags = all;
+-- }
+
+-- my_record = record {
+--     id:    i32;
+--     info:  string;
+--     store: set<string>;
+--     hash:  map<string, i32>;
+
+--     values: list<another_record>;
+
+--     # Comments can also be put here
+
+--     # Constants can be included
+--     const string_const: string = "Constants can be put here";
+--     const min_value: another_record = {
+--         key1 = 0,
+--         key2 = ""
+--     };
+-- }
+
+-- another_record = record {
+--     key1: i32;
+--     key2: string;
+-- } deriving (eq, ord)
+
+-- # This interface will be implemented in C++ and can be called from any language.
+-- my_cpp_interface = interface +c {
+--     method_returning_nothing(value: i32);
+--     method_returning_some_type(key: string): another_record;
+--     static get_version(): i32;
+
+--     # Interfaces can also have constants
+--     const version: i32 = 1;
+-- }
+
+-- # This interface will be implemented in Java and ObjC and can be called from C++.
+-- my_client_interface = interface +j +o {
+--     log_string(str: string): bool;
+-- }

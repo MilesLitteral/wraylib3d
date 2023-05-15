@@ -1,19 +1,29 @@
 module HRayLib3d.GameEngine.Graphics.GLB
-  ( addGLB
+  ( unpackChunk
+  , unpackGLBChunk
+  , addGLB
   , GLBInstance(..)
   ) where
+
+import Data.Binary.Get
+import qualified Data.Vector as V
+import qualified Data.ByteString as BS
 
 import HRayLib3d.GameEngine.Data.GLB
 import HRayLib3d.GameEngine.Data.GLTF
 import HRayLib3d.GameEngine.Utils
-import qualified Data.Vector as V
-import qualified Data.ByteString as BS
 import qualified Codec.GLB  as GLB
 import qualified Codec.GlTF as GlTF
 
 -- GLTF ByteStrings
 data GLBInstance = GLBInstance { glbInstanceModel  :: GLBModel, glbContents :: V.Vector (String, BS.ByteString) } deriving (Show)
 
+unpackGLBChunk :: Either (ByteOffset, String) GLB.GLB -> Get GLB.GLB
+unpackGLBChunk chuk = case chuk of
+                Left  (bos, st) -> error ("Bad Read, ByteOffset: " ++ show bos ++ ", Msg: " ++ st)
+                Right a -> return a
+
+-- GLB.Chunk -> GLTF
 unpackChunk :: Either String GlTF.GlTF -> GlTF.GlTF
 unpackChunk chuk = case chuk of
                 Left  _ -> error "Bad Chunk"

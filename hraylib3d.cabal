@@ -29,6 +29,7 @@ library
       HRayLib3d.Benchmarks
       HRayLib3d.Core
       HRayLib3d.Core.BuildBundler
+      HRayLib3d.Core.MobileInterface
       HRayLib3d.Core.ResourceBundler
       HRayLib3d.Core.ShaderPrecompilerPipeline
       HRayLib3d.Core.StructuredData
@@ -56,17 +57,11 @@ library
       HRayLib3d.GameEngine.Loader.Entity
       HRayLib3d.GameEngine.Loader.GameCharacter
       HRayLib3d.GameEngine.Loader.GLB
-      HRayLib3d.GameEngine.Loader.GLTF
+      HRayLib3d.GameEngine.Loader.GlTF
       HRayLib3d.GameEngine.Loader.Image
       HRayLib3d.GameEngine.Loader.MD3
       HRayLib3d.GameEngine.Loader.ShaderParser
       HRayLib3d.GameEngine.Loader.Zip
-      HRayLib3d.GameEngine.MapViewer.Camera
-      HRayLib3d.GameEngine.MapViewer.Content
-      HRayLib3d.GameEngine.MapViewer.Engine
-      HRayLib3d.GameEngine.MapViewer.Entity
-      HRayLib3d.GameEngine.MapViewer.ItemsMV
-      HRayLib3d.GameEngine.MapViewer.Main
       HRayLib3d.GameEngine.Realm.CodeSample
       HRayLib3d.GameEngine.Realm.Collision
       HRayLib3d.GameEngine.Realm.Entities
@@ -82,15 +77,23 @@ library
       HRayLib3d.GameEngine.Realm.RenderGame
       HRayLib3d.GameEngine.Realm.Visuals
       HRayLib3d.GameEngine.Realm.World
+      HRayLib3d.GameEngine.RealmViewer.Camera
+      HRayLib3d.GameEngine.RealmViewer.Content
+      HRayLib3d.GameEngine.RealmViewer.Engine
+      HRayLib3d.GameEngine.RealmViewer.Entity
+      HRayLib3d.GameEngine.RealmViewer.ItemsMV
+      HRayLib3d.GameEngine.RealmViewer.Main
       HRayLib3d.GameEngine.RenderSystem
       HRayLib3d.GameEngine.Scene
       HRayLib3d.GameEngine.Utils
       HRayLib3d.GuideWriter
+      HRayLib3d.I18n.Localization
       HRayLib3d.Network
       HRayLib3d.Network.Cloud
       HRayLib3d.Network.Database
       HRayLib3d.Network.Realms
       HRayLib3d.Network.Requests
+      HRayLib3d.Network.Web
       HRayLib3d.ScriptEngine
       HRayLib3d.ScriptEngine.HRuby
       HRayLib3d.ScriptEngine.HRuby.Parser
@@ -104,27 +107,24 @@ library
       HRayLib3d.Utils.LogMessage
       HRayLib3d.Utils.Md3Show
       HRayLib3d.Utils.PrettyPrint
+      HRayLib3d.Utils.Prisms
       HRayLib3d.Utils.Project
-      HRayLib3d.Utils.Reporting
+      HRayLib3d.Utils.Tooltips
   other-modules:
       Paths_hraylib3d
   hs-source-dirs:
       src
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  ghc-options: -Wall -optl-mconsole -optl-mwindows -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   cc-options: -fPIC
-  include-dirs:
-      cbits
-  install-includes:
-      stb_image.h
-  c-sources:
-      cbits/stb_image.c
   build-tools:
       c2hs
   build-depends:
       GLFW-b
+    , HaTeX
     , JuicyPixels
     , MonadRandom
     , OpenGLRaw
+    , adjunctions
     , aeson
     , attoparsec
     , base >=4.7 && <5
@@ -134,6 +134,7 @@ library
     , containers
     , criterion
     , data-binary-ieee754
+    , data-default
     , deepseq
     , digest
     , directory
@@ -155,6 +156,7 @@ library
     , mersenne-random-pure64
     , microlens-platform
     , modern-uri
+    , monomer
     , mtl
     , nsis
     , parsec
@@ -167,29 +169,36 @@ library
     , scientific
     , stm
     , text
+    , text-show
     , time
+    , tinyfiledialogs
     , transformers
     , unordered-containers
+    , utf8-string
     , uuid
     , vect
     , vector
     , vulkan
     , vulkan-utils
+    , wreq
     , zlib
   default-language: Haskell2010
 
-executable hraylib3d-exe
+executable RB-ProjectManager-FE-Demo
   main-is: Main.hs
   other-modules:
+      TodoTypes
       Paths_hraylib3d
   hs-source-dirs:
-      app
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+      app/RB-ProjectManager-FE-Demo/
+  ghc-options: -Wall -optl-mconsole -optl-mwindows -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       GLFW-b
+    , HaTeX
     , JuicyPixels
     , MonadRandom
     , OpenGLRaw
+    , adjunctions
     , aeson
     , attoparsec
     , base >=4.7 && <5
@@ -199,6 +208,7 @@ executable hraylib3d-exe
     , containers
     , criterion
     , data-binary-ieee754
+    , data-default
     , deepseq
     , digest
     , directory
@@ -221,6 +231,7 @@ executable hraylib3d-exe
     , mersenne-random-pure64
     , microlens-platform
     , modern-uri
+    , monomer
     , mtl
     , nsis
     , parsec
@@ -233,14 +244,242 @@ executable hraylib3d-exe
     , scientific
     , stm
     , text
+    , text-show
     , time
+    , tinyfiledialogs
     , transformers
     , unordered-containers
+    , utf8-string
     , uuid
     , vect
     , vector
     , vulkan
     , vulkan-utils
+    , wreq
+    , zlib
+  default-language: Haskell2010
+
+executable RealmBuilder-FE-Demo
+  main-is: Main.hs
+  other-modules:
+      OpenGLWidget
+      Paths_hraylib3d
+  hs-source-dirs:
+      app/RealmBuilder-FE-Demo/
+  ghc-options: -Wall -optl-mconsole -optl-mwindows -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      GLFW-b
+    , HaTeX
+    , JuicyPixels
+    , MonadRandom
+    , OpenGLRaw
+    , adjunctions
+    , aeson
+    , attoparsec
+    , base >=4.7 && <5
+    , base64-bytestring
+    , binary
+    , bytestring
+    , containers
+    , criterion
+    , data-binary-ieee754
+    , data-default
+    , deepseq
+    , digest
+    , directory
+    , elerea
+    , extra
+    , filepath
+    , gltf-codec
+    , gltf-loader
+    , hashable
+    , hraylib3d
+    , http-client
+    , lambdacube-compiler
+    , lambdacube-gl
+    , lambdacube-ir
+    , language-glsl
+    , lens
+    , linear
+    , megaparsec
+    , megastore
+    , mersenne-random-pure64
+    , microlens-platform
+    , modern-uri
+    , monomer
+    , mtl
+    , nsis
+    , parsec
+    , postgresql-simple
+    , pretty-show
+    , prettyclass
+    , process
+    , proteaaudio
+    , req
+    , scientific
+    , stm
+    , text
+    , text-show
+    , time
+    , tinyfiledialogs
+    , transformers
+    , unordered-containers
+    , utf8-string
+    , uuid
+    , vect
+    , vector
+    , vulkan
+    , vulkan-utils
+    , wreq
+    , zlib
+  default-language: Haskell2010
+
+executable RealmViewer-FE-Demo
+  main-is: Main.hs
+  other-modules:
+      BookTypes
+      Paths_hraylib3d
+  hs-source-dirs:
+      app/RealmViewer-FE-Demo/
+  ghc-options: -Wall -optl-mconsole -optl-mwindows -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      GLFW-b
+    , HaTeX
+    , JuicyPixels
+    , MonadRandom
+    , OpenGLRaw
+    , adjunctions
+    , aeson
+    , attoparsec
+    , base >=4.7 && <5
+    , base64-bytestring
+    , binary
+    , bytestring
+    , containers
+    , criterion
+    , data-binary-ieee754
+    , data-default
+    , deepseq
+    , digest
+    , directory
+    , elerea
+    , extra
+    , filepath
+    , gltf-codec
+    , gltf-loader
+    , hashable
+    , hraylib3d
+    , http-client
+    , lambdacube-compiler
+    , lambdacube-gl
+    , lambdacube-ir
+    , language-glsl
+    , lens
+    , linear
+    , megaparsec
+    , megastore
+    , mersenne-random-pure64
+    , microlens-platform
+    , modern-uri
+    , monomer
+    , mtl
+    , nsis
+    , parsec
+    , postgresql-simple
+    , pretty-show
+    , prettyclass
+    , process
+    , proteaaudio
+    , req
+    , scientific
+    , stm
+    , text
+    , text-show
+    , time
+    , tinyfiledialogs
+    , transformers
+    , unordered-containers
+    , utf8-string
+    , uuid
+    , vect
+    , vector
+    , vulkan
+    , vulkan-utils
+    , wreq
+    , zlib
+  default-language: Haskell2010
+
+executable hraylib3d
+  main-is: Main.hs
+  other-modules:
+      Paths_hraylib3d
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -optl-mconsole -optl-mwindows -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      GLFW-b
+    , HaTeX
+    , JuicyPixels
+    , MonadRandom
+    , OpenGLRaw
+    , adjunctions
+    , aeson
+    , attoparsec
+    , base >=4.7 && <5
+    , base64-bytestring
+    , binary
+    , bytestring
+    , containers
+    , criterion
+    , data-binary-ieee754
+    , data-default
+    , deepseq
+    , digest
+    , directory
+    , elerea
+    , extra
+    , filepath
+    , gltf-codec
+    , gltf-loader
+    , hashable
+    , hraylib3d
+    , http-client
+    , lambdacube-compiler
+    , lambdacube-gl
+    , lambdacube-ir
+    , language-glsl
+    , lens
+    , linear
+    , megaparsec
+    , megastore
+    , mersenne-random-pure64
+    , microlens-platform
+    , modern-uri
+    , monomer
+    , mtl
+    , nsis
+    , parsec
+    , postgresql-simple
+    , pretty-show
+    , prettyclass
+    , process
+    , proteaaudio
+    , req
+    , scientific
+    , stm
+    , text
+    , text-show
+    , time
+    , tinyfiledialogs
+    , transformers
+    , unordered-containers
+    , utf8-string
+    , uuid
+    , vect
+    , vector
+    , vulkan
+    , vulkan-utils
+    , wreq
     , zlib
   default-language: Haskell2010
 
@@ -251,12 +490,14 @@ test-suite hraylib3d-test
       Paths_hraylib3d
   hs-source-dirs:
       test
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -optl-mconsole -optl-mwindows -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       GLFW-b
+    , HaTeX
     , JuicyPixels
     , MonadRandom
     , OpenGLRaw
+    , adjunctions
     , aeson
     , attoparsec
     , base >=4.7 && <5
@@ -266,6 +507,7 @@ test-suite hraylib3d-test
     , containers
     , criterion
     , data-binary-ieee754
+    , data-default
     , deepseq
     , digest
     , directory
@@ -288,6 +530,7 @@ test-suite hraylib3d-test
     , mersenne-random-pure64
     , microlens-platform
     , modern-uri
+    , monomer
     , mtl
     , nsis
     , parsec
@@ -298,15 +541,20 @@ test-suite hraylib3d-test
     , proteaaudio
     , req
     , scientific
+    , sdl2
     , stm
     , text
+    , text-show
     , time
+    , tinyfiledialogs
     , transformers
     , unordered-containers
+    , utf8-string
     , uuid
     , vect
     , vector
     , vulkan
     , vulkan-utils
+    , wreq
     , zlib
   default-language: Haskell2010

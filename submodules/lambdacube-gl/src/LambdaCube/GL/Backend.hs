@@ -20,9 +20,11 @@ import qualified Data.Set as Set
 import qualified Data.Vector as V
 import qualified Data.Vector.Storable as SV
 
-import Graphics.GL.Core33
 import Foreign
 import Foreign.C.String
+import Graphics.GL.Core33
+import Graphics.GL.ARB.GlSpirv
+import Graphics.GL.ARB.ShaderObjects 
 
 -- LC IR imports
 import LambdaCube.PipelineSchema
@@ -199,14 +201,22 @@ printFBOStatus = checkFBO >>= print
 
 compileProgram :: Program -> IO GLProgram
 compileProgram p = do
-    po <- glCreateProgram
+    po    <- glCreateProgram
     --putStrLn $ "compile program: " ++ show po
-    let createAndAttach src t = do
-            o <- glCreateShader t
-            compileShader o [src]
-            glAttachShader po o
-            --putStr "    + compile shader source: " >> printGLStatus
-            return o
+    spirv <- glGetARBGlSpirv
+    let createAndAttach src t = if (spirv == False) 
+                                    then do
+                                        o <- glCreateShader t
+                                        compileShader o [src]
+                                        glAttachShader po o
+                                        --putStr "    + compile shader source: " >> printGLStatus
+                                        return o
+                                    else do
+                                        o <- glCreateShaderObjectARB t
+                                        compileShader o [src]
+                                        glAttachShader po o
+                                        --putStr "    + compile shader source: " >> printGLStatus
+                                        return o
 
     objs <- sequence $ createAndAttach (vertexShader p) GL_VERTEX_SHADER : createAndAttach (fragmentShader p) GL_FRAGMENT_SHADER : case geometryShader p of
         Nothing -> []

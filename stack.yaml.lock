@@ -26,6 +26,13 @@ packages:
   original:
     hackage: autoapply-0.4.1.3@sha256:b6e7e0555a8fd938e1a0fe681e6d561963e3f158803e6cb187169b5fa8bc00a9
 - completed:
+    hackage: tinyfiledialogs-0.2.1.0@sha256:118f9fd7b721de68f1e84c8b820784e31140bf34e32f23fd6410fb57914a309c,1905
+    pantry-tree:
+      size: 482
+      sha256: 518def606ee59dad71b77dec20a9dc55072bdd8fe2194a0ccfca2b2afee1767e
+  original:
+    hackage: tinyfiledialogs-0.2.1.0@sha256:118f9fd7b721de68f1e84c8b820784e31140bf34e32f23fd6410fb57914a309c,1905
+- completed:
     hackage: vulkan-3.24.5@sha256:9e11572d2dfc43bd22a9c477b79494c884d3e94aad170088c08a32d695f46000,31913
     pantry-tree:
       size: 86973

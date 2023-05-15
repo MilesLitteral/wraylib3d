@@ -1,0 +1,6 @@
+resolver: lts-15.0
+packages:
+  - .
+
+local-bin-path: inplace/bin
+

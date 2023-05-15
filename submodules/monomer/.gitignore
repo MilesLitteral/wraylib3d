@@ -1,0 +1,16 @@
+.stack-work/
+.vscode/
+.metals/
+
+hackage-docs/
+haddock/
+dist-newstyle/
+dist-docs.*/
+*~
+*.aux
+*.hp
+*.prof
+*.ps
+*.ser
+*.dylib
+cabal.project.local*

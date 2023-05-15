@@ -1,0 +1,1147 @@
+Cabal-Version:  2.4
+Name:           ghcjs
+Version:        8.10.7
+Synopsis:       Haskell to JavaScript compiler
+Description:    Haskell to JavaScript compiler based on GHC
+Category:       compiler, web
+License:        MIT
+License-file:   LICENSE
+Author:         Victor Nazarov, Hamish Mackenzie, Luite Stegeman
+Copyright:      Victor Nazarov, Hamish Mackenzie, Luite Stegeman
+Maintainer:     Luite Stegeman <stegeman@gmail.com>
+Stability:      Experimental
+Build-Type:     Simple
+
+extra-source-files:
+                utils/*.hs
+                utils/*.sh
+                include/prim/*.hs-incl
+                include/prim/*.txt
+                include/*.h
+                src-bin/haddock/*.hs
+                HACKING.markdown
+                README.markdown
+                test/LICENSE
+                test/ghcjs-testsuite.cabal
+                stack.yaml
+                cabal.project
+                inplace/bin/README.markdown
+
+                ghc/compiler/Unique.h
+                ghc/compiler/HsVersions.h
+                ghc/compiler/parser/cutils.h
+                ghc/includes/CodeGen.Platform.hs
+                lib/ghc/includes/*.h
+                lib/ghc/includes/*.hs
+                lib/ghc/includes/*.hs-incl
+                ghc/includes/rts/*.h
+                ghc/includes/rts/storage/*.h
+                ghc/includes/MachDeps.h
+                ghc/includes/Rts.h
+                ghc/includes/RtsAPI.h
+                ghc/includes/Stg.h
+                ghc/includes/HsFFI.h
+                ghc/includes/Cmm.h
+                ghc/includes/stg/*.h
+                ghc/utils/unlit/fs.h
+                ghc/driver/utils/cwrapper.h
+                ghc/driver/utils/getLocation.h
+                utils/wrapper/getline.h
+
+
+source-repository head
+  type:     git
+  location: https://github.com/ghcjs/ghcjs.git
+
+-- cabal v2-install will install the package as multiple components
+-- however this breaks ghcjs-boot, which needs to be able to find the
+-- private executables in the package.
+--
+-- for now, we use a custom setup that forces everything to be in the same
+-- component, so ghcjs-boot can find all executables through the
+-- Paths_ghcjs module.
+-- Custom-Setup
+--  Setup-Depends:      base,
+--                      Cabal >= 2.4
+
+-- only build the library and ghcjs executable
+flag compiler-only
+  description: only build the library and ghcjs executable
+  default:     False
+  manual:      True
+
+-- Don't rename the executables to include the version number in the filename
+-- and install the wrapper scripts. This means that you need to supply your own
+-- scripts to pass the correct library paths to the programs. See Setup.hs and
+-- the template files in /lib/etc for more information.
+flag no-wrapper-install
+  description: don't install wrapper scripts and add version numbers to the executable names
+  default:     False
+  manual:      True
+
+flag disable-optimizer
+  description: disable the GHCJS optimizer, for debugging purposes
+  default:     False
+  manual:      True
+
+flag runtime-assertions
+  description: add runtime assertions to the generated code, for debugging purposes (this makes the code much bigger and slower!)
+  default:     False
+  manual:      True
+
+Library
+    Default-Language: Haskell2010
+    exposed-modules: Gen2.Generator,
+                     Gen2.Profiling,
+                     Gen2.Floater,
+                     Gen2.Prim,
+                     Gen2.Rts,
+                     Gen2.RtsApply,
+                     Gen2.RtsTypes,
+                     Gen2.RtsAlloc,
+                     Gen2.Utils,
+                     Gen2.StgAst,
+                     Gen2.Optimizer,
+                     Gen2.Dataflow,
+                     Gen2.Deps,
+                     Gen2.Printer,
+                     Gen2.Linker,
+                     Gen2.Shim,
+                     Gen2.Compactor,
+                     Gen2.Object,
+                     Gen2.Archive,
+                     Gen2.ClosureInfo,
+                     Gen2.Foreign,
+                     Gen2.Sinker,
+                     Gen2.TH,
+                     Gen2.Base,
+                     Gen2.Cache,
+                     Gen2.DynamicLinking,
+                     Gen2.GHC.Digraph,
+                     Gen2.GHC.DsForeign,
+                     Compiler.Compat,
+                     Compiler.GhcjsHooks,
+                     Compiler.GhcjsPlatform,
+                     Compiler.Info,
+                     Compiler.Plugins,
+                     Compiler.Program,
+                     Compiler.GhcjsProgram,
+                     Compiler.Platform,
+                     Compiler.Settings,
+                     Compiler.Utils,
+                     Compiler.Variants,
+                     Compiler.JMacro,
+                     Compiler.JMacro.Base,
+                     Compiler.JMacro.Lens,
+                     Compiler.JMacro.QQ,
+                     Compiler.JMacro.Util,
+                     Compiler.JMacro.Combinators,
+                     Compiler.JMacro.Symbols,
+                     GHCJS
+    other-modules: Paths_ghcjs
+    autogen-modules: Paths_ghcjs
+
+    if os(windows)
+        hs-source-dirs: src-platform/windows
+    else
+        hs-source-dirs: src-platform/unix
+
+    build-depends: ghci
+
+    -- from ghcjs-th package
+    -- this should be a separate internal library
+    hs-source-dirs: lib/ghcjs-th
+    exposed-modules: GHCJS.Prim.TH.Eval
+                     GHCJS.Prim.TH.Types
+    -- end ghcjs-th package
+
+    build-depends: base           >= 4        && < 5,
+                   Cabal          >= 2.4,
+                   ghc-boot,
+                   ghc-heap,
+                   ghc-compact,
+                   directory,
+                   filepath,
+                   containers,
+                   process,
+                   mtl,
+                   ghc-paths,
+                   template-haskell,
+                   syb            >= 0.6      && < 0.8,
+                   bytestring     >= 0.10     && < 0.11,
+                   attoparsec     >= 0.12     && < 0.14,
+                   aeson          >= 1.4      && < 1.5,
+                   text           >= 1.2      && < 1.3,
+                   wl-pprint-text >= 1.1      && < 1.3,
+                   lens           >= 4.15     && < 4.20,
+                   yaml           >= 0.10     && < 0.12,
+                   time,
+                   transformers,
+                   split          >= 0.2      && < 0.3,
+                   deepseq,
+                   vector         >= 0.12     && < 0.13,
+                   data-default   >= 0.7      && < 0.8,
+                   array          >= 0.4      && < 0.6,
+                   -- experimental binary 0.9 and 0.10 ?
+                   binary         >= 0.7      && < 0.9,
+                   unordered-containers >= 0.2 && < 0.3,
+                   parallel       >= 3.2      && < 3.3,
+                   cryptohash     >= 0.11     && < 0.12,
+                   hashable,
+                   optparse-applicative       >= 0.14 && < 0.16,
+                   stringsearch               >= 0.3 && < 0.4,
+                   base16-bytestring          >= 0.1 && < 0.2,
+                   base64-bytestring          >= 1.0 && < 1.1,
+                   -- ,
+                   -- for JMacro
+                   safe                       >= 0.3  && < 0.4,
+                   parsec                     >= 3.1  && < 3.2
+    exposed: True
+    buildable: True
+    hs-source-dirs: src
+    -- include-dirs: include
+    GHC-Options: -Wall -fno-warn-orphans -fno-warn-name-shadowing -fno-warn-unused-do-bind -fprof-auto-calls -fobject-code
+    if flag(disable-optimizer)
+      cpp-options: -DDISABLE_OPTIMIZER
+    if flag(runtime-assertions)
+      cpp-options: -DRUNTIME_ASSERTIONS
+
+    build-tool-depends: happy:happy >= 1.19
+    happy-options: -agc --strict
+
+    Build-Depends: base       >= 4.9 && < 5,
+                   deepseq    >= 1.4 && < 1.5,
+                   directory  >= 1   && < 1.4,
+                   process    >= 1   && < 1.7,
+                   bytestring >= 0.9 && < 0.11,
+                   binary     == 0.8.*,
+                   time       >= 1.4 && < 1.10,
+                   containers >= 0.5 && < 0.7,
+                   array      >= 0.1 && < 0.6,
+                   filepath   >= 1   && < 1.5,
+                   template-haskell == 2.16.*,
+                   hpc        == 0.6.*,
+                   transformers == 0.5.*,
+                   ghc-boot   == 8.10.*,
+                   ghc-boot-th == 8.10.*,
+                   ghc-heap   == 8.10.*,
+                   ghci == 8.10.*
+
+
+    if os(windows)
+        Build-Depends: Win32  >= 2.3 && < 2.7
+    else
+        if flag(terminfo)
+            Build-Depends: terminfo == 0.4.*
+        Build-Depends: unix   >= 2.7 && < 2.9
+
+    GHC-Options: -Wall
+                 -Wno-name-shadowing
+                 -Wnoncanonical-monad-instances
+                 -Wnoncanonical-monoid-instances
+                 -Wno-orphans
+
+    if flag(debug)
+        CPP-Options: -DDEBUG
+
+    if flag(ghci)
+        CPP-Options: -DHAVE_INTERNAL_INTERPRETER
+        -- Include-Dirs: ../rts/dist/build
+
+    Other-Extensions:
+        BangPatterns
+        CPP
+        DataKinds
+        DeriveDataTypeable
+        DeriveFoldable
+        DeriveFunctor
+        DeriveTraversable
+        DisambiguateRecordFields
+        ExplicitForAll
+        FlexibleContexts
+        FlexibleInstances
+        GADTs
+        GeneralizedNewtypeDeriving
+        MagicHash
+        MultiParamTypeClasses
+        NamedFieldPuns
+        --NondecreasingIndentation
+        RankNTypes
+        RecordWildCards
+        ScopedTypeVariables
+        StandaloneDeriving
+        Trustworthy
+        TupleSections
+        TypeFamilies
+        TypeSynonymInstances
+        UnboxedTuples
+        UndecidableInstances
+
+    Include-Dirs: ghc/compiler ghc/compiler/parser ghc/compiler/utils
+
+    if flag(stage1)
+        CPP-options: -DGHC_STAGE1 -DGHC_STAGE=1
+    else
+        if flag(stage2)
+            CPP-options: -DGHC_STAGE2 -DGHC_STAGE=2
+        else
+            if flag(stage3)
+                CPP-options: -DGHC_STAGE3 -DGHC_STAGE=3
+
+    Install-Includes: ghc/compiler/HsVersions.h
+
+    c-sources:
+        ghc/compiler/parser/cutils.c
+        ghc/compiler/cbits/genSym.c
+
+    -- fixme multiple ghc versions support?
+    hs-source-dirs: lib/ghc/autogen
+
+    include-dirs:
+        lib/ghc/includes
+       -- lib/ghc/autogen
+        -- ghc/includes
+
+    hs-source-dirs:
+        ghc/compiler
+        ghc/compiler/backpack
+        ghc/compiler/basicTypes
+        ghc/compiler/cmm
+        ghc/compiler/coreSyn
+        ghc/compiler/deSugar
+        ghc/compiler/ghci
+        ghc/compiler/hieFile
+        ghc/compiler/iface
+        ghc/compiler/llvmGen
+        ghc/compiler/main
+        ghc/compiler/nativeGen
+        ghc/compiler/parser
+        ghc/compiler/prelude
+        ghc/compiler/profiling
+        ghc/compiler/rename
+        ghc/compiler/simplCore
+        ghc/compiler/simplStg
+        ghc/compiler/specialise
+        ghc/compiler/stgSyn
+        ghc/compiler/stranal
+        ghc/compiler/typecheck
+        ghc/compiler/types
+        ghc/compiler/utils
+
+    -- we use an explicit Prelude
+    Default-Extensions:
+        NoImplicitPrelude
+
+    Exposed-Modules:
+        HieTypes
+        HieDebug
+        HieBin
+        HieUtils
+        HieAst
+        Ar
+        FileCleanup
+        DriverBkp
+        BkpSyn
+        NameShape
+        RnModIface
+        Avail
+        AsmUtils
+        BasicTypes
+        ConLike
+        DataCon
+        PatSyn
+        Demand
+        Debug
+        Exception
+        FieldLabel
+        GhcMonad
+        Hooks
+        Id
+        IdInfo
+        Predicate
+        Lexeme
+        Literal
+        Llvm
+        Llvm.AbsSyn
+        Llvm.MetaData
+        Llvm.PpLlvm
+        Llvm.Types
+        LlvmCodeGen
+        LlvmCodeGen.Base
+        LlvmCodeGen.CodeGen
+        LlvmCodeGen.Data
+        LlvmCodeGen.Ppr
+        LlvmCodeGen.Regs
+        LlvmMangler
+        MkId
+        Module
+        Name
+        NameEnv
+        NameSet
+        OccName
+        RdrName
+        NameCache
+        SrcLoc
+        UniqSupply
+        Unique
+        Var
+        VarEnv
+        VarSet
+        UnVarGraph
+        BlockId
+        CLabel
+        Cmm
+        CmmBuildInfoTables
+        CmmPipeline
+        CmmCallConv
+        CmmCommonBlockElim
+        CmmImplementSwitchPlans
+        CmmContFlowOpt
+        CmmExpr
+        CmmInfo
+        CmmLex
+        CmmLint
+        CmmLive
+        CmmMachOp
+        CmmMonad
+        CmmSwitch
+        CmmNode
+        CmmOpt
+        CmmParse
+        CmmProcPoint
+        CmmSink
+        CmmType
+        CmmUtils
+        CmmLayoutStack
+        CliOption
+        EnumSet
+        GhcNameVersion
+        FileSettings
+        MkGraph
+        PprBase
+        PprC
+        PprCmm
+        PprCmmDecl
+        PprCmmExpr
+        Bitmap
+        GHC.Platform.Regs
+        GHC.Platform.ARM
+        GHC.Platform.AArch64
+        GHC.Platform.NoRegs
+        GHC.Platform.PPC
+        GHC.Platform.S390X
+        GHC.Platform.SPARC
+        GHC.Platform.X86
+        GHC.Platform.X86_64
+        GHC.StgToCmm.CgUtils
+        GHC.StgToCmm
+        GHC.StgToCmm.Bind
+        GHC.StgToCmm.Closure
+        GHC.StgToCmm.DataCon
+        GHC.StgToCmm.Env
+        GHC.StgToCmm.Expr
+        GHC.StgToCmm.Foreign
+        GHC.StgToCmm.Heap
+        GHC.StgToCmm.Hpc
+        GHC.StgToCmm.ArgRep
+        GHC.StgToCmm.Layout
+        GHC.StgToCmm.Monad
+        GHC.StgToCmm.Prim
+        GHC.StgToCmm.Prof
+        GHC.StgToCmm.Ticky
+        GHC.StgToCmm.Utils
+        GHC.StgToCmm.ExtCode
+        SMRep
+        CoreArity
+        CoreFVs
+        CoreLint
+        CorePrep
+        CoreSubst
+        CoreOpt
+        CoreSyn
+        TrieMap
+        CoreTidy
+        CoreUnfold
+        CoreUtils
+        CoreMap
+        CoreSeq
+        CoreStats
+        MkCore
+        PprCore
+        GHC.HsToCore.PmCheck.Oracle
+        GHC.HsToCore.PmCheck.Ppr
+        GHC.HsToCore.PmCheck.Types
+        GHC.HsToCore.PmCheck
+        Coverage
+        Desugar
+        DsArrows
+        DsBinds
+        DsCCall
+        DsExpr
+        DsForeign
+        DsGRHSs
+        DsListComp
+        DsMonad
+        DsUsage
+        DsUtils
+        ExtractDocs
+        Match
+        MatchCon
+        MatchLit
+        GHC.Hs
+        GHC.Hs.Binds
+        GHC.Hs.Decls
+        GHC.Hs.Doc
+        GHC.Hs.Expr
+        GHC.Hs.ImpExp
+        GHC.Hs.Lit
+        GHC.Hs.PlaceHolder
+        GHC.Hs.Extension
+        GHC.Hs.Instances
+        GHC.Hs.Pat
+        GHC.Hs.Types
+        GHC.Hs.Utils
+        GHC.Hs.Dump
+        BinIface
+        BinFingerprint
+        BuildTyCl
+        IfaceEnv
+        IfaceSyn
+        IfaceType
+        ToIface
+        LoadIface
+        MkIface
+        TcIface
+        FlagChecker
+        Annotations
+        CmdLineParser
+        CodeOutput
+        Config
+        Constants
+        DriverMkDepend
+        DriverPhases
+        PipelineMonad
+        DriverPipeline
+        DynFlags
+        ErrUtils
+        Finder
+        GHC
+        GhcMake
+        GhcPlugins
+        GhcPrelude
+        DynamicLoading
+        HeaderInfo
+        HscMain
+        HscStats
+        HscTypes
+        InteractiveEval
+        InteractiveEvalTypes
+        PackageConfig
+        Packages
+        PlatformConstants
+        Plugins
+        TcPluginM
+        PprTyThing
+        Settings
+        StaticPtrTable
+        SysTools
+        SysTools.BaseDir
+        SysTools.Terminal
+        SysTools.ExtraObj
+        SysTools.Info
+        SysTools.Process
+        SysTools.Tasks
+        SysTools.Settings
+        Elf
+        TidyPgm
+        Ctype
+        HaddockUtils
+        Lexer
+        OptCoercion
+        Parser
+        RdrHsSyn
+        ApiAnnotation
+        ForeignCall
+        KnownUniques
+        PrelInfo
+        PrelNames
+        PrelRules
+        PrimOp
+        ToolSettings
+        TysPrim
+        TysWiredIn
+        CostCentre
+        CostCentreState
+        ProfInit
+        RnBinds
+        RnEnv
+        RnExpr
+        RnHsDoc
+        RnNames
+        RnPat
+        RnSource
+        RnSplice
+        RnTypes
+        RnFixity
+        RnUtils
+        RnUnbound
+        CoreMonad
+        CSE
+        FloatIn
+        FloatOut
+        LiberateCase
+        OccurAnal
+        SAT
+        SetLevels
+        SimplCore
+        SimplEnv
+        SimplMonad
+        SimplUtils
+        Simplify
+        SimplStg
+        StgStats
+        StgCse
+        StgLiftLams
+        StgLiftLams.Analysis
+        StgLiftLams.LiftM
+        StgLiftLams.Transformation
+        StgSubst
+        UnariseStg
+        RepType
+        Rules
+        SpecConstr
+        Specialise
+        CoreToStg
+        StgLint
+        StgSyn
+        StgFVs
+        CallArity
+        DmdAnal
+        Exitify
+        WorkWrap
+        WwLib
+        FamInst
+        ClsInst
+        Inst
+        TcAnnotations
+        TcArrows
+        TcBinds
+        TcSigs
+        TcClassDcl
+        TcDefaults
+        TcDeriv
+        TcDerivInfer
+        TcDerivUtils
+        TcEnv
+        TcExpr
+        TcForeign
+        TcGenDeriv
+        TcGenFunctor
+        TcGenGenerics
+        TcHsSyn
+        TcHsType
+        TcInstDcls
+        TcMType
+        TcValidity
+        TcMatches
+        TcPat
+        TcPatSyn
+        TcRnDriver
+        TcBackpack
+        TcRnExports
+        TcRnMonad
+        TcRnTypes
+        Constraint
+        TcOrigin
+        TcRules
+        TcSimplify
+        TcHoleErrors
+        TcHoleFitTypes
+        TcErrors
+        TcTyClsDecls
+        TcTyDecls
+        TcTypeable
+        TcType
+        TcEvidence
+        TcEvTerm
+        TcUnify
+        TcInteract
+        TcCanonical
+        TcFlatten
+        TcSMonad
+        TcTypeNats
+        TcSplice
+        Class
+        Coercion
+        DsMeta
+        THNames
+        FamInstEnv
+        FunDeps
+        InstEnv
+        TyCon
+        CoAxiom
+        Type
+        TyCoRep
+        TyCoFVs
+        TyCoSubst
+        TyCoPpr
+        TyCoTidy
+        Unify
+        Bag
+        Binary
+        BooleanFormula
+        BufWrite
+        Digraph
+        Encoding
+        FastFunctions
+        FastMutInt
+        FastString
+        FastStringEnv
+        Fingerprint
+        FiniteMap
+        FV
+        GraphBase
+        GraphColor
+        GraphOps
+        GraphPpr
+        IOEnv
+        Json
+        ListSetOps
+        Maybes
+        MonadUtils
+        OrdList
+        Outputable
+        Pair
+        Panic
+        PlainPanic
+        PprColour
+        Pretty
+        State
+        Stream
+        StringBuffer
+        UniqDFM
+        UniqDSet
+        UniqFM
+        UniqMap
+        UniqSet
+        Util
+        Hoopl.Block
+        Hoopl.Collections
+        Hoopl.Dataflow
+        Hoopl.Graph
+        Hoopl.Label
+--        CgInfoTbls used in ghci/DebuggerUtils
+--        CgHeapery  mkVirtHeapOffsets used in ghci
+
+    Exposed-Modules:
+            AsmCodeGen
+            TargetReg
+            NCGMonad
+            Instruction
+            BlockLayout
+            CFG
+            Dominators
+            Format
+            Reg
+            RegClass
+            PIC
+            CPrim
+            X86.Regs
+            X86.RegInfo
+            X86.Instr
+            X86.Cond
+            X86.Ppr
+            X86.CodeGen
+            PPC.Regs
+            PPC.RegInfo
+            PPC.Instr
+            PPC.Cond
+            PPC.Ppr
+            PPC.CodeGen
+            SPARC.Base
+            SPARC.Regs
+            SPARC.Imm
+            SPARC.AddrMode
+            SPARC.Cond
+            SPARC.Instr
+            SPARC.Stack
+            SPARC.ShortcutJump
+            SPARC.Ppr
+            SPARC.CodeGen
+            SPARC.CodeGen.Amode
+            SPARC.CodeGen.Base
+            SPARC.CodeGen.CondCode
+            SPARC.CodeGen.Gen32
+            SPARC.CodeGen.Gen64
+            SPARC.CodeGen.Sanity
+            SPARC.CodeGen.Expand
+            RegAlloc.Liveness
+            RegAlloc.Graph.Main
+            RegAlloc.Graph.Stats
+            RegAlloc.Graph.ArchBase
+            RegAlloc.Graph.ArchX86
+            RegAlloc.Graph.Coalesce
+            RegAlloc.Graph.Spill
+            RegAlloc.Graph.SpillClean
+            RegAlloc.Graph.SpillCost
+            RegAlloc.Graph.TrivColorable
+            RegAlloc.Linear.Main
+            RegAlloc.Linear.JoinToTargets
+            RegAlloc.Linear.State
+            RegAlloc.Linear.Stats
+            RegAlloc.Linear.FreeRegs
+            RegAlloc.Linear.StackMap
+            RegAlloc.Linear.Base
+            RegAlloc.Linear.X86.FreeRegs
+            RegAlloc.Linear.X86_64.FreeRegs
+            RegAlloc.Linear.PPC.FreeRegs
+            RegAlloc.Linear.SPARC.FreeRegs
+            Dwarf
+            Dwarf.Types
+            Dwarf.Constants
+            GHC.ThToHs
+            ByteCodeTypes
+            ByteCodeAsm
+            ByteCodeGen
+            ByteCodeInstr
+            ByteCodeItbls
+            ByteCodeLink
+            Debugger
+            LinkerTypes
+            Linker
+            RtClosureInspect
+            GHCi
+
+-- ghcjs-boot is the only public executable. it is responsible for
+-- copying the other executables in place
+Executable ghcjs
+    Main-Is:        Main.hs
+    Default-Language: Haskell2010
+    hs-source-dirs: src-bin
+    Build-Depends:  base                >= 4    &&  < 5,
+                    ghcjs
+    GHC-Options:    -rtsopts -with-rtsopts=-N -with-rtsopts=-K1024m -threaded -fprof-auto-calls
+
+-- the package manager, like with the compiler, this executable is called
+-- through a wrapper script
+Executable ghcjs-pkg
+    if flag(compiler-only)
+      Buildable:      False
+    Main-Is: Pkg.hs
+    Default-Language: Haskell2010
+    Hs-Source-Dirs:   src-bin
+    Build-Depends:    ghcjs,
+                      base       >= 4   && < 5,
+                      directory  >= 1,
+                      process    >= 1,
+                      filepath,
+                      containers,
+                      Cabal,
+                      binary,
+                      bytestring,
+                      ghc-boot
+
+    if !os(windows)
+        Build-Depends: unix,
+                       terminfo
+    if os(windows)
+        c-sources: cbits/CRT_noglob.c
+
+-- the boot program, this prepares a ghcjs installation by populating the
+-- installation directory and building the boot libraries
+Executable ghcjs-boot
+    -- if flag(compiler-only)
+    -- Buildable:      False
+    if os(Windows)
+      cpp-options: -DWINDOWS
+    ghc-options:      -threaded -Wall -fno-warn-orphans -fno-warn-name-shadowing -fno-warn-unused-do-bind -fprof-auto
+    Main-Is:          Boot.hs
+    Default-Language: Haskell2010
+    Hs-Source-Dirs:   src-bin
+
+    Build-Depends:    base                 >= 4      && < 5,
+                      ghcjs,
+                      directory,
+                      Cabal,
+                      mtl,
+                      transformers,
+                      lens,
+                      unordered-containers,
+                      vector,
+                      filepath,
+                      aeson,
+                      text                 >= 0.11   && < 1.3,
+                      bytestring           >= 0.10   && < 0.11,
+                      -- shelly               >= 1.9    && < 1.10,
+                      optparse-applicative >= 0.11   && < 0.16,
+                      tar                  >= 0.5    && < 0.6,
+                      yaml                 >= 0.10   && < 0.12,
+                      process              >= 1.2,
+                      time                 >= 1.8    && < 1.11,
+                      unix-compat          >= 0.5    && < 0.6,
+                      executable-path      >= 0      && < 0.1
+
+Executable private-ghcjs-run
+    if flag(compiler-only)
+      Buildable:      False
+    if os(Windows)
+      cpp-options: -DWINDOWS
+    ghc-options:      -threaded
+    Main-Is:          Run.hs
+    Default-Language: Haskell2010
+    Hs-Source-Dirs:   src-bin
+    Build-Depends:    base                 >= 4      && < 5,
+                      directory,
+                      process,
+                      filepath
+
+Executable private-ghcjs-wrapper
+    if flag(compiler-only) || !os(Windows)
+      Buildable:      False
+    Main-Is:          wrapper.c
+    Default-Language: Haskell2010
+    Hs-Source-Dirs:   utils/wrapper
+    Include-Dirs: ghc/driver/utils
+    C-Sources: ghc/driver/utils/getLocation.c,
+               ghc/driver/utils/cwrapper.c,
+               utils/wrapper/getline.c
+    Includes: ghc/driver/utils/cwrapper.h,
+              ghc/driver/utils/getLocation.h,
+              utils/wrapper/getline.h
+
+Executable private-ghcjs-unlit
+    if flag(compiler-only)
+        Buildable: False
+    Default-Language: Haskell2010
+    hs-source-dirs: ghc/utils/unlit
+    Main-Is: unlit.c
+    C-Sources: ghc/utils/unlit/fs.c
+    Includes: ghc/utils/unlit/fs.h
+
+Executable private-ghcjs-touchy
+    if flag(compiler-only) || !os(Windows)
+        Buildable: False
+    Default-Language: Haskell2010
+    Hs-Source-Dirs: ghc/utils/touchy
+    Main-Is: touchy.c
+
+-- adapted from ghc/utils/hsc2hs/hsc2hs.cabal
+Executable private-ghcjs-hsc2hs
+    if flag(compiler-only)
+      Buildable:      False
+    Default-Language: Haskell2010
+    Hs-Source-Dirs: ghc/utils/hsc2hs
+    Cpp-Options: -DPaths_hsc2hs=Paths_ghcjs
+    Main-Is: Main.hs
+    Other-Modules:
+        C
+        Common
+        CrossCodegen
+        DirectCodegen
+        Flags
+        HSCParser
+        ATTParser
+        UtilsCodegen
+        Compat.ResponseFile
+        Compat.TempFile
+        Paths_ghcjs
+
+    Autogen-Modules:
+        Paths_ghcjs
+
+    Other-Extensions: CPP, NoMonomorphismRestriction
+
+    Build-Depends: base       >= 4.3.0 && < 4.15,
+                   containers >= 0.4.0 && < 0.7,
+                   directory  >= 1.1.0 && < 1.4,
+                   filepath   >= 1.2.0 && < 1.5,
+                   process    >= 1.1.0 && < 1.7
+
+    if os(windows)
+      Build-Depends: process  >= 1.5.0 && < 1.7
+
+-- adapted from ghc/utils/haddock/haddock.cabal
+executable haddock
+  if flag(compiler-only)
+    Buildable:      False
+  default-language:     Haskell2010
+  -- hs-source-dirs:       ghc/utils/haddock/driver
+  -- we use a custom driver that sets up DynFlags for js_hi files etc.
+  main-is:              HaddockDriver.hs
+  hs-source-dirs:       src-bin
+  ghc-options:          -funbox-strict-fields -Wall -fwarn-tabs -O2 -threaded
+
+  -- haddock typically only supports a single GHC major version
+  build-depends:
+    base ^>= 4.14.0
+
+  if true -- was flag(in-ghc-tree)
+    hs-source-dirs: ghc/utils/haddock/haddock-api/src,  ghc/utils/haddock/haddock-library/src
+    cpp-options: -DIN_GHC_TREE -DPaths_haddock=Paths_ghcjs "-DMIN_VERSION_ghc(mj1,mj2,mn)=((mj1)<8||(mj1)==8&&(mj2)<10||(mj1)==8&&(mj2)==10&&(mn)<=1)"
+    build-depends:
+      filepath,
+      directory,
+      containers,
+      deepseq,
+      array,
+      xhtml >= 3000.2 && < 3000.3,
+      Cabal >= 1.10,
+      ghc-boot,
+      ghcjs == 8.10.*,
+      bytestring,
+      parsec,
+      text,
+      transformers
+
+    other-modules:
+      CompatPrelude
+      Documentation.Haddock.Parser
+      Documentation.Haddock.Parser.Monad
+      Documentation.Haddock.Parser.Identifier
+      Documentation.Haddock.Types
+      Documentation.Haddock.Doc
+      Documentation.Haddock.Parser.Util
+      Documentation.Haddock.Markup
+
+      Documentation.Haddock
+      Haddock
+      Haddock.Interface
+      Haddock.Interface.Json
+      Haddock.Interface.Rename
+      Haddock.Interface.Create
+      Haddock.Interface.AttachInstances
+      Haddock.Interface.LexParseRn
+      Haddock.Interface.ParseModuleHeader
+      Haddock.Interface.Specialize
+      Haddock.Parser
+      Haddock.Utils
+      Haddock.Utils.Json
+      Haddock.Backends.Xhtml
+      Haddock.Backends.Xhtml.Decl
+      Haddock.Backends.Xhtml.DocMarkup
+      Haddock.Backends.Xhtml.Layout
+      Haddock.Backends.Xhtml.Meta
+      Haddock.Backends.Xhtml.Names
+      Haddock.Backends.Xhtml.Themes
+      Haddock.Backends.Xhtml.Types
+      Haddock.Backends.Xhtml.Utils
+      Haddock.Backends.LaTeX
+      Haddock.Backends.HaddockDB
+      Haddock.Backends.Hoogle
+      Haddock.Backends.Hyperlinker
+      Haddock.Backends.Hyperlinker.Parser
+      Haddock.Backends.Hyperlinker.Renderer
+      Haddock.Backends.Hyperlinker.Types
+      Haddock.Backends.Hyperlinker.Utils
+      Haddock.ModuleTree
+      Haddock.Types
+      Haddock.Doc
+      Haddock.Version
+      Haddock.InterfaceFile
+      Haddock.Options
+      Haddock.GhcUtils
+      Haddock.Syb
+      Haddock.Convert
+
+      Paths_ghcjs
+
+    Autogen-Modules:
+      Paths_ghcjs
+
+Executable ghcjs-dumparchive
+    if flag(compiler-only)
+      Buildable:      False
+    if os(Windows)
+      cpp-options: -DWINDOWS
+    ghc-options:      -threaded
+    Main-Is:          dumpArchive.hs
+    Default-Language: Haskell2010
+    Hs-Source-Dirs:   utils
+    Build-Depends:    base                 >= 4      && < 5,
+                      text,
+                      ghcjs,
+                      bytestring,
+                      filepath
+
+
+-- our test suite, requires JavaScript environments to run the tests:
+--   - node.js              http://nodejs.org/
+--   - SpiderMonkey jsshell http://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/
+--   - JavaScriptCore       ?
+--   - Selenium WebDriver   http://www.seleniumhq.org/
+--        for Selenium server:
+--          - Firefox
+--          - ChromeDriver - http://chromedriver.storage.googleapis.com/index.html
+--          - Opera / IE
+--
+-- don't forget to run utils/updateTestSuite.hs after updating this section
+-- to update the cabal file for the stand-alone testsuite package
+test-suite test
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    Default-Language: Haskell2010
+    ghc-options:      -threaded
+    main-is:          TestRunner.hs
+    other-modules:    Server
+                      Client
+                      Types
+    build-depends:    base                 >= 4 && < 5,
+                      process,
+                      network,
+                      aeson,
+                      test-framework       >= 0.8,
+                      test-framework-hunit >= 0.3,
+                      HUnit                >= 1.6 && < 1.7,
+                      filepath,
+                      text,
+                      transformers,
+                      lens,
+                      random,
+                      time,
+                      bytestring,
+                      deepseq,
+                      unordered-containers,
+                      shelly               >= 1.9 &&  < 1.10,
+                      data-default         >= 0.7 &&  < 0.8,
+                      yaml                 >= 0.10 && < 0.12,
+                      optparse-applicative,
+                      directory,
+                      http-types           >= 0.11 &&  < 0.13,
+                      warp                 >= 3.0  &&  < 3.4,
+                      wai                  >= 3.0  &&  < 3.3,
+                      wai-extra            >= 3.0  &&  < 3.1,
+                      wai-app-static       >= 3.0  &&  < 3.2,
+                      wai-websockets       >= 3.0  &&  < 3.1,
+                      websockets           >= 0.12 &&  < 0.13,
+                      webdriver            >= 0.9  &&  < 0.10,
+                      lifted-base          >= 0.2  &&  < 0.3
+
+Flag debug
+    Description: Build with additional assertions.
+    Default: False
+    Manual: True
+
+Flag ghci
+    Description: Build GHCi support.
+    Default: True
+    Manual: True
+
+Flag stage1
+    Description: Is this stage 1?
+    Default: False
+    Manual: True
+
+Flag stage2
+    Description: Is this stage 2?
+    Default: True
+    Manual: True
+
+Flag stage3
+    Description: Is this stage 3?
+    Default: False
+    Manual: True
+
+Flag terminfo
+    Description: Build GHC with terminfo support on non-Windows platforms.
+    Default: True
+    Manual: True

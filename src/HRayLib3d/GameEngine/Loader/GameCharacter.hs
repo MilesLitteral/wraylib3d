@@ -53,7 +53,7 @@ characterAttributes = fmap (\l x -> foldr ($) x l) $ many $ choice
       , value FOOTSTEP_MECH "mech"
       , value FOOTSTEP_ENERGY "energy"
       ]
-  , (\c -> c {fixedLegs = True}) <$ symbol "fixedlegs"
+  , (\c -> c {fixedLegs = True})  <$ symbol "fixedlegs"
   , (\c -> c {fixedTorso = True}) <$ symbol "fixedtorso"
   , (\a c -> c {gender = a}) <$ symbol "sex" <*> choice
       [ value GENDER_FEMALE "f"

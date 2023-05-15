@@ -49,8 +49,11 @@ dependencies:
 - req
 - stm
 - digest
+- utf8-string
+- HaTeX
 - OpenGLRaw
 - GLFW-b
+#- sdl2
 #- vulkan-api
 - vulkan
 - vulkan-utils
@@ -58,7 +61,6 @@ dependencies:
 - MonadRandom
 - attoparsec
 #- graphql
-#- sdl2 #Add this at some point for mature window management, controller support, audio support, and general UI support
 #- lambdacube-core  #all the Utils when they inevitably become their own modules (hruby and nsis go here )
 - lambdacube-compiler
 - lambdacube-ir
@@ -76,7 +78,13 @@ dependencies:
 #- language-vulkan
 #- language-metal
 #- lambdacube-sl # can entail all shader dialect stuff (including Q3SS)
+- data-default
 - megastore
+- monomer
+- tinyfiledialogs
+- adjunctions
+- wreq # will be replaced with internal Network module features, currently in for compatibility 
+- text-show
 - criterion
 - nsis
 
@@ -84,6 +92,8 @@ ghc-options:
 - -Wall
 # - -shared
 # - -fno-shared-implib
+- -optl-mconsole
+- -optl-mwindows
 - -Wcompat
 - -Widentities
 - -Wincomplete-record-updates
@@ -95,19 +105,50 @@ ghc-options:
 
 library:
   source-dirs:  src
-  include-dirs: cbits
-  install-includes:
-    - stb_image.h
-  c-sources:
-    - cbits/stb_image.c 
+  #include-dirs: cbits
+  # install-includes:
+  #   - stb_image.h
+  # c-sources:
+  #   - cbits/stb_image.c 
   cc-options:
     - -fPIC
+  #extra-include-dirs:  C:\ghcup\msys64\mingw64\include\SDL2
   build-tools:     c2hs
 
 executables:
-  hraylib3d-exe:
+  hraylib3d:
     main:                Main.hs
     source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - hraylib3d
+
+  RealmViewer-FE-Demo:
+    main:                Main.hs
+    source-dirs:         app/RealmViewer-FE-Demo/
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - hraylib3d
+
+  RealmBuilder-FE-Demo:
+    main:                Main.hs
+    source-dirs:         app/RealmBuilder-FE-Demo/
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - hraylib3d
+
+  RB-ProjectManager-FE-Demo:
+    main:                Main.hs
+    source-dirs:         app/RB-ProjectManager-FE-Demo/
     ghc-options:
     - -threaded
     - -rtsopts
@@ -125,3 +166,4 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - hraylib3d
+    - sdl2

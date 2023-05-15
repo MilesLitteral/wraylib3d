@@ -20,7 +20,7 @@ import qualified Data.Vector as V
 import Control.Monad
 
 import HRayLib3d.GameEngine.Data.BSP
-
+import HRayLib3d.Network.Realms
 {-
 Information:
   http://graphics.stanford.edu/~kekoa/q3/
@@ -127,3 +127,12 @@ readBSP dat = BSPLevel
 
 loadBSP :: String -> IO BSPLevel
 loadBSP n = readBSP <$> LB.readFile n
+
+-- Realm Functions
+
+-- it is presumed the Query will be in a style to actually
+-- get a Level, like SELECT bsp_name FROM realm/<bsp_name>/bsp/
+-- where this will result in a Lazy ByteString that is then
+-- read by readBSP
+sendRealmBSPQuery :: Query -> IO BSPLevel
+sendRealmBSPQuery q = readBSP <$> sendRealmQueryBS q

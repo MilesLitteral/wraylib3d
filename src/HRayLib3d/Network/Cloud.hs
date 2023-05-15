@@ -34,4 +34,3 @@ module HRayLib3d.Network.Cloud (Supabase(..), Firebase(..)) where
             messagingSenderId :: MessagingSenderId,
             measurementId     :: MeasurementId      
         } deriving (Eq, Show)
-

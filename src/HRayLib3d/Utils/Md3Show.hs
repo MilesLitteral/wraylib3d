@@ -5,4 +5,5 @@ module HRayLib3d.Utils.Md3Show where
     import System.Environment
     import HRayLib3d.GameEngine.Loader.MD3
 
+    md3Show :: IO ()
     md3Show = getArgs >>= mapM_ (loadMD3 >=> pPrint)

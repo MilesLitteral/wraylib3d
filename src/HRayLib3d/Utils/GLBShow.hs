@@ -5,4 +5,5 @@ module HRayLib3d.Utils.GLBShow where
     import System.Environment
     import HRayLib3d.GameEngine.Loader.GLB
 
-    GLBShow = getArgs >>= mapM_ (loadGLB >=> pPrint)
+    glbShow :: IO ()
+    glbShow = getArgs >>= mapM_ (loadGLB >=> pPrint)
