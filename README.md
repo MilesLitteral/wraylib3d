@@ -225,6 +225,15 @@ stack run mapviewer-debug
        as it could also be the answer for generating vcprojs or xcprojs
        
    ```
+   General FS:
+   C:/WRL/Projects/<YourGame>
+     AssetBundles/assets.AssetBundle(s)
+     ShaderCaches/shader.ShaderCache(s)
+     src/game/.hs(')
+     src/gameScripting/.rb(s)
+     Realms.db
+     YourGame.wrlp
+
    Windows:
    NSIS (Standard)
    C:/WRL/Games/<YourGame>
