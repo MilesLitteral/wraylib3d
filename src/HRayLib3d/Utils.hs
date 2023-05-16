@@ -6,7 +6,8 @@ module HRayLib3d.Utils
     , module HRayLib3d.Utils.Project
     , module HRayLib3d.Utils.PrettyPrint
     , module HRayLib3d.Utils.Prisms 
-    , module HRayLib3d.Utils.Tooltips 
+    , module HRayLib3d.Utils.Tooltips
+    , module HRayLib3d.Utils.Unsafe
     )
 where
 
@@ -18,3 +19,4 @@ import HRayLib3d.Utils.LogMessage
 import HRayLib3d.Utils.PrettyPrint
 import HRayLib3d.Utils.Prisms 
 import HRayLib3d.Utils.Tooltips 
+import HRayLib3d.Utils.Unsafe

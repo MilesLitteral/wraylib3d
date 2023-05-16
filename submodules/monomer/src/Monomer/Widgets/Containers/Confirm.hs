@@ -38,12 +38,13 @@ customConfirm = confirm ConfirmAcceptEvent ConfirmCancelEvent where
 module Monomer.Widgets.Containers.Confirm (
   -- * Configuration
   ConfirmCfg,
-  InnerConfirmEvt,
+  InnerConfirmEvt(..),
   -- * Constructors
   confirm,
   confirm_,
   confirmMsg,
-  confirmMsg_
+  confirmMsg_,
+  menuDialog_
 ) where
 
 import Control.Applicative ((<|>))
@@ -142,7 +143,7 @@ confirm_
   -> WidgetNode s e                     -- ^ The created dialog.
 confirm_ acceptEvt cancelEvt configs dialogBody = newNode where
   config = mconcat configs
-  createUI = buildUI (const dialogBody) acceptEvt cancelEvt config
+  createUI = buildUI (const dialogBody) acceptEvt cancelEvt True config
   compCfg = [compositeMergeReqs mergeReqs]
   newNode = compositeD_ "confirm" (WidgetLens id) createUI handleEvent compCfg
 
@@ -167,9 +168,23 @@ confirmMsg_ message acceptEvt cancelEvt configs = newNode where
   config = mconcat configs
   dialogBody wenv = label_ message [multiline]
     & L.info . L.style .~ collectTheme wenv L.dialogMsgBodyStyle
-  createUI = buildUI dialogBody acceptEvt cancelEvt config
+  createUI = buildUI dialogBody acceptEvt cancelEvt True config
   compCfg = [compositeMergeReqs mergeReqs]
   newNode = compositeD_ "confirm" (WidgetLens id) createUI handleEvent compCfg
+
+  -- | Creates a confirm dialog with a text message as content. Accepts config.
+menuDialog_
+  :: (CompositeModel s, WidgetEvent e)
+  => WidgetNode s (InnerConfirmEvt e)            -- ^ The message to display in the dialog.
+  -> e               -- ^ The accept button event.
+  -> e               -- ^ The cancel button event.
+  -> WidgetNode s e  -- ^ The created dialog.
+menuDialog_ message acceptEvt cancelEvt = newNode where
+  -- config = mconcat configs
+  dialogBody wenv = message & L.info . L.style .~ collectTheme wenv L.dialogMsgBodyStyle
+  createUI = buildUI dialogBody (acceptEvt) cancelEvt False def
+  compCfg = [compositeMergeReqs mergeReqs]
+  newNode = compositeD_ "menu" (WidgetLens id) createUI handleEvent compCfg
 
 mergeReqs :: MergeReqsHandler s e sp
 mergeReqs wenv newNode oldNode parentModel oldModel model = reqs where
@@ -184,11 +199,12 @@ buildUI
   => (WidgetEnv s (InnerConfirmEvt ep) -> WidgetNode s (InnerConfirmEvt ep))
   -> ep
   -> ep
+  -> Bool
   -> ConfirmCfg
   -> WidgetEnv s (InnerConfirmEvt ep)
   -> s
   -> WidgetNode s (InnerConfirmEvt ep)
-buildUI dialogBody pAcceptEvt pCancelEvt config wenv model = mainTree where
+buildUI dialogBody pAcceptEvt pCancelEvt showConfirmW config wenv model = mainTree where
   acceptEvt = ConfirmParentEvt pAcceptEvt
   cancelEvt = ConfirmParentEvt pCancelEvt
 
@@ -197,8 +213,8 @@ buildUI dialogBody pAcceptEvt pCancelEvt config wenv model = mainTree where
   cancel = fromMaybe "Cancel" (_cfcCancel config)
   emptyOverlay = collectTheme wenv L.emptyOverlayStyle
 
-  acceptBtn = mainButton accept acceptEvt `nodeKey` "acceptBtn"
-  cancelBtn = button cancel cancelEvt
+  acceptBtn = mainButton accept acceptEvt `nodeKey` "acceptBtn" `nodeVisible` showConfirmW
+  cancelBtn = button cancel cancelEvt                           `nodeVisible` showConfirmW
   buttons = hstack [ acceptBtn, spacer, cancelBtn ]
 
   closeIcon = icon_ IconClose [width 2]

@@ -30,10 +30,17 @@ library
       HRayLib3d.Core
       HRayLib3d.Core.BuildBundler
       HRayLib3d.Core.MobileInterface
+      HRayLib3d.Core.Parser.Language.GLSL
+      HRayLib3d.Core.Parser.Language.GLSL.Parser
+      HRayLib3d.Core.Parser.Language.GLSL.Pretty
+      HRayLib3d.Core.Parser.Language.GLSL.Syntax
+      HRayLib3d.Core.Parser.Language.Metal
+      HRayLib3d.Core.Parser.Language.Metal.Parser
+      HRayLib3d.Core.Parser.Language.Metal.Pretty
+      HRayLib3d.Core.Parser.Language.Metal.Syntax
       HRayLib3d.Core.ResourceBundler
       HRayLib3d.Core.ShaderPrecompilerPipeline
       HRayLib3d.Core.StructuredData
-      HRayLib3d.Core.WindowSystem
       HRayLib3d.GameEngine
       HRayLib3d.GameEngine.Collision
       HRayLib3d.GameEngine.Content
@@ -43,6 +50,7 @@ library
       HRayLib3d.GameEngine.Data.GLTF
       HRayLib3d.GameEngine.Data.Material
       HRayLib3d.GameEngine.Data.MD3
+      HRayLib3d.GameEngine.Data.OBJ
       HRayLib3d.GameEngine.Graphics.BezierSurface
       HRayLib3d.GameEngine.Graphics.BSP
       HRayLib3d.GameEngine.Graphics.Culling
@@ -91,8 +99,10 @@ library
       HRayLib3d.Network
       HRayLib3d.Network.Cloud
       HRayLib3d.Network.Database
+      HRayLib3d.Network.FTP
       HRayLib3d.Network.Realms
       HRayLib3d.Network.Requests
+      HRayLib3d.Network.UDP
       HRayLib3d.Network.Web
       HRayLib3d.ScriptEngine
       HRayLib3d.ScriptEngine.HRuby
@@ -102,6 +112,7 @@ library
       HRayLib3d.ScriptEngine.HRubyHS
       HRayLib3d.ScriptEngine.HRubyHSInterface
       HRayLib3d.Utils
+      HRayLib3d.Utils.Chart
       HRayLib3d.Utils.GLBShow
       HRayLib3d.Utils.GLTFShow
       HRayLib3d.Utils.LogMessage
@@ -110,6 +121,13 @@ library
       HRayLib3d.Utils.Prisms
       HRayLib3d.Utils.Project
       HRayLib3d.Utils.Tooltips
+      HRayLib3d.Utils.Unsafe
+      HRayLib3d.WindowSystem
+      HRayLib3d.WindowSystem.Communication
+      HRayLib3d.WindowSystem.RenderPipelineWidget
+      HRayLib3d.WindowSystem.Streaming
+      HRayLib3d.WindowSystem.Types
+      HRayLib3d.WindowSystem.WindowSystem
   other-modules:
       Paths_hraylib3d
   hs-source-dirs:
@@ -181,6 +199,8 @@ library
     , vulkan
     , vulkan-utils
     , wreq
+    , xml
+    , yaml
     , zlib
   default-language: Haskell2010
 
@@ -256,6 +276,8 @@ executable RB-ProjectManager-FE-Demo
     , vulkan
     , vulkan-utils
     , wreq
+    , xml
+    , yaml
     , zlib
   default-language: Haskell2010
 
@@ -331,6 +353,85 @@ executable RealmBuilder-FE-Demo
     , vulkan
     , vulkan-utils
     , wreq
+    , xml
+    , yaml
+    , zlib
+  default-language: Haskell2010
+
+executable RealmModelViewer-Demo
+  main-is: Main.hs
+  other-modules:
+      OpenGLWidget
+      Paths_hraylib3d
+  hs-source-dirs:
+      app/RealmModelViewer-Demo/
+  ghc-options: -Wall -optl-mconsole -optl-mwindows -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      GLFW-b
+    , HaTeX
+    , JuicyPixels
+    , MonadRandom
+    , OpenGLRaw
+    , adjunctions
+    , aeson
+    , attoparsec
+    , base >=4.7 && <5
+    , base64-bytestring
+    , binary
+    , bytestring
+    , containers
+    , criterion
+    , data-binary-ieee754
+    , data-default
+    , deepseq
+    , digest
+    , directory
+    , elerea
+    , extra
+    , filepath
+    , gltf-codec
+    , gltf-loader
+    , hashable
+    , hraylib3d
+    , http-client
+    , lambdacube-compiler
+    , lambdacube-gl
+    , lambdacube-ir
+    , language-glsl
+    , lens
+    , linear
+    , megaparsec
+    , megastore
+    , mersenne-random-pure64
+    , microlens-platform
+    , modern-uri
+    , monomer
+    , mtl
+    , nsis
+    , parsec
+    , postgresql-simple
+    , pretty-show
+    , prettyclass
+    , process
+    , proteaaudio
+    , req
+    , scientific
+    , stm
+    , text
+    , text-show
+    , time
+    , tinyfiledialogs
+    , transformers
+    , unordered-containers
+    , utf8-string
+    , uuid
+    , vect
+    , vector
+    , vulkan
+    , vulkan-utils
+    , wreq
+    , xml
+    , yaml
     , zlib
   default-language: Haskell2010
 
@@ -406,6 +507,8 @@ executable RealmViewer-FE-Demo
     , vulkan
     , vulkan-utils
     , wreq
+    , xml
+    , yaml
     , zlib
   default-language: Haskell2010
 
@@ -480,6 +583,8 @@ executable hraylib3d
     , vulkan
     , vulkan-utils
     , wreq
+    , xml
+    , yaml
     , zlib
   default-language: Haskell2010
 
@@ -487,6 +592,7 @@ test-suite hraylib3d-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Setup
       Paths_hraylib3d
   hs-source-dirs:
       test
@@ -556,5 +662,7 @@ test-suite hraylib3d-test
     , vulkan
     , vulkan-utils
     , wreq
+    , xml
+    , yaml
     , zlib
   default-language: Haskell2010

@@ -13,18 +13,30 @@ Main module for the 'Books' example.
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
 
+-- Notes on making a Widget for direct backend use
+-- Very important for the RendererWidget that is coming up
+-- https://github.com/fjvallarino/monomer/issues/24
+-- https://github.com/fjvallarino/monomer/issues/261
+-- https://github.com/fjvallarino/monomer/issues/10
+-- https://github.com/fjvallarino/monomer/issues/52 (Bonus)
 module Main where
 
 import Control.Exception
 import Control.Lens
 import Data.Default
 import Data.List
+import HRayLib3d.Utils.Unsafe
+
 import Data.Either.Extra
 import Data.Maybe
-import Data.Text (Text)
+import Data.Binary
+import Data.Text (Text, pack)
 import TextShow
 
+import System.FilePath  ( takeBaseName )
+import System.Directory ( createDirectoryIfMissing, listDirectory )
 import qualified Data.Text as T
+import qualified Data.ByteString.Lazy as BL
 import qualified Network.Wreq as W
 import qualified Network.Wreq.Session as Sess
 
@@ -33,6 +45,8 @@ import Monomer
 
 import qualified Monomer.Lens as L
 import Graphics.UI.TinyFileDialogs
+import Monomer (CmbFitWidth(fitWidth))
+import Data.Data (Typeable)
 
 type BooksWenv = WidgetEnv BooksModel BooksEvt
 type BooksNode = WidgetNode BooksModel BooksEvt
@@ -45,7 +59,6 @@ type TodoNode = WidgetNode TodoModel TodoEvt
 
 -- todoRow :: TodoWenv -> TodoModel -> Int -> Todo -> TodoNode
 -- todoRow wenv model idx t = animRow `nodeKey` todoKey where
---   sectionBg = wenv ^. L.theme . L.sectionColor
 --   rowButtonColor = wenv ^. L.theme . L.userColorMap . at "rowButton" . non def
 --   rowSepColor = gray & L.a .~ 0.5
 
@@ -133,10 +146,6 @@ type TodoNode = WidgetNode TodoModel TodoEvt
 --     | TodoEditing _ <- model ^. action = True
 --     | otherwise = False
 
---   countLabel = label caption `styleBasic` styles where
---     caption = "Tasks (" <> showt (length $ model ^. todos) <> ")"
---     styles = [textFont "Regular", textSize 16, padding 20, bgColor sectionBg]
-
 --   todoList = vstack (zipWith (todoRow wenv model) [0..] (model ^. todos))
 
 --   newButton = mainButton "New" TodoNew `nodeKey` "todoNew"
@@ -173,7 +182,7 @@ type TodoNode = WidgetNode TodoModel TodoEvt
 --       editLayer `nodeVisible` isEditing
 --     ] <> confirmDeleteLayer)
 
-bookImage :: Maybe Int -> Text -> WidgetNode s BooksEvt
+bookImage :: Maybe Int -> Text -> WidgetNode BooksModel BooksEvt
 bookImage imgId size = maybe filler coverImg imgId where
   baseUrl = "http://covers.openlibrary.org/b/id/<id>-<size>.jpg"
   imgUrl i = T.replace "<size>" size $ T.replace "<id>" (showt i) baseUrl
@@ -206,7 +215,7 @@ bookRow wenv b = row where
       `styleBasic` [height 80, padding 20, radius 5]
       `styleHover` [bgColor rowBgColor, cursorIcon CursorHand]
 
-bookDetail :: Book -> WidgetNode s BooksEvt
+bookDetail :: Book -> WidgetNode BooksModel BooksEvt
 bookDetail b = content `styleBasic` [minWidth 500, paddingH 20] where
   hasCover = isJust (b ^. cover)
   publishYear = maybe "" showt (b ^. year)
@@ -230,31 +239,44 @@ bookDetail b = content `styleBasic` [minWidth 500, paddingH 20] where
       ]
     ]
 
+readProjectFileIndex :: ProjectSession -> [WidgetNode BooksModel BooksEvt] -- will be changed to a Scene Inspector 
+readProjectFileIndex   projSess = map (\x -> hstack [(image_  . matchPFType $ _projectFileType x) [fitWidth] `styleBasic` [border 1 black, width 35, height 35], label $ pack $ _projectFileName x]) $ _projectFiles projSess
+
+generateProjectFileGUI :: ProjectSession -> [WidgetNode BooksModel BooksEvt]
+generateProjectFileGUI projSess = map (\x -> hstack [(image_  . matchPFType $ _projectFileType x) [fitWidth] `styleBasic` [border 1 black, width 45, height 45], label $ pack $ _projectFileName x]) $ _projectFiles projSess
+
 buildUI
   :: WidgetEnv BooksModel BooksEvt
   -> BooksModel
   -> WidgetNode BooksModel BooksEvt
 buildUI wenv model = widgetTree where
-  -- sectionBgColor = wenv ^. L.theme . L.sectionColor
+  sectionBg  = wenv ^. L.theme . L.sectionColor
 
-  -- errorOverlay = alertMsg msg BooksCloseError where
-  --   msg = fromMaybe "" (model ^. errorMsg)
+  countLabel = label caption `styleBasic` styles where
+    caption  = "Files (" <> showt (length $ model ^. books) <> ")"
+    styles   = [textFont "Regular", textSize 16, padding 20, bgColor sectionBg]
 
-  -- bookOverlay = alert BooksCloseDetails content where
-  --   content = maybe spacer bookDetail (model ^. selected)
+  searchOverlay = box content `styleBasic` [bgColor (darkGray & L.a .~ 0.8)] where
+    content = label "Searching" `styleBasic` [textSize 20, textColor black]
 
-  -- searchOverlay = box content `styleBasic` [bgColor (darkGray & L.a .~ 0.8)] where
-  --   content = label "Searching" `styleBasic` [textSize 20, textColor black]
+  errorOverlay = alert BooksCloseError content where
+    content    = fromMaybe spacer (Just $ label err :: Maybe (WidgetNode BooksModel BooksEvt))
+    err        = fromJust $ model ^. errorMsg
 
-  -- searchForm = keystroke [("Enter", BooksSearch)] $ vstack [
-  --     hstack [
-  --       label "Query:",
-  --       spacer,
-  --       textField query `nodeKey` "query",
-  --       spacer,
-  --       mainButton "Search" BooksSearch
-  --     ] `styleBasic` [bgColor sectionBgColor, padding 25]
-  --   ]
+  -- for file selection
+  bookOverlay = alert BooksCloseDetails content where
+    content   = fromMaybe spacer (Just $ bookDetail book)
+    book      = fromJust $ model ^. selected
+
+  searchForm = keystroke [("Enter", BooksSearch)] $ vstack [
+      hstack [
+        label "Query:",
+        spacer,
+        textField query `nodeKey` "query",
+        spacer,
+        mainButton "Search" BooksSearch
+      ] `styleBasic` [bgColor (rgbHex "A6A6A6"), padding 25]
+    ]
 
   -- countLabel = label caption `styleBasic` [padding 10] where
   --   caption = "Books (" <> showt (length $ model ^. books) <> ")"
@@ -305,9 +327,14 @@ buildUI wenv model = widgetTree where
   --     vstack (sectionBody <$> sectionIds)
   --   ]
 
-  -- dialogBoxMenu field content = case model ^.action of
-  --   TodoCreate  -> [popup field content]
-  --   _           -> []
+  --   where
+  -- config = mconcat configs
+  -- dialogBody wenv = label_ message [multiline]
+  --   & L.info . L.style .~ collectTheme wenv L.dialogMsgBodyStyle
+  -- createUI = buildUI dialogBody acceptEvt cancelEvt config
+  -- compCfg = [compositeMergeReqs mergeReqs]
+  -- newNode = compositeD_ "confirm" (WidgetValue ()) createUI handleEvent compCfg
+  --popup field content
 
   -- confirmDeleteLayer = case model ^. action of
   --   TodoConfirmingDelete idx todo -> [popup] where
@@ -315,73 +342,176 @@ buildUI wenv model = widgetTree where
   --     msg   = "Are you sure you want to delete '" <> (todo ^. description) <> "' ?"
   --   _                             -> []
 
+  dialogBoxMenu field content              = box_ [alignCenter, onClickEmpty OpenFS] (boxShadow $ popup field content)
+  fullscreenDialogMenu field content       = popup field content `styleBasic` [bgColor (rgbHex "#000000")]
   separator = separatorLine
 
-  widgetTree = vstack [
+  -- create alternative trees for the other menus and add transitions to all of them 
+  -- animFadeIn (widget) `nodeKey` "fadeTimeLabel" -- (see handleEvent)
+  widgetTree = zstack [
+    vstack [
       spacer,
       separator,
       spacer,
       hstack [
         spacer,
-        button "📖"  None `styleBasic` [ textFont  "UI", textMiddle ],
+        button "📖"  OpenFS              `styleBasic`  [ textFont  "UI", textMiddle ],
         spacer,
-        button "🆔"  None `styleBasic` [ textFont  "UI", textMiddle ],
+        button "🆔"  OpenAppPrefs        `styleBasic`  [ textFont  "UI", textMiddle ],
         spacer,
-        button "🚻"  None `styleBasic` [ textFont  "UI", textMiddle ],
+        button "🌑"  OpenRealmList       `styleBasic`  [ textFont  "UI", textMiddle ],
         spacer,
-        button "🆑"  None `styleBasic` [ textFont  "UI", textMiddle ],
+        button "🎮"  OpenControllerPrefs `styleBasic` [ textFont  "UI", textMiddle ],
         spacer,
-        button "🌑"  None `styleBasic` [ textFont  "UI", textMiddle ],
+        button "🆑"  OpenExportPrefs     `styleBasic` [ textFont  "UI", textMiddle ],
         spacer,
-        button "🎮"  None `styleBasic` [ textFont  "UI", textMiddle ],
+        button "🎥"  OpenRunPrefs        `styleBasic` [ textFont  "UI", textMiddle ],
         spacer,
-        button "🎥" None `styleBasic` [ textFont  "UI", textMiddle ],
+        button "⛳"  OpenMPPrefs         `styleBasic` [ textFont  "UI", textMiddle ], -- Multiplayer
         filler,
-        button "#" None `styleBasic` [ textFont  "UI", textMiddle ],
+        button "#"    None               `styleBasic` [ textFont  "UI", textMiddle ],
         spacer,
-        button "➿" None `styleBasic` [ textFont  "UI", textMiddle ],
+        button "➿"  None                `styleBasic` [ textFont  "UI", textMiddle ],
         spacer
       ],
       spacer,
       separator,
-      filler,
-      --mainContent,
-      --sideBar
-      separator,
-      spacer,
-      hstack [
-        vstack [
-          filler
-          -- searchForm,
-          -- countLabel,
-          -- box_ [mergeRequired booksChanged] $
-          --   vscroll (vstack (bookRow wenv <$> model ^. books)) `nodeKey` "mainScroll"
-        ],
-        vstack [
-          filler
-        ]
-      ],
-      spacer,
-      separator,
-      spacer,
-      hstack [
+      vstack [
+        label "📷 0" `styleBasic` [textFont  "UI", textSize 10, textMiddle, textRight],
         filler,
+        filler
+      ] `styleBasic` [bgColor (rgbHex "#00AF54"), sizeReqW $ fixedSize 256, sizeReqH $ fixedSize 256], -- this is mainContent
+      separator,
+      hstack [
+        label "Inspector",
+        spacer,
+        searchForm,
+        countLabel
+        --        box_ [mergeRequired booksChanged] $ vscroll (vstack (bookRow wenv <$> model ^. books)) `nodeKey` "mainScroll"
+      ],
+      separator,
+      hstack [
+        --scroll $ vstack (label "File System" : readProjectFileIndex (fromJust $ model ^. projectSession)) `styleBasic` [bgColor (rgbHex "#A6A6A6")],
+        --separator,
+        scroll $ vstack (label "File GUI"    : generateProjectFileGUI (fromJust $ model ^. projectSession))  `styleBasic` [bgColor (rgbHex "#612B8A")]
+      ],
+      separator,
+      spacer,
+      hstack [
+        spacer,
+        button "💥" RefreshProjectFilesTask `styleBasic` [ textFont  "UI", textMiddle, textLeft ],
+        filler, 
         label "Run Dedicated Server",
-        checkbox toolTips,
+        checkbox dedicatedServer,
         spacer,
         label "Debug On Play",
-        checkbox toolTips,
+        checkbox debugOnPlay,
+        spacer,
+        label "📷" `styleBasic` [ textFont  "UI", textMiddle ],
+        checkbox rendererEnabled,
         spacer,
         label "Tooltips",
         checkbox toolTips,
         spacer
       ],
-      spacer
-      -- errorOverlay `nodeVisible` isJust (model ^. errorMsg),
-      -- bookOverlay `nodeVisible` isJust (model ^. selected),
-      -- searchOverlay `nodeVisible` model ^. searching
-    ] -- <> confirmDeleteLayer
+      spacer,
+      searchOverlay `nodeVisible` model ^. searching
+    ],
+    --FileSystem Menu
+    menuDialog_ (vstack $ intersperse spacer [
+      label "Files",
+      spacer,
+      button "Save"   (ConfirmParentEvt OpenFS),
+      button "Load"   (ConfirmParentEvt OpenFS),
+      button "Import" (ConfirmParentEvt OpenFS),
+      button "Export" (ConfirmParentEvt OpenFS)
+      ]) OpenFS OpenFS `nodeVisible` (model ^. fileMenu),
 
+    -- Application Preferences
+    menuDialog_ (vstack $ intersperse spacer [
+      label "Application Preferences",
+      spacer,
+      button "Project"   (ConfirmParentEvt OpenAppPrefs),
+      button "Assets"    (ConfirmParentEvt OpenAppPrefs),
+      button "Renderer"  (ConfirmParentEvt OpenAppPrefs)
+      ]) OpenAppPrefs OpenAppPrefs `nodeVisible` (model ^. applicationPreferences),
+
+    -- Realm List (Number of Stages/Scenes included in Game)
+    menuDialog_ (vstack $ intersperse spacer [
+        label "Realms",
+        spacer,
+        scroll $ vstack [
+          button "default"  (ConfirmParentEvt OpenRealmList) -- Replace for a ALens' BookEvt [Realm], also add data Realm
+        ],
+        hstack [
+          button "Add"      (ConfirmParentEvt OpenRealmList),
+          spacer,
+          button "Remove"   (ConfirmParentEvt OpenRealmList)
+        ]
+      ]) OpenRealmList OpenRealmList `nodeVisible` (model ^. realmList),
+
+    -- Controller Preferences
+    menuDialog_ (vstack $ intersperse spacer [
+      label "Controller Preferences",
+      spacer,
+      -- Elaborate Widget for Controllers (Xbox vs Playstation vs 3rd Party) goes here
+      button "Controller Setup"   (ConfirmParentEvt OpenControllerPrefs),
+      button "Load Button Assignment"   (ConfirmParentEvt OpenControllerPrefs),
+      button "Export Profile" (ConfirmParentEvt OpenControllerPrefs),
+      button "Export Button Assignment" (ConfirmParentEvt OpenControllerPrefs)
+      ]) OpenControllerPrefs OpenControllerPrefs `nodeVisible` (model ^. controllerPreferences),
+      -- box_ [alignTop, onClick OpenFS] closeIcon
+
+    -- Export Preferences
+    menuDialog_ (vstack $ intersperse spacer [
+      label "Export Preferences",
+      spacer,
+      button "Select Platform"     (ConfirmParentEvt OpenExportPrefs),
+      button "Set External Deps"   (ConfirmParentEvt OpenExportPrefs),
+      hstack [
+        label "Multiplayer",
+        checkbox multiplayerEnabled,
+        spacer,
+        label "Optimize Shaders for Platform",
+        checkbox optimizeShaders,
+        spacer,
+        label "Optimize For Web (WASM, WebGL)",
+        checkbox optimizeForWeb,
+        spacer
+      ],
+      button "Revert to Defaults" (ConfirmParentEvt OpenExportPrefs)
+      ]) OpenExportPrefs OpenExportPrefs `nodeVisible` (model ^. exportPreferences),
+
+    -- Run Preferences
+    menuDialog_ (vstack $ intersperse spacer [
+      label "Run Preferences",
+      spacer,
+      button "Run Current Scene"   (ConfirmParentEvt OpenRunPrefs),
+      button "Run Named Scene"   (ConfirmParentEvt OpenRunPrefs),
+      button "Disable ScriptEngine Execution" (ConfirmParentEvt OpenRunPrefs),
+      button "Legacy Render Pipeline Only (OpenGL 3.2)" (ConfirmParentEvt OpenRunPrefs)
+      ]) OpenRunPrefs OpenRunPrefs `nodeVisible` (model ^. runPreferences),
+
+    -- Multiplayer Preferences
+    menuDialog_ (vstack $ intersperse spacer [
+      label "Multiplayer Preferences",
+      spacer,
+      button "Push Realm to Cloud"     (ConfirmParentEvt OpenMPPrefs),
+      button "Make Realm Searchable"   (ConfirmParentEvt OpenMPPrefs),
+      button "Private Realm Only (Singleplayer/Co-Op Only)" (ConfirmParentEvt OpenMPPrefs),
+      button "Realm Visibility"        (ConfirmParentEvt OpenMPPrefs)
+      ]) OpenMPPrefs OpenMPPrefs `nodeVisible` (model ^. mPPreferences)
+    --sideBar
+    errorOverlay  `nodeVisible` isJust (model ^. errorMsg),
+    bookOverlay   `nodeVisible` isJust (model ^. selected)
+    ]
+
+buildProjectSession :: BooksModel -> String -> IO ProjectSession
+buildProjectSession model projPath =  do
+  projDir <- listDirectory  projPath
+  let pSession = fromJust $ model ^. projectSession
+  return $ ProjectSession (_projectName pSession) (map (\x -> ProjectSessionFile (takeBaseName x) $ matchExtType x) projDir) (_projectRealms pSession) (_projectPreferences pSession)
+  
 handleEvent
   :: Sess.Session
   -> WidgetEnv BooksModel BooksEvt
@@ -390,7 +520,10 @@ handleEvent
   -> BooksEvt
   -> [EventResponse BooksModel BooksEvt BooksModel BooksEvt]
 handleEvent sess wenv node model evt = case evt of
-  BooksInit -> [SetFocusOnKey "query"]
+  BooksInit -> [SetFocusOnKey "query",  Task $ do
+    createDirectoryIfMissing True "./assets/projects/default"
+    BL.writeFile "./assets/projects/default/default.wrlp" (encode . fromJust $ model ^. projectSession)
+    return None]
   BooksSearch -> [
     Model $ model & searching .~ True,
     Task $ searchBooks sess (model ^. query)
@@ -408,6 +541,25 @@ handleEvent sess wenv node model evt = case evt of
       & errorMsg ?~ msg
       & books .~ []
     ]
+  OpenFS                -> [Model $ model & fileMenu .~ not (model ^. fileMenu)]
+  OpenAppPrefs          -> [Model $ model & applicationPreferences .~ not (model ^. applicationPreferences)]
+  OpenRealmList         -> [Model $ model & realmList .~ not (model ^. realmList)]
+  OpenControllerPrefs   -> [Model $ model & controllerPreferences .~ not (model ^. controllerPreferences)]
+  OpenExportPrefs       -> [Model $ model & exportPreferences .~ not (model ^. exportPreferences)]
+  OpenRunPrefs          -> [Model $ model & runPreferences .~ not (model ^. runPreferences)]
+  OpenMPPrefs           -> [Model $ model & mPPreferences  .~ not (model ^. mPPreferences )]
+  RefreshProjectFiles      projDir -> [Model $ model & projectSession ?~ ProjectSession (_projectName (fromJust $ model ^. projectSession)) (map (\x -> ProjectSessionFile (takeBaseName x) $ matchExtType x) projDir) (_projectRealms (fromJust $ model ^. projectSession)) (_projectPreferences (fromJust $ model ^. projectSession))]
+  RefreshProjectFilesTask   -> [Task $ do
+    dirCont <- listDirectory  "./assets/projects/default/" -- this will be formally addressed later
+    print dirCont
+    return $ RefreshProjectFiles dirCont]
+  --do  _projectName        :: Text,
+
+    -- _projectFiles       :: [ProjectSessionFile],
+    -- _projectRealms      :: [Text],
+    -- _projectPreferences :: ProjectSessionPrefs
+  --   projDir <- listDirectory  "./assets/projects/default/"
+  --   
   None                  -> []
   NoneB   b             -> []
   --LoadFile fp         -> -- [Task $ do
@@ -419,6 +571,11 @@ handleEvent sess wenv node model evt = case evt of
   BooksShowDetails book -> [Model $ model & selected ?~ book]
   BooksCloseDetails     -> [Model $ model & selected .~ Nothing]
   BooksCloseError       -> [Model $ model & errorMsg .~ Nothing]
+  -- AppSetTime time       -> fadeInMsg time ++ [Model $ model & currentTime .~ time]
+  --   where
+  --     fadeInMsg time
+  --       | truncate (todSec time) `mod` 10 /= 0 = []
+  --       | otherwise = [Message "fadeTimeLabel" AnimationStart]
 
 searchBooks :: Sess.Session -> Text -> IO BooksEvt
 searchBooks sess query = do
@@ -434,9 +591,7 @@ searchBooks sess query = do
       | null (resp ^. docs) = Nothing
       | otherwise = Just resp
     fetch url = do
-      resp <- Sess.get sess url
-        >>= W.asJSON
-        >>= return . preview (W.responseBody . _Just)
+      resp <- Sess.get sess url >>= W.asJSON >>= return . preview (W.responseBody . _Just)
 
       return $ maybeToEither "Empty response" (resp >>= checkEmpty)
 
@@ -454,7 +609,10 @@ main = do
       appFontDef "UI"      "./assets/fonts/og-dcm-emoji.ttf",
       appInitEvent BooksInit
       ]
-    initModel = BooksModel "" False Nothing [] Nothing False
+    initModel = appModel
+
+appModel :: BooksModel
+appModel  = BooksModel "" False Nothing [] Nothing False False False False False False False False False False False False False False (Just $ ProjectSession "default" [] [] (ProjectSessionPrefs [] False))
 
 customLightTheme :: Theme
 customLightTheme = lightTheme

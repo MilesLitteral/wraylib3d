@@ -1,5 +1,7 @@
 {
     "files.associations": {
         "utility": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "C:/Users/Manda/OneDrive/Documents/Github/wraylib3d/wraylib3d-xross/mobile/djinni",
+    "cmake.configureOnOpen": false
 }

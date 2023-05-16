@@ -6,6 +6,7 @@ module HRayLib3d.ScriptEngine.HRuby (
     module HRayLib3d.ScriptEngine.HRubyHSInterface
   ) where
 
+-- https://github.com/fjvallarino/monomer/issues/101
 import HRayLib3d.ScriptEngine.HRuby.Syntax
 import HRayLib3d.ScriptEngine.HRuby.Parser
 import HRayLib3d.ScriptEngine.HRuby.Pretty
