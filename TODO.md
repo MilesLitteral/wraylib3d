@@ -25,13 +25,31 @@ This list will be ever expanding:
     Build Issues: All Resolved, None to Report (4/23)
         TODO: post the latest GHC Report here, there are new build issues and big things to tackle
         - Implement the Language Parser (GLSL, Metal) (also figure out where LambdaCube's glsl shaderpipeline is and edit it into WRayLib ShaderPipeline style), it currently is from a submodule that is in the interest of this feature    
-        - Implement GPUCommand, rename it (PipelineCommand?), it could be a means to have the backend communicate with SDL2 and the Raw Widget
+        - Implement GPUCommand, rename it (PipelineCommand is now its name), it could be a means to have the backend communicate with SDL2 and the Raw Widget
         - Cleanup code and consolidate any orphaned modules/functions
 
     High Priorities:
+        - fix search query, reevalute sess' use
+        - fix front end file system features
+        - remove duplicate button in Controller menu
+        - connect engine cloud, build, web, and controller feature to front end
+        - add export controller features
+        - add db load, remove entry, edit entry, and validate query features
+        - editor options, network prefs, in project prefs
+        - external deps list in build list
+        - add on to editinglayer context (ex:build list)
+        - fix footer features (dedicated server, tooltips, cameras on/off, net option
+        - fix project and level naming system
+        - expand renderer window to include shader optiond
+        - add button icon for CbType
+        - add third party button icons, mouse & keyboard
+        - add build button to build window
+        - serialize .rlm (levels), and .wcb files (button profiles)
+        - make meaningful ide integration
+        -
         - Build a RenderPipelineWidget for 3d Rendering in the front-end
-        Build a multi-composite widget setup with fades and transitions for alternative 
-        windows/functions
+        -~~Build a multi-composite widget setup with fades and transitions for alternative 
+        windows/functions~~ Done, window system is working, and fixed lists
 
         - Figure out sdl2's place in the design and create a true UI        
         haskell modules and systems (This may be the main Window and "Renderer" as a handler, it may be able to create SDL2.OpenGL, SDL2.Vulkan(therefore openXR and Metal Handling)), This is still in progress, Monomer is being used to build the UI and GUI
@@ -52,7 +70,7 @@ This list will be ever expanding:
         - answer the various TODO comments in code, replace all instances of IORef for example with a better type (Monomer could be an inspiration here)
         - Implement WRayLib3d.Network.FTP and WRayLib3d.Network.UDP 
         - Update Github Projects on these issues
-
+        - write script engine front end components/widgets
 
     Lowest Priorities:
         - Implement all the technical replacements
