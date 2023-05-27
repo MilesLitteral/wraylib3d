@@ -52,6 +52,8 @@
           Xross will contain Linking module in the future for making sure AssetBundles and ShaderCaches
           aren't lost and the appropriate libraries (like wrl3d.dll or wrl3d.exe ) aren't lost in the build process
 
+          In the future Xross may also help condone the creation of React(JSX) projects as a potential export option
+
         - Resource Bundler
             Handles The compiling of all project 3d Assets (and associated assets) into .AssetBundles which are 
             accessed at runtime. AssetBundles can be thought of like onion data structure, 
@@ -64,8 +66,8 @@
             KHR_Audio extension but this needs to be explored.
 
         - Structured Data 
-            Descriptions of All ingame classes as JSON data structures, these are then used for serialzing the game
-            as save files or transmittable data. It could also be expanded to support XMLSerialization and Deserialization
+            Descriptions of All ingame classes as JSON, XML, or YAML data structures, these are then used for serialzing the game
+            as save files or transmittable data.
 
         - Shader Precompiler Pipeline
             Handles packaging of applicable Shaders to ShaderCaches (MegaStores) which are accessed at runtime
@@ -85,7 +87,10 @@
         - Window System
             Handles SDL2 Windowing and User Interface Creation at Application level
             At some point, it will have a full Front-End Interface to create Widgets in Window with
-            scriptable UIs
+            scriptable UIs. Currently Monomer is being used to implement the front-end UI, a fork
+            of it is available in the submodules folder with extensive modifications in the interest
+            of building a 3d application rather than just a 2d one with the author's blessing (not to say he endorses this library, WRaylib3d, in any way shape or form)
+            
             WRayLib uses Protea Audio and therefore can use OGGs and WAVs, there is an interest
             in maybe making an Audio System to go along with it built on top of SDL2.      
 
@@ -220,6 +225,15 @@ stack run mapviewer-debug
        as it could also be the answer for generating vcprojs or xcprojs
        
    ```
+   General FS:
+   C:/WRL/Projects/<YourGame>
+     AssetBundles/assets.AssetBundle(s)
+     ShaderCaches/shader.ShaderCache(s)
+     src/game/.hs(')
+     src/gameScripting/.rb(s)
+     Realms.db
+     YourGame.wrlp
+
    Windows:
    NSIS (Standard)
    C:/WRL/Games/<YourGame>
