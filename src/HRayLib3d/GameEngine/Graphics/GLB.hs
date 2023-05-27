@@ -34,7 +34,8 @@ addGLB model unis = do
   let objs = V.map (\x -> (show $ GLB.chunkType x, GLB.chunkData x)) $ (glbChunks model)
   return $ GLBInstance { glbInstanceModel = model, glbContents = objs }
 
--- loadGlTFFromGLB :: GLBInstance -> Int -> IO GLTFModel
--- loadGlTFFromGLB glb index = do
---   return $ 
---   GlTF.fromByteString (snd $ glbContents glb V.! index)
+loadGlTFFromGLB :: GLBInstance -> Int -> GlTF.GlTF --IO GLTFModel
+loadGlTFFromGLB glb index = 
+  case GlTF.fromByteString (snd $ glbContents glb V.! index) of
+    Left  _      -> error "mismatch of loader type (currently GLB Chunk -> GLTF)" 
+    Right gltf   -> gltf

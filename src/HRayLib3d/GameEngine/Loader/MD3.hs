@@ -28,17 +28,36 @@ import HRayLib3d.GameEngine.Data.MD3
 getLowerCaseString :: Int -> Get ByteString
 getLowerCaseString len = SB8.map toLower . SB8.takeWhile (/= '\0') <$> getByteString len
 
+getUByte :: Get Word8
 getUByte    = B.get :: Get Word8
+
+getFloat :: Get Float
 getFloat    = getFloat32le :: Get Float
+
+getVec2 :: Get Vec2
 getVec2     = Vec2 <$> getFloat <*> getFloat :: Get Vec2
+
+getVec3 :: Get Vec3
 getVec3     = Vec3 <$> getFloat <*> getFloat <*> getFloat :: Get Vec3
+
+getMat3 :: Get Mat3
 getMat3     = Mat3 <$> getVec3 <*> getVec3 <*> getVec3
+
+getVec3i16 :: Get Vec3
 getVec3i16  = (\x y z -> Vec3 (fromIntegral x) (fromIntegral y) (fromIntegral z)) <$> getInt16 <*> getInt16 <*> getInt16 :: Get Vec3
+
+getInt16 :: Get Int
 getInt16    = fromIntegral <$> getInt' :: Get Int
   where getInt' = fromIntegral <$> getWord16le :: Get Int16
+
+getInt :: Get Int
 getInt      = fromIntegral <$> getInt' :: Get Int
   where getInt' = fromIntegral <$> getWord32le :: Get Int32
+  
+getInt3 :: Get (Int, Int, Int)
 getInt3     = (,,) <$> getInt <*> getInt <*> getInt :: Get (Int, Int, Int)
+
+getAngle :: Get Float
 getAngle    = (\i -> fromIntegral i * 2 * pi / 255) <$> getUByte :: Get Float
 
 getV :: Int -> Int -> Get a -> LB.ByteString -> V.Vector a
@@ -47,8 +66,13 @@ getV o n f dat = runGet (V.replicateM n f) (LB.drop (fromIntegral o) dat)
 getSV :: SV.Storable a => Int -> Int -> Get a -> LB.ByteString -> SV.Vector a
 getSV o n f dat = runGet (SV.replicateM n f) (LB.drop (fromIntegral o) dat)
 
+getFrame :: Get Frame
 getFrame    = Frame <$> getVec3 <*> getVec3 <*> getVec3 <*> getFloat <*> getLowerCaseString 64 :: Get Frame
+
+getTag :: Get Tag
 getTag      = Tag <$> getLowerCaseString 64 <*> getVec3 <*> getMat3 :: Get Tag
+
+getShader :: Get Shader
 getShader   = Shader <$> getLowerCaseString 64 <*> getInt  :: Get Shader
 
 getXyzNormal :: Get (Vec3, Vec3)

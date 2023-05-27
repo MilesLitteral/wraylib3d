@@ -1,4 +1,4 @@
-module HRayLib3d.Core.ResourceBundler (loadBundle) where
+module HRayLib3d.Core.ResourceBundler (loadBundle, saveBundle, saveCache) where
 
 import Data.Aeson
 import Data.Binary
@@ -33,7 +33,12 @@ loadBundle path = do loadStore path
 saveBundle :: [(T.Text, BS.ByteString)] -> Bool -> String -> IO ()
 saveBundle paths makeDir outpath = do
     createDirectoryIfMissing makeDir outpath
-    saveStore (outpath) $ MegaStore paths 
+    saveStoreBundle outpath $ MegaStore paths 
+
+saveCache :: [(T.Text, BS.ByteString)] -> Bool -> String -> IO ()
+saveCache paths makeDir outpath = do
+    createDirectoryIfMissing makeDir outpath
+    saveStoreCache outpath $ MegaStore paths 
 
 -- writeGLB :: FilePath -> GLB -> IO ()
 -- writeGLB  path glb  = BL.writeFile  path $ Data.Binary.encode glb

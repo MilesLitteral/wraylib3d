@@ -44,6 +44,7 @@ library
       HRayLib3d.GameEngine
       HRayLib3d.GameEngine.Collision
       HRayLib3d.GameEngine.Content
+      HRayLib3d.GameEngine.Data
       HRayLib3d.GameEngine.Data.BSP
       HRayLib3d.GameEngine.Data.GameCharacter
       HRayLib3d.GameEngine.Data.GLB
@@ -51,6 +52,19 @@ library
       HRayLib3d.GameEngine.Data.Material
       HRayLib3d.GameEngine.Data.MD3
       HRayLib3d.GameEngine.Data.OBJ
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Element
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Face
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.IO
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Lexer
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Line
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Location
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Normal
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Object
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Point
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.TexCoord
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Token
+      HRayLib3d.GameEngine.Graphics
       HRayLib3d.GameEngine.Graphics.BezierSurface
       HRayLib3d.GameEngine.Graphics.BSP
       HRayLib3d.GameEngine.Graphics.Culling
@@ -61,6 +75,7 @@ library
       HRayLib3d.GameEngine.Graphics.MD3
       HRayLib3d.GameEngine.Graphics.Quad
       HRayLib3d.GameEngine.Graphics.Storage
+      HRayLib3d.GameEngine.Loader
       HRayLib3d.GameEngine.Loader.BSP
       HRayLib3d.GameEngine.Loader.Entity
       HRayLib3d.GameEngine.Loader.GameCharacter
@@ -70,6 +85,7 @@ library
       HRayLib3d.GameEngine.Loader.MD3
       HRayLib3d.GameEngine.Loader.ShaderParser
       HRayLib3d.GameEngine.Loader.Zip
+      HRayLib3d.GameEngine.Realm
       HRayLib3d.GameEngine.Realm.CodeSample
       HRayLib3d.GameEngine.Realm.Collision
       HRayLib3d.GameEngine.Realm.Entities
@@ -85,6 +101,7 @@ library
       HRayLib3d.GameEngine.Realm.RenderGame
       HRayLib3d.GameEngine.Realm.Visuals
       HRayLib3d.GameEngine.Realm.World
+      HRayLib3d.GameEngine.RealmViewer
       HRayLib3d.GameEngine.RealmViewer.Camera
       HRayLib3d.GameEngine.RealmViewer.Content
       HRayLib3d.GameEngine.RealmViewer.Engine
@@ -112,22 +129,22 @@ library
       HRayLib3d.ScriptEngine.HRubyHS
       HRayLib3d.ScriptEngine.HRubyHSInterface
       HRayLib3d.Utils
-      HRayLib3d.Utils.Chart
       HRayLib3d.Utils.GLBShow
       HRayLib3d.Utils.GLTFShow
+      HRayLib3d.Utils.ImageBuffer
       HRayLib3d.Utils.LogMessage
       HRayLib3d.Utils.Md3Show
       HRayLib3d.Utils.PrettyPrint
       HRayLib3d.Utils.Prisms
       HRayLib3d.Utils.Project
       HRayLib3d.Utils.Tooltips
-      HRayLib3d.Utils.Unsafe
       HRayLib3d.WindowSystem
-      HRayLib3d.WindowSystem.Communication
+      HRayLib3d.WindowSystem.Core
+      HRayLib3d.WindowSystem.RendererWidget
       HRayLib3d.WindowSystem.RenderPipelineWidget
       HRayLib3d.WindowSystem.Streaming
+      HRayLib3d.WindowSystem.Theme
       HRayLib3d.WindowSystem.Types
-      HRayLib3d.WindowSystem.WindowSystem
   other-modules:
       Paths_hraylib3d
   hs-source-dirs:
@@ -153,9 +170,11 @@ library
     , criterion
     , data-binary-ieee754
     , data-default
+    , data-default-class
     , deepseq
     , digest
     , directory
+    , dlist
     , elerea
     , extra
     , filepath
@@ -163,18 +182,20 @@ library
     , gltf-loader
     , hashable
     , http-client
+    , ilist
     , lambdacube-compiler
     , lambdacube-gl
     , lambdacube-ir
-    , language-glsl
     , lens
     , linear
+    , linear-base
     , megaparsec
     , megastore
     , mersenne-random-pure64
     , microlens-platform
     , modern-uri
     , monomer
+    , monomer-hagrid
     , mtl
     , nsis
     , parsec
@@ -198,239 +219,10 @@ library
     , vector
     , vulkan
     , vulkan-utils
+    , wavefront
     , wreq
     , xml
-    , yaml
-    , zlib
-  default-language: Haskell2010
-
-executable RB-ProjectManager-FE-Demo
-  main-is: Main.hs
-  other-modules:
-      TodoTypes
-      Paths_hraylib3d
-  hs-source-dirs:
-      app/RB-ProjectManager-FE-Demo/
-  ghc-options: -Wall -optl-mconsole -optl-mwindows -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      GLFW-b
-    , HaTeX
-    , JuicyPixels
-    , MonadRandom
-    , OpenGLRaw
-    , adjunctions
-    , aeson
-    , attoparsec
-    , base >=4.7 && <5
-    , base64-bytestring
-    , binary
-    , bytestring
-    , containers
-    , criterion
-    , data-binary-ieee754
-    , data-default
-    , deepseq
-    , digest
-    , directory
-    , elerea
-    , extra
-    , filepath
-    , gltf-codec
-    , gltf-loader
-    , hashable
-    , hraylib3d
-    , http-client
-    , lambdacube-compiler
-    , lambdacube-gl
-    , lambdacube-ir
-    , language-glsl
-    , lens
-    , linear
-    , megaparsec
-    , megastore
-    , mersenne-random-pure64
-    , microlens-platform
-    , modern-uri
-    , monomer
-    , mtl
-    , nsis
-    , parsec
-    , postgresql-simple
-    , pretty-show
-    , prettyclass
-    , process
-    , proteaaudio
-    , req
-    , scientific
-    , stm
-    , text
-    , text-show
-    , time
-    , tinyfiledialogs
-    , transformers
-    , unordered-containers
-    , utf8-string
-    , uuid
-    , vect
-    , vector
-    , vulkan
-    , vulkan-utils
-    , wreq
-    , xml
-    , yaml
-    , zlib
-  default-language: Haskell2010
-
-executable RealmBuilder-FE-Demo
-  main-is: Main.hs
-  other-modules:
-      OpenGLWidget
-      Paths_hraylib3d
-  hs-source-dirs:
-      app/RealmBuilder-FE-Demo/
-  ghc-options: -Wall -optl-mconsole -optl-mwindows -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      GLFW-b
-    , HaTeX
-    , JuicyPixels
-    , MonadRandom
-    , OpenGLRaw
-    , adjunctions
-    , aeson
-    , attoparsec
-    , base >=4.7 && <5
-    , base64-bytestring
-    , binary
-    , bytestring
-    , containers
-    , criterion
-    , data-binary-ieee754
-    , data-default
-    , deepseq
-    , digest
-    , directory
-    , elerea
-    , extra
-    , filepath
-    , gltf-codec
-    , gltf-loader
-    , hashable
-    , hraylib3d
-    , http-client
-    , lambdacube-compiler
-    , lambdacube-gl
-    , lambdacube-ir
-    , language-glsl
-    , lens
-    , linear
-    , megaparsec
-    , megastore
-    , mersenne-random-pure64
-    , microlens-platform
-    , modern-uri
-    , monomer
-    , mtl
-    , nsis
-    , parsec
-    , postgresql-simple
-    , pretty-show
-    , prettyclass
-    , process
-    , proteaaudio
-    , req
-    , scientific
-    , stm
-    , text
-    , text-show
-    , time
-    , tinyfiledialogs
-    , transformers
-    , unordered-containers
-    , utf8-string
-    , uuid
-    , vect
-    , vector
-    , vulkan
-    , vulkan-utils
-    , wreq
-    , xml
-    , yaml
-    , zlib
-  default-language: Haskell2010
-
-executable RealmModelViewer-Demo
-  main-is: Main.hs
-  other-modules:
-      OpenGLWidget
-      Paths_hraylib3d
-  hs-source-dirs:
-      app/RealmModelViewer-Demo/
-  ghc-options: -Wall -optl-mconsole -optl-mwindows -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      GLFW-b
-    , HaTeX
-    , JuicyPixels
-    , MonadRandom
-    , OpenGLRaw
-    , adjunctions
-    , aeson
-    , attoparsec
-    , base >=4.7 && <5
-    , base64-bytestring
-    , binary
-    , bytestring
-    , containers
-    , criterion
-    , data-binary-ieee754
-    , data-default
-    , deepseq
-    , digest
-    , directory
-    , elerea
-    , extra
-    , filepath
-    , gltf-codec
-    , gltf-loader
-    , hashable
-    , hraylib3d
-    , http-client
-    , lambdacube-compiler
-    , lambdacube-gl
-    , lambdacube-ir
-    , language-glsl
-    , lens
-    , linear
-    , megaparsec
-    , megastore
-    , mersenne-random-pure64
-    , microlens-platform
-    , modern-uri
-    , monomer
-    , mtl
-    , nsis
-    , parsec
-    , postgresql-simple
-    , pretty-show
-    , prettyclass
-    , process
-    , proteaaudio
-    , req
-    , scientific
-    , stm
-    , text
-    , text-show
-    , time
-    , tinyfiledialogs
-    , transformers
-    , unordered-containers
-    , utf8-string
-    , uuid
-    , vect
-    , vector
-    , vulkan
-    , vulkan-utils
-    , wreq
-    , xml
+    , xml-conduit-writer
     , yaml
     , zlib
   default-language: Haskell2010
@@ -438,7 +230,7 @@ executable RealmModelViewer-Demo
 executable RealmViewer-FE-Demo
   main-is: Main.hs
   other-modules:
-      BookTypes
+      OpenGLWidget
       Paths_hraylib3d
   hs-source-dirs:
       app/RealmViewer-FE-Demo/
@@ -460,9 +252,11 @@ executable RealmViewer-FE-Demo
     , criterion
     , data-binary-ieee754
     , data-default
+    , data-default-class
     , deepseq
     , digest
     , directory
+    , dlist
     , elerea
     , extra
     , filepath
@@ -471,18 +265,20 @@ executable RealmViewer-FE-Demo
     , hashable
     , hraylib3d
     , http-client
+    , ilist
     , lambdacube-compiler
     , lambdacube-gl
     , lambdacube-ir
-    , language-glsl
     , lens
     , linear
+    , linear-base
     , megaparsec
     , megastore
     , mersenne-random-pure64
     , microlens-platform
     , modern-uri
     , monomer
+    , monomer-hagrid
     , mtl
     , nsis
     , parsec
@@ -506,8 +302,10 @@ executable RealmViewer-FE-Demo
     , vector
     , vulkan
     , vulkan-utils
+    , wavefront
     , wreq
     , xml
+    , xml-conduit-writer
     , yaml
     , zlib
   default-language: Haskell2010
@@ -536,9 +334,11 @@ executable hraylib3d
     , criterion
     , data-binary-ieee754
     , data-default
+    , data-default-class
     , deepseq
     , digest
     , directory
+    , dlist
     , elerea
     , extra
     , filepath
@@ -547,18 +347,20 @@ executable hraylib3d
     , hashable
     , hraylib3d
     , http-client
+    , ilist
     , lambdacube-compiler
     , lambdacube-gl
     , lambdacube-ir
-    , language-glsl
     , lens
     , linear
+    , linear-base
     , megaparsec
     , megastore
     , mersenne-random-pure64
     , microlens-platform
     , modern-uri
     , monomer
+    , monomer-hagrid
     , mtl
     , nsis
     , parsec
@@ -582,8 +384,10 @@ executable hraylib3d
     , vector
     , vulkan
     , vulkan-utils
+    , wavefront
     , wreq
     , xml
+    , xml-conduit-writer
     , yaml
     , zlib
   default-language: Haskell2010
@@ -614,9 +418,11 @@ test-suite hraylib3d-test
     , criterion
     , data-binary-ieee754
     , data-default
+    , data-default-class
     , deepseq
     , digest
     , directory
+    , dlist
     , elerea
     , extra
     , filepath
@@ -625,18 +431,20 @@ test-suite hraylib3d-test
     , hashable
     , hraylib3d
     , http-client
+    , ilist
     , lambdacube-compiler
     , lambdacube-gl
     , lambdacube-ir
-    , language-glsl
     , lens
     , linear
+    , linear-base
     , megaparsec
     , megastore
     , mersenne-random-pure64
     , microlens-platform
     , modern-uri
     , monomer
+    , monomer-hagrid
     , mtl
     , nsis
     , parsec
@@ -661,8 +469,10 @@ test-suite hraylib3d-test
     , vector
     , vulkan
     , vulkan-utils
+    , wavefront
     , wreq
     , xml
+    , xml-conduit-writer
     , yaml
     , zlib
   default-language: Haskell2010

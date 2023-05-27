@@ -37,10 +37,10 @@ import HRayLib3d.GameEngine.Realm.GameLogic
 import HRayLib3d.GameEngine.Realm.LoadEntities
 import HRayLib3d.GameEngine.Realm.LoadResources
 import HRayLib3d.GameEngine.Realm.RenderGame
+import HRayLib3d.GameEngine.Realm.Entities
 import HRayLib3d.GameEngine.RenderSystem as RenderSystem
 
 import Debug.Trace
-
 
 data Event
   = Event
@@ -82,11 +82,13 @@ inputFun Event{..} w = w & wInput .~ i' where
 mapTuple :: (a -> b) -> (a,a) -> (b,b)
 mapTuple = join (***)
 
+main :: IO ()
 main = do
   (pk3, ents, mapfile, bsp) <- loadMap
   putStrLn $ "entity count: " ++ show (length ents)
   play pk3 (initWorld ents mapfile $ pureMT 123456789) renderFun inputFun (stepFun bsp) logPlayerChange
 
+noLog :: p1 -> p2 -> Maybe a
 noLog _ _ = Nothing
 
 play :: Map String Entry
@@ -166,6 +168,9 @@ play pk3 world0 getScene processInput stepWorld logWorldChange = do
 
   destroyWindow win
 
+loadMap :: IO
+  (Map String Entry, [HRayLib3d.GameEngine.Realm.Entities.Entity],
+   FilePath, BSPLevel)
 loadMap = do
   -- init PK3 database
   noPak0_pk3 <- null . filter (\n -> "pak0.pk3" == map toLower n) <$> getDirectoryContents "."

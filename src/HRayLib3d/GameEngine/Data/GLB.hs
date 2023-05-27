@@ -8,7 +8,7 @@ import Data.Vect hiding (Vector)
 import Codec.GLB
 import Codec.GlTF.Material
 
--- No Animation, for Static Models
+-- No Animation, for Static Models or bundles of multiple individual asset
 -- This could be a bundle (in Chunks) of the following:
 -- GlTFs
 -- Textures
@@ -16,7 +16,7 @@ import Codec.GlTF.Material
 data GLBModel
     = GLBModel
     { glbHeader     :: Header
-    , glbChunks     :: (Vector Chunk) -- Each GLB Chunk is potentially a glTF or Texture
+    , glbChunks     :: Vector Chunk -- Each GLB Chunk is potentially a glTF or Texture, see glbHeader for more info
     } deriving Show
 
 type GLBSkin = Map Text Material

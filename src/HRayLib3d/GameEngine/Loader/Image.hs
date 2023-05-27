@@ -13,7 +13,6 @@ import qualified Data.Vector.Storable as SV
 
 import Control.Monad (liftM)
 import Control.Exception
-import Data.ByteString (ByteString)
 import qualified Data.ByteString as B
 import Foreign
 import Foreign.C

@@ -1,10 +1,12 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE LambdaCase, DeriveGeneric, OverloadedStrings #-}
 module HRayLib3d.GameEngine.Loader.Entity
   ( parseEntities
   , EntityData(..)
   ) where
 
 import Control.Monad (void)
+import Data.Aeson
+import GHC.Generics
 import Data.Char
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as SB8
@@ -17,7 +19,9 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Vect
 import Data.Void
+import Data.Vect.Float.Instances
 
+-- import Data.Linear
 type Parser a = Parsec Void String a
 
 data EntityData
@@ -60,8 +64,15 @@ data EntityData
   , targetShaderNewName :: Maybe String
   --, targetRubyScript  :: Maybe FilePath
   }
-  deriving Show
+  deriving (Eq, Show, Generic)
+  
+-- instance Generic Vec3
+instance ToJSON Vec3 where
+  toJSON (Vec3 x y z) = object ["vec3X" .= x, "vec3Y" .= y, "vec3Z" .= z ]
 
+instance ToJSON EntityData
+
+emptyEntityData :: EntityData
 emptyEntityData = EntityData
   { classname     = ""
   , spawnflags    = 0
@@ -103,6 +114,7 @@ emptyEntityData = EntityData
   }
 
 -- quake 3 entity parser
+-- TODO: Replace this "raw parser" for a more robust parsing system (JSON and XML)
 parseEntities :: String -> String -> Either String [EntityData]
 parseEntities fname src = case parse entities fname $ map toLower src of
   Left err  -> Left (errorBundlePretty err)
@@ -117,9 +129,9 @@ entity = foldr ($) emptyEntityData <$> between (newlineSymbol "{") (newlineSymbo
 value :: Parser (EntityData -> EntityData)
 value = stringLiteral >>= \case
   "classname"   -> (\v e -> e {classname = v})       <$> stringLiteral
-  "model"       -> (\v e -> e {model = Just v})      <$> stringLiteral
-  "model2"      -> (\v e -> e {model2 = Just v})     <$> stringLiteral
-  "target"      -> (\v e -> e {target = Just v})     <$> stringLiteral
+  "model"       -> (\v e -> e {model     = Just v})      <$> stringLiteral
+  "model2"      -> (\v e -> e {model2    = Just v})     <$> stringLiteral
+  "target"      -> (\v e -> e {target    = Just v})     <$> stringLiteral
   "targetname"  -> (\v e -> e {targetname = Just v}) <$> stringLiteral
   "team"        -> (\v e -> e {team = Just v})       <$> stringLiteral
   "targetshadername"    -> (\v e -> e {targetShaderName    = Just v}) <$> stringLiteral
@@ -145,26 +157,35 @@ value = stringLiteral >>= \case
   "music"       -> (\v e -> e {music = Just v}) <$> stringLiteral
 
   "speed"       -> (\v e -> e {speed = Just v}) <$> quoted floatLiteral
-  "wait"        -> (\v e -> e {wait = Just v})  <$> quoted floatLiteral
-  "random"      -> (\v e -> e {random = Just v})  <$> quoted floatLiteral
+  "wait"        -> (\v e -> e {wait  = Just v})  <$> quoted floatLiteral
+  "random"      -> (\v e -> e {random  = Just v})  <$> quoted floatLiteral
   "gravity"     -> (\v e -> e {gravity = Just v}) <$> quoted floatLiteral
-  "roll"        -> (\v e -> e {roll = Just v})   <$> quoted floatLiteral
+  "roll"        -> (\v e -> e {roll  = Just v})   <$> quoted floatLiteral
   "light"       -> (\v e -> e {light = Just v})  <$> quoted floatLiteral
-  "lip"         -> (\v e -> e {lip = Just v})    <$> quoted floatLiteral
+  "lip"         -> (\v e -> e {lip   = Just v})    <$> quoted floatLiteral
   "height"      -> (\v e -> e {height = Just v}) <$> quoted floatLiteral
   "phase"       -> (\v e -> e {phase = Just v})  <$> quoted floatLiteral
   "delay"       -> (\v e -> e {delay = Just v})  <$> quoted floatLiteral
 
   "color"       -> (\v e -> e {color = Just v}) <$> quoted vector3
 
-  "count"       -> (\v e -> e {count = Just v}) <$> quoted integerLiteral
+  "count"       -> (\v e -> e {count  = Just v}) <$> quoted integerLiteral
   "dmg"         -> (\v e -> e {damage = Just v}) <$> quoted integerLiteral
   "nobots"      -> (\v e -> e {nobots = Just v}) <$> quoted integerLiteral
   "nohumans"    -> (\v e -> e {nohumans = Just v}) <$> quoted integerLiteral
   "health"      -> (\v e -> e {health = Just v}) <$> quoted integerLiteral
   "noglobalsound" -> (\v e -> e {noglobalsound = Just v}) <$> quoted integerLiteral
-
   _ -> return id
+
+-- element "hello" $ content "world"
+-- {-# LANGUAGE OverloadedStrings #-}
+-- let doc = document "root" $ do
+--     element "hello" $ content "world"
+--     element "hierarchy" $ do
+--         element "simple" True
+--         element "as" ("it should be" :: Text)
+--         toXML $ Just . T.pack $ "like this"
+--     comment "that's it!"
 
 -- parser primitives
 lineComment :: Parser ()
@@ -213,17 +234,17 @@ line p = p <* skipTillEol <* newlineConsumer
 
 skipTillEol :: Parser ()
 skipTillEol = do
-  n   <- lookAhead (choice [eol, string "{", string "}"])
-  pos <- getSourcePos
-  cmd <- string n
-  --unless (null cmd) $ tell ["LEFTOVER - " ++ sourcePosPretty pos ++ ": " ++ cmd]
+  -- n   <- lookAhead (choice [eol, string "{", string "}"])
+  -- pos <- getSourcePos
+  -- cmd <- string n
+  -- unless (null cmd) $ tell ["LEFTOVER - " ++ sourcePosPretty pos ++ ": " ++ cmd]
   return ()
 
 unknownAttribute :: Parser (a -> a)
 unknownAttribute = do
-  n    <- lookAhead (choice [eol])
-  pos  <- getSourcePos
-  cmd  <- some alphaNumChar
-  args <- string n
+  -- n    <- lookAhead (choice [eol])
+  -- pos  <- getSourcePos
+  -- cmd  <- some alphaNumChar
+  -- args <- string n
   --tell ["IGNORE - " ++ sourcePosPretty pos ++ ": " ++ cmd ++ args]
   return id

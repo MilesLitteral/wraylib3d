@@ -40,35 +40,34 @@ data Mesh
   { mAttributes :: Map String MeshAttribute
   , mPrimitive :: MeshPrimitive
   }
-
   deriving (Show, Eq, Ord)
 
 
 instance ToJSON MeshAttribute where
   toJSON v = case v of
     A_Float arg0 -> object [ "tag" .= ("A_Float" :: Text), "arg0" .= arg0]
-    A_V2F arg0 -> object [ "tag" .= ("A_V2F" :: Text), "arg0" .= arg0]
-    A_V3F arg0 -> object [ "tag" .= ("A_V3F" :: Text), "arg0" .= arg0]
-    A_V4F arg0 -> object [ "tag" .= ("A_V4F" :: Text), "arg0" .= arg0]
-    A_M22F arg0 -> object [ "tag" .= ("A_M22F" :: Text), "arg0" .= arg0]
-    A_M33F arg0 -> object [ "tag" .= ("A_M33F" :: Text), "arg0" .= arg0]
-    A_M44F arg0 -> object [ "tag" .= ("A_M44F" :: Text), "arg0" .= arg0]
-    A_Int arg0 -> object [ "tag" .= ("A_Int" :: Text), "arg0" .= arg0]
-    A_Word arg0 -> object [ "tag" .= ("A_Word" :: Text), "arg0" .= arg0]
+    A_V2F arg0   -> object [ "tag" .= ("A_V2F" :: Text), "arg0" .= arg0]
+    A_V3F arg0   -> object [ "tag" .= ("A_V3F" :: Text), "arg0" .= arg0]
+    A_V4F arg0   -> object [ "tag" .= ("A_V4F" :: Text), "arg0" .= arg0]
+    A_M22F arg0  -> object [ "tag" .= ("A_M22F" :: Text), "arg0" .= arg0]
+    A_M33F arg0  -> object [ "tag" .= ("A_M33F" :: Text), "arg0" .= arg0]
+    A_M44F arg0  -> object [ "tag" .= ("A_M44F" :: Text), "arg0" .= arg0]
+    A_Int arg0   -> object [ "tag" .= ("A_Int" :: Text), "arg0" .= arg0]
+    A_Word arg0  -> object [ "tag" .= ("A_Word" :: Text), "arg0" .= arg0]
 
 instance FromJSON MeshAttribute where
   parseJSON (Object obj) = do
     tag <- obj .: "tag"
     case tag :: Text of
-      "A_Float" -> A_Float <$> obj .: "arg0"
-      "A_V2F" -> A_V2F <$> obj .: "arg0"
-      "A_V3F" -> A_V3F <$> obj .: "arg0"
-      "A_V4F" -> A_V4F <$> obj .: "arg0"
-      "A_M22F" -> A_M22F <$> obj .: "arg0"
-      "A_M33F" -> A_M33F <$> obj .: "arg0"
-      "A_M44F" -> A_M44F <$> obj .: "arg0"
-      "A_Int" -> A_Int <$> obj .: "arg0"
-      "A_Word" -> A_Word <$> obj .: "arg0"
+      "A_Float" -> A_Float <$> obj .:  "arg0"
+      "A_V2F"   -> A_V2F <$> obj   .:  "arg0"
+      "A_V3F"   -> A_V3F <$> obj   .:  "arg0"
+      "A_V4F"   -> A_V4F <$> obj   .:  "arg0"
+      "A_M22F"  -> A_M22F <$> obj  .:  "arg0"
+      "A_M33F"  -> A_M33F <$> obj  .:  "arg0"
+      "A_M44F"  -> A_M44F <$> obj  .:  "arg0"
+      "A_Int"   -> A_Int <$> obj   .:  "arg0"
+      "A_Word"  -> A_Word <$> obj  .:  "arg0"
   parseJSON _ = mzero
 
 instance ToJSON MeshPrimitive where

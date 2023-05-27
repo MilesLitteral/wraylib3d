@@ -1,22 +1,22 @@
-{-# LANGUAGE LinearTypes, UnicodeSyntax #-}
-module Manifest.Utils.Streaming where
+{-# LANGUAGE LinearTypes, UnicodeSyntax, GADTs #-}
+module HRayLib3d.WindowSystem.Streaming where
 
 import Prelude hiding (IO, Show, fromInteger, (>>=), (>>), return, fail, ($), (.))
-import Prelude.Linear hiding (Eq)
-import Control.Functor.Linear 
+import Prelude.Linear ( Show, IO )
+  
+type Path   = String
+type FileIO = LState (S [String])
 
--- |Manifest's Data (File) Streaming Module (utilizing LinearTypes)
+-- |WRayLib3d's Data (File) Streaming Module (utilizing LinearTypes)
 -- The State Machine has one function, Run, which it acts on stream 
 -- with.
 newtype LState s a = LState { runLState :: s ⊸ (s, a) }
 
+data LHandle where Handle :: Int -> LHandle
+
 -- | Record Keeper of the current State (S)
 data S a where S :: a -> S a
   deriving (Show, Eq)
-
-data LHandle where Handle :: Int -> LHandle
-type Path   = String
-type FileIO = LState (S [String])
 
 -- | Open (Stream) behavior, provide a file path
 openFile  :: Path -> LHandle

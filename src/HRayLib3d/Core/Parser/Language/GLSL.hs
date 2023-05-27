@@ -1,10 +1,10 @@
-module Language.GLSL (
-  module Language.GLSL.Syntax,
-  module Language.GLSL.Parser,
-  module Language.GLSL.Pretty
+module HRayLib3d.Core.Parser.Language.GLSL (
+  module HRayLib3d.Core.Parser.Language.GLSL.Syntax,
+  module HRayLib3d.Core.Parser.Language.GLSL.Parser,
+  module HRayLib3d.Core.Parser.Language.GLSL.Pretty
   ) where
 
-import Language.GLSL.Syntax
-import Language.GLSL.Parser
-import Language.GLSL.Pretty
+import HRayLib3d.Core.Parser.Language.GLSL.Syntax
+import HRayLib3d.Core.Parser.Language.GLSL.Parser
+import HRayLib3d.Core.Parser.Language.GLSL.Pretty
 

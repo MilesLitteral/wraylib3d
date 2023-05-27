@@ -1,27 +1,11 @@
 module HRayLib3d.GameEngine.Data.GLTF (
-    Frame(..)
-    ,Tag(..)
-    ,Shader(..)
-    ,Surface(..)
-    ,GLTFModel(..)
-    ,GLTFSkin
-    ,GLTFAnimation
+    GLTFModel(..)
+    ,fromByteString 
+    ,fromChunk
 )where
 
-import Data.Int
-import Data.Map (Map)
-import Data.HashMap.Strict
-import Data.Vect hiding (Vector)
-import Data.Vector (Vector)
-import Data.ByteString (ByteString)
-import qualified Data.Vector.Storable as SV
+import Codec.GlTF ( fromByteString, fromChunk, GlTF )
 
-import Codec.GlTF
-import Codec.GlTF.Texture
-import Codec.GlTF.Material
-import Codec.GlTF.Animation
-import Codec.GlTF.Buffer
-import Codec.GlTF.Accessor
 -- GlTF	 
 -- asset :: Asset	 
 -- extensionsUsed :: Maybe (Vector Text)	 
@@ -42,22 +26,6 @@ import Codec.GlTF.Accessor
 -- extensions :: Maybe Object	 
 -- extras :: Maybe Value
 
-data Frame
-    = Frame
-    { frGlTFMins    :: !Vec3
-    , frGlTFMaxs    :: !Vec3
-    , frGlTFOrigin  :: !Vec3
-    , frGlTFRadius  :: !Float
-    , frGlTFName    :: !ByteString
-    } deriving Show
-
-data Tag
-    = Tag
-    { tgGlTFName         :: !ByteString
-    , tgGlTFOrigin       :: !Vec3
-    , tgGlTFRotationMat  :: !Mat3
-    } deriving Show
-
 -- (One Day) Codec.GlTF Material -> Shader (Material?)
 -- Shaders can be pulled out of GLTFs from:
 -- GlTF.extensionsUsed  
@@ -65,7 +33,7 @@ data Tag
 -- The necessary data looks like this:
 -- {
 --     "extensions": {
---         "KHR_techniques_webgl": {
+--         "KHR_techniques_webgl<wrl3d>": {
 --             "programs": [
 --                 {
 --                     "fragmentShader": 0,
@@ -101,28 +69,4 @@ data Tag
 --         }
 --     }
 -- }
-
-data Shader
-    = Shader
-    { shGlTFName    :: !ByteString
-    , shGlTFIndex   :: !Int
-    } deriving Show
-
-data Surface
-    = Surface
-    { srGlTFName        :: !ByteString
-    , srGlTFShaders     :: !(Vector Shader) -- apply a generic, applicable, glsl shader for now -- Materials come later
-    , srGlTFTriangles   :: !(SV.Vector Int32)
-    , srGlTFTexCoords   :: !(SV.Vector Vec2)
-    , srGlTFXyzNormal   :: !(Vector (SV.Vector Vec3,SV.Vector Vec3))
-    } deriving Show
-
-data GLTFModel
-    = GLTFModel
-    { gltfFrames      :: !(Vector Frame) -- GlTF.accessors :: Maybe (Vector Accessor) -> gltfFrames :: !(Vector Frame)
-    , gltfTags        :: !(Vector (HashMap ByteString Tag))
-    , gltfSurfaces    :: !(Vector Surface)
-    } deriving Show
-
-type GLTFSkin      = Map String Texture
-type GLTFAnimation = Map String Animation
+newtype GLTFModel = GLTFModel { gltfRaw :: Codec.GlTF.GlTF } deriving Show

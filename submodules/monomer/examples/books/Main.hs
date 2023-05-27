@@ -182,7 +182,7 @@ searchBooks sess query = do
         >>= W.asJSON
         >>= return . preview (W.responseBody . _Just)
 
-      return $ maybeToEither "Empty response" (resp >>= checkEmpty)
+      return $ maybeToEither "Empty Search Query" (resp >>= checkEmpty)
 
 main :: IO ()
 main = do

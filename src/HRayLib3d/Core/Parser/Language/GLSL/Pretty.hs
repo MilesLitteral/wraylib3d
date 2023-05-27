@@ -1,10 +1,10 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-module Language.GLSL.Pretty where
+module HRayLib3d.Core.Parser.Language.GLSL.Pretty where
 
 import Text.PrettyPrint.HughesPJClass
 import Text.Printf
 
-import Language.GLSL.Syntax
+import HRayLib3d.Core.Parser.Language.GLSL.Syntax
 import Prelude hiding ((<>))
 
 ----------------------------------------------------------------------

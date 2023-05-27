@@ -44,6 +44,7 @@ dependencies:
 - text
 - uuid
 - xml
+- xml-conduit-writer 
 - yaml
 - lens
 - http-client
@@ -62,6 +63,8 @@ dependencies:
 - proteaaudio
 - MonadRandom
 - attoparsec
+- data-default-class
+- ilist
 #- graphql
 #- lambdacube-core  #all the Utils when they inevitably become their own modules (hruby and nsis go here )
 - lambdacube-compiler
@@ -73,22 +76,25 @@ dependencies:
 #- lambdacube-renderer # obligatory
 - gltf-loader
 - gltf-codec
-- language-glsl # move to core
+- dlist
+#- unix
 - extra
 - prettyclass
 - base64-bytestring
-#- language-vulkan
-#- language-metal
-#- lambdacube-sl # can entail all shader dialect stuff (including Q3SS)
+- linear-base
+- uuid
 - data-default
 - megastore # move to core
 - monomer
 - tinyfiledialogs
 - adjunctions
+- wavefront
 - wreq # will be replaced with internal Network module features, currently in for compatibility 
 - text-show
 - criterion
+- monomer-hagrid
 - nsis
+- linear # This will replace Data.Vect entirely
 
 ghc-options:
 - -Wall
@@ -136,36 +142,6 @@ executables:
   RealmViewer-FE-Demo:
     main:                Main.hs
     source-dirs:         app/RealmViewer-FE-Demo/
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - hraylib3d
-
-  RealmBuilder-FE-Demo:
-    main:                Main.hs
-    source-dirs:         app/RealmBuilder-FE-Demo/
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - hraylib3d
-
-  RB-ProjectManager-FE-Demo:
-    main:                Main.hs
-    source-dirs:         app/RB-ProjectManager-FE-Demo/
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - hraylib3d
-
-  RealmModelViewer-Demo:
-    main:                Main.hs
-    source-dirs:         app/RealmModelViewer-Demo/
     ghc-options:
     - -threaded
     - -rtsopts

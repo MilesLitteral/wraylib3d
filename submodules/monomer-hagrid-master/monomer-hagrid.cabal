@@ -1,0 +1,222 @@
+cabal-version: 2.0
+
+-- This file has been generated from package.yaml by hpack version 0.35.1.
+--
+-- see: https://github.com/sol/hpack
+
+name:           monomer-hagrid
+version:        0.3.0.1
+synopsis:       A datagrid widget for the Monomer library.
+description:    A configurable Monomer widget that shows a scrollable grid of data.
+category:       GUI
+homepage:       https://github.com/Dretch/monomer-hagrid#readme
+bug-reports:    https://github.com/Dretch/monomer-hagrid/issues
+maintainer:     garethdanielsmith@gmail.com
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/Dretch/monomer-hagrid
+
+flag examples
+  description: Whether to build the example executables. Off by default because they are not usually wanted.
+  manual: True
+  default: False
+
+library
+  exposed-modules:
+      Monomer.Hagrid
+  other-modules:
+      Paths_monomer_hagrid
+  autogen-modules:
+      Paths_monomer_hagrid
+  hs-source-dirs:
+      src
+  default-extensions:
+      DisambiguateRecordFields
+      DuplicateRecordFields
+      EmptyCase
+      FlexibleContexts
+      GADTs
+      LambdaCase
+      NamedFieldPuns
+      NoFieldSelectors
+      NumericUnderscores
+      OverloadedRecordDot
+      OverloadedStrings
+      RankNTypes
+      ScopedTypeVariables
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , data-default-class
+    , ilist
+    , lens
+    , monomer >=1.5.1.0 && <1.6
+    , text
+  default-language: Haskell2010
+
+executable example-basic
+  main-is: Main.hs
+  other-modules:
+      Paths_monomer_hagrid
+  autogen-modules:
+      Paths_monomer_hagrid
+  hs-source-dirs:
+      example-basic
+  default-extensions:
+      DisambiguateRecordFields
+      DuplicateRecordFields
+      EmptyCase
+      FlexibleContexts
+      GADTs
+      LambdaCase
+      NamedFieldPuns
+      NoFieldSelectors
+      NumericUnderscores
+      OverloadedRecordDot
+      OverloadedStrings
+      RankNTypes
+      ScopedTypeVariables
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , data-default-class
+    , ilist
+    , lens
+    , monomer >=1.5.1.0 && <1.6
+    , monomer-hagrid
+    , text
+    , time
+  default-language: Haskell2010
+  if flag(examples)
+    buildable: True
+  else
+    buildable: False
+
+executable example-big-grid
+  main-is: Main.hs
+  other-modules:
+      Paths_monomer_hagrid
+  autogen-modules:
+      Paths_monomer_hagrid
+  hs-source-dirs:
+      example-big-grid
+  default-extensions:
+      DisambiguateRecordFields
+      DuplicateRecordFields
+      EmptyCase
+      FlexibleContexts
+      GADTs
+      LambdaCase
+      NamedFieldPuns
+      NoFieldSelectors
+      NumericUnderscores
+      OverloadedRecordDot
+      OverloadedStrings
+      RankNTypes
+      ScopedTypeVariables
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , data-default-class
+    , ilist
+    , lens
+    , monomer >=1.5.1.0 && <1.6
+    , monomer-hagrid
+    , text
+  default-language: Haskell2010
+  if flag(examples)
+    buildable: True
+  else
+    buildable: False
+
+executable example-resizing-cells
+  main-is: Main.hs
+  other-modules:
+      Paths_monomer_hagrid
+  autogen-modules:
+      Paths_monomer_hagrid
+  hs-source-dirs:
+      example-resizing-cells
+  default-extensions:
+      DisambiguateRecordFields
+      DuplicateRecordFields
+      EmptyCase
+      FlexibleContexts
+      GADTs
+      LambdaCase
+      NamedFieldPuns
+      NoFieldSelectors
+      NumericUnderscores
+      OverloadedRecordDot
+      OverloadedStrings
+      RankNTypes
+      ScopedTypeVariables
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , data-default-class
+    , ilist
+    , lens
+    , monomer >=1.5.1.0 && <1.6
+    , monomer-hagrid
+    , random
+    , text
+  default-language: Haskell2010
+  if flag(examples)
+    buildable: True
+  else
+    buildable: False
+
+test-suite spec
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Monomer.HagridSpec
+      Monomer.TestUtil
+      Paths_monomer_hagrid
+  autogen-modules:
+      Paths_monomer_hagrid
+  hs-source-dirs:
+      test
+  default-extensions:
+      DisambiguateRecordFields
+      DuplicateRecordFields
+      EmptyCase
+      FlexibleContexts
+      GADTs
+      LambdaCase
+      NamedFieldPuns
+      NoFieldSelectors
+      NumericUnderscores
+      OverloadedRecordDot
+      OverloadedStrings
+      RankNTypes
+      ScopedTypeVariables
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , bytestring
+    , containers
+    , data-default
+    , data-default-class
+    , hspec ==2.*
+    , ilist
+    , lens
+    , monomer >=1.5.1.0 && <1.6
+    , monomer-hagrid
+    , mtl
+    , stm
+    , text
+  default-language: Haskell2010
+  build-tool-depends: hspec-discover:hspec-discover == 2.*

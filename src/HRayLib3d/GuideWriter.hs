@@ -4,8 +4,21 @@ module HRayLib3d.GuideWriter (demo) where
 
     -- Use this module to write guides, it will display it as LaTeX (.pdfs)
     -- Maybe this could be used as a basis for a Text system? rendering wise.
-    import Data.Text
-    import Text.LaTeX
+    import Text.LaTeX ( 
+        article,
+        author,
+        document,
+        documentclass,
+        hatex,
+        large,
+        maketitle,
+        section,
+        textbf,
+        title,
+        renderFile,
+        execLaTeXT,
+        LaTeXT_ 
+      )
     
     demo :: IO ()
     demo = execLaTeXT simple >>= renderFile "simple.tex"
@@ -21,7 +34,7 @@ module HRayLib3d.GuideWriter (demo) where
     thePreamble = do
      documentclass [] article
      author "Daniel Diaz"
-     title "Simple example"
+     title  "Simple example"
     
     -- Body with a section.
     theBody :: Monad m => LaTeXT_ m

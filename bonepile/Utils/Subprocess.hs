@@ -61,7 +61,7 @@ appendIO      model a lens    = return [Model $ model & lens .~  a]
 -- window is, or be communicated to later
 startIDE :: ManifestModel -> Text -> IO ()
 startIDE mdl txt = do
-    result <- try' $ createProcess (proc (unpack txt) []){ cwd = Just $ (mdl ^. userHome) ++ "/Software/manimer", std_out = CreatePipe } --(_, Just hout, _, _) 
+    result <- try' $ createProcess (proc (unpack txt) ["./assets/projects/default"]){ cwd = Just $ (mdl ^. userHome) ++ "/Software/manimer", std_out = CreatePipe } --(_, Just hout, _, _) 
     orderedMessage $ ManiLogMessage MANI_LOG_HEAD MANI_LOG_ZONE ("Booting IDE")
     case result of
         Left ex         -> orderedMessage $ ManiLogMessage MANI_LOG_TAIL MANI_LOG_ERROR ("IDE: " ++ show ex)

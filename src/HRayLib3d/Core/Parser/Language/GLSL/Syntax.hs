@@ -1,4 +1,4 @@
-module Language.GLSL.Syntax where
+module HRayLib3d.Core.Parser.Language.GLSL.Syntax where
 
 -- TODO:
 -- - add support for 'array of strings' ?

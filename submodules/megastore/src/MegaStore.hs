@@ -44,6 +44,8 @@ module MegaStore
     , remove'
     , megastoreToMap
     , mapToMegaStore
+    , saveStoreBundle 
+    , saveStoreCache
     ) where
 
 import Codec.Picture
@@ -81,6 +83,12 @@ instance Binary MegaStore where
 -- Where the data is compressed and encoded to Strict ByteStrings
 saveStore :: String -> MegaStore -> IO ()
 saveStore name store = BL.writeFile (name ++ ".megastore") (compress $ encode store)
+
+saveStoreBundle :: String -> MegaStore -> IO ()
+saveStoreBundle name store = BL.writeFile (name ++ ".assetBundle") (compress $ encode store)
+
+saveStoreCache :: String -> MegaStore -> IO ()
+saveStoreCache name store = BL.writeFile (name ++ ".shaderCache") (compress $ encode store)
 
 -- | Read a MegaStore from file system path, it reads the file, decodes, and decompresses the data
 loadStore :: FilePath -> IO MegaStore

@@ -1,6 +1,8 @@
 {-# LANGUAGE LambdaCase, ViewPatterns, RecordWildCards, TupleSections, PackageImports, OverloadedStrings #-}
 module HRayLib3d.GameEngine.RealmViewer.Engine
   ( loadPK3
+  , loadAssetBundle
+  , loadShaderCache
   , createLoadingScreen
   , drawLoadingScreen
   , engineInit
@@ -16,6 +18,7 @@ module HRayLib3d.GameEngine.RealmViewer.Engine
   , getMusicFile
   ) where
 
+-- import Data.Aeson hiding (Object(..))
 import Control.Monad
 import Data.Char
 import Data.List (isPrefixOf,partition,isInfixOf,elemIndex)
@@ -23,6 +26,7 @@ import Data.Maybe
 import Data.Vect
 import Data.Set (Set)
 import Data.Map (Map)
+import Data.Aeson hiding (Object)
 import System.FilePath
 import System.Directory
 
@@ -57,10 +61,11 @@ import qualified HRayLib3d.GameEngine.Loader.Entity as E
 
 import HRayLib3d.GameEngine.RealmViewer.Entity
 import HRayLib3d.GameEngine.RealmViewer.Content
+import Text.XML.Writer
 
 type EngineContent =
   ( BSPLevel
-  , Map ByteString MD3.MD3Model
+  , Map ByteString MD3.MD3Model -- change to GLB/GLTF
   , [(Proj4, (Map String String, String))]
   , [[(Proj4, (Map String String, [Char]))]]
   , [Character]
@@ -75,7 +80,7 @@ type EngineGraphics =
   ( GLStorage
   , [(Proj4, MD3Instance)]
   , [Character]
-  , [(Proj4, (MD3.MD3Model, MD3Instance), (MD3.MD3Model, MD3Instance),(MD3.MD3Model, MD3Instance))]
+  , [(Proj4, (MD3.MD3Model, MD3Instance), (MD3.MD3Model, MD3Instance),(MD3.MD3Model, MD3Instance))] -- change to GLTF
   , V.Vector [Object]
   , BSPLevel
   , MD3Instance
@@ -91,17 +96,26 @@ engineInit pk3Data fullBSPName = do
             Just bspd -> bspd
 
     putStrLn $ "loading: " ++ show bspName
+
     -- load bsp data
+    -- TODO: load bsp data AS XML Data Structures and JSON
+    -- JSON is easier to implement and will give hints to 
+    -- XML
     bsp <- readBSP . LB.fromStrict <$> readEntry bspEntry
-
     createDirectoryIfMissing True lc_q3_cache -- create cache
-
-    SB.writeFile (lc_q3_cache </> bspName ++ ".entities") $ blEntities bsp
+    SB.writeFile (lc_q3_cache </> bspName ++ ".entities") $ blEntities bsp -- $ LB.toStrict $ Data.Aeson.encode bsp --blEntities bsp 
+    -- LB.toStrict $ Data.Aeson.encode bsp
 
     -- extract spawn points
-    let ents = case E.parseEntities bspName $ SB.unpack $ blEntities bsp of
-            Left err -> error err
-            Right x -> x
+    --TODO: .entries is a .xml file, parse the entries values
+    -- There is a bug in this, where it is reading off by a single character thus breaking the reading stream, 
+    -- if this was fixed .entities files would work with the current changes and potentially Monomer now
+    -- .entities  should still perhaps be structured with XML/JSON to simply make such cache reading elementry 
+    -- and not broken by something as trivial as whitespace...
+    -- plus then a lot of excess code trying to literally parse the .entities can be removed from the code outright
+    let ents = case E.parseEntities bspName $ SB.unpack $ blEntities bsp of --LB.toStrict $ Data.Aeson.encode bsp {-blEntities bsp-} of
+            Left err -> error err 
+            Right x  -> x
         spawnPoint E.EntityData{..}
           | classname `elem` [ "info_player_deathmatch"
                              , "info_player_start"
@@ -111,14 +125,14 @@ engineInit pk3Data fullBSPName = do
                              , "team_CTF_redplayer"
                              ] = [origin]
           | otherwise = []
-        spawnPoints = concatMap spawnPoint ents
-        p0 = head spawnPoints
-        teleportData = loadTeleports ents
-        music = (head . words) <$> (E.music $ head ents)
+        spawnPoints   = concatMap spawnPoint ents
+        p0            = head spawnPoints
+        teleportData  = loadTeleports ents
+        music         = head . words <$> E.music (head ents)
 
     -- MD3 related code
     (characterSkinMaterials,characterObjs,characters) <- readCharacters pk3Data p0
-    (md3Materials,md3Map,md3Objs) <- readMD3Objects characterObjs ents pk3Data
+    (md3Materials, md3Map, md3Objs)                   <- readMD3Objects characterObjs ents pk3Data
     --putStrLn $ "level materials"
     --mapM_ SB.putStrLn $ map shName $ V.toList $ blShaders bsp
     shMap <- loadShaderMap pk3Data
@@ -142,14 +156,18 @@ engineInit pk3Data fullBSPName = do
     let brushModelMapping = V.replicate (V.length $ blBrushes bsp) (-1) V.//
           (concat $ V.toList $ V.imap (\i Model{..} -> [(n,i) | n <- [mdFirstBrush..mdFirstBrush+mdNumBrushes-1]]) (blModels bsp))
     putStrLn $ "bsp model count: " ++ show (V.length $ blModels bsp)
-    print brushModelMapping
-    print teleportData
+    --print brushModelMapping
+    --print teleportData
     return (inputSchema,(bsp,md3Map,md3Objs,characterObjs,characters,shMapTexSlot,spawnPoints,brushModelMapping,teleportData,music))
 
-getMusicFile (bsp,md3Map,md3Objs,characterObjs,characters,shMapTexSlot,spawnPoints,brushModelMapping,teleportData,music) = music
-getModelIndexFromBrushIndex (bsp,md3Map,md3Objs,characterObjs,characters,shMapTexSlot,spawnPoints,brushModelMapping,teleportData,music) brushIndex = brushModelMapping V.! brushIndex
-getBSP (bsp,md3Map,md3Objs,characterObjs,characters,shMapTexSlot,spawnPoints,brushModelMapping,teleportData,music) = bsp
-getSpawnPoints (bsp,md3Map,md3Objs,characterObjs,characters,shMapTexSlot,spawnPoints,brushModelMapping,teleportData,music) = spawnPoints
+getMusicFile (_,_,_,_,_,_,_,_,_,music) = music
+
+getModelIndexFromBrushIndex (_,_,_,_,_,_,_,brushModelMapping,_,_) brushIndex = brushModelMapping V.! brushIndex
+
+getBSP (bsp,_,_,_,_,_,_,_,_,_) = bsp
+
+getSpawnPoints (_,_,_,_,_,_,spawnPoints,_,_,_) = spawnPoints
+
 getTeleportFun levelData@(bsp,md3Map,md3Objs,characterObjs,characters,shMapTexSlot,spawnPoints,brushModelMapping,(teleport,teleportTarget),music) brushIndex p =
   let models = map (getModelIndexFromBrushIndex levelData) brushIndex
       hitModels = [tp | TriggerTeleport target model <- teleport, model `elem` models, TargetPosition _ tp <- maybeToList $ Map.lookup target teleportTarget]
@@ -157,12 +175,12 @@ getTeleportFun levelData@(bsp,md3Map,md3Objs,characterObjs,characters,shMapTexSl
   in head $ hitModels ++ [p]
 
 setupStorage :: Map String Entry -> EngineContent -> GLStorage -> IO EngineGraphics
-setupStorage pk3Data (bsp,md3Map,md3Objs,characterObjs,characters,shMapTexSlot,_,_,_,_) storage = do
+setupStorage pk3Data (bsp, md3Map, md3Objs, characterObjs, characters, shMapTexSlot,_,_,_,_) storage = do
     let slotU           = uniformSetter storage
-        entityRGB       = uniformV3F "entityRGB" slotU
-        entityAlpha     = uniformFloat "entityAlpha" slotU
+        entityRGB       = uniformV3F   "entityRGB"     slotU
+        entityAlpha     = uniformFloat "entityAlpha"   slotU
         identityLight   = uniformFloat "identityLight" slotU
-        worldMat        = uniformM44F "worldMat" slotU
+        worldMat        = uniformM44F  "worldMat"      slotU
         overbrightBits  = 0
         idmtx = V4 (V4 1 0 0 0) (V4 0 1 0 0) (V4 0 0 1 0) (V4 0 0 0 1)
     worldMat idmtx
@@ -260,10 +278,11 @@ updateRenderInput (storage,lcMD3Objs,characters,lcCharacterObjs,surfaceObjs,bsp,
                 let m = mat4ToM44F $ fromProjective $ (rotationEuler (Vec3 time 0 0) .*. mat)
                     p = trim . _4 $ fromProjective mat
                 uniformM44F "worldMat" (objectUniformSetter obj) m
+                -- uniformM44F "orientation" (objectUniformSetter obj) orientation
                 cullObject obj p
 
             forM_ (zip characters lcCharacterObjs) $ \(Character{..},(mat,(hMD3,hLC),(uMD3,uLC),(lMD3,lLC))) -> do
-              {-
+{-
 typedef struct {
 	vec3_t		origin;
 	vec3_t		axis[3];

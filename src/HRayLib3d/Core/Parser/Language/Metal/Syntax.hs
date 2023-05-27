@@ -1,4 +1,4 @@
-module Language.Metal.Syntax where
+module HRayLib3d.Core.Parser.Language.Metal.Syntax where
 
 -- TODO:
 -- - add support for 'array of strings' ?
@@ -269,3 +269,5 @@ data FunctionIdentifier =
   | FuncId String
   deriving (Show, Eq)
 
+data StructDeclarator = StructDeclarator String (Maybe (Maybe Expr)) -- constant expression
+  deriving (Show, Eq)

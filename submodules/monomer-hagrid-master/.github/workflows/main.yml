@@ -1,0 +1,81 @@
+name: CI
+
+on: [push]
+
+jobs:
+  check-formatting-and-metadata:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+
+    - uses: actions/checkout@v3
+      
+    - name: 'Install Stack'
+      uses: haskell/actions/setup@v2
+      with:
+        stack-setup-ghc: true
+        enable-stack: true
+
+    - name: 'Check formatting'
+      uses: mrkkrp/ormolu-action@v9
+
+    - name: 'Check package metadata'
+      run: cabal check
+
+  build:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+
+    - name: 'Install OS-level packages needed for Monomer'
+      run: sudo apt-get update && sudo apt-get install --assume-yes libsdl2-dev libglew-dev
+
+    - uses: actions/checkout@v3
+
+    - uses: actions/cache@v3
+      with:
+        key: stack
+        path: ~/.stack
+    
+    - uses: actions/cache@v3
+      with:
+        key: stack-work
+        path: .stack-work
+  
+    - name: 'Install Stack'
+      uses: haskell/actions/setup@v2
+      with:
+        stack-setup-ghc: true
+        enable-stack: true
+    
+    - name: 'Build and test'
+      run: stack test
+
+  package:
+
+    needs: [check-formatting-and-metadata, build]
+
+    runs-on: ubuntu-22.04
+
+    steps:
+
+    - uses: actions/checkout@v3
+      
+    - name: 'Install Stack'
+      uses: haskell/actions/setup@v2
+      with:
+        stack-setup-ghc: true
+        enable-stack: true
+    
+    - name: 'Generate package'
+      run: stack sdist
+
+    - name: 'Archive package'
+      uses: actions/upload-artifact@v3
+      with:
+        name: package
+        path: .stack-work/dist/*/*/monomer-hagrid-*.tar.gz
+        if-no-files-found: error
+

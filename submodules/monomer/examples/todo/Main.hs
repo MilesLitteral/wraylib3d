@@ -74,7 +74,7 @@ todoRow wenv model idx t = animRow `nodeKey` todoKey where
 
 todoEdit :: TodoWenv -> TodoModel -> TodoNode
 todoEdit wenv model = editNode where
-  sectionBg = wenv ^. L.theme . L.sectionColor
+  sectionBg    = wenv ^. L.theme . L.sectionColor
   isValidInput = model ^. activeTodo . description /= ""
 
   (saveAction, saveLabel) = case model ^. action of
@@ -124,13 +124,12 @@ buildUI wenv model = widgetTree where
     | otherwise = False
 
   countLabel = label caption `styleBasic` styles where
-    caption = "Tasks (" <> showt (length $ model ^. todos) <> ")"
-    styles = [textFont "Regular", textSize 16, padding 20, bgColor sectionBg]
+    caption  = "Tasks (" <> showt (length $ model ^. todos) <> ")"
+    styles   = [textFont "Regular", textSize 16, padding 20, bgColor sectionBg]
 
   todoList = vstack (zipWith (todoRow wenv model) [0..] (model ^. todos))
 
-  newButton = mainButton "New" TodoNew `nodeKey` "todoNew"
-    `nodeVisible` not isEditing
+  newButton = mainButton "New" TodoNew `nodeKey` "todoNew" `nodeVisible` not isEditing
 
   editLayer = content where
     dualSlide content = outer where
@@ -175,7 +174,7 @@ handleEvent wenv node model evt = case evt of
   TodoNew -> [
     Event TodoShowEdit,
     Model $ model
-      & action .~ TodoAdding
+      & action     .~ TodoAdding
       & activeTodo .~ def,
     SetFocusOnKey "todoDesc"]
 
@@ -218,7 +217,7 @@ handleEvent wenv node model evt = case evt of
     SetFocusOnKey "todoNew"]
 
   TodoShowEdit -> [
-    Message "animEditIn" AnimationStart,
+    Message "animEditIn"  AnimationStart,
     Message "animEditOut" AnimationStop
     ]
 

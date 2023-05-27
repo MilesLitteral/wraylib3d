@@ -32,7 +32,11 @@ import qualified Codec.GLB as GLB
 -- turn store all binary data as 'Data URIs' 
 -- (Raw Base64 Encoded Binary) all in file.
 -- Therefore, we foregoe support of GLBs 
--- pointing to a .bin of some kind
+-- pointing to a .bin of some kind and instead trust
+-- the engine to load the GlTF contents of GLBs as necessary
+-- the GLB then is what is held in memory whilst the GLTFs
+-- are instances of data from these GLBs
+
 getGLBModel :: Get GLBModel
 getGLBModel = do
     dat   <- lookAhead getRemainingLazyByteString
@@ -44,17 +48,8 @@ getGLBModel = do
       }
 
 readGLB :: LB.ByteString -> GLBModel
-readGLB dat = runGet getGLBModel dat
+readGLB = runGet getGLBModel
 
 loadGLB :: String -> IO GLBModel
-loadGLB n   = readGLB <$> LB.readFile n
+loadGLB n = readGLB <$> LB.readFile n
 
--- readGLBSkin :: ByteString -> GLBSkin
--- readGLBSkin txt = Map.fromList
---   [ (head k, head v)
---   | l <- lines . map toLower $ SB8.unpack txt
---   , i <- maybeToList $ elemIndex ',' l
---   , let (words -> k,words . tail -> v) = splitAt i l
---   , not . null $ k
---   , not . null $ v
---   ]

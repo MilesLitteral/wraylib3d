@@ -129,10 +129,9 @@ loadBSP :: String -> IO BSPLevel
 loadBSP n = readBSP <$> LB.readFile n
 
 -- Realm Functions
-
 -- it is presumed the Query will be in a style to actually
--- get a Level, like SELECT bsp_name FROM realm/<bsp_name>/bsp/
+-- get a Level, like "SELECT <bsp_name> FROM realm/<bsp_name>/bsp/"
 -- where this will result in a Lazy ByteString that is then
--- read by readBSP
+-- read by readBSP in IO
 sendRealmBSPQuery :: Query -> IO BSPLevel
 sendRealmBSPQuery q = readBSP <$> sendRealmQueryBS q

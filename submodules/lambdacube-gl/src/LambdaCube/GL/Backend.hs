@@ -697,7 +697,7 @@ setStorage' p@GLRenderer{..} input' = do
     -}
 {-
   design:
-    runtime eleminiation of redundant buffer bind commands and redundant texture bind commands
+    runtime elimination of redundant buffer bind commands and redundant texture bind commands
 -}
 {-
   track:

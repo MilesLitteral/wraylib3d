@@ -1,11 +1,9 @@
-module Language.GLSL.Parser where
+module HRayLib3d.Core.Parser.Language.GLSL.Parser where
 
 import Prelude hiding (break, exponent)
-
-import Text.ParserCombinators.Parsec hiding (State, parse)
 import Text.ParserCombinators.Parsec.Expr
-
-import Language.GLSL.Syntax
+import Text.ParserCombinators.Parsec hiding (State, parse)
+import HRayLib3d.Core.Parser.Language.GLSL.Syntax
 
 ----------------------------------------------------------------------
 -- Parser state, hold a symbol table.

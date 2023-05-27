@@ -1,0 +1,2 @@
+psql -U wrl_dev #9395
+CREATE DATABASE wrl_(UUID) WITH ENCODING 'UTF8' LC_COLLATE='English_United Kingdom' LC_CTYPE='English_United Kingdom';

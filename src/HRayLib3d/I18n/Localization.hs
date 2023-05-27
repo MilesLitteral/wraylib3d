@@ -9,7 +9,6 @@ module HRayLib3d.I18n.Localization where
     import Data.Text
     import Data.Maybe
     import Data.Aeson
-    import Data.Typeable 
 
     data    LJSON                   = LJSON                { lKey :: String, lValue :: String }                      deriving (Generic, Eq, Show)
     data    Internationalization    = Internationalization { translations  :: [(String, Text)], fallbacks :: Bool}   deriving (Generic, Eq, Show)
@@ -19,26 +18,28 @@ module HRayLib3d.I18n.Localization where
     instance FromJSON Internationalization
     instance FromJSON I18nCollection
 
-    getSystemLocalWin32 :: String -> IO Handle
-    getSystemLocalWin32 metal = do
+    getSystemLocalWin32 :: IO Handle
+    getSystemLocalWin32 = do
         (_, Just hout, _, _) <- createProcess (proc "powershell" ["Get-WinSystemLocale []"]){ cwd = Just "./", std_out = CreatePipe }
         return hout
         
-    getSystemLocalOSX   :: String -> IO Handle
-    getSystemLocalOSX metal = do
+    getSystemLocalOSX   :: IO Handle
+    getSystemLocalOSX = do
         (_, Just hout, _, _) <- createProcess (proc "defaults" ["read", ".GlobalPreferences", "AppleLanguages", "| tr -d [:space:] ", "| cut -c2-3"]){ cwd = Just "./", std_out = CreatePipe }
         return hout
         
-    getSystemLocalLinux :: String -> IO Handle
-    getSystemLocalLinux metal = do
+    getSystemLocalLinux :: IO Handle
+    getSystemLocalLinux = do
         (_, Just hout, _, _) <- createProcess (proc "locale" ["-k", "LANG"]){ cwd = Just "./", std_out = CreatePipe }
         return hout
 
+    setTranslation :: FilePath -> Bool -> IO Internationalization
     setTranslation path fallbacks = do
         fp  <- decodeFileStrict path
         return $ Internationalization (fromJust fp) fallbacks
 
-    setTranslationsFromFile path fallbacks = do
+    setTranslationsFromFile :: FilePath -> IO I18nCollection
+    setTranslationsFromFile path  = do
         paths <- decodeFileStrict path
         return $ I18nCollection (fromJust paths)
 
@@ -71,7 +72,7 @@ module HRayLib3d.I18n.Localization where
     getI18nBody :: String -> Internationalization -> Text
     getI18nBody key mp = snd $ (Prelude.filter (\x -> (fst x == key)) $ translations mp) !! 0
 
-    liftInternationalizationOverlay :: (Typeable s, Typeable e) => Bool -> String -> WidgetNode s e -> WidgetNode s e
+    liftInternationalizationOverlay :: Bool -> String -> WidgetNode s e -> WidgetNode s e
     liftInternationalizationOverlay mdl key widget = do
         case mdl of
             True  -> tooltip_ (getI18nBody key $ defaultI18nKeysEN False) [tooltipDelay 2,  tooltipFollow] (widget) `styleBasic` [textColor (Color 2 2 2 1), bgColor (Color 253 204 128 1)]

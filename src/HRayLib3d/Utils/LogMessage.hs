@@ -18,15 +18,18 @@ module HRayLib3d.Utils.LogMessage (
 
   import Data.List
   import Data.String
-  import Control.Monad.State
-  import Control.Monad.IO.Class
+  import Control.Monad.State 
 
-  import Data.Either (Either(..))
-  import Data.Vector.Storable (toList, fromList)
-  import Data.Vector hiding   (map, last, length, take, (++), zipWith, concat, tail, sum, drop, replicate, head, null, takeWhile, foldr)
+  -- Ternary Function Helper
+  data Ternary a = a :? a
 
-  import Codec.Picture.Types
-  import Codec.Picture (DynamicImage, PixelRGB8, writePng, savePngImage, convertRGBA8, convertRGB8, imageData, generateImage, readImage, decodeImage, writeTiff)
+  infixl 0 ?
+  infixl 1 :?
+
+  (?) :: Bool -> Ternary a -> a
+  True  ? (x :? _) = x
+  False ? (_ :? y) = y
+  -- Ternary Function Helper
 
   data LogLevel   =
     LOG_ZONE
@@ -50,9 +53,9 @@ module HRayLib3d.Utils.LogMessage (
       body  :: String 
     } deriving (Show, Eq) 
 
-  instance (MonadState LogPrefix IO) => MonadState LogPrefix IO where
-    get   = liftIO   get
-    put k = liftIO $ put k
+  -- instance (MonadState LogPrefix IO) => MonadState LogPrefix IO where
+  --   get   = liftIO   get
+  --   put k = liftIO $ put k
     
   -- terminate: \033[0m
   logColor :: LogLevel -> [Char] -> [Char]

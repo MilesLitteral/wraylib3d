@@ -5,7 +5,6 @@ module HRayLib3d.Utils.Prisms ((##), (#?), (#!), (#.), (#^.), (##?)) where
 import Data.Maybe   ()
 import Data.Monoid  ( First )
 import Control.Lens ( (^?), (^.), re, view, from, Getting, Getter, AReview, AnIso, Iso, Prism ) 
-import Control.Monad.Representable.Reader
 
 -- | "Review" Operator
 -- Use this to create instances of types

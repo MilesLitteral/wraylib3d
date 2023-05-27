@@ -1,9 +1,9 @@
 {-# LANGUAGE CPP #-}
 
-module Manifest.OpenGL.Format.Obj (
-  WavefrontOBJ
-, importObjFromFile
-) where
+module HRayLib3d.GameEngine.Data.OBJ (
+   WavefrontOBJ
+  , importObjFromFile
+  ) where
 
 import Data.Either
 import Data.String

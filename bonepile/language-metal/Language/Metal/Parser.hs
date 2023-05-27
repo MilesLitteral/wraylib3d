@@ -1,9 +1,9 @@
-module Language.Metal.Parser where
+module HRayLib3d.Core.Parser.Language.Metal.Parser where
 
 import Prelude hiding (break, exponent)
 import Text.ParserCombinators.Parsec hiding (State, parse)
 import Text.ParserCombinators.Parsec.Expr
-import Language.Metal.Syntax
+import HRayLib3d.Core.Parser.Language.Metal.Syntax
 
 ----------------------------------------------------------------------
 -- Parser state, hold a symbol table.

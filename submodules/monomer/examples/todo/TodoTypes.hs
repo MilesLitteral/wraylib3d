@@ -45,6 +45,13 @@ instance Default Todo where
     _description = ""
   }
 
+data ControllerType 
+  = XBOX_CONTROLLER
+  |PS_CONTROLLER 
+  |TP_CONTROLLER
+  |GENERIC_CONTROLLER
+  deriving (Eq, Show, Enum)
+
 data TodoAction
   = TodoNone
   | TodoAdding

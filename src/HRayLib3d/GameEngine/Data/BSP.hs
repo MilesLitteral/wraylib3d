@@ -1,9 +1,18 @@
+{-# LANGUAGE OverloadedStrings, DeriveGeneric, RecordWildCards  #-}
+
 module HRayLib3d.GameEngine.Data.BSP where
 
+import Data.Aeson
 import Data.Word
-import Data.Vector (Vector)
+import Data.Binary
+import GHC.Generics
+import Data.Vector      (Vector)
 import Data.Vect hiding (Vector)
+import Data.Vect.Float.Instances
+
 import Data.ByteString
+import Text.XML.Writer
+import qualified Data.Text as T
 
 {-
 Information:
@@ -19,20 +28,20 @@ data Model
     , mdNumSurfaces  :: !Int
     , mdFirstBrush   :: !Int
     , mdNumBrushes   :: !Int
-    }
+    } deriving (Eq, Show, Generic)
 
 data Shader
     = Shader
     { shName         :: !ByteString
     , shSurfaceFlags :: !Int
     , shContentFlags :: !Int
-    }
+    } deriving (Eq, Show, Generic)
 
 data Plane
     = Plane
     { plNormal :: !Vec3
     , plDist   :: !Float
-    }
+    } deriving (Eq, Show, Generic)
 
 data Node
     = Node
@@ -40,7 +49,7 @@ data Node
     , ndChildren :: !(Int,Int)
     , ndMins     :: !Vec3
     , ndMaxs     :: !Vec3
-    }
+    } deriving (Eq, Show)
 
 data Leaf
     = Leaf
@@ -52,27 +61,27 @@ data Leaf
     , lfNumLeafSurfaces  :: !Int
     , lfFirstLeafBrush   :: !Int
     , lfNumLeafBrushes   :: !Int
-    }
+    } deriving (Eq, Show, Generic)
 
 data BrushSide
     = BrushSide
     { bsPlaneNum  :: !Int
     , bsShaderNum :: !Int
-    }
+    } deriving (Eq, Show)
 
 data Brush
     = Brush
     { brFirstSide :: !Int
     , brNumSides  :: !Int
     , brShaderNum :: !Int
-    }
+    } deriving (Eq, Show)
 
 data Fog
     = Fog
     { fgName        :: !ByteString
     , fgBrushNum    :: !Int
     , fgVisibleSide :: !Int
-    }
+    } deriving (Eq, Show, Generic)
 
 data DrawVertex
     = DrawVertex
@@ -81,13 +90,14 @@ data DrawVertex
     , dvLightmaptUV :: !Vec2
     , dvNormal      :: !Vec3
     , dvColor       :: !Vec4
-    }
+    } deriving (Eq, Show, Generic)
 
 data SurfaceType
     = Planar
     | Patch
     | TriangleSoup
     | Flare
+    deriving (Eq, Show, Enum, Generic)
 
 data Surface
     = Surface
@@ -106,22 +116,18 @@ data Surface
     , srLightmapVec2   :: !Vec3
     , srLightmapVec3   :: !Vec3
     , srPatchSize      :: !(Int,Int)
-    }
+    } deriving (Eq, Show, Generic)
 
-data Lightmap
-    = Lightmap
-    { lmMap :: !ByteString
-    }
+newtype Lightmap = Lightmap { lmMap :: ByteString } deriving (Eq, Show, Generic)
 
-data LightGrid
-    = LightGrid
+data LightGrid   = LightGrid deriving (Eq, Show, Generic)
 
 data Visibility
     = Visibility
     { vsNumVecs     :: !Int
     , vsSizeVecs    :: !Int
     , vsVecs        :: !(Vector Word8)
-    }
+    } deriving (Eq, Show, Generic)
 
 data BSPLevel
     = BSPLevel
@@ -142,4 +148,73 @@ data BSPLevel
     , blLightmaps    :: !(Vector Lightmap)
     , blLightgrid    :: !(Vector LightGrid)
     , blVisibility   :: !Visibility
-    }
+    } deriving (Eq, Show, Generic)
+
+instance ToJSON Vec2 where
+  toJSON (Vec2 x y) = object ["vec2X" .= x, "vec2Y" .= y ]
+
+instance ToJSON Vec3 where
+  toJSON (Vec3 x y z) = object ["vec3X" .= x, "vec3Y" .= y, "vec3Z" .= z ]
+
+instance ToJSON Vec4 where
+    toJSON (Vec4 w x y z) = object ["vec4W" .= w, "vec4X" .= x, "vec4Y" .= y, "vec4Z" .= z ]
+
+instance ToJSON Shader where
+    toJSON Shader{..} = object [ "shName" .= show shName, "shSurfaceFlags" .= shSurfaceFlags, "shContentFlags" .= shContentFlags]
+
+instance ToJSON  Fog where
+    toJSON Fog{..} = object ["fgName" .= (show fgName), "fgBrushNum" .= fgBrushNum, "fgVisibleSide" .= fgVisibleSide ]
+
+instance ToJSON SurfaceType
+instance ToJSON  Surface
+instance ToJSON  Brush where
+    toJSON Brush{..} = object[ "brFirstSide" .= brFirstSide, "brNumSides" .= brNumSides, "brShaderNum" .= brShaderNum]
+
+instance ToJSON  Model
+instance ToJSON  Leaf
+instance ToJSON  Node where
+    toJSON Node{..} = object[ "ndPlaneNum" .= ndPlaneNum, "ndChildren" .= ndChildren, "ndMins" .= ndMins, "ndMaxs" .= ndMaxs]
+
+instance ToJSON  Plane
+instance ToJSON  Lightmap where
+    toJSON Lightmap{..} = object [ "lmMap" .= show lmMap ]
+
+instance ToJSON  BrushSide where
+    toJSON BrushSide{..} = object ["bsPlaneNum" .= bsPlaneNum, "bsShaderNum" .= bsShaderNum]
+
+instance ToJSON  LightGrid
+instance ToJSON  DrawVertex
+instance ToJSON  Visibility
+
+instance ToJSON  BSPLevel where
+    toJSON BSPLevel{..} = object [ 
+          "blEntities" .= show blEntities
+        , "blShaders"  .= blShaders
+        , "blPlanes"   .= blPlanes
+        , "blNodes"    .= blNodes
+        , "blLeaves"   .= blLeaves
+        , "blLeafSurfaces" .= blLeafSurfaces
+        , "blLeafBrushes"  .= blLeafBrushes
+        , "blModels"       .= blModels
+        , "blBrushes"      .= blBrushes
+        , "blBrushSides"   .= blBrushSides
+        , "blDrawVertices" .= blDrawVertices
+        , "blDrawIndices"  .= blDrawIndices
+        , "blFogs"         .= blFogs
+        , "blSurfaces"     .= blSurfaces
+        , "blLightmaps"    .= blLightmaps
+        , "blLightgrid"    .= blLightgrid
+        , "blVisibility"   .= blVisibility
+        ] 
+
+-- --fix this later for JSON and XML Support
+-- TODO: a custom data XML object with an ToXML and FromXML allegory
+-- that should rival Data.Aeson's support of JSON, this is not a priority
+-- but something todo
+
+-- instance ToXML BSPLevel where
+--     toXML bspLevel = element "BSPLevel" $ many "entry" $ show $ blEntities bspLevel
+
+-- map (\x -> element "container" $ many . show "wrapper" . blEntities)
+-- instance Binary XML
+-- instance (GHC.Generics.Generic XML)

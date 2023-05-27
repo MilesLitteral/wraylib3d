@@ -41,28 +41,27 @@ import HRayLib3d.GameEngine.Data.GLTF
 import HRayLib3d.GameEngine.Graphics.Storage
 import HRayLib3d.GameEngine.Utils
 
+data GlTFInstance
+  = GlTFInstance
+  { gltfInstanceObject :: [Object]
+  , gltfInstanceBuffer :: LambdaCube.GL.Buffer
+  , gltfInstanceFrames :: Vector [(Int, Array)]
+  , gltfInstanceModel  :: GLTFModel
+  }
 
--- data GlTFInstance
---   = GlTFInstance
---   { gltfInstanceObject :: [Object]
---   , gltfInstanceBuffer :: LambdaCube.GL.Buffer
---   , gltfInstanceFrames :: Vector [(Int, Array)]
---   , gltfInstanceModel  :: GLTFModel
---   }
+data GPUGlTF
+  = GPUGlTF
+  { gpuGlTFBuffer    :: LambdaCube.GL.Buffer
+  , gpuGlTFSurfaces  :: [(IndexStream LambdaCube.GL.Buffer, Map String (Stream LambdaCube.GL.Buffer))] -- index stream, attribute streams
+  , gpuGlTFFrames    :: Vector [(Int,Array)]
+  , gpuGlTFModel     :: GLTFModel
+  , gpuGlTFShaders   :: HashSet String
+  }
 
--- data GPUGlTF
---   = GPUGlTF
---   { gpuGlTFBuffer    :: LambdaCube.GL.Buffer
---   , gpuGlTFSurfaces  :: [(IndexStream LambdaCube.GL.Buffer, Map String (Stream LambdaCube.GL.Buffer))] -- index stream, attribute streams
---   , gpuGlTFFrames    :: Vector [(Int,Array)]
---   , gpuGlTFModel     :: GLTFModel
---   , gpuGlTFShaders   :: HashSet String
---   }
-
--- setGlTFFrame :: GlTFInstance -> Int -> IO ()
--- setGlTFFrame (GlTFInstance{..}) idx = case gltfInstanceFrames V.!? idx of
---   Just frame  -> updateBuffer gltfInstanceBuffer frame
---   Nothing     -> pure ()
+setGlTFFrame :: GlTFInstance -> Int -> IO ()
+setGlTFFrame (GlTFInstance{..}) idx = case gltfInstanceFrames V.!? idx of
+  Just frame  -> updateBuffer gltfInstanceBuffer frame
+  Nothing     -> pure ()
 
 -- {-
 --     buffer layout
@@ -219,38 +218,38 @@ import HRayLib3d.GameEngine.Utils
 --     , gpuGlTFShaders   = HashSet.fromList $ concat [map (SB8.unpack . fromJust . Codec.GlTF.Material.name) $ V.toList srGlTFShaders | Surface{..} <- V.toList gltfSurfaces]
 --     }
 
--- -- addGPUGlTF :: GLStorage -> GPUGlTF -> GLTFSkin -> [String] -> IO GlTFInstance
--- -- addGPUGlTF r GPUGlTF{..} skin unis = do
--- --   let GLTFModel{..} = gpuGlTFModel
--- --   objs <- forM (zip gpuGlTFSurfaces $ V.toList gltfSurfaces) $ \((index,attrs),sf) -> do
--- --     let materialName s = case Map.lookup (SB8.unpack $ srGlTFName sf) skin of
--- --           Nothing -> SB8.unpack $ shGlTFName s
--- --           Just a  -> a
--- --     objList <- concat <$> forM (V.toList $ srGlTFShaders sf) (\s -> do
--- --       a <- addObjectWithMaterial r (materialName s) TriangleList (Just index) attrs $ setNub $ "worldMat":unis
--- --       b <- addObject r "LightMapOnly" TriangleList (Just index) attrs $ setNub $ "worldMat":unis
--- --       return [a,b])
+-- addGPUGlTF :: GLStorage -> GPUGlTF -> GLTFSkin -> [String] -> IO GlTFInstance
+-- addGPUGlTF r GPUGlTF{..} skin unis = do
+--   let GLTFModel{..} = gpuGlTFModel
+--   objs <- forM (zip gpuGlTFSurfaces $ V.toList gltfSurfaces) $ \((index,attrs),sf) -> do
+--     let materialName s = case Map.lookup (SB8.unpack $ srGlTFName sf) skin of
+--           Nothing -> SB8.unpack $ shGlTFName s
+--           Just a  -> a
+--     objList <- concat <$> forM (V.toList $ srGlTFShaders sf) (\s -> do
+--       a <- addObjectWithMaterial r (materialName s) TriangleList (Just index) attrs $ setNub $ "worldMat":unis
+--       b <- addObject r "LightMapOnly" TriangleList (Just index) attrs $ setNub $ "worldMat":unis
+--       return [a,b])
 
--- --     -- add collision geometry
--- --     collisionObjs <- case V.toList mdFrames of
--- --       (Frame{..}:_) -> do
--- --         sphereObj <- uploadMeshToGPU (sphere (V4 1 0 0 1) 4 frRadius)   >>= addMeshToObjectArray r "CollisionShape" (setNub $ ["worldMat","origin"] ++ unis)
--- --         boxObj    <- uploadMeshToGPU (bbox  (V4 0 0 1 1) frMins frMaxs) >>= addMeshToObjectArray r "CollisionShape" (setNub $ ["worldMat","origin"] ++ unis)
--- --         --when (frOrigin /= zero) $ putStrLn $ "frOrigin: " ++ show frOrigin
--- --         return [sphereObj,boxObj]
--- --       _ -> return []
+--     -- add collision geometry
+--     collisionObjs <- case V.toList mdFrames of
+--       (Frame{..}:_) -> do
+--         sphereObj <- uploadMeshToGPU (sphere (V4 1 0 0 1) 4 frRadius)   >>= addMeshToObjectArray r "CollisionShape" (setNub $ ["worldMat","origin"] ++ unis)
+--         boxObj    <- uploadMeshToGPU (bbox  (V4 0 0 1 1) frMins frMaxs) >>= addMeshToObjectArray r "CollisionShape" (setNub $ ["worldMat","origin"] ++ unis)
+--         --when (frOrigin /= zero) $ putStrLn $ "frOrigin: " ++ show frOrigin
+--         return [sphereObj,boxObj]
+--       _ -> return []
 
--- --     return $ objList ++ collisionObjs
--- --   -- question: how will be the referred shaders loaded?
--- --   --           general problem: should the gfx network contain all passes (every possible materials)?
--- --   return $ GlTFInstance
--- --     { gltfInstanceObject = concat objs
--- --     , gltfInstanceBuffer = gpuGlTFBuffer
--- --     , gltfInstanceFrames = gpuGlTFFrames
--- --     , gltfInstanceModel  = gpuGlTFModel
--- --     }
+--     return $ objList ++ collisionObjs
+--   -- question: how will be the referred shaders loaded?
+--   --           general problem: should the gfx network contain all passes (every possible materials)?
+--   return $ GlTFInstance
+--     { gltfInstanceObject = concat objs
+--     , gltfInstanceBuffer = gpuGlTFBuffer
+--     , gltfInstanceFrames = gpuGlTFFrames
+--     , gltfInstanceModel  = gpuGlTFModel
+--     }
 
--- -- addGlTF :: GLStorage -> GLTFModel -> GLTFSkin -> [String] -> IO GlTFInstance
--- -- addGlTF r model skin unis = do
--- --   gpuGlTF <- uploadGlTF model
--- --   addGPUGlTF r gpuGlTF skin unis
+-- addGlTF :: GLStorage -> GLTFModel -> GLTFSkin -> [String] -> IO GlTFInstance
+-- addGlTF r model skin unis = do
+--   gpuGlTF <- uploadGlTF model
+--   addGPUGlTF r gpuGlTF skin unis
