@@ -40,6 +40,20 @@ packages:
   original:
     hackage: tinyfiledialogs-0.2.1.0@sha256:118f9fd7b721de68f1e84c8b820784e31140bf34e32f23fd6410fb57914a309c,1905
 - completed:
+    hackage: aeson-2.1.2.1@sha256:5b8d62a60963a925c4d123a46e42a8e235a32188522c9f119f64ac228c2612a7,6359
+    pantry-tree:
+      size: 82465
+      sha256: 58d33beedd6e0ff79920c636d8a4295deb684b6e97c9b1ca94d3c780958d6302
+  original:
+    hackage: aeson-2.1.2.1@sha256:5b8d62a60963a925c4d123a46e42a8e235a32188522c9f119f64ac228c2612a7,6359
+- completed:
+    hackage: generically-0.1.1@sha256:2b9b5efb6eea2fb65377565d53d85b0ccc5b37404fba4bef1d60277caa877e5e,1155
+    pantry-tree:
+      size: 233
+      sha256: 98a8fe89d516d3752a9cc0af22cfa652f098cc6613da080762b63aa1d596e56d
+  original:
+    hackage: generically-0.1.1@sha256:2b9b5efb6eea2fb65377565d53d85b0ccc5b37404fba4bef1d60277caa877e5e,1155
+- completed:
     hackage: vulkan-3.24.5@sha256:9e11572d2dfc43bd22a9c477b79494c884d3e94aad170088c08a32d695f46000,31913
     pantry-tree:
       size: 86973

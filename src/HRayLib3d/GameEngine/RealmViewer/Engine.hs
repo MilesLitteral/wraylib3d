@@ -1,4 +1,5 @@
-{-# LANGUAGE LambdaCase, ViewPatterns, RecordWildCards, TupleSections, PackageImports, OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards, OverloadedStrings, RankNTypes, DataKinds #-}
+{-# LANGUAGE LambdaCase #-}
 module HRayLib3d.GameEngine.RealmViewer.Engine
   ( loadPK3
   , loadAssetBundle
@@ -25,8 +26,7 @@ import Data.List (isPrefixOf,partition,isInfixOf,elemIndex)
 import Data.Maybe
 import Data.Vect
 import Data.Set (Set)
-import Data.Map (Map)
-import Data.Aeson hiding (Object)
+import Data.Map ( Map, fromList, map )
 import System.FilePath
 import System.Directory
 
@@ -36,12 +36,17 @@ import Data.Binary (encodeFile,decodeFile)
 import qualified Data.ByteString.Lazy as LB
 import Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as SB
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as BL
 import qualified Data.Set as Set
 import qualified Data.HashSet as HashSet
 import qualified Data.Vector as V
+import qualified Data.Text as T
+import Data.List.Split
+-- import Text.Format
 
+import Control.Monad.Catch
 import Text.Show.Pretty (ppShow)
-
 import Codec.Picture
 import LambdaCube.GL as GL
 import HRayLib3d.GameEngine.Data.BSP
@@ -63,11 +68,19 @@ import HRayLib3d.GameEngine.RealmViewer.Entity
 import HRayLib3d.GameEngine.RealmViewer.Content
 import Text.XML.Writer
 
+-- import qualified Data.Aeson.Decoding as JSON
+import qualified Data.Aeson as JSON
+import Data.String (IsString)
+import System.Directory()
+import System.Process (StdStream(..), proc, shell, createProcess, cwd, std_out)
+import HRayLib3d.GameEngine.Loader.Entity (EntityData(EntityData))
+import qualified Control.Exception as Data.Aeson
+
 type EngineContent =
   ( BSPLevel
   , Map ByteString MD3.MD3Model -- change to GLB/GLTF
   , [(Proj4, (Map String String, String))]
-  , [[(Proj4, (Map String String, [Char]))]]
+  , [[(Proj4, (Map String String, String))]]
   , [Character]
   , Map String CommonAttrs
   , [Vec3]
@@ -81,84 +94,88 @@ type EngineGraphics =
   , [(Proj4, MD3Instance)]
   , [Character]
   , [(Proj4, (MD3.MD3Model, MD3Instance), (MD3.MD3Model, MD3Instance),(MD3.MD3Model, MD3Instance))] -- change to GLTF
-  , V.Vector [Object]
+  , V.Vector [GL.Object]
   , BSPLevel
   , MD3Instance
   , [(Float, SetterFun TextureData, V.Vector TextureData)]
   )
 
--- TODO
+entitiesToJSON :: String -> String -> IO ()
+entitiesToJSON inputS outputS = do
+  cwrd <- getCurrentDirectory 
+  _    <- createProcess (proc "py" [cwrd </> "read.py", inputS, outputS]){ std_out = CreatePipe }   {-(_, Just hout, _, _) <- -}
+  return ()
+
 engineInit :: Map String Entry -> FilePath -> IO (PipelineSchema, EngineContent)
 engineInit pk3Data fullBSPName = do
-    let bspName = takeBaseName fullBSPName
-        bspEntry = case Map.lookup fullBSPName pk3Data of
-            Nothing -> error "You need to put pk3 file into your current directory"
-            Just bspd -> bspd
+  let bspName    = takeBaseName fullBSPName
+      bspEntry   = case Map.lookup fullBSPName pk3Data of
+                      Nothing   -> error "You need to put pk3 file into your current directory"
+                      Just bspd -> bspd
+  putStrLn $ "loading: " ++ show bspName
 
-    putStrLn $ "loading: " ++ show bspName
+  -- load bsp data
+  bsp        <- readBSP . LB.fromStrict <$> readEntry bspEntry
+  cwrd       <- getCurrentDirectory 
+  jsonExists <- doesFileExist (lc_q3_cache </> bspName ++ ".json")  
+  
+  -- parse entities 
+  let entitiesPath     = lc_q3_cache </> bspName ++ ".entities"
+      jsonEntitiesPath = lc_q3_cache </> bspName ++ ".json" 
+  print $ "Entities Path:      " ++ entitiesPath
+  print $ "JSON Entities Path: " ++ jsonEntitiesPath
+  createDirectoryIfMissing True lc_q3_cache -- create cache 
+  if not jsonExists
+    then entitiesToJSON (cwrd </> entitiesPath) (cwrd </> jsonEntitiesPath)
+    else print $ "File Exists: " ++ bspName ++ ".json" 
+  jsonEntities <- BL.readFile(cwrd </> jsonEntitiesPath)  --JSON.decodeFileStrict -- :: Maybe (E.EntityContainer)
+  putStrLn $ "Try to load entities at: " ++ (cwrd </> jsonEntitiesPath)
+  -- parse entities as json instead of raw parsing
+  let entities = case JSON.eitherDecode jsonEntities of 
+                Left  x  -> error ("Error Parsing Container JSON: " ++ x)
+                Right y  -> Just y 
+      spawnPoint E.EntityData{..}
+        | classname `elem` [ "info_player_deathmatch"
+                            , "info_player_start"
+                            , "team_CTF_bluespawn"
+                            , "team_CTF_redspawn"
+                            , "team_CTF_blueplayer"
+                            , "team_CTF_redplayer"
+                            ] = [fromJust origin]
+        | otherwise = []
+      spawnPoints   = concatMap spawnPoint (E.ecData $ fromJust entities)
+      p0            = head spawnPoints
+      teleportData  = loadTeleports $  E.ecData $ fromJust entities
+      music         = head . words <$> E.music  (head (E.ecData $ fromJust entities))
 
-    -- load bsp data
-    -- TODO: load bsp data AS XML Data Structures and JSON
-    -- JSON is easier to implement and will give hints to 
-    -- XML
-    bsp <- readBSP . LB.fromStrict <$> readEntry bspEntry
-    createDirectoryIfMissing True lc_q3_cache -- create cache
-    SB.writeFile (lc_q3_cache </> bspName ++ ".entities") $ blEntities bsp -- $ LB.toStrict $ Data.Aeson.encode bsp --blEntities bsp 
-    -- LB.toStrict $ Data.Aeson.encode bsp
+  -- MD3 related code
+  (characterSkinMaterials,characterObjs,characters) <- readCharacters pk3Data p0
+  (md3Materials, md3Map, md3Objs)                   <- readMD3Objects characterObjs (E.ecData $ fromJust entities) pk3Data
+  putStrLn "level materials"
+  --mapM_ SB.putStrLn $ map shName $ V.toList $ blShaders bsp
 
-    -- extract spawn points
-    --TODO: .entries is a .xml file, parse the entries values
-    -- There is a bug in this, where it is reading off by a single character thus breaking the reading stream, 
-    -- if this was fixed .entities files would work with the current changes and potentially Monomer now
-    -- .entities  should still perhaps be structured with XML/JSON to simply make such cache reading elementry 
-    -- and not broken by something as trivial as whitespace...
-    -- plus then a lot of excess code trying to literally parse the .entities can be removed from the code outright
-    let ents = case E.parseEntities bspName $ SB.unpack $ blEntities bsp of --LB.toStrict $ Data.Aeson.encode bsp {-blEntities bsp-} of
-            Left err -> error err 
-            Right x  -> x
-        spawnPoint E.EntityData{..}
-          | classname `elem` [ "info_player_deathmatch"
-                             , "info_player_start"
-                             , "team_CTF_bluespawn"
-                             , "team_CTF_redspawn"
-                             , "team_CTF_blueplayer"
-                             , "team_CTF_redplayer"
-                             ] = [origin]
-          | otherwise = []
-        spawnPoints   = concatMap spawnPoint ents
-        p0            = head spawnPoints
-        teleportData  = loadTeleports ents
-        music         = head . words <$> E.music (head ents)
+  shMap <- loadShaderMap pk3Data
+  -- let maxMaterial = 20 -- TODO: remove if we will have fast reducer
+  let shNames   = Set.fromList $ selectedMaterials ++ ignoredMaterials {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -}
+      allShName = Prelude.map shName $ V.toList $ blShaders bsp
+      (selectedMaterials,ignoredMaterials) = partition (\n -> or $ [SB.isInfixOf k n | k <- ["floor","wall","door","trim","block"]]) allShName
+      levelMaterials = HashSet.fromList . Set.toList $ Set.map SB.unpack shNames
+      modelMaterials = HashSet.fromList . Set.toList $ Set.map SB.unpack (md3Materials `Set.union` characterSkinMaterials)
+      (inputSchema,shMapTexSlot) = createRenderInfo shMap levelMaterials modelMaterials
+  writeSampleMaterial shMapTexSlot
+  --putStrLn $ "all materials:  " ++ show (Map.size shMap)
+  --putStrLn $ "used materials: " ++ show (Map.size shMap)
+  --putStrLn $ "texture uniforms: \n" ++ ppShow textureUniforms
+  --putStrLn $ "used materials: " ++ show (Map.size shMapTexSlot)
+  --putStrLn $ "ignored materials: " ++ show (length ignoredMaterials)
+  --SB.putStrLn $ SB.unlines ignoredMaterials
 
-    -- MD3 related code
-    (characterSkinMaterials,characterObjs,characters) <- readCharacters pk3Data p0
-    (md3Materials, md3Map, md3Objs)                   <- readMD3Objects characterObjs ents pk3Data
-    --putStrLn $ "level materials"
-    --mapM_ SB.putStrLn $ map shName $ V.toList $ blShaders bsp
-    shMap <- loadShaderMap pk3Data
-    let
-        maxMaterial = 20 -- TODO: remove if we will have fast reducer
-        shNames = Set.fromList $ {-Prelude.take maxMaterial $ -}selectedMaterials ++ ignoredMaterials
-        allShName = map shName $ V.toList $ blShaders bsp
-        (selectedMaterials,ignoredMaterials) = partition (\n -> or $ [SB.isInfixOf k n | k <- ["floor","wall","door","trim","block"]]) allShName
-
-    let levelMaterials = HashSet.fromList . Set.toList $ Set.map SB.unpack shNames
-        modelMaterials = HashSet.fromList . Set.toList $ Set.map SB.unpack (md3Materials `Set.union` characterSkinMaterials)
-        (inputSchema,shMapTexSlot) = createRenderInfo shMap levelMaterials modelMaterials
-    --putStrLn $ "all materials:  " ++ show (Map.size shMap')
-    --putStrLn $ "used materials: " ++ show (Map.size shMap)
-    --putStrLn $ "texture uniforms: \n" ++ ppShow textureUniforms
-    --putStrLn $ "used materials: " ++ show (Map.size shMapTexSlot)
-    --putStrLn $ "ignored materials: " ++ show (length ignoredMaterials)
-    writeSampleMaterial shMapTexSlot
-    --SB.putStrLn $ SB.unlines ignoredMaterials
-
-    let brushModelMapping = V.replicate (V.length $ blBrushes bsp) (-1) V.//
-          (concat $ V.toList $ V.imap (\i Model{..} -> [(n,i) | n <- [mdFirstBrush..mdFirstBrush+mdNumBrushes-1]]) (blModels bsp))
-    putStrLn $ "bsp model count: " ++ show (V.length $ blModels bsp)
-    --print brushModelMapping
-    --print teleportData
-    return (inputSchema,(bsp,md3Map,md3Objs,characterObjs,characters,shMapTexSlot,spawnPoints,brushModelMapping,teleportData,music))
+  let brushModelMapping = V.replicate (V.length $ blBrushes bsp) (-1) V.//
+        concat (V.toList $ V.imap (\i Model{..} -> [(n,i) | n <- [mdFirstBrush..mdFirstBrush+mdNumBrushes-1]]) (blModels bsp))
+  putStrLn $ "bsp model count: " ++ show (V.length $ blModels bsp)
+  --print brushModelMapping
+  --print teleportData
+  return (inputSchema,(bsp,md3Map,md3Objs,characterObjs,characters,shMapTexSlot,spawnPoints,brushModelMapping,teleportData,music))
 
 getMusicFile (_,_,_,_,_,_,_,_,_,music) = music
 
@@ -169,7 +186,7 @@ getBSP (bsp,_,_,_,_,_,_,_,_,_) = bsp
 getSpawnPoints (_,_,_,_,_,_,spawnPoints,_,_,_) = spawnPoints
 
 getTeleportFun levelData@(bsp,md3Map,md3Objs,characterObjs,characters,shMapTexSlot,spawnPoints,brushModelMapping,(teleport,teleportTarget),music) brushIndex p =
-  let models = map (getModelIndexFromBrushIndex levelData) brushIndex
+  let models = Prelude.map (getModelIndexFromBrushIndex levelData) brushIndex
       hitModels = [tp | TriggerTeleport target model <- teleport, model `elem` models, TargetPosition _ tp <- maybeToList $ Map.lookup target teleportTarget]
   --in head $ trace (show ("hitModels",hitModels,models)) hitModels ++ [p]
   in head $ hitModels ++ [p]
@@ -186,11 +203,11 @@ setupStorage pk3Data (bsp, md3Map, md3Objs, characterObjs, characters, shMapTexS
     worldMat idmtx
     entityRGB $ V3 1 1 1
     entityAlpha 1
-    identityLight $ 1 / (2 ^ overbrightBits)
+    identityLight $ 1 / 2 ^ overbrightBits
     initTableTextures >>= setupTableTextures slotU
 
     -- default texture
-    let redBitmap x y = let v = if (x+y) `mod` 2 == 0 then 255 else 0 in PixelRGB8 v v 0
+    let redBitmap x y = let v = if even (x+y) then 255 else 0 in PixelRGB8 v v 0
     defaultTexture <- uploadTexture2DToGPU' False False False False $ ImageRGB8 $ generateImage redBitmap 2 2
 
     putStrLn "loading textures:"
@@ -243,7 +260,7 @@ updateRenderInput (storage,lcMD3Objs,characters,lcCharacterObjs,surfaceObjs,bsp,
 
             let matSetter   = uniformM44F "viewProj" slotU
                 viewOrigin  = uniformV3F "viewOrigin" slotU
-                orientation = uniformM44F "orientation" slotU
+                --orientation = uniformM44F "orientation" slotU
                 viewMat     = uniformM44F "viewMat" slotU
                 timeSetter  = uniformFloat "time" slotU
 
@@ -260,26 +277,25 @@ updateRenderInput (storage,lcMD3Objs,characters,lcCharacterObjs,surfaceObjs,bsp,
                 cullObject obj p = enableObject obj (pointInFrustum p frust)
 
             -- set uniforms
-            timeSetter $ time / 1
+            timeSetter time
             --putStrLn $ "time: " ++ show time ++ " " ++ show capturing
             viewOrigin $ V3 cx cy cz
             viewMat $ mat4ToM44F cm
             --orientation $ V4 orientA orientB orientC $ V4 0 0 0 1
             matSetter $! mat4ToM44F $! cm .*. sm .*. pm
 
-            let invCM = mat4ToM44F $ idmtx -- inverse cm .*. (fromProjective $ translation (Vec3 0 (0) (-30)))
+            let invCM = mat4ToM44F idmtx -- inverse cm .*. (fromProjective $ translation (Vec3 0 (0) (-30)))
                 --rot = fromProjective $ rotationEuler (Vec3 (-pi/2+30/pi*2) (pi/2) (-pi))
                 rot = fromProjective $ orthogonal $ toOrthoUnsafe $ rotMatrixX (-pi/2) .*. rotMatrixY (pi/2) .*. rotMatrixX (10/pi*2)
             forM_ (md3instanceObject lcMD3Weapon) $ \obj -> do
-              uniformM44F "viewProj" (objectUniformSetter obj) $ mat4ToM44F $! rot .*. (fromProjective $ translation (Vec3 3 (-10) (-5))) .*. sm .*. pm
+              uniformM44F "viewProj" (objectUniformSetter obj) $ mat4ToM44F $! rot .*. fromProjective (translation (Vec3 3 (-10) (-5))) .*. sm .*. pm
               uniformM44F "worldMat" (objectUniformSetter obj) invCM
-            forM_ lcMD3Objs $ \(mat,lcmd3) -> do
-              forM_ (md3instanceObject lcmd3) $ \obj -> do
-                let m = mat4ToM44F $ fromProjective $ (rotationEuler (Vec3 time 0 0) .*. mat)
-                    p = trim . _4 $ fromProjective mat
-                uniformM44F "worldMat" (objectUniformSetter obj) m
-                -- uniformM44F "orientation" (objectUniformSetter obj) orientation
-                cullObject obj p
+            forM_ lcMD3Objs $ \(mat,lcmd3) -> forM_ (md3instanceObject lcmd3) $ \obj -> do
+              let m = mat4ToM44F $ fromProjective (rotationEuler (Vec3 time 0 0) .*. mat)
+                  p = trim . _4 $ fromProjective mat
+              uniformM44F "worldMat" (objectUniformSetter obj) m
+              -- uniformM44F "orientation" (objectUniformSetter obj) orientation
+              cullObject obj p
 
             forM_ (zip characters lcCharacterObjs) $ \(Character{..},(mat,(hMD3,hLC),(uMD3,uLC),(lMD3,lLC))) -> do
 {-
@@ -352,8 +368,8 @@ void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]);
                   torsoFrame = aFirstFrame torsoAnim + t `mod` aNumFrames torsoAnim
 
                   tagToMat4 MD3.Tag{..} = translateAfter4 tgOrigin (orthogonal . toOrthoUnsafe $ tgRotationMat)
-                  hMat = (tagToMat4 $ (MD3.mdTags uMD3 V.! torsoFrame) HashMap.! "tag_head") .*. uMat
-                  uMat = (tagToMat4 $ (MD3.mdTags lMD3 V.! legFrame) HashMap.! "tag_torso")
+                  hMat = tagToMat4 ((MD3.mdTags uMD3 V.! torsoFrame) HashMap.! "tag_head") .*. uMat
+                  uMat = tagToMat4 $ (MD3.mdTags lMD3 V.! legFrame) HashMap.! "tag_torso"
                   lMat = one :: Proj4
                   lcMat m = mat4ToM44F . fromProjective $ m .*. rotationEuler (Vec3 (time/5) 0 0) .*. mat
                   p = trim . _4 $ fromProjective mat
@@ -375,7 +391,5 @@ void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]);
             -- TODO
             let idmtx = V4 (V4 1 0 0 0) (V4 0 1 0 0) (V4 0 0 1 0) (V4 0 0 0 1)
             V.forM_ surfaceObjs $ \objs -> forM_ objs $ \obj -> uniformM44F "worldMat" (objectUniformSetter obj) idmtx
-            case noBSPCull of
-              True  -> V.forM_ surfaceObjs $ \objs -> forM_ objs $ \obj -> enableObject obj True
-              False -> cullSurfaces bsp camPos frust surfaceObjs
+            (if noBSPCull then V.forM_ surfaceObjs $ \objs -> forM_ objs $ \obj -> enableObject obj True else cullSurfaces bsp camPos frust surfaceObjs)
             return ()

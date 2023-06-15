@@ -52,8 +52,8 @@ readCharacters pk3Data p0 = do
         ]
       characterSkins name = [tail . dropWhile (/='_') $ takeBaseName n | n <- Map.keys pk3Data, isPrefixOf prefix n, ".skin" == takeExtension n ] where prefix = printf "models/players/%s/" name
       characterFiles name skin = printf "models/players/%s/animation.cfg" name : concat
-                            [ [ printf "models/players/%s/%s_%s.skin" name part skin
-                              , printf "models/players/%s/%s.md3" name part
+                            [ [  printf "models/players/%s/%s_%s.skin"    name part skin
+                              ,  printf "models/players/%s/%s.md3"        name part
                               ]
                             | part <- characterParts
                             ]
@@ -80,7 +80,7 @@ readCharacters pk3Data p0 = do
 
   characterSkinMap <- evaluate =<< (force . Map.fromList <$> sequence
     [ ((name,skin,part),) <$> readCharacterModelSkin name skin part
-    | (name,skin) <- characterNames
+    | (name,skin)  <- characterNames
     , part <- characterParts
     ])
 
@@ -122,13 +122,13 @@ readMD3Objects :: [[(Proj4, (Map String String, String))]]
 readMD3Objects characterObjs ents pk3Data = do
     let itemMap = Map.fromList [(SB.pack $ itClassName it,it) | it <- items]
         collectObj E.EntityData{..} = case Map.lookup (SB.pack classname) itemMap of
-            Just i -> [(mat, (mempty,m)) | m <- Prelude.take cnt $ itWorldModel i, let mat = mkWorldMat' origin]
+            Just i -> [(mat, (mempty,m)) | m <- Prelude.take cnt $ itWorldModel i, let mat = mkWorldMat' (fromJust origin)]
               where cnt = case itType i of
                       IT_HEALTH     -> 2
                       IT_POWERUP _  -> 2
                       _ -> 1
             Nothing -> case model2 of
-              Just m -> [(mkWorldMat' origin, (mempty,m))]
+              Just m -> [(mkWorldMat' (fromJust origin), (mempty,m))]
               Nothing -> []
         md3Objs = concatMap collectObj ents
     md3Map <- Map.fromList <$> sequence
@@ -137,5 +137,4 @@ readMD3Objects characterObjs ents pk3Data = do
       , m <- maybeToList $ Map.lookup n pk3Data
       ]
     let md3Materials = Set.fromList . concatMap (concatMap (map MD3.shName . V.toList . MD3.srShaders) . V.toList . MD3.mdSurfaces) $ Map.elems md3Map
-
     return (md3Materials,md3Map,md3Objs)

@@ -160,9 +160,9 @@ library
     , MonadRandom
     , OpenGLRaw
     , adjunctions
-    , aeson
+    , aeson ==2.1.2.1
     , attoparsec
-    , base >=4.7 && <5
+    , base >=4 && <=5
     , base64-bytestring
     , binary
     , bytestring
@@ -176,6 +176,7 @@ library
     , directory
     , dlist
     , elerea
+    , exceptions
     , extra
     , filepath
     , gltf-codec
@@ -206,6 +207,7 @@ library
     , proteaaudio
     , req
     , scientific
+    , split
     , stm
     , text
     , text-show
@@ -222,6 +224,7 @@ library
     , wavefront
     , wreq
     , xml
+    , xml-conduit
     , xml-conduit-writer
     , yaml
     , zlib
@@ -242,9 +245,9 @@ executable RealmViewer-FE-Demo
     , MonadRandom
     , OpenGLRaw
     , adjunctions
-    , aeson
+    , aeson ==2.1.2.1
     , attoparsec
-    , base >=4.7 && <5
+    , base >=4 && <=5
     , base64-bytestring
     , binary
     , bytestring
@@ -258,6 +261,7 @@ executable RealmViewer-FE-Demo
     , directory
     , dlist
     , elerea
+    , exceptions
     , extra
     , filepath
     , gltf-codec
@@ -289,6 +293,7 @@ executable RealmViewer-FE-Demo
     , proteaaudio
     , req
     , scientific
+    , split
     , stm
     , text
     , text-show
@@ -305,6 +310,7 @@ executable RealmViewer-FE-Demo
     , wavefront
     , wreq
     , xml
+    , xml-conduit
     , xml-conduit-writer
     , yaml
     , zlib
@@ -324,9 +330,9 @@ executable hraylib3d
     , MonadRandom
     , OpenGLRaw
     , adjunctions
-    , aeson
+    , aeson ==2.1.2.1
     , attoparsec
-    , base >=4.7 && <5
+    , base >=4 && <=5
     , base64-bytestring
     , binary
     , bytestring
@@ -340,6 +346,7 @@ executable hraylib3d
     , directory
     , dlist
     , elerea
+    , exceptions
     , extra
     , filepath
     , gltf-codec
@@ -371,6 +378,7 @@ executable hraylib3d
     , proteaaudio
     , req
     , scientific
+    , split
     , stm
     , text
     , text-show
@@ -387,6 +395,7 @@ executable hraylib3d
     , wavefront
     , wreq
     , xml
+    , xml-conduit
     , xml-conduit-writer
     , yaml
     , zlib
@@ -408,9 +417,9 @@ test-suite hraylib3d-test
     , MonadRandom
     , OpenGLRaw
     , adjunctions
-    , aeson
+    , aeson ==2.1.2.1
     , attoparsec
-    , base >=4.7 && <5
+    , base >=4 && <=5
     , base64-bytestring
     , binary
     , bytestring
@@ -424,6 +433,7 @@ test-suite hraylib3d-test
     , directory
     , dlist
     , elerea
+    , exceptions
     , extra
     , filepath
     , gltf-codec
@@ -456,6 +466,7 @@ test-suite hraylib3d-test
     , req
     , scientific
     , sdl2
+    , split
     , stm
     , text
     , text-show
@@ -472,6 +483,7 @@ test-suite hraylib3d-test
     , wavefront
     , wreq
     , xml
+    , xml-conduit
     , xml-conduit-writer
     , yaml
     , zlib

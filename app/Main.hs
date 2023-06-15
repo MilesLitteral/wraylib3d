@@ -1,17 +1,19 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Main (main) where
+module Main (Main.main) where
 
 import HRayLib3d
 import HRayLib3d.Utils.Project
 import HRayLib3d.Core.MobileInterface
 import Data.Attoparsec.ByteString.Char8
+import HRayLib3d.GameEngine.RealmViewer.Main
 import qualified Data.ByteString as BS
 
 -- Otherwise: defaultWindow
 main :: IO ()
 main = do
-    let d = DClass 1 2 3
-    print d --"Hello World" 
+    HRayLib3d.GameEngine.RealmViewer.Main.main
+    -- let d = DClass 1 2 3
+    -- print d --"Hello World" 
 
     -- initializeAll
     -- window   <- createWindow   "WRL3D (SDL2)" glWindowConfig -- vkWindowConfig --defaultWindow

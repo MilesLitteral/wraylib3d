@@ -182,30 +182,54 @@ instance ToJSON  Lightmap where
 instance ToJSON  BrushSide where
     toJSON BrushSide{..} = object ["bsPlaneNum" .= bsPlaneNum, "bsShaderNum" .= bsShaderNum]
 
+
 instance ToJSON  LightGrid
 instance ToJSON  DrawVertex
 instance ToJSON  Visibility
+instance FromJSON  LightGrid
+-- instance FromJSON  DrawVertex
+instance FromJSON  Visibility
 
 instance ToJSON  BSPLevel where
     toJSON BSPLevel{..} = object [ 
-          "blEntities" .= show blEntities
-        , "blShaders"  .= blShaders
-        , "blPlanes"   .= blPlanes
-        , "blNodes"    .= blNodes
-        , "blLeaves"   .= blLeaves
-        , "blLeafSurfaces" .= blLeafSurfaces
-        , "blLeafBrushes"  .= blLeafBrushes
-        , "blModels"       .= blModels
-        , "blBrushes"      .= blBrushes
-        , "blBrushSides"   .= blBrushSides
-        , "blDrawVertices" .= blDrawVertices
-        , "blDrawIndices"  .= blDrawIndices
-        , "blFogs"         .= blFogs
-        , "blSurfaces"     .= blSurfaces
-        , "blLightmaps"    .= blLightmaps
-        , "blLightgrid"    .= blLightgrid
-        , "blVisibility"   .= blVisibility
+          "entities"     .= show blEntities
+        , "shaders"      .= blShaders
+        , "planes"       .= blPlanes
+        , "nodes"        .= blNodes
+        , "leaves"       .= blLeaves
+        , "leafSurfaces" .= blLeafSurfaces
+        , "leafBrushes"  .= blLeafBrushes
+        , "models"       .= blModels
+        , "brushes"      .= blBrushes
+        , "brushSides"   .= blBrushSides
+        , "drawVertices" .= blDrawVertices
+        , "drawIndices"  .= blDrawIndices
+        , "fogs"         .= blFogs
+        , "surfaces"     .= blSurfaces
+        , "lightmaps"    .= blLightmaps
+        , "lightgrid"    .= blLightgrid
+        , "visibility"   .= blVisibility
         ] 
+
+-- instance FromJSON  BSPLevel where             
+--     parseJSON (Object v) = 
+--         BSPLevel <$> v     .: "entities"      
+--                     <*>  v .: "shaders" 
+--                     <*>  v .: "planes"        
+--                     <*>  v .: "nodes"         
+--                     <*>  v .: "leaves"        
+--                     <*>  v .: "leafSurfaces"  
+--                     <*>  v .: "leafBrushes"   
+--                     <*>  v .: "models"        
+--                     <*>  v .: "brushes"       
+--                     <*>  v .: "brushSides"    
+--                     <*>  v .: "drawVertices"  
+--                     <*>  v .: "drawIndices"   
+--                     <*>  v .: "fogs"          
+--                     <*>  v .: "surfaces"      
+--                     <*>  v .: "lightmaps"     
+--                     <*>  v .: "lightgrid"     
+--                     <*>  v .: "visibility"  
 
 -- --fix this later for JSON and XML Support
 -- TODO: a custom data XML object with an ToXML and FromXML allegory

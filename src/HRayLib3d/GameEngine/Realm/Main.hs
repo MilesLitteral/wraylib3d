@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards, PackageImports #-}
+{-# LANGUAGE RecordWildCards, OverloadedStrings, PackageImports #-}
 module HRayLib3d.GameEngine.Realm.Main where
 
 import GHC.Base (failIO)
@@ -11,6 +11,8 @@ import Lens.Micro.Platform
 import Graphics.UI.GLFW as GLFW
 import Graphics.GL.Core33
 import Data.Binary (encode, decode)
+import qualified Data.Aeson as JSON
+import qualified Data.ByteString.Lazy as BL 
 
 import System.FilePath
 import System.Directory
@@ -41,6 +43,9 @@ import HRayLib3d.GameEngine.Realm.Entities
 import HRayLib3d.GameEngine.RenderSystem as RenderSystem
 
 import Debug.Trace
+import Data.Maybe
+import System.Directory
+import System.Process
 
 data Event
   = Event
@@ -168,6 +173,13 @@ play pk3 world0 getScene processInput stepWorld logWorldChange = do
 
   destroyWindow win
 
+entitiesToJSON :: String -> String -> IO ()
+entitiesToJSON inputS outputS = do
+  cwrd <- getCurrentDirectory 
+  _    <- createProcess (proc "py" [cwrd </> "read.py", inputS, outputS]){ std_out = CreatePipe }   {-(_, Just hout, _, _) <- -}
+  return ()
+
+
 loadMap :: IO
   (Map String Entry, [HRayLib3d.GameEngine.Realm.Entities.Entity],
    FilePath, BSPLevel)
@@ -200,12 +212,25 @@ loadMap = do
   createDirectoryIfMissing True lc_q3_cache -- create cache
 
   SB.writeFile (lc_q3_cache </> bspName ++ ".entities") $ blEntities bsp
+  cwrd <- getCurrentDirectory 
+  jsonExists <- doesFileExist (lc_q3_cache </> bspName ++ ".json")  
 
+  let entitiesPath     = lc_q3_cache </> bspName ++ ".entities"
+      jsonEntitiesPath = lc_q3_cache </> bspName ++ ".json" 
+  createDirectoryIfMissing True lc_q3_cache -- create cache 
+  if not jsonExists
+    then entitiesToJSON (cwrd </> entitiesPath) (cwrd </> jsonEntitiesPath)
+    else print $ "File Exists: " ++ bspName ++ ".json" 
+  jsonEntities <- BL.readFile jsonEntitiesPath  --JSON.decodeFileStrict -- :: Maybe (E.EntityContainer)
+  BL.writeFile (cwrd </> lc_q3_cache </> bspName ++ "_test.json" ) $ JSON.encode E.emptyEntityData  
+  jsonETest    <- BL.readFile (cwrd  </> lc_q3_cache </> bspName ++ "_test.json" )  
+  print (fromJust $ JSON.decode  "{\"classname \":\"any\", \"_color\":null,\"angles\":{\"x\":0,\"y\":0,\"z\":0}}\"" :: Maybe E.EntityData)
+  let entities = fromJust $ JSON.decode jsonEntities :: E.EntityContainer
   -- extract spawn points
-  let ents = case E.parseEntities bspName $ SB.unpack $ blEntities bsp of
-          Left err -> error err
-          Right x -> x
-  return (pk3Data,loadEntities ents,fullBSPName, bsp)
+  -- let ents = case E.parseEntities bspName $ SB.unpack $ blEntities bsp of
+  --         Left err -> error err
+  --         Right x -> x
+  return (pk3Data,loadEntities (E.ecData entities), fullBSPName, bsp)
 
 initWindow :: String -> Int -> Int -> IO Window
 initWindow title width height = do

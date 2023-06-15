@@ -50,6 +50,9 @@ withFrameBuffer x y w h fn = allocaBytes (w*h*4) $ \p -> do
 captureRate :: Double
 captureRate = 30
 
+main :: IO ()
+main = run
+
 run :: IO ()
 run = do
     hSetBuffering stdout NoBuffering
@@ -84,7 +87,7 @@ run = do
     swapBuffers win
     pollEvents
 
-    initAudio 64 44100 1024
+    _ <- initAudio 64 44100 1024
 
     (inputSchema, levelData) <- engineInit pk3Data fullBSPName
 

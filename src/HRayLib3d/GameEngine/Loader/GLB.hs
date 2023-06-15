@@ -42,10 +42,7 @@ getGLBModel = do
     dat   <- lookAhead getRemainingLazyByteString
     glb   <- unpackGLBChunk $ GLB.fromByteString (LB.toStrict dat) 
     when (GLB.version (GLB.header glb) < 1) $ fail "unsupported GLB version"
-    return $ GLBModel
-      { glbHeader  = GLB.header glb
-      , glbChunks  = GLB.chunks glb
-      }
+    return $ GLBModel { rawGlb  = GLB.GLB (GLB.header glb) (GLB.chunks glb) }
 
 readGLB :: LB.ByteString -> GLBModel
 readGLB = runGet getGLBModel

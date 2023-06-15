@@ -23,38 +23,38 @@ loadEntity :: E.EntityData -> Maybe Entity
 loadEntity E.EntityData{..} = case Map.lookup classname itemMap of
   Just Item{..} -> case itType of
     IT_HEALTH t -> Just . EHealth $ Health
-      { _hPosition  = origin
+      { _hPosition  = fromJust origin
       , _hQuantity  = itQuantity
       , _hType      = t
       , _hTime      = 0.0
       }
     IT_WEAPON w -> Just . EWeapon $ Weapon
-      { _wPosition  = origin
+      { _wPosition  = fromJust origin
       , _wDropped   = False
       , _wType      = w
       , _wTime      = 0.0
       }
     IT_AMMO w -> Just . EAmmo $ Ammo
-      { _aPosition  = origin
+      { _aPosition  = fromJust origin
       , _aQuantity  = itQuantity
       , _aDropped   = False
       , _aType      = w
       , _aTime      = 0.0
       }
     IT_ARMOR t -> Just . EArmor $ Armor
-      { _rPosition  = origin
+      { _rPosition  = fromJust origin
       , _rQuantity  = itQuantity
       , _rDropped   = False
       , _rType      = t
       , _rTime      = 0.0
       }
     IT_POWERUP p -> Just . EPowerup $ Powerup
-      { _puPosition = origin
+      { _puPosition = fromJust origin
       , _puType     = p
       , _puTime     = 0.0
       }
     IT_HOLDABLE h -> Just . EHoldable $ Holdable
-      { _hoPosition = origin
+      { _hoPosition = fromJust origin
       , _hoType     = h
       , _hoTime     = 0.0
       }
@@ -69,24 +69,24 @@ loadEntity E.EntityData{..} = case Map.lookup classname itemMap of
     "trigger_teleport" -> do
       target_ <- target
       Just . ETeleport $ Teleport
-        { _tPosition  = origin
+        { _tPosition  = fromJust origin
         , _tTarget    = target_
         }
     "trigger_push" -> do 
       target_ <- target
       Just . ETeleport $ Teleport -- HACK
-        { _tPosition  = origin
+        { _tPosition  = fromJust origin
         , _tTarget    = target_
         }
     _ | classname `elem` ["target_position","misc_teleporter_dest","info_notnull"] -> do
       targetname_ <- targetname
       Just . ETarget $ Target
-        { _ttPosition   = origin
+        { _ttPosition   = fromJust origin
         , _ttTargetName = targetname_
         }
     _ -> Nothing
   where
     spawnPoint = Just . ESpawnPoint $ SpawnPoint
-      { _spPosition = origin
-      , _spAngles   = angles
+      { _spPosition = fromJust origin
+      , _spAngles   = fromJust angles
       }

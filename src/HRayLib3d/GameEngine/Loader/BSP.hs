@@ -26,7 +26,6 @@ Information:
   http://graphics.stanford.edu/~kekoa/q3/
   http://www.mralligator.com/q3/
 -}
-
 getLowerCaseString :: Int -> Get ByteString
 getLowerCaseString len = SB8.map toLower . SB8.takeWhile (/= '\0') <$> getByteString len
 

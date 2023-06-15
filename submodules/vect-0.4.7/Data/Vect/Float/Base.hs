@@ -616,7 +616,6 @@ instance Pointwise Mat2 where
        
 --------------------------------------------------------------------------------     
 -- Vec3 instances
-
 instance HasCoordinates Vec3 Flt where
   _1 (Vec3 x _ _) = x
   _2 (Vec3 _ y _) = y

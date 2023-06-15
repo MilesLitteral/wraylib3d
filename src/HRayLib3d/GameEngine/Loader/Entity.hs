@@ -1,39 +1,33 @@
-{-# LANGUAGE LambdaCase, DeriveGeneric, OverloadedStrings #-}
+{-# LANGUAGE LambdaCase, DeriveGeneric, OverloadedStrings, FlexibleInstances, TypeSynonymInstances #-}
 module HRayLib3d.GameEngine.Loader.Entity
-  ( parseEntities
+  ( emptyEntityData
+  , EntityContainer(..)
   , EntityData(..)
   ) where
 
-import Control.Monad (void)
 import Data.Aeson
 import GHC.Generics
-import Data.Char
-import Data.ByteString (ByteString)
-import qualified Data.ByteString.Char8 as SB8
 
-import Text.Megaparsec hiding (count)
-import qualified Text.Megaparsec as L
-import Text.Megaparsec.Char
-import qualified Text.Megaparsec.Char.Lexer as L -- (skipLineComment, skipBlockComment, symbol, lexeme, signed)
-import Data.Map (Map)
-import qualified Data.Map as Map
 import Data.Vect
-import Data.Void
-import Data.Vect.Float.Instances
-
+import Data.Void ()
+import Data.Vect.Float.Instances ()
+import Text.XML (Document)
+import Text.XML.Writer (document, element, XML, ToXML)
+import Data.Maybe
 -- import Data.Linear
-type Parser a = Parsec Void String a
+
+newtype EntityContainer = EntityContainer {ecData :: [EntityData]} deriving (Eq, Show)
 
 data EntityData
   = EntityData
   { classname           :: String
-  , spawnflags          :: Int
-  , origin              :: Vec3
-  , angles              :: Vec3
-  , notsingle           :: Bool
-  , notteam             :: Bool
-  , notfree             :: Bool
-  , notq3a              :: Bool
+  , spawnflags          :: Maybe Int
+  , origin              :: Maybe Vec3
+  , angles              :: Maybe Vec3
+  , notsingle           :: Maybe Bool
+  , notteam             :: Maybe Bool
+  , notfree             :: Maybe Bool
+  , notq3a              :: Maybe Bool
   , speed               :: Maybe Float
   , wait                :: Maybe Float
   , random              :: Maybe Float
@@ -44,7 +38,7 @@ data EntityData
   , height              :: Maybe Float
   , phase               :: Maybe Float
   , delay               :: Maybe Float
-  , color               :: Maybe Vec3
+  , _color              :: Maybe Vec3
   , count               :: Maybe Int
   , damage              :: Maybe Int
   , nobots              :: Maybe Int
@@ -66,22 +60,200 @@ data EntityData
   }
   deriving (Eq, Show, Generic)
   
--- instance Generic Vec3
+instance ToJSON   EntityContainer where
+  toJSON s = object ["ecData" .= ecData s]
+
+instance FromJSON EntityContainer where
+  parseJSON (Object v) =  EntityContainer <$> v.: "ecData" 
+
 instance ToJSON Vec3 where
-  toJSON (Vec3 x y z) = object ["vec3X" .= x, "vec3Y" .= y, "vec3Z" .= z ]
+    toJSON (Vec3 x y z) = object ["x" .= x, "y" .= y, "z" .= z ]
+  
+instance ToJSON EntityData where
+    toJSON s = object
+      [ "classname"                   .= classname  s,
+        "model"                       .= model      s,
+        "model2"                      .= model2     s,
+        "target"                      .= target     s,
+        "targetname"                  .= targetname s,
+        "team"                        .= team       s,
+        "targetshadername"            .= targetShaderName s,
+        "targetshadernewname"         .= targetShaderNewName s,
+        -- "targetRubyScript" -> (\v e -> e {targetRubyScript    = Just v}) <$> stringLiteral
 
-instance ToJSON EntityData
+        "spawnflags"  .= spawnflags s,
 
+        "origin"      .= origin s,
+        "angles"      .= angles s,
+
+        "angle"       .= Vec3 0 (if isNothing (angles s)
+                                  then 0
+                                  else _2 $ fromJust $ angles s) 
+                                  0, --s s,
+
+        "notsingle"   .= notsingle s,
+        "notteam"     .= notteam s,
+        "notfree"     .= notfree s,
+        "notq3a"      .= notq3a  s,
+        "gametype"    .= gametype s,
+
+      -- custom; varying defaults
+        "message"     .= message s,
+        "noise"       .= noise s,
+        "music"       .= music s,
+
+        "speed"       .= speed s,
+        "wait"        .= wait  s,
+        "random"      .= random s,
+        "gravity"     .= gravity s,
+        "roll"        .= roll s,
+        "light"       .= light s,
+        "lip"         .= lip s,
+        "height"      .= height s,
+        "phase"       .= phase s,
+        "delay"       .= delay s,
+
+        "_color"       .= _color s,
+
+        "count"       .= count  s,
+        "dmg"         .= damage s,
+        "nobots"      .= nobots s,
+        "nohumans"    .= nohumans s,
+        "health"      .= health s,
+        "noglobalsound" .= noglobalsound s
+      ]
+
+instance FromJSON Vec3 where
+  parseJSON (Object v) = Vec3 <$> v .: "x"
+                              <*> v .: "y"
+                              <*> v .: "z"
+                              
+                              
+instance FromJSON EntityData where
+    parseJSON (Object v) = EntityData <$> v .: "classname"
+                                      <*> v .: "model"
+                                      <*> v .: "model2"
+                                      <*> v .: "target"
+                                      <*> v .: "targetname"
+                                      <*> v .: "team"
+                                      <*> v .: "targetshadername"
+                                      <*> v .: "targetshadernewname"
+                                      <*> v .: "spawnflags"
+
+                                      <*> v .: "origin"
+                                      <*> v .: "angles"
+                                      <*> v .: "angle"
+
+                                      <*> v .: "notsingle"
+                                      <*> v .: "notteam"
+                                      <*> v .: "notfree"
+                                      <*> v .: "notq3a"
+                                      <*> v .: "gametype"
+
+                                    -- custom; varying defaults
+                                      <*> v .: "message"
+                                      <*> v .: "noise"
+                                      <*> v .: "music"
+
+                                      <*> v .: "speed"
+                                      <*> v .: "wait"
+                                      <*> v .: "random"
+                                      <*> v .: "gravity"
+                                      <*> v .: "roll"
+                                      <*> v .: "light"
+                                      <*> v .: "lip"
+                                      <*> v .: "height"
+                                      <*> v .: "phase"
+                                      <*> v .: "delay"
+
+                                      <*> v .: "_color"
+                                      <*> v .: "count"
+                                      <*> v .: "dmg"
+                                      <*> v .: "nobots"
+                                      <*> v .: "nohumans"
+                                      <*> v .: "health"
+                                    -- return $ EntityData
+
+slice :: Int -> Int -> [a] -> [a]
+slice start end = take (end - start + 1) . drop start
+
+-- quake 3 entity parser (xml)
+-- element "hello" $ content "world"
+-- {-# LANGUAGE OverloadedStrings #-}
+-- let doc = document "root" $ do
+--     element "hello" $ content "world"
+--     element "hierarchy" $ do
+--         element "simple" True
+--         element "as" ("it should be" :: Text)
+--         toXML $ Just . T.pack $ "like this"
+--     comment "that's it!"
+
+instance Semigroup XML
+
+createXML :: ToXML a => [(String, a)] -> Document
+createXML vxml = document "root" $ foldl1 (<>) $ map (uncurry valueXML) vxml
+
+valueXML :: ToXML  a => String -> a -> Text.XML.Writer.XML
+valueXML xml v =  case xml of
+                    "classname"   -> element "classname"  v
+                    "model"       -> element "model"      v
+                    "model2"      -> element "model2"     v
+                    "target"      -> element "target"     v
+                    "targetname"  -> element "targetname" v
+                    "team"        -> element "team" v
+                    "targetshadername"    -> element "targetshadername"    v
+                    "targetshadernewname" -> element "targetshadernewname" v
+                    "spawnflags"  -> element "spawnflags" v
+
+                    "origin"      -> element "origin" v
+                    "angles"      -> element "angles" v
+
+                    "angle"       -> element "angle" $ do 
+                                                        element "x" (0.0 :: Float)
+                                                        element "y" v 
+                                                        element "z" (0.0 :: Float)
+
+                    "notsingle"   -> element "notsingle" v
+                    "notteam"     -> element "notteam"   v
+                    "notfree"     -> element "notfree"   v
+                    "notq3a"      -> element "notq3a"    v
+                    "gametype"    -> element "gametype" v
+
+                  -- custom; varying defaults
+                    "message"       -> element "message" v
+                    "noise"         -> element "noise" v
+                    "music"         -> element "music" v
+                    "speed"         -> element "speed" v
+                    "wait"          -> element "wait" v
+                    "random"        -> element "random" v
+                    "gravity"       -> element "gravity" v
+                    "roll"          -> element "roll"  v
+                    "light"         -> element "light" v
+                    "lip"           -> element "lip"   v
+                    "height"        -> element "height" v
+                    "phase"         -> element "phase" v
+                    "delay"         -> element "delay"  v
+                    "color"         -> element "color" v
+
+                    "count"         -> element "count" v
+                    "dmg"           -> element "dmg" v
+                    "nobots"        -> element "nobots" v
+                    "nohumans"      -> element "nohumans" v
+                    "health"        -> element "health" v
+                    "noglobalsound" -> element "noglobalsound" v
+                    _               -> element "unknown" v
+
+-- replace with: instance Default EntityData where
 emptyEntityData :: EntityData
 emptyEntityData = EntityData
   { classname     = ""
-  , spawnflags    = 0
-  , origin        = zero
-  , angles        = zero
-  , notsingle     = False
-  , notteam       = False
-  , notfree       = False
-  , notq3a        = False
+  , spawnflags    = Nothing --0
+  , origin        = Nothing --zero
+  , angles        = Nothing --zero
+  , notsingle     = Nothing --False
+  , notteam       = Nothing --False
+  , notfree       = Nothing --False
+  , notq3a        = Nothing --False
   , speed         = Nothing
   , wait          = Nothing
   , random        = Nothing
@@ -92,7 +264,7 @@ emptyEntityData = EntityData
   , height        = Nothing
   , phase         = Nothing
   , delay         = Nothing
-  , color         = Nothing
+  , _color        = Nothing
   , count         = Nothing
   , damage        = Nothing
   , nobots        = Nothing
@@ -112,139 +284,3 @@ emptyEntityData = EntityData
   , targetShaderNewName = Nothing
   -- , targetRubyScript = Nothing
   }
-
--- quake 3 entity parser
--- TODO: Replace this "raw parser" for a more robust parsing system (JSON and XML)
-parseEntities :: String -> String -> Either String [EntityData]
-parseEntities fname src = case parse entities fname $ map toLower src of
-  Left err  -> Left (errorBundlePretty err)
-  Right e   -> Right e
-
-entities :: Parser [EntityData]
-entities = newlineConsumer *> many entity <* eof
-
-entity :: Parser EntityData
-entity = foldr ($) emptyEntityData <$> between (newlineSymbol "{") (newlineSymbol "}") (some $ choice [line value, line unknownAttribute])
-
-value :: Parser (EntityData -> EntityData)
-value = stringLiteral >>= \case
-  "classname"   -> (\v e -> e {classname = v})       <$> stringLiteral
-  "model"       -> (\v e -> e {model     = Just v})      <$> stringLiteral
-  "model2"      -> (\v e -> e {model2    = Just v})     <$> stringLiteral
-  "target"      -> (\v e -> e {target    = Just v})     <$> stringLiteral
-  "targetname"  -> (\v e -> e {targetname = Just v}) <$> stringLiteral
-  "team"        -> (\v e -> e {team = Just v})       <$> stringLiteral
-  "targetshadername"    -> (\v e -> e {targetShaderName    = Just v}) <$> stringLiteral
-  "targetshadernewname" -> (\v e -> e {targetShaderNewName = Just v}) <$> stringLiteral
-  -- "targetRubyScript" -> (\v e -> e {targetRubyScript    = Just v}) <$> stringLiteral
-
-  "spawnflags"  -> (\v e -> e {spawnflags = v}) <$> quoted integerLiteral
-
-  "origin"      -> (\v e -> e {origin = v}) <$> quoted vector3
-  "angles"      -> (\v e -> e {angles = v}) <$> quoted vector3
-
-  "angle"       -> (\v e -> e {angles = Vec3 0 v 0}) <$> quoted floatLiteral
-
-  "notsingle"   -> (\v e -> e {notsingle = v /= 0}) <$> quoted integerLiteral
-  "notteam"     -> (\v e -> e {notteam   = v /= 0}) <$> quoted integerLiteral
-  "notfree"     -> (\v e -> e {notfree   = v /= 0}) <$> quoted integerLiteral
-  "notq3a"      -> (\v e -> e {notq3a    = v /= 0}) <$> quoted integerLiteral
-  "gametype"    -> (\v e -> e {gametype  = Just v}) <$> stringLiteral
-
--- custom; varying defaults
-  "message"     -> (\v e -> e {message = Just v}) <$> stringLiteral
-  "noise"       -> (\v e -> e {noise = Just v}) <$> stringLiteral
-  "music"       -> (\v e -> e {music = Just v}) <$> stringLiteral
-
-  "speed"       -> (\v e -> e {speed = Just v}) <$> quoted floatLiteral
-  "wait"        -> (\v e -> e {wait  = Just v})  <$> quoted floatLiteral
-  "random"      -> (\v e -> e {random  = Just v})  <$> quoted floatLiteral
-  "gravity"     -> (\v e -> e {gravity = Just v}) <$> quoted floatLiteral
-  "roll"        -> (\v e -> e {roll  = Just v})   <$> quoted floatLiteral
-  "light"       -> (\v e -> e {light = Just v})  <$> quoted floatLiteral
-  "lip"         -> (\v e -> e {lip   = Just v})    <$> quoted floatLiteral
-  "height"      -> (\v e -> e {height = Just v}) <$> quoted floatLiteral
-  "phase"       -> (\v e -> e {phase = Just v})  <$> quoted floatLiteral
-  "delay"       -> (\v e -> e {delay = Just v})  <$> quoted floatLiteral
-
-  "color"       -> (\v e -> e {color = Just v}) <$> quoted vector3
-
-  "count"       -> (\v e -> e {count  = Just v}) <$> quoted integerLiteral
-  "dmg"         -> (\v e -> e {damage = Just v}) <$> quoted integerLiteral
-  "nobots"      -> (\v e -> e {nobots = Just v}) <$> quoted integerLiteral
-  "nohumans"    -> (\v e -> e {nohumans = Just v}) <$> quoted integerLiteral
-  "health"      -> (\v e -> e {health = Just v}) <$> quoted integerLiteral
-  "noglobalsound" -> (\v e -> e {noglobalsound = Just v}) <$> quoted integerLiteral
-  _ -> return id
-
--- element "hello" $ content "world"
--- {-# LANGUAGE OverloadedStrings #-}
--- let doc = document "root" $ do
---     element "hello" $ content "world"
---     element "hierarchy" $ do
---         element "simple" True
---         element "as" ("it should be" :: Text)
---         toXML $ Just . T.pack $ "like this"
---     comment "that's it!"
-
--- parser primitives
-lineComment :: Parser ()
-lineComment = L.skipLineComment "//"
-
-blockComment :: Parser ()
-blockComment = L.skipBlockComment "/*" "*/"
-
-spaceConsumer :: Parser ()
-spaceConsumer = L.space (void $ oneOf (" \t" :: String)) lineComment blockComment
-
-newlineConsumer :: Parser ()
-newlineConsumer = L.space (void spaceChar) lineComment blockComment
-
-symbol :: String -> Parser String
-symbol = L.symbol spaceConsumer -- do not consumes line breaks
-
-newlineSymbol :: String -> Parser String
-newlineSymbol = L.symbol newlineConsumer -- consumes line breaks
-
-lexeme :: Parser a -> Parser a
-lexeme = L.lexeme spaceConsumer
-
-quoted :: Parser a -> Parser a
-quoted = between (lexeme $ char '"') (lexeme $ char '"')
-
-stringLiteral :: Parser String
-stringLiteral = lexeme $ string ['"'] >> (string ['"'])
-
-integerLiteral :: Parser Int
-integerLiteral = fromIntegral <$> L.signed spaceConsumer (lexeme L.decimal)
-
-floatLiteral :: Parser Float
-floatLiteral = realToFrac <$> L.signed spaceConsumer (lexeme float) where
-  float = choice
-    [ try L.float
-    , try ((read . ("0."++)) <$ char '.' <*> some digitChar)
-    , fromIntegral <$> L.decimal
-    ]
-
-vector3 :: Parser Vec3
-vector3 = Vec3 <$> floatLiteral <*> floatLiteral <*> floatLiteral
-
-line :: Parser a -> Parser a
-line p = p <* skipTillEol <* newlineConsumer
-
-skipTillEol :: Parser ()
-skipTillEol = do
-  -- n   <- lookAhead (choice [eol, string "{", string "}"])
-  -- pos <- getSourcePos
-  -- cmd <- string n
-  -- unless (null cmd) $ tell ["LEFTOVER - " ++ sourcePosPretty pos ++ ": " ++ cmd]
-  return ()
-
-unknownAttribute :: Parser (a -> a)
-unknownAttribute = do
-  -- n    <- lookAhead (choice [eol])
-  -- pos  <- getSourcePos
-  -- cmd  <- some alphaNumChar
-  -- args <- string n
-  --tell ["IGNORE - " ++ sourcePosPretty pos ++ ": " ++ cmd ++ args]
-  return id

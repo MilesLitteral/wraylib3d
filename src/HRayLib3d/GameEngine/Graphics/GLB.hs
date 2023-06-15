@@ -11,7 +11,6 @@ import qualified Data.ByteString as BS
 
 import HRayLib3d.GameEngine.Data.GLB
 import HRayLib3d.GameEngine.Data.GLTF
-import HRayLib3d.GameEngine.Utils
 import qualified Codec.GLB  as GLB
 import qualified Codec.GlTF as GlTF
 
@@ -25,17 +24,17 @@ unpackGLBChunk chuk = case chuk of
 
 -- GLB.Chunk -> GLTF
 unpackChunk :: Either String GlTF.GlTF -> GlTF.GlTF
-unpackChunk chuk = case chuk of
+unpackChunk chunk = case chunk of
                 Left  _ -> error "Bad Chunk"
                 Right a -> a
 
-addGLB :: GLBModel -> [String] -> IO GLBInstance
-addGLB model unis = do
-  let objs = V.map (\x -> (show $ GLB.chunkType x, GLB.chunkData x)) $ (glbChunks model)
+addGLB :: GLBModel -> IO GLBInstance
+addGLB model = do
+  let objs = V.map (\x -> (show $ GLB.chunkType x, GLB.chunkData x)) $ GLB.chunks (rawGlb model)
   return $ GLBInstance { glbInstanceModel = model, glbContents = objs }
 
-loadGlTFFromGLB :: GLBInstance -> Int -> GlTF.GlTF --IO GLTFModel
+loadGlTFFromGLB :: GLBInstance -> Int -> GLTFModel
 loadGlTFFromGLB glb index = 
   case GlTF.fromByteString (snd $ glbContents glb V.! index) of
-    Left  _      -> error "mismatch of loader type (currently GLB Chunk -> GLTF)" 
-    Right gltf   -> gltf
+    Left  _     -> error "mismatch of loader type (currently GLB Chunk -> GLTF)" 
+    Right gltf  -> GLTFModel gltf

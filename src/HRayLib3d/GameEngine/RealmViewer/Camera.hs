@@ -3,7 +3,6 @@ module HRayLib3d.GameEngine.RealmViewer.Camera where
 
 import Data.Vect
 import FRP.Elerea.Param
-import Control.Applicative
 import qualified Data.Vector as V
 
 import HRayLib3d.GameEngine.Collision
@@ -97,27 +96,6 @@ proceedOnPath ps prec t d = go t (samplePath ps t) 0
         p' = samplePath ps t'
         (i, f) = properFraction t
         grad = spline' (ps V.! i) (ps V.! (i+1)) (ps V.! (i+2)) (ps V.! (i+3)) f
-{-    
-    iterate step t !! prec
-  where
-    step t = t + d / (len s * fromIntegral prec)
-      where
-        (i, f) = properFraction t
-        s = spline' (ps V.! i) (ps V.! (i+1)) (ps V.! (i+2)) (ps V.! (i+3)) f
--}
-
-{-
-
- f(t0) = p0
- f(t0+t) = p0+d
-
- t = ?
-
- f'(t0) = p'0
- f(t0+1) ~= p0+p'0 
- f(t0+x) ~= p0+d/prec  ->  x = d/(prec*p'0)
-
--}
 
 samplePath :: V.Vector Vec3 -> Float -> Vec3
 samplePath ps t = spline (ps V.! i) (ps V.! (i+1)) (ps V.! (i+2)) (ps V.! (i+3)) f
