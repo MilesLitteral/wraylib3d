@@ -132,8 +132,8 @@ engineInit pk3Data fullBSPName = do
   putStrLn $ "Try to load entities at: " ++ (cwrd </> jsonEntitiesPath)
   -- parse entities as json instead of raw parsing
   let entities = case JSON.eitherDecode jsonEntities of 
-                Left  x  -> error ("Error Parsing Container JSON: " ++ x)
-                Right y  -> Just y 
+                  Left  x  -> error ("Error Parsing Container JSON: " ++ x)
+                  Right y  -> Just y 
       spawnPoint E.EntityData{..}
         | classname `elem` [ "info_player_deathmatch"
                             , "info_player_start"

@@ -11,6 +11,8 @@ import GHC.Generics
 import Data.Vect
 import Data.Void ()
 import Data.Vect.Float.Instances ()
+import qualified Data.Vector as V
+
 import Text.XML (Document)
 import Text.XML.Writer (document, element, XML, ToXML)
 import Data.Maybe
@@ -38,7 +40,7 @@ data EntityData
   , height              :: Maybe Float
   , phase               :: Maybe Float
   , delay               :: Maybe Float
-  , _color              :: Maybe Vec3
+  , _color              :: Maybe EngineColor
   , count               :: Maybe Int
   , damage              :: Maybe Int
   , nobots              :: Maybe Int
@@ -69,6 +71,9 @@ instance FromJSON EntityContainer where
 instance ToJSON Vec3 where
     toJSON (Vec3 x y z) = object ["x" .= x, "y" .= y, "z" .= z ]
   
+instance ToJSON EngineColor where
+    toJSON (EngineColor r g b) = object ["r" .= r, "g" .= g, "b" .= b ]
+      
 instance ToJSON EntityData where
     toJSON s = object
       [ "classname"                   .= classname  s,
@@ -123,56 +128,66 @@ instance ToJSON EntityData where
         "noglobalsound" .= noglobalsound s
       ]
 
+data EngineColor = EngineColor {r :: Float, g :: Float, b :: Float} deriving (Show, Eq)
+
+instance FromJSON EngineColor where
+  parseJSON (Object v) = EngineColor <$> v .: "r"
+                                     <*> v .: "g"
+                                     <*> v .: "b"
+
 instance FromJSON Vec3 where
   parseJSON (Object v) = Vec3 <$> v .: "x"
                               <*> v .: "y"
                               <*> v .: "z"
                               
-                              
+parseOriginJSON (Array v) | not (null v) = do
+      x <- parseJSON $ v V.! 0
+      y <- parseJSON $ v V.! 1
+      z <- parseJSON $ v V.! 2
+      return $ Just $ Vec3 x y z
+
 instance FromJSON EntityData where
-    parseJSON (Object v) = EntityData <$> v .: "classname"
-                                      <*> v .: "model"
-                                      <*> v .: "model2"
-                                      <*> v .: "target"
-                                      <*> v .: "targetname"
-                                      <*> v .: "team"
-                                      <*> v .: "targetshadername"
-                                      <*> v .: "targetshadernewname"
-                                      <*> v .: "spawnflags"
+    parseJSON (Object v) = EntityData <$> v .:  "classname"
+                                      <*> v .:? "spawnflags"
+                                      <*> v .:? "origin"
+                                      <*> v .:? "angles"
+                                      <*> v .:? "notsingle"
+                                      <*> v .:? "notteam"
+                                      <*> v .:? "notfree"
+                                      <*> v .:? "notq3a"
 
-                                      <*> v .: "origin"
-                                      <*> v .: "angles"
-                                      <*> v .: "angle"
+                                      <*> v .:? "speed"
+                                      <*> v .:? "wait"
+                                      <*> v .:? "random"
+                                      <*> v .:? "gravity"
+                                      <*> v .:? "roll"
+                                      <*> v .:? "light"
+                                      <*> v .:? "lip"
+                                      <*> v .:? "height"
+                                      <*> v .:? "phase"
+                                      <*> v .:? "delay"
 
-                                      <*> v .: "notsingle"
-                                      <*> v .: "notteam"
-                                      <*> v .: "notfree"
-                                      <*> v .: "notq3a"
-                                      <*> v .: "gametype"
+                                      <*> v .:? "_color"
+                                      <*> v .:? "count"
+                                      <*> v .:? "dmg"
+                                      <*> v .:? "nobots"
+                                      <*> v .:? "nohumans"
+                                      <*> v .:? "health"
+                                      <*> v .:? "noglobalsound"
 
-                                    -- custom; varying defaults
-                                      <*> v .: "message"
-                                      <*> v .: "noise"
-                                      <*> v .: "music"
+                                      <*> v .:? "model"
+                                      <*> v .:? "model2"
+                                      <*> v .:? "target"
+                                      <*> v .:? "targetname"
+                                      <*> v .:? "team"
+                                      <*> v .:? "gametype"
+                                      <*> v .:? "message"
+                                      <*> v .:? "noise"
+                                      <*> v .:? "music"
 
-                                      <*> v .: "speed"
-                                      <*> v .: "wait"
-                                      <*> v .: "random"
-                                      <*> v .: "gravity"
-                                      <*> v .: "roll"
-                                      <*> v .: "light"
-                                      <*> v .: "lip"
-                                      <*> v .: "height"
-                                      <*> v .: "phase"
-                                      <*> v .: "delay"
-
-                                      <*> v .: "_color"
-                                      <*> v .: "count"
-                                      <*> v .: "dmg"
-                                      <*> v .: "nobots"
-                                      <*> v .: "nohumans"
-                                      <*> v .: "health"
-                                    -- return $ EntityData
+                                      <*> v .:? "targetshadername"
+                                      <*> v .:? "targetshadernewname"
+                                      -- <*> v .:? "angle"
 
 slice :: Int -> Int -> [a] -> [a]
 slice start end = take (end - start + 1) . drop start
@@ -195,29 +210,28 @@ createXML vxml = document "root" $ foldl1 (<>) $ map (uncurry valueXML) vxml
 
 valueXML :: ToXML  a => String -> a -> Text.XML.Writer.XML
 valueXML xml v =  case xml of
-                    "classname"   -> element "classname"  v
-                    "model"       -> element "model"      v
-                    "model2"      -> element "model2"     v
-                    "target"      -> element "target"     v
-                    "targetname"  -> element "targetname" v
-                    "team"        -> element "team" v
+                    "classname"           -> element "classname"  v
+                    "model"               -> element "model"      v
+                    "model2"              -> element "model2"     v
+                    "target"              -> element "target"     v
+                    "targetname"          -> element "targetname" v
+                    "team"                -> element "team" v
                     "targetshadername"    -> element "targetshadername"    v
                     "targetshadernewname" -> element "targetshadernewname" v
-                    "spawnflags"  -> element "spawnflags" v
 
-                    "origin"      -> element "origin" v
-                    "angles"      -> element "angles" v
-
-                    "angle"       -> element "angle" $ do 
+                    "spawnflags"    -> element "spawnflags" v
+                    "origin"        -> element "origin" v
+                    "angles"        -> element "angles" v
+                    "angle"         -> element "angle" $ do 
                                                         element "x" (0.0 :: Float)
                                                         element "y" v 
                                                         element "z" (0.0 :: Float)
 
-                    "notsingle"   -> element "notsingle" v
-                    "notteam"     -> element "notteam"   v
-                    "notfree"     -> element "notfree"   v
-                    "notq3a"      -> element "notq3a"    v
-                    "gametype"    -> element "gametype" v
+                    "notsingle"     -> element "notsingle" v
+                    "notteam"       -> element "notteam"   v
+                    "notfree"       -> element "notfree"   v
+                    "notq3a"        -> element "notq3a"    v
+                    "gametype"      -> element "gametype" v
 
                   -- custom; varying defaults
                     "message"       -> element "message" v

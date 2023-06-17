@@ -24,8 +24,17 @@ def entityRawToJSON(m, index, jsonExample:list):
         if idx % 2 or elem != StopIteration:
             lastElem  = elem
             idx, elem = next(x_enum)
-            jsonExport[lastElem] = elem
-            jsonExample.append(jsonExport) # {"EntityData": jsonExport}
+            if lastElem == "origin":
+                elements = elem.split(" ")
+                jsonExport[lastElem] = {"x": eval(elements[0]), "y": eval(elements[1]), "z": eval(elements[2])}
+            elif lastElem == "_color":
+                elements = elem.split(" ")
+                jsonExport[lastElem] = {"r": eval(elements[0]), "g": eval(elements[1]), "b": eval(elements[2])}
+            elif lastElem == "light" or lastElem == "radius" or lastElem == "spawnflags" or lastElem == "angle" or lastElem == "ambient" or lastElem == "spawnflags" or lastElem == "random" or lastElem == "wait":
+                jsonExport[lastElem] = eval(elem)
+            else:
+                jsonExport[lastElem] = elem
+            jsonExample.append(jsonExport)
     sort = sorted(jsonExample, key=myFunc)
     return sort
 
