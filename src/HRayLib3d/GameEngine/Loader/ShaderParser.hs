@@ -95,7 +95,7 @@ stageAttribute = line $ choice
   [ try $ choice [alphaFunc, alphaGen, animMap, blendFunc, clampMap, depthFunc, depthWrite, map_, rgbGen, tcGen, tcMod]
   , unknownCommand
   ]
-
+  
 wave :: Parser Wave
 wave = Wave <$> waveType <*> float <*> float <*> float <*> float where
   waveType = choice

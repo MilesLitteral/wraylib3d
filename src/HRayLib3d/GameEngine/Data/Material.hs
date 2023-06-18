@@ -26,7 +26,9 @@ data WaveType
     | WT_Noise
     deriving (Show,Generic)
 
-data Wave = Wave !WaveType !Float !Float !Float !Float deriving (Show,Generic)
+data Wave         = Wave !WaveType !Float !Float !Float !Float deriving (Show,Generic)
+data SurfaceLight = SurfaceLight !Float deriving (Show,Generic)
+data SurfaceType  = SL deriving (Show,Generic)
 
 data Deform
     = D_AutoSprite

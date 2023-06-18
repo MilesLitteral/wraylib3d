@@ -112,7 +112,7 @@ engineInit pk3Data fullBSPName = do
       bspEntry   = case Map.lookup fullBSPName pk3Data of
                       Nothing   -> error "You need to put pk3 file into your current directory"
                       Just bspd -> bspd
-  putStrLn $ "loading: " ++ show bspName
+  putStrLn $ "loading map: " ++ show bspName
 
   -- load bsp data
   bsp        <- readBSP . LB.fromStrict <$> readEntry bspEntry
@@ -151,9 +151,10 @@ engineInit pk3Data fullBSPName = do
   -- MD3 related code
   (characterSkinMaterials,characterObjs,characters) <- readCharacters pk3Data p0
   (md3Materials, md3Map, md3Objs)                   <- readMD3Objects characterObjs (E.ecData $ fromJust entities) pk3Data
-  putStrLn "level materials"
+  putStrLn "loading level materials"
   --mapM_ SB.putStrLn $ map shName $ V.toList $ blShaders bsp
 
+  print "Current WIP (q3 shader parsing)"
   shMap <- loadShaderMap pk3Data
   -- let maxMaterial = 20 -- TODO: remove if we will have fast reducer
   let shNames   = Set.fromList $ selectedMaterials ++ ignoredMaterials {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -} {-Prelude.take maxMaterial $ -}
