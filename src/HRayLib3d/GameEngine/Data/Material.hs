@@ -54,10 +54,72 @@ data CullType
     | CT_TwoSided
     deriving (Show,Generic)
 
+newtype SkyDef = SkyDef String
+-- Ex: sky	"env/castle"
+
+data    SunDef = SunDef !Int !Int !Int !Int !Int !Int
+-- Ex: q3map_sun	0.9 0.8 1 25 135 60
+data CloudDef = CloudDef !Int !Int !Int
+data FogDef = FogDef !Int !Int !Int !Int !Int -- 	fogparms 0 0 0 400 256
+--see also: hell.shader, sky.shader, gfx.shader, liquid.shader
+
+data SurfaceParam =
+    None
+    | NoLightMap
+    | NoImpact 
+    | NoMarks
+    | NonSolid
+    | LightFilter
+    | MetalSteps
+    | Trans
+    | AlphaShadow
+    | Lava
+    | Water
+    | Slime
+    | Fog -- TBA
+    | Sky -- TBA
+    deriving (Show,Generic)
+
+data CloudParam = 
+    NONE
+    | HALF
+    | FULL
+    deriving (Show,Generic)
+
+data CloudDef = CloudDef {
+    cloudEnvArg :: Maybe String, --ex: env/xnight2
+    cloudCount  :: Maybe Int,
+    cloudFill   :: Maybe CloudParam
+} deriving (Show,Generic)
+
 data CommonAttrs
     = CommonAttrs
     { caSkyParms        :: !() -- TODO
+    -- sky params ex:
+    {-
+    	surfaceparm noimpact
+        surfaceparm nolightmap
+        surfaceparm sky
+        --qer_editorimage textures/skies/toxicbluesky.tga
+        --q3map_surfacelight 500
+        q3map_sun	1 1 0.5 150	30 60 -- associated param
+        skyparms (env arg) 512 (CloudParam) --sky params actual 
+
+        sky env/hell2
+	    cloudparms 512 full
+	    lightning
+        -- cloudparms 512 full -- additional associated parameters
+    -}
+    --, caCloudParms    :: !() -- TODO --
     , caFogParms        :: !() -- TODO
+    -- fog params ex:
+    {-	
+        fogonly (an associated option into it self)
+	    fogparms 0 0 0 400 256
+    -}
+    , caSurfaceParm     :: !SurfaceParam
+    , caLight           :: !Int
+    , caSurfaceLight    :: !Int
     , caPortal          :: !Bool
     , caSort            :: !Float -- default: 3 or 6 depends on blend function
     , caEntityMergable  :: !Bool
@@ -67,12 +129,10 @@ data CommonAttrs
     , caNoMipMaps       :: !Bool
     , caPolygonOffset   :: !Bool
     , caStages          :: ![StageAttrs]
-
     -- parser internals
     , caIsSky           :: Bool
     }
     deriving (Show,Generic)
-
 
 data RGBGen
     = RGB_Wave !Wave
@@ -185,6 +245,7 @@ instance Binary CullType
 instance Binary Blending
 instance Binary StageAttrs
 instance Binary CommonAttrs
+instance Binary SurfaceParam
 
 identityLight :: Float
 identityLight = 1
@@ -193,6 +254,9 @@ defaultCommonAttrs :: CommonAttrs
 defaultCommonAttrs = CommonAttrs
     { caSkyParms        = ()
     , caFogParms        = ()
+    , caSurfaceParm     = None
+    , caSurfaceLight    = 0
+    , caLight           = 0
     , caPortal          = False
     , caSort            = 0
     , caEntityMergable  = False

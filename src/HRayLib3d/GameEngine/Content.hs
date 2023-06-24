@@ -33,15 +33,15 @@ loadPK3 = do
 
 loadAssetBundle :: IO (Map String AssetContent)
 loadAssetBundle = do
-  let takeExtensionCI = map toLower . takeExtension
+  -- let takeExtensionCI = map toLower . takeExtension
   mst <- loadStore "./wrl3d-assets.assetBundle"
   return (Map.fromList (map (\x -> (T.unpack $ fst x , snd x)) $ _contents mst))
   -- Map.unions <$> (mapM loadStore =<< filter (\n -> ".assetBundle" == takeExtensionCI n) <$> getDirectoryContents ".")
 
 pk3ToAssetBundle :: IO (Map String AssetContent)
 pk3ToAssetBundle = do
-  let takeExtensionCI = map toLower . takeExtension
-  --mst <- loadStore "./wrl3d-assets.assetBundle"
+  -- let takeExtensionCI = map toLower . takeExtension
+  -- mst <- loadStore "./wrl3d-assets.assetBundle"
   pk3 <- loadPK3
   let fileData = Map.keys pk3
   files      <- mapM BL.readFile fileData 
@@ -58,9 +58,10 @@ pk3ToAssetBundle = do
 
 loadShaderCache :: IO (Map String ShaderContent)
 loadShaderCache = do
-  let takeExtensionCI = map toLower . takeExtension
   mst <- loadStore "./wrl3d-shaders.shadercache"
-  return (Map.fromList (map (\x -> (T.unpack $ fst x , snd x)) $ _contents mst)) --loadStore =<< filter (\n -> ".shaderCache" == takeExtensionCI n) <$> getDirectoryContents ".")
+  return $ Map.fromList (map (\x -> (T.unpack $ fst x , snd x)) $ _contents mst)
+  -- let takeExtensionCI = map toLower . takeExtension
+  -- loadStore =<< filter (\n -> ".shaderCache" == takeExtensionCI n) <$> getDirectoryContents ".")
 
 loadShaderMap :: Map String Entry -> IO (Map String CommonAttrs)
 loadShaderMap ar = do

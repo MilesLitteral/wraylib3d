@@ -3,6 +3,7 @@ module HRayLib3d.GameEngine.Loader.ShaderParser
   ( parseShaders
   ) where
 
+import GHC.Float ( float2Int )
 import Control.Applicative hiding (many, some)
 import Control.Monad
 import Data.ByteString.Char8 (ByteString,pack)
@@ -21,6 +22,7 @@ import qualified Data.ByteString.Char8 as BS8
 import HRayLib3d.GameEngine.Data.Material
 
 import Control.Monad.Trans.Writer.Strict
+import HRayLib3d.Core.Parser.Language.GLSL (intConstant)
 
 instance ShowErrorComponent (ErrorFancy Void)
 type Parser = WriterT [String] (Parsec (ErrorFancy Void) String)
@@ -32,13 +34,15 @@ parseShaders fname src = case parse (runWriterT $ newlineConsumer *> many shader
   Right a   -> Right a
 
 -- q3 shader related parsers
-shader :: Parser (String,CommonAttrs)
+shader :: Parser (String, CommonAttrs)
 shader = (\n l -> (n,finishShader $ foldl' (\s f -> f s) defaultCommonAttrs l)) <$>
   line filepath <* newlineSymbol "{" <*> many shaderAttribute <* newlineSymbol "}"
 
 finishShader :: CommonAttrs -> CommonAttrs
 finishShader ca = ca
-    { caDeformVertexes  = reverse $ caDeformVertexes ca
+    { caLight           = caLight        ca -- maybe global lighting (effect on material)
+    , caSurfaceLight    = caSurfaceLight ca -- maybe fog
+    , caDeformVertexes  = reverse $ caDeformVertexes ca
     , caStages          = fixedStages
     , caSort            = fixedSort
     }
@@ -80,12 +84,13 @@ finishShader ca = ca
                 ST_Lightmap -> TG_Lightmap
                 _           -> TG_Base
             a               -> a
+            
 
 shaderAttribute :: Parser (CommonAttrs -> CommonAttrs)
 shaderAttribute = choice [line general, stage, line unknownCommand]
 
 general :: Parser (CommonAttrs -> CommonAttrs)
-general = try $ choice [cull, deformVertexes, nomipmaps, polygonOffset, portal, skyParms, sort]
+general = try $ choice [surfaceparm, lightF, surfaceLight, lightMaps, cull, deformVertexes, nomipmaps, polygonOffset, portal, skyParms, sort]
 
 stage :: Parser (CommonAttrs -> CommonAttrs)
 stage = (\fl ca -> ca {caStages = (foldl' (\s f -> f s) defaultStageAttrs fl):caStages ca}) <$ newlineSymbol "{" <*> many stageAttribute <* newlineSymbol "}"
@@ -96,6 +101,13 @@ stageAttribute = line $ choice
   , unknownCommand
   ]
   
+-- -- Match the lowercase or uppercase form of 'c'
+-- caseInsensitiveChar c = char (toLower c) <|> char (toUpper c)
+
+-- -- Match the string 's', accepting either lowercase or uppercase form of each character 
+-- caseInsensitiveString :: Parser String
+-- caseInsensitiveString s = try (mapM caseInsensitiveChar s) <?> "\"" ++ s ++ "\""
+
 wave :: Parser Wave
 wave = Wave <$> waveType <*> float <*> float <*> float <*> float where
   waveType = choice
@@ -107,28 +119,42 @@ wave = Wave <$> waveType <*> float <*> float <*> float <*> float where
     , value WT_Noise "noise"
     ]
 
+cloudParms :: Parser (CommonAttrs -> CommonAttrs)
+cloudParms = (\ca -> ca {caIsSky = True}) <$ symbol "cloudparms" <* image <* image <* image
+  where image = choice [Nothing <$ symbol "-", Just <$> filepath]
+
 skyParms :: Parser (CommonAttrs -> CommonAttrs)
 skyParms = (\ca -> ca {caIsSky = True}) <$ symbol "skyparms" <* image <* image <* image
   where image = choice [Nothing <$ symbol "-", Just <$> filepath]
 
+fogParms :: Parser (CommonAttrs -> CommonAttrs)
+fogParms = (\ca -> ca {caIsSky = True}) <$ symbol "fogparms" <* image <* image <* image
+  where image = choice [Nothing <$ symbol "-", Just <$> filepath]
+
+lightF :: Parser (CommonAttrs -> CommonAttrs)
+lightF = (\a ca -> ca {caLight = a}) <$ symbol "light" <*> (integer) 
+
+surfaceLight :: Parser (CommonAttrs -> CommonAttrs)
+surfaceLight = (\a ca -> ca {caSurfaceLight = a}) <$ symbol "q3map_surfacelight" <*> (integer) 
+
 cull :: Parser (CommonAttrs -> CommonAttrs)
 cull = (\a ca -> ca {caCull = a}) <$ symbol "cull" <*> choice
   [ value CT_FrontSided "front"
-  , value CT_TwoSided "none"
-  , value CT_TwoSided "twosided"
-  , value CT_TwoSided "disable"
-  , value CT_BackSided "backsided"
-  , value CT_BackSided "backside"
-  , value CT_BackSided "back"
+  , value CT_TwoSided   "none"
+  , value CT_TwoSided   "twosided"
+  , value CT_TwoSided   "disable"
+  , value CT_BackSided  "backsided"
+  , value CT_BackSided  "backside"
+  , value CT_BackSided  "back"
   ]
 
 deformVertexes :: Parser (CommonAttrs -> CommonAttrs)
 deformVertexes = (\v ca -> ca {caDeformVertexes = v:caDeformVertexes ca}) <$ symbol "deformvertexes" <*> choice
     [ value D_AutoSprite2 "autosprite2"
-    , value D_AutoSprite "autosprite"
-    , D_Bulge <$ symbol "bulge" <*> float <*> float <*> float
-    , D_Move <$ symbol "move" <*> v3 <*> wave
-    , D_Normal <$ symbol "normal" <*> float <*> float -- amplitude, frequency
+    , value D_AutoSprite  "autosprite"
+    , D_Bulge  <$ symbol  "bulge"  <*> float <*> float <*> float
+    , D_Move   <$ symbol  "move"   <*> v3    <*> wave
+    , D_Normal <$ symbol  "normal" <*> float <*> float -- amplitude, frequency
     , value D_ProjectionShadow "projectionshadow"
     , value D_Text0 "text0"
     , value D_Text1 "text1"
@@ -166,9 +192,10 @@ sort = (\i ca -> ca {caSort = i}) <$ symbol "sort" <*> choice
   , float
   ]
 
+
 map_ :: Parser (StageAttrs -> StageAttrs)
 map_ = (\v sa -> sa {saTexture = v}) <$ symbol "map" <*> choice
-  [ value ST_Lightmap "$lightmap"
+  [ value ST_Lightmap   "$lightmap"
   , value ST_WhiteImage "$whiteimage"
   , ST_Map <$> filepath
   ]
@@ -178,6 +205,39 @@ clampMap = (\v sa -> sa {saTexture = ST_ClampMap v}) <$> (symbol "clampmap" *> f
 
 animMap :: Parser (StageAttrs -> StageAttrs)
 animMap = (\f v sa -> sa {saTexture = ST_AnimMap f v}) <$ symbol "animmap" <*> float <*> some filepath
+
+-- NoLightMap 
+-- | NoMarks
+-- | Trans
+surfaceparm :: Parser (CommonAttrs -> CommonAttrs)
+surfaceparm = (\v sa -> sa {caSurfaceParm = v}) <$ symbol "surfaceparm" <*> surfaceParmData
+
+surfaceParmData :: Parser (SurfaceParam)
+surfaceParmData = choice
+  [ value NoLightMap  "nolightmap"
+  , value NoMarks     "nomarks"
+  , value NonSolid    "nonsolid"
+  , value Trans       "trans"
+  , value LightFilter "lightfilter"
+  , value MetalSteps  "metalsteps"
+  , value AlphaShadow "alphashadow"
+  ]	
+
+	-- qer_editorimage textures/hell/ironcrosslt1.tga
+  {-
+  editorImage :: Parser (StageAttrs -> StageAttrs)
+  editorImage = (\v sa -> sa {saEditorImage = ST_ClampMap v}) <$> (symbol "qer_editorimage" *> filepath)
+
+  lightImage :: Parser (StageAttrs -> StageAttrs)
+  lightImage = (\v sa -> sa {saLightImage = ST_ClampMap v}) <$> (symbol "q3map_lightimage" *> filepath)
+  -}
+	-- q3map_lightimage textures/hell/ironcrosslt1.blend.tga
+
+lightMaps :: Parser (CommonAttrs -> CommonAttrs)
+lightMaps = (\i ca -> ca {caSort = i}) <$ symbol "sort" <*>  choice
+  [ value 1 "light"
+  , value 1400 "q3map_surfacelight"
+  ]	
 
 blendFuncFunc :: Parser (Blending, Blending)
 blendFuncFunc = choice
@@ -263,12 +323,12 @@ tcGen = (\v sa -> sa {saTCGen = v}) <$ (symbol "texgen" <|> symbol "tcgen") <*> 
 tcMod :: Parser (StageAttrs -> StageAttrs)
 tcMod = (\v sa -> sa {saTCMod = v:saTCMod sa}) <$ symbol "tcmod" <*> choice
   [ value TM_EntityTranslate "entitytranslate"
-  , TM_Rotate <$ symbol "rotate" <*> float
-  , TM_Scroll <$ symbol "scroll" <*> float <*> float
-  , TM_Scale <$ symbol "scale" <*> float <*> float
-  , TM_Stretch <$ symbol "stretch" <*> wave
+  , TM_Rotate    <$ symbol "rotate" <*> float
+  , TM_Scroll    <$ symbol "scroll" <*> float <*> float
+  , TM_Scale     <$ symbol "scale" <*> float <*> float
+  , TM_Stretch   <$ symbol "stretch" <*> wave
   , TM_Transform <$ symbol "transform" <*> float <*> float <*> float <*> float <*> float <*> float
-  , TM_Turb <$ symbol "turb" <*> float <*> float <*> float <*> float
+  , TM_Turb      <$ symbol "turb" <*> float <*> float <*> float <*> float
   ]
 
 depthFunc :: Parser (StageAttrs -> StageAttrs)
@@ -305,6 +365,14 @@ lexeme = L.lexeme spaceConsumer
 float :: Parser Float
 float = realToFrac <$> L.signed spaceConsumer (lexeme floatLiteral) where
   floatLiteral = choice
+    [ try L.float
+    , try ((read . ("0."++)) <$ char '.' <*> some digitChar)
+    , fromIntegral <$> L.decimal
+    ]
+
+integer :: Parser Int
+integer = float2Int <$> L.signed spaceConsumer (lexeme intLiteral) where
+  intLiteral = choice
     [ try L.float
     , try ((read . ("0."++)) <$ char '.' <*> some digitChar)
     , fromIntegral <$> L.decimal
