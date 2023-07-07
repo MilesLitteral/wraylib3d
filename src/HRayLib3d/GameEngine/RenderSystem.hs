@@ -17,18 +17,28 @@ module HRayLib3d.GameEngine.RenderSystem
   , lookupAnimationData
   ) where
 
-import Data.Vect hiding (Vector)
-import Data.Maybe (fromJust, mapMaybe)
-import Data.IORef
-import Data.List (foldl')
-import Data.Hashable
-import Data.HashSet (HashSet)
+import Data.Vect
+    ( Proj4,
+      translateAfter4,
+      translateBefore4,
+      AbelianGroup(neg),
+      Extend(trim),
+      HasCoordinates(_4),
+      Matrix(transpose, idmtx),
+      MultSemiGroup((.*.), one),
+      Orthogonal(toOrthoUnsafe),
+      Projective(fromProjective, orthogonal) )
+import Data.Maybe    (fromJust, mapMaybe)
+import Data.IORef    ( IORef, newIORef, readIORef, writeIORef )
+import Data.List     (foldl')
+import Data.Hashable ( Hashable )
+import Data.HashSet  (HashSet)
 
-import Codec.Picture
-import Data.Vector (Vector)
-import Data.Map.Strict (Map)
-import Data.Digest.CRC32 (crc32)
-import Data.HashMap.Strict (HashMap)
+import Codec.Picture ( DynamicImage(ImageRGB8), generateImage, PixelRGB8(PixelRGB8) )
+import Data.Vector   ( Vector )
+import Data.Map.Strict ( Map )
+import Data.Digest.CRC32   ( crc32   )
+import Data.HashMap.Strict ( HashMap )
 
 import qualified Data.Set as Set
 import qualified Data.Vector as V
@@ -38,28 +48,77 @@ import qualified Data.ByteString.Lazy as LB
 import qualified Data.ByteString.Char8 as BS8
 import qualified Data.HashMap.Strict as HashMap
 
-import Text.Printf
-import Control.Monad
-import Control.Monad.State.Strict
-import Lens.Micro.Platform hiding (_4)
+import Text.Printf                ( printf )
+import Control.Monad              ( forM, forM_, unless )
+import Control.Monad.State.Strict ( MonadIO(liftIO), forM, forM_, unless, StateT, execStateT )
+import Lens.Micro.Platform ( Lens', (%=), use, makeLenses )
 
 import LambdaCube.GL
-import HRayLib3d.GameEngine.Data.Material hiding (Vec3)
+    ( V3(V3),
+      disposeRenderer,
+      renderFrame,
+      uploadTexture2DToGPU',
+      allocStorage,
+      enableObject,
+      objectUniformSetter,
+      setScreenSize,
+      uniformFTexture2D,
+      uniformFloat,
+      uniformM44F,
+      uniformV3F,
+      GLRenderer,
+      GLStorage(uniformSetter),
+      SetterFun,
+      TextureData 
+      )
+import HRayLib3d.GameEngine.Data.Material
+    ( StageTexture(ST_AnimMap, ST_Map, ST_ClampMap),
+      StageAttrs(StageAttrs, saBlend, saTextureUniform,
+                 saDepthMaskExplicit, saAlphaMap, saAlphaFunc, saDetail,
+                 saDepthFunc, saDepthWrite, saTexture, saTCMod, saTCGen, saAlphaGen,
+                 saRGBGen),
+      CommonAttrs(..) )
 import HRayLib3d.GameEngine.Graphics.Storage
-import HRayLib3d.GameEngine.Graphics.Frustum
-import HRayLib3d.GameEngine.Graphics.Culling
-import HRayLib3d.GameEngine.Graphics.Quad
+    ( compileQuake3GraphicsCached,
+      createRenderInfo,
+      initTableTextures,
+      loadQ3Texture,
+      loadQuake3Graphics,
+      setupTableTextures,
+      writeSampleMaterial,
+      TableTextures )
+import HRayLib3d.GameEngine.Graphics.Frustum ()
+import HRayLib3d.GameEngine.Graphics.Culling ( cullSurfaces )
+import HRayLib3d.GameEngine.Graphics.Quad ( addQuad, updateQuad, QuadInstance(..) )
 import HRayLib3d.GameEngine.Graphics.MD3
+    ( addGPUMD3,
+      setMD3Frame,
+      uploadMD3,
+      GPUMD3(gpumd3Shaders, gpumd3Model),
+      MD3Instance(..) )
 import HRayLib3d.GameEngine.Graphics.BSP
-import HRayLib3d.GameEngine.Graphics.GameCharacter
-import HRayLib3d.GameEngine.Loader.Zip
+    ( addGPUBSP,
+      uploadBSP,
+      BSPInstance(..),
+      GPUBSP(gpubspShaders, gpubspBSPLevel) )
+import HRayLib3d.GameEngine.Graphics.GameCharacter ( addCharacterInstance, setupGameCharacter, CharacterInstance(..) )
+import HRayLib3d.GameEngine.Loader.Zip ( readEntry, Entry )
 import HRayLib3d.GameEngine.Loader.BSP (readBSP)
 import HRayLib3d.GameEngine.Loader.MD3 (readMD3, readMD3Skin)
-import HRayLib3d.GameEngine.Loader.GameCharacter
-import HRayLib3d.GameEngine.Content
+import HRayLib3d.GameEngine.Loader.GameCharacter ( parseCharacter )
+import HRayLib3d.GameEngine.Content ( loadShaderMap )
 import HRayLib3d.GameEngine.Scene
-import HRayLib3d.GameEngine.Utils
-import HRayLib3d.GameEngine.Data.MD3
+    ( asResource,
+      leftOrthoU,
+      Camera(..),
+      MD3Data(..),
+      Picture(..),
+      Renderable(..),
+      Resource(R_Shader, R_AnimationCfg, R_Skin, R_MD3, R_BSPMap),
+      Scene(..),
+      Tag(Tag) )
+import HRayLib3d.GameEngine.Utils    ( mat4ToM44F, ortho, setNub, toWorldMatrix, vec3ToV3F )
+import HRayLib3d.GameEngine.Data.MD3 ( Tag(tgName, tgRotationMat, tgOrigin) )
 import qualified HRayLib3d.GameEngine.Data.BSP as BSP
 import qualified HRayLib3d.GameEngine.Data.MD3 as MD3
 import qualified HRayLib3d.GameEngine.Data.GameCharacter as GCH

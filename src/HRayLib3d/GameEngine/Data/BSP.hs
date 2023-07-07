@@ -2,22 +2,21 @@
 
 module HRayLib3d.GameEngine.Data.BSP where
 
-import Data.Aeson
-import Data.Word
-import Data.Binary
-import GHC.Generics
-import Data.Vector      (Vector)
-import Data.Vect hiding (Vector)
-import Data.Vect.Float.Instances
+import Text.XML.Writer ()
 
-import Data.ByteString
-import Text.XML.Writer
-import qualified Data.Text as T
+import GHC.Generics    (Generic)
+import Data.Aeson      (FromJSON, ToJSON(toJSON), object, KeyValue((.=)))
+import Data.Binary     ()
+import Data.Word       (Word8)
+import Data.ByteString (ByteString)
+import Data.Vector     (Vector)
+import Data.Vect       (Vec3(..), Vec2(..), Vec4(..) )
+import Data.Vect.Float.Instances ()
 
 {-
-Information:
-  http://graphics.stanford.edu/~kekoa/q3/
-  http://www.mralligator.com/q3/
+    Information:
+        http://graphics.stanford.edu/~kekoa/q3/
+        http://www.mralligator.com/q3/
 -}
 
 data Model
@@ -182,13 +181,9 @@ instance ToJSON  Lightmap where
 instance ToJSON  BrushSide where
     toJSON BrushSide{..} = object ["bsPlaneNum" .= bsPlaneNum, "bsShaderNum" .= bsShaderNum]
 
-
 instance ToJSON  LightGrid
 instance ToJSON  DrawVertex
 instance ToJSON  Visibility
-instance FromJSON  LightGrid
--- instance FromJSON  DrawVertex
-instance FromJSON  Visibility
 
 instance ToJSON  BSPLevel where
     toJSON BSPLevel{..} = object [ 
@@ -210,6 +205,9 @@ instance ToJSON  BSPLevel where
         , "lightgrid"    .= blLightgrid
         , "visibility"   .= blVisibility
         ] 
+
+instance FromJSON  LightGrid
+instance FromJSON  Visibility
 
 -- instance FromJSON  BSPLevel where             
 --     parseJSON (Object v) = 

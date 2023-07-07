@@ -5,13 +5,11 @@ import Data.Map (Map)
 import Codec.GLB
 import Codec.GlTF.Material
 
-
-type GLBSkin = Map Text Material
-
 -- No Animation, for Static Models or bundles of multiple individual asset
 -- This could be a bundle (in Chunks) of the following:
 -- GlTFs
 -- Textures
 -- Misc Data 
-newtype GLBModel = GLBModel { rawGlb :: GLB } deriving Show
 
+type GLBSkin     = Map Text Material
+newtype GLBModel = GLBModel { rawGlb :: GLB } deriving Show

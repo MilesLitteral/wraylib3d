@@ -18,11 +18,10 @@ module HRayLib3d.GameEngine.Realm (
     where
 
     import HRayLib3d.GameEngine.Realm.CodeSample
-    import HRayLib3d.GameEngine.Realm.CodeSample
     import HRayLib3d.GameEngine.Realm.Collision
     import HRayLib3d.GameEngine.Realm.Entities
     import HRayLib3d.GameEngine.Realm.GameLogic
-    import HRayLib3d.GameEngine.Realm.Items
+    import HRayLib3d.GameEngine.Realm.Items ()
     import HRayLib3d.GameEngine.Realm.LoadEntities
     import HRayLib3d.GameEngine.Realm.LoadResources
     import HRayLib3d.GameEngine.Realm.Main
@@ -32,4 +31,4 @@ module HRayLib3d.GameEngine.Realm (
     import HRayLib3d.GameEngine.Realm.Player
     import HRayLib3d.GameEngine.Realm.RenderGame
     import HRayLib3d.GameEngine.Realm.Visuals
-    import HRayLib3d.GameEngine.Realm.World
+    import HRayLib3d.GameEngine.Realm.World ()

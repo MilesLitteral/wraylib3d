@@ -1,3 +1,4 @@
+--{-# LANGUAGE DatatypeContexts #-}
 module HRayLib3d.Core.MobileInterface where
 
     import qualified Data.Text as T

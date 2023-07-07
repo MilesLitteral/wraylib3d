@@ -22,7 +22,7 @@ textures/hell/skin7_teeth2
 {
 	deformVertexes wave 100 sin 2 3 0 0.4
 	{
-		map $lightmapt
+		map $lightmap
 		rgbGen identity
 	}
 	{
@@ -37,7 +37,7 @@ textures/hell/hellredclouds
 	surfaceparm nolightmap
 	q3map_surfacelight 280
 
-	cloudparms 512 full
+	cloudparms - 512 full
 	lightning
 
 	{

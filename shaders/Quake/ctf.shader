@@ -4,48 +4,43 @@ textures/ctf/blue_telep
         surfaceparm nomarks
         surfaceparm trans
         sort additive	
-
         {
-	        
-	        clampmap textures/ctf/blue_telep.tga
-		blendFunc add
-                //depthWrite
-                //tcMod stretch sin .9 0.1 0 .5
-                tcmod rotate 327
-                rgbGen identity
-	}
+			clampmap textures/ctf/blue_telep.tga
+			blendFunc add
+			//depthWrite
+			//tcMod stretch sin .9 0.1 0 .5
+			tcmod rotate 327
+			rgbGen identity
+		}
         {
-	        clampmap textures/ctf/blue_telep2.tga
-		blendFunc add
-                //depthWrite
-                //tcMod stretch sin .9 0.1 0 .1
-                tcmod rotate -211
-                rgbGen identity
+			clampmap textures/ctf/blue_telep2.tga
+			blendFunc add
+			//depthWrite
+			//tcMod stretch sin .9 0.1 0 .1
+			tcmod rotate -211
+			rgbGen identity
         }
         {
-	        clampmap textures/ctf/telep.tga
-		alphaFunc GE128
-                depthWrite
-                tcmod rotate 20
-	        rgbGen identity
-	}
+			clampmap textures/ctf/telep.tga
+			alphaFunc GE128
+			depthWrite
+			tcmod rotate 20
+			rgbGen identity
+		}
         {
 	        clampmap textures/ctf/telep.tga
-		alphaFunc GE128
-                depthWrite
-                tcMod stretch sin .7 0 0 0
-                tcmod rotate -20
-                rgbGen identity
-	}
+			alphaFunc GE128
+            depthWrite
+            tcMod stretch sin .7 0 0 0
+            tcmod rotate -20
+            rgbGen identity
+		}
         {
-		map $lightmap
-		rgbGen identity
-		blendFunc GL_DST_COLOR GL_ZERO
-		depthFunc equal
-	}
-
-
-
+			map $lightmap
+			rgbGen identity
+			blendFunc GL_DST_COLOR GL_ZERO
+			depthFunc equal
+		}
 }
 textures/ctf/red_telep
 { 

@@ -2,14 +2,13 @@
 
 module HRayLib3d.Core.StructuredData where
 
-    import Data.Aeson
-    import Data.Yaml.Parser
-    import Text.XML.Light
-    import Text.XML.Light.Lexer (XmlSource(..))
-    import Text.XML.Light.Input (parseXML)
-    import Data.Vect
-    import HRayLib3d.GameEngine.Realm.Entities 
-    import HRayLib3d.GameEngine.Realm.Items
+    import Data.Aeson           ( FromJSON, ToJSON, FromJSONKey, ToJSONKey )
+    import Data.Yaml.Parser     ( readYamlFile, FromYaml )
+    import Text.XML.Light       ( Content, parseXML )
+    import Text.XML.Light.Lexer ( XmlSource(..) )
+    import Data.Vect            ( Vec3 )
+    import HRayLib3d.GameEngine.Realm.Entities ( Player, Powerup,  Weapon ) 
+    import HRayLib3d.GameEngine.Realm.Items    ( Armor,  Holdable, Powerup, Weapon )
 
     instance FromJSON Player
     instance ToJSON   Player
@@ -38,7 +37,7 @@ module HRayLib3d.Core.StructuredData where
     instance FromJSON    HRayLib3d.GameEngine.Realm.Items.Powerup
     instance ToJSON      HRayLib3d.GameEngine.Realm.Items.Powerup
 
-    loadXML :: XmlSource s => s -> [Content]
+    loadXML  :: XmlSource s => s -> [Content]
     loadXML  = parseXML 
 
     loadYaml :: FromYaml a => FilePath -> IO a

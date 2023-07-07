@@ -11,8 +11,7 @@ type FileIO = LState (S [String])
 -- The State Machine has one function, Run, which it acts on stream 
 -- with.
 newtype LState s a = LState { runLState :: s ⊸ (s, a) }
-
-data LHandle where Handle :: Int -> LHandle
+data    LHandle where Handle :: Int -> LHandle
 
 -- | Record Keeper of the current State (S)
 data S a where S :: a -> S a

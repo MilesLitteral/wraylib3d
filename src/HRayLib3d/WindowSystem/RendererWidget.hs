@@ -8,39 +8,38 @@ module HRayLib3d.WindowSystem.RendererWidget (
 ) where
 
 
-import Data.IORef
-import Data.Maybe
-import Data.Char (toLower)
+import Data.IORef ( IORef )
+import Data.Maybe ()
+import Data.Char  (toLower)
 import qualified Data.Map as Map
 import Control.Monad
-import Control.Concurrent
+import Control.Concurrent ()
 
-import System.IO
-import System.Exit
-import System.FilePath
-import System.Directory
-import System.Environment
+import System.IO ()
+import System.Exit ()
+import System.FilePath ()
+import System.Directory ()
+import System.Environment ()
 import qualified System.Mem
 
-import FRP.Elerea.Param
-import Sound.ProteaAudio
+import FRP.Elerea.Param ()
+import Sound.ProteaAudio ()
 import Graphics.GL.Core33
-import Graphics.UI.GLFW as GLFW
+import Graphics.UI.GLFW as GLFW ()
 
 import LambdaCube.GL as GL
 import HRayLib3d.GameEngine.Loader.Zip ()
-import HRayLib3d.GameEngine.RealmViewer.Main 
-import HRayLib3d.GameEngine.RealmViewer.Camera
-import HRayLib3d.GameEngine.RealmViewer.Engine
+import HRayLib3d.GameEngine.RealmViewer.Main   ( run, runAsWidget ) 
+import HRayLib3d.GameEngine.RealmViewer.Camera ()
+import HRayLib3d.GameEngine.RealmViewer.Engine ()
 import qualified Data.ByteString.Char8 as SB8
-
 
 import Data.Default
 import Data.Typeable (cast)
 import Data.Vector.Storable (Vector)
 
-import Control.Lens ((&), (^.), (.~))
 import Control.Monad
+import Control.Lens ((&), (^.), (.~))
 
 import Foreign.C.String
 import Foreign.Marshal.Alloc

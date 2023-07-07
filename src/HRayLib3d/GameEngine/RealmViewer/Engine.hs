@@ -237,10 +237,9 @@ setupStorage pk3Data (bsp, md3Map, md3Objs, characterObjs, characters, shMapTexS
                     lcmd3 <- addMD3 storage md3 skin ["worldMat"]
                     return [(mat,lcmd3)]
 
-    lcMD3Objs <- concat <$> forM md3Objs addMD3Obj
-
+    lcMD3Objs   <- concat <$> forM md3Objs addMD3Obj
     lcMD3Weapon <- addMD3 storage (fromJust $ Map.lookup (SB.pack handWeapon) md3Map) mempty ["worldMat","viewProj"]
-
+ 
     -- add characters
     lcCharacterObjs <- forM characterObjs
       (\[(mat,(hSkin,hName)),(_,(uSkin,uName)),(_,(lSkin,lName))] -> do
@@ -257,9 +256,8 @@ setupStorage pk3Data (bsp, md3Map, md3Objs, characterObjs, characters, shMapTexS
 -- TODO
 updateRenderInput :: EngineGraphics -> (Vec3, Vec3, Vec3) -> Int -> Int -> Float -> Bool -> IO ()
 updateRenderInput (storage,lcMD3Objs,characters,lcCharacterObjs,surfaceObjs,bsp,lcMD3Weapon,animTex) (camPos,camTarget,camUp) w h time noBSPCull = do
-            let slotU = uniformSetter storage
-
-            let matSetter   = uniformM44F "viewProj" slotU
+            let slotU       = uniformSetter storage
+                matSetter   = uniformM44F "viewProj" slotU
                 viewOrigin  = uniformV3F "viewOrigin" slotU
                 --orientation = uniformM44F "orientation" slotU
                 viewMat     = uniformM44F "viewMat" slotU
@@ -286,8 +284,8 @@ updateRenderInput (storage,lcMD3Objs,characters,lcCharacterObjs,surfaceObjs,bsp,
             matSetter $! mat4ToM44F $! cm .*. sm .*. pm
 
             let invCM = mat4ToM44F idmtx -- inverse cm .*. (fromProjective $ translation (Vec3 0 (0) (-30)))
-                --rot = fromProjective $ rotationEuler (Vec3 (-pi/2+30/pi*2) (pi/2) (-pi))
                 rot = fromProjective $ orthogonal $ toOrthoUnsafe $ rotMatrixX (-pi/2) .*. rotMatrixY (pi/2) .*. rotMatrixX (10/pi*2)
+                --rot = fromProjective $ rotationEuler (Vec3 (-pi/2+30/pi*2) (pi/2) (-pi))
             forM_ (md3instanceObject lcMD3Weapon) $ \obj -> do
               uniformM44F "viewProj" (objectUniformSetter obj) $ mat4ToM44F $! rot .*. fromProjective (translation (Vec3 3 (-10) (-5))) .*. sm .*. pm
               uniformM44F "worldMat" (objectUniformSetter obj) invCM

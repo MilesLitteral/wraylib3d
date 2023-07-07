@@ -11,14 +11,12 @@ module HRayLib3d.Core.BuildBundler (
     , configureAutoLinux
     , buildLinux
     , startIDE
-
     ) where
 
     --windows support only for now
-    import System.IO
-    import System.Process 
-    import Development.NSIS
-    -- import System.Info
+    import System.IO        ( Handle )
+    import System.Process   ( createProcess, proc, shell, CreateProcess(std_out, cwd), StdStream(CreatePipe) ) 
+    import Development.NSIS ( nsis, file, installDir, name, outFile, page, requestExecutionLevel, section, setOutPath, str, Level(User), Page(InstFiles, Directory) )
 
     compileCMakeProject :: String -> String
     compileCMakeProject projectName = ("cmake_minimum_required(VERSION 3.23)              \n"

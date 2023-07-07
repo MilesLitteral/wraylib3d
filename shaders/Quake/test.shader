@@ -269,12 +269,7 @@ textures/dont_use/nightsky_kc
 	surfaceparm nolightmap
 	q3map_surfacelight 200
 
-	cloudparms 256 half
-
-	
-
-
-	
+	cloudparms - 256 half
 	{
 		map textures/dont_use/strangesky3_kc.tga
 		tcMod scroll  .03 .03
@@ -309,7 +304,7 @@ textures/dont_use/nightsky_kcold
 	surfaceparm nolightmap
 	q3map_surfacelight 200
 
-	cloudparms 256 full
+	cloudparms - 256 full
 	lightning
 
 

@@ -1,18 +1,18 @@
 {-# LANGUAGE DeriveGeneric #-}
 module HRayLib3d.I18n.Localization where
 
-    import Monomer 
-    import System.IO
-    import System.Process 
-    import GHC.Generics(Generic)
+    import Monomer       ( Color(Color), tooltipDelay, tooltipFollow, tooltip_, CmbBgColor(bgColor), CmbStyleBasic(styleBasic), CmbTextColor(textColor), WidgetNode ) 
+    import System.IO      ( Handle )
+    import System.Process ( createProcess, proc, CreateProcess(std_out, cwd), StdStream(CreatePipe) ) 
+    import GHC.Generics   (Generic)
 
-    import Data.Text
-    import Data.Maybe
-    import Data.Aeson
+    import Data.Text  ( Text, pack )
+    import Data.Maybe ( fromJust   )
+    import Data.Aeson ( FromJSON, decodeFileStrict )
 
-    data    LJSON                   = LJSON                { lKey :: String, lValue :: String }                      deriving (Generic, Eq, Show)
-    data    Internationalization    = Internationalization { translations  :: [(String, Text)], fallbacks :: Bool}   deriving (Generic, Eq, Show)
-    newtype I18nCollection          = I18nCollection       { cTranslations :: [Internationalization]             }   deriving (Generic, Eq, Show)
+    data    LJSON                   = LJSON                { lKey          :: String,           lValue    :: String }                      deriving (Generic, Eq, Show)
+    data    Internationalization    = Internationalization { translations  :: [(String, Text)], fallbacks :: Bool   }   deriving (Generic, Eq, Show)
+    newtype I18nCollection          = I18nCollection       { cTranslations :: [Internationalization]                }   deriving (Generic, Eq, Show)
 
     instance FromJSON LJSON 
     instance FromJSON Internationalization

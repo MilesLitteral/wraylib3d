@@ -679,7 +679,7 @@ textures/base_floor/concretefloor1
 	{
 		map textures/base_floor/concretefloor1.tga
 		blendFunc GL_ONE GL_SRC_ALPHA
-		tcmod turb sin .5 1 0 1
+		tcmod turbl sin .5 1 0 1
 		rgbgen identity	
 	}
 
@@ -702,8 +702,6 @@ textures/base_floor/pjgrate1kc
 	cull none
 
 	// A GRATE OR GRILL THAT CAN BE SEEN FROM BOTH SIDES
-	
-	
 	{
 		map textures/base_floor/proto_grate5.tga
 		blendFunc GL_ONE GL_ZERO
@@ -901,11 +899,11 @@ textures/base_floor/diamond_dirty
  }
 	{
 		map textures/base_floor/grunge2.tga
-                blendfunc GL_DST_COLOR GL_SRC_COLOR
+        blendfunc GL_DST_COLOR GL_SRC_COLOR
 		rgbGen identity
-                detail
-                tcMod scale 0.0693 0.0712
-        }
+        detail
+        tcMod scale 0.0693 0.0712
+    }
 	{
 		map textures/base_floor/diamond2.tga
 		tcMod scale 0.5 0.5

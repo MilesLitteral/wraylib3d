@@ -1,20 +1,17 @@
 {-# LANGUAGE BangPatterns      #-}
 {-# LANGUAGE FlexibleInstances #-}
-module HRayLib3d.WindowSystem.RenderPipelineWidget (
-    --RunInteraction(..)
-    --, runFutharkCommand
-) where
+module HRayLib3d.WindowSystem.RenderPipelineWidget () where
 
-import System.IO
-import GHC.Real
+import System.IO ()
+import GHC.Real  ()
 import GHC.Float (float2Int, int2Float)
 import Data.Int  (Int16)
 import Data.Word (Word8)
-import Control.Lens
-import Control.Monad.Identity
-import Control.Concurrent.Chan
-import Control.Concurrent.MVar
-import Control.Monad.IO.Class
+import Control.Lens            ()
+import Control.Monad.Identity  ()
+import Control.Concurrent.Chan ( Chan, newChan, readChan, writeChan )
+import Control.Concurrent.MVar ( MVar, newMVar, putMVar, takeMVar )
+import Control.Monad.IO.Class  ()
 import Control.Concurrent      (ThreadId, forkOS)
 import Control.Concurrent.QSem (QSem, newQSem, waitQSem, signalQSem)
 import Control.Monad.Trans.State.Lazy (StateT)
@@ -29,10 +26,8 @@ type WRendererT m a  = StateT m a
 class ToGPU a where
     toGPU :: a -> GPUObject b
 
-
 instance ToGPU Float where
     toGPU a = GPUObject $ toInt16 a
-
 
 newtype GPUObject a = GPUObject { gpuRawObject :: Int16 } deriving (Show, Eq)
 

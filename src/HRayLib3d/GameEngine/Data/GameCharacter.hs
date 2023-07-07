@@ -1,10 +1,10 @@
 {-# LANGUAGE DeriveGeneric #-}
 module HRayLib3d.GameEngine.Data.GameCharacter where
 
-import GHC.Generics (Generic)
-import Data.Hashable
-import Data.HashMap.Strict
-import LambdaCube.Linear (V3(..))
+import GHC.Generics        ( Generic  )
+import Data.Hashable       ( Hashable )
+import Data.HashMap.Strict ( HashMap  )
+import LambdaCube.Linear   (V3(..))
 
 data Animation
   = Animation
@@ -41,42 +41,31 @@ data AnimationType
   | BOTH_DEAD2
   | BOTH_DEATH3
   | BOTH_DEAD3
-
   | TORSO_GESTURE
-
   | TORSO_ATTACK
   | TORSO_ATTACK2
-
   | TORSO_DROP
   | TORSO_RAISE
-
   | TORSO_STAND
   | TORSO_STAND2
-
   | LEGS_WALKCR
   | LEGS_WALK
   | LEGS_RUN
   | LEGS_BACK
   | LEGS_SWIM
-
   | LEGS_JUMP
   | LEGS_LAND
-
   | LEGS_JUMPB
   | LEGS_LANDB
-
   | LEGS_IDLE
   | LEGS_IDLECR
-
   | LEGS_TURN
-
   | TORSO_GETFLAG
   | TORSO_GUARDBASE
   | TORSO_PATROL
   | TORSO_FOLLOWME
   | TORSO_AFFIRMATIVE
   | TORSO_NEGATIVE
-
   | LEGS_BACKCR
   | LEGS_BACKWALK
   | FLAG_RUN

@@ -2,11 +2,11 @@
 
 module HRayLib3d.Core.ShaderPrecompilerPipeline where
 
-    import MegaStore
-    import System.Directory
-    import Codec.Compression.GZip
+    import MegaStore              ( MegaStore(MegaStore) )
+    import System.Directory       ( createDirectoryIfMissing, getDirectoryContents )
+    import Codec.Compression.GZip ( compress )
 
-    import Data.Binary
+    import Data.Binary ( encode )
     import qualified Data.Text as T
     import qualified Data.ByteString      as BS
     import qualified Data.ByteString.Lazy as BL

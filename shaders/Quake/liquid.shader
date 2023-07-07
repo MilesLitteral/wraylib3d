@@ -757,7 +757,7 @@ textures/liquids/lavahell2
 	tesssize 256
 	cull disable
 	deformVertexes wave 100 sin 5 5 .5 0.02
-	fogparms ( 0.8519142 0.309723 0.0 ) 128
+	fogparmsv ( 0.8519142 0.309723 0.0 ) 128
 
 	{
 		map textures/liquids/lavahell.tga
@@ -1093,7 +1093,7 @@ textures/liquids/ripplewater2
 
 		// JDC: testing foggy water
 		surfaceparm	fog
-		fogparms ( .5 .12 1 ) 200
+		fogparmsv ( .5 .12 1 ) 200
 
 		tesssize 64
 		deformVertexes wave 100 triangle 2 2 1 0.1
@@ -1374,7 +1374,7 @@ textures/liquids/xripplewater2
 		deformVertexes wave 100 triangle 2 2 1 0.1
 		
 		surfaceparm fog
-		fogparms ( 0.3 0.3 1.0 ) 512
+		fogparmsv ( 0.3 0.3 1.0 ) 512
 
 		{
 			map textures/liquids/ripplewater3.tga

@@ -482,7 +482,7 @@ textures/sfx/lightmap
 	surfaceparm	nonsolid
 	surfaceparm 	nodrop
 	surfaceparm	fog
-	fogparms ( .7 .1 .1 ) 64
+	fogparmsv ( .7 .1 .1 ) 64
 
 	
 	
@@ -512,7 +512,7 @@ textures/sfx/hellfog_pj_dm10
 	surfaceparm 	nolightmap
 	q3map_globaltexture
 	q3map_surfacelight 50
-	fogparms ( .5 .12 .1 ) 392
+	fogparmsv ( .5 .12 .1 ) 392
 
 	
 	
@@ -548,7 +548,7 @@ textures/sfx/hellfog_mini_dm10
 	surfaceparm 	nolightmap
 	q3map_globaltexture
 	q3map_surfacelight 50
-	fogparms ( .5 .12 .1 ) 16
+	fogparmsv ( .5 .12 .1 ) 16
 
 	
 	
@@ -633,7 +633,7 @@ surfaceparm	trans
 surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
-fogparms ( 0 0 0 ) 128
+fogparmsv ( 0 0 0 ) 128
 
 }
 
@@ -646,7 +646,7 @@ surfaceparm	trans
 surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
-fogparms ( 0 0 0 ) 500
+fogparmsv ( 0 0 0 ) 500
 
 }
 
@@ -659,7 +659,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 qer_nocarve
-fogparms ( 0 0 0 ) 256
+fogparmsv ( 0 0 0 ) 256
 
 }
 
@@ -676,7 +676,7 @@ textures/sfx/xbluefog
 	surfaceparm	fog
 	surfaceparm	nolightmap
 	qer_nocarve
-	fogparms ( 0.3 0.3 0.9 ) 128
+	fogparmsv ( 0.3 0.3 0.9 ) 128
 
 }
 
@@ -692,7 +692,7 @@ textures/sfx/xredfog
 	surfaceparm	fog
 	surfaceparm	nolightmap
 	qer_nocarve
-	fogparms ( 0.9 0.3 0.3 ) 128
+	fogparmsv ( 0.9 0.3 0.3 ) 128
 
 }
 
@@ -707,7 +707,7 @@ textures/sfx/xbluefogx128
 	surfaceparm	fog
 	surfaceparm	nolightmap
 	qer_nocarve
-	fogparms ( 0.3 0.3 0.9 ) 128
+	fogparmsv ( 0.3 0.3 0.9 ) 128
 
 }
 
@@ -4349,7 +4349,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 qer_nocarve
-fogparms ( 0.7 0.7 0.7 ) 1700
+fogparmsv ( 0.7 0.7 0.7 ) 1700
 }
 
 textures/sfx/xlightgreyfog
@@ -4360,7 +4360,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 qer_nocarve
-fogparms ( 0.7 0.7 0.7 ) 1400
+fogparmsv ( 0.7 0.7 0.7 ) 1400
 
 }
 
@@ -4372,7 +4372,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 qer_nocarve
-fogparms ( 0.7 0.7 0.7 ) 3000
+fogparmsv ( 0.7 0.7 0.7 ) 3000
 
 }
 
@@ -4886,7 +4886,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 //fogparms ( .615 .309 0 ) 1800
-fogparms ( .615 .309 0 ) 616
+fogparmsv ( .615 .309 0 ) 616
 }
 
 //Tim's fog for map tim_dm8
@@ -4897,7 +4897,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 
-fogparms ( .211 .231 .094 ) 250
+fogparmsv ( .211 .231 .094 ) 250
 }
 
 //Tim's fog for map tim_dm2
@@ -4909,7 +4909,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 
-fogparms ( .615 .309 0 ) 356
+fogparmsv ( .615 .309 0 ) 356
 }
 
 //Tim's fog for map tim_ctf1
@@ -4921,7 +4921,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 
-fogparms ( .729 .729 .780 ) 464
+fogparmsv ( .729 .729 .780 ) 464
 
 }
 
@@ -4934,7 +4934,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 
-fogparms ( .733 .737 .620 ) 300
+fogparmsv ( .733 .737 .620 ) 300
 
 }
 
@@ -4947,7 +4947,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 
-fogparms ( .275 .012 0 ) 500
+fogparmsv ( .275 .012 0 ) 500
 }
 
 
@@ -4960,7 +4960,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 
-fogparms ( .75 .38 0 ) 800
+fogparmsv ( .75 .38 0 ) 800
 }
 
 //Paul's gray fog for q3dm10
@@ -4972,7 +4972,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 
-fogparms ( 0.75 0.38 0 ) 128
+fogparmsv ( 0.75 0.38 0 ) 128
 }
 
 
@@ -5010,7 +5010,7 @@ textures/sfx/hellfog_tim_dm14
 	surfaceparm 	nolightmap
 	q3map_globaltexture
 	q3map_surfacelight 50
-	fogparms ( .55 .11 .1 ) 128
+	fogparmsv ( .55 .11 .1 ) 128
 	
 	{
 		map textures/liquids/kc_fogcloud3.tga
@@ -5045,7 +5045,7 @@ textures/sfx/kc_hellfog_1k
 	q3map_globaltexture
 	q3map_surfacelight 300
 	q3map_lightsubdivide 32
-	fogparms ( .5 .12 .1 ) 225
+	fogparmsv ( .5 .12 .1 ) 225
 
 	
 	
@@ -5082,7 +5082,7 @@ textures/sfx/hellfog_1k
 	surfaceparm 	nolightmap
 	q3map_globaltexture
 	q3map_surfacelight 200
-	fogparms ( .5 .12 .1 ) 300
+	fogparmsv ( .5 .12 .1 ) 300
 
 	
 	
@@ -5119,7 +5119,7 @@ textures/sfx/hellfog
 	surfaceparm 	nolightmap
 	q3map_globaltexture
 	q3map_surfacelight 100
-	fogparms ( .55 .11 .1 ) 300
+	fogparmsv ( .55 .11 .1 ) 300
 
 	
 	{
@@ -5149,7 +5149,7 @@ textures/sfx/constfog
 	surfaceparm	nolightmap
 	surfaceparm nodrop
 	q3map_surfacelight 100
-	fogparms ( .8 .8 .8 ) 100
+	fogparmsv ( .8 .8 .8 ) 100
 }
 
 
@@ -5162,7 +5162,7 @@ textures/sfx/testconstantfog
 	surfaceparm	nolightmap
 	surfaceparm nodrop
 	q3map_surfacelight 100
-	fogparms ( 0 1 0 ) 300
+	fogparmsv ( 0 1 0 ) 300
 }
 
 textures/sfx/q3tourney3fog
@@ -5178,7 +5178,7 @@ textures/sfx/q3tourney3fog
 	surfaceparm 	nolightmap
 	q3map_globaltexture
 	q3map_surfacelight 100
-	fogparms ( .55 .11 .1 ) 384
+	fogparmsv ( .55 .11 .1 ) 384
 	
 	
 
@@ -5214,7 +5214,7 @@ textures/sfx/q3dm14fog
 	surfaceparm 	nolightmap
 	q3map_globaltexture
 	q3map_surfacelight 100
-	fogparms ( .55 .11 .1 ) 256
+	fogparmsv ( .55 .11 .1 ) 256
 	
 	
 
@@ -5251,7 +5251,7 @@ textures/sfx/q3dm9fog
 	surfaceparm 	nolightmap
 	q3map_globaltexture
 	q3map_surfacelight 100
-	fogparms ( .55 .11 .1 ) 256
+	fogparmsv ( .55 .11 .1 ) 256
 	
 	
 
@@ -5288,7 +5288,7 @@ textures/sfx/hellfogdense
 	surfaceparm 	nolightmap
 	q3map_globaltexture
 	q3map_surfacelight 100
-	fogparms ( .55 .11 .1 ) 128
+	fogparmsv ( .55 .11 .1 ) 128
 	
 	
 
@@ -5333,7 +5333,7 @@ textures/sfx/pj_a1_fog1
 	surfaceparm	nolightmap
 	surfaceparm nodrop
 	q3map_surfacelight 30
-	fogparms ( .5 .5 .5 ) 512
+	fogparmsv ( .5 .5 .5 ) 512
 }
 textures/sfx/pitted_rust3arrowbase
 {
@@ -5406,7 +5406,7 @@ surfaceparm	nonsolid
 surfaceparm	fog
 surfaceparm	nolightmap
 
-fogparms ( .5 0 0 ) 96
+fogparmsv ( .5 0 0 ) 96
 }
 
 textures/sfx/mkc_bigflame
@@ -5450,7 +5450,7 @@ textures/sfx/mkc_fog_tdm3
 	surfaceparm 	nodrop
 	surfaceparm 	nolightmap
 	q3map_globaltexture
-	fogparms ( 0.3 0.2 0.2 ) 320
+	fogparmsv ( 0.3 0.2 0.2 ) 320
 	
 	
 	{
@@ -5479,7 +5479,7 @@ textures/sfx/mkc_fog_ctfred
 	surfaceparm 	nodrop
 	surfaceparm 	nolightmap
 	q3map_globaltexture
-	fogparms ( 0.3 0.2 0.2 ) 320
+	fogparmsv ( 0.3 0.2 0.2 ) 320
 
 	{
 		map textures/liquids/kc_fogcloud3.tga
@@ -5507,7 +5507,7 @@ textures/sfx/mkc_fog_ctfblue
 	surfaceparm 	nodrop
 	surfaceparm 	nolightmap
 	q3map_globaltexture
-	fogparms ( 0.2 0.2 0.25 ) 320
+	fogparmsv ( 0.2 0.2 0.25 ) 320
 	
 	{
 		map textures/liquids/kc_fogcloud3.tga
@@ -5535,7 +5535,7 @@ textures/sfx/mkc_fog_ctfblue2
 	surfaceparm 	nodrop
 	surfaceparm 	nolightmap
 	q3map_globaltexture
-	fogparms ( 0.1 0.1 0.3 ) 320
+	fogparmsv ( 0.1 0.1 0.3 ) 320
 
 	q3map_surfacelight 40
 	

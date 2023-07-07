@@ -1,7 +1,6 @@
 textures/base/q1met_redpad
 {
-	q3map_surfacelight 1500
-	{
+ 	{
 		map $lightmap
 		rgbGen identity
 	}
@@ -137,9 +136,8 @@ textures/base/electricwall
 	}
 	{
 		map textures/base/electric.blend.tga
-		tcMod scroll 1 1 10 20
+		tcMod scroll 1 1 
 		rgbGen wave sin 1 2 0 1
 		blendfunc GL_ONE GL_ONE
 	}
 }
-

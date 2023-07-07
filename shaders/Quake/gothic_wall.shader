@@ -335,7 +335,7 @@ textures/gothic_wall/streetbricks10_shiny
 
 	{
 		map $lightmap 
-		tcmod turb sin .1 .1 0 0
+		tcmod turbl sin .1 .1 0 0
 		tcmod scale 2 2
 		rgbgen identity
 	}

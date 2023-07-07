@@ -1,22 +1,22 @@
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances      #-}
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE ScopedTypeVariables    #-}
+{-# LANGUAGE TemplateHaskell        #-}
+{-# LANGUAGE OverloadedStrings      #-}
+{-# LANGUAGE DeriveGeneric          #-}
 {-# OPTIONS_GHC -Woverlapping-patterns #-}
 
 module HRayLib3d.WindowSystem.Types where
 
-import GHC.Generics
-import Control.Lens.TH
-import Data.Aeson
-import Data.Default
-import Data.Text (Text)
-import Data.Binary
-import Monomer
-import System.FilePath
-import System.Directory
+import GHC.Generics     ( Generic )
+import Control.Lens.TH  ( abbreviatedFields, makeLenses, makeLensesWith )
+import Data.Aeson       ( FromJSON(parseJSON), (.!=), (.:), (.:?), withObject )
+import Data.Default     ( Default(..) )
+import Data.Text        ( Text   )
+import Data.Binary      ( Binary )
+import Monomer          ( Millisecond )
+import System.FilePath  ( takeExtension )
+import System.Directory ( doesDirectoryExist, listDirectory )
 
 data ProjectSessionPrefs 
   = ProjectSessionPrefs {
@@ -32,10 +32,10 @@ data ProjectSessionFile
 
 data ProjectSession 
   = ProjectSession {
-    _projectName        :: Text,
-    _projectFiles       :: [ProjectSessionFile],
-    _projectRealms      :: [Text],
-    _projectPreferences :: ProjectSessionPrefs
+    _projectName           :: Text,
+    _projectFiles          :: [ProjectSessionFile],
+    _projectRealms         :: [Text],
+    _projectPreferences    :: ProjectSessionPrefs
   } deriving(Generic, Eq, Show)
 
 instance Binary ProjectSession
@@ -112,64 +112,64 @@ data ProjectSessionFileType
 
 matchExtType :: FilePath  -> ProjectSessionFileType
 matchExtType pt = case takeExtension  pt of
-  ".wrlp"        -> WRLProjectFile
-  ".vsproj"      -> VSProjectFile
-  ".xcproj"      -> XCodeProjectFile
-  ".cmakelists"  -> CMakeProjectFile
-  ".makefile"    -> MakeProjectFile
-  ".webgl"       -> WebGLProjectFile
-  ".wasm"        -> WASMProjectFile
-  ".djinni"      -> DjinniProjectFile
-  ".ipa"         -> IOSProjectFile
-  ".gradle"      -> AndroidProjectFile
+  ".wrlp"         -> WRLProjectFile
+  ".vsproj"       -> VSProjectFile
+  ".xcproj"       -> XCodeProjectFile
+  ".cmakelists"   -> CMakeProjectFile
+  ".makefile"     -> MakeProjectFile
+  ".webgl"        -> WebGLProjectFile
+  ".wasm"         -> WASMProjectFile
+  ".djinni"       -> DjinniProjectFile
+  ".ipa"          -> IOSProjectFile
+  ".gradle"       -> AndroidProjectFile
 
   --System Bundle Types
-  ".assetBundle" -> AssetBundleFile
-  ".shaderCache" -> ShaderCacheFile
-  -- ".obj"      -> WavefrontOBJFile -- re-add
-  ".glb"         -> GLBAssetFile
-  ".gltf"        -> GLTFAssetFile
-  ".pk3"         -> PK3AssetFile
-  ".md3"         -> MD3AssetFile
-  ".bsp"         -> BSPAssetFile
-  ".db"          -> RealmFile
-  "GemFile"      -> GemFile
+  ".assetBundle"  -> AssetBundleFile
+  ".shaderCache"  -> ShaderCacheFile
+  -- ".obj"       -> WavefrontOBJFile -- re-add
+  ".glb"          -> GLBAssetFile
+  ".gltf"         -> GLTFAssetFile
+  ".pk3"          -> PK3AssetFile
+  ".md3"          -> MD3AssetFile
+  ".bsp"          -> BSPAssetFile
+  ".db"           -> RealmFile
+  "GemFile"       -> GemFile
 
   -- Shader File Types
-  ".q3s"      -> Q3Shader
-  ".glsl"     -> GLSLShaderFile
-  ".metal"    -> MetalShaderFile
-  ".metallib" -> MetalLibFile
+  ".q3s"          -> Q3Shader
+  ".glsl"         -> GLSLShaderFile
+  ".metal"        -> MetalShaderFile
+  ".metallib"     -> MetalLibFile
 
   -- Component File Types
-  ".hs"   -> HaskellFile
-  ".cpp"  -> CPPFile
-  ".h"    -> CPPFileHeader
-  ".hpp"  -> CPPFileHeader
+  ".hs"           -> HaskellFile
+  ".cpp"          -> CPPFile
+  ".h"            -> CPPFileHeader
+  ".hpp"          -> CPPFileHeader
 
   -- Script File Types
-  ".rb"   -> RubyScriptFile
-  ".py"   -> PythonScriptFile
-  ".lua"  -> LuaScriptFile
-  ".js"   -> JavaScriptFile
-  ".jsx"  -> JavaScriptFile -- replace with JSX Icon/JSXFile
-  ".wasm" -> WASMFile
+  ".rb"           -> RubyScriptFile
+  ".py"           -> PythonScriptFile
+  ".lua"          -> LuaScriptFile
+  ".js"           -> JavaScriptFile
+  ".jsx"          -> JavaScriptFile -- replace with JSX Icon/JSXFile
+  ".wasm"         -> WASMFile
   -- GenericScript     -> GenericScript
   -- GenericScriptAlt2 -> "./assets/images/script_alt.png"
   -- GenericScriptAlt3 -> "./assets/images/script_alt2.png"
-  ".txt"  -> TextFile
+  ".txt"           -> TextFile
 
   -- Data Structure Type
-  ".html" -> HTMLFile
-  ".lc"   -> LCFile
-  ".xml"  -> XMLFile
-  ".json" -> JSONFile
-  ".mat"  -> MaterialFile
-  ".zip"  -> ZIPFile
+  ".html"           -> HTMLFile
+  ".lc"             -> LCFile
+  ".xml"            -> XMLFile
+  ".json"           -> JSONFile
+  ".mat"            -> MaterialFile
+  ".zip"            -> ZIPFile
 
   -- Audio File Types
-  ".ogg" -> OGGFile
-  ".wav" -> WAVFile
+  ".ogg"            -> OGGFile
+  ".wav"            -> WAVFile
 
   -- Misc
   ""                -> FolderFile

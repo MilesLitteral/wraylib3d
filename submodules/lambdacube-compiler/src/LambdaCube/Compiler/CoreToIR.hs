@@ -14,6 +14,7 @@ module LambdaCube.Compiler.CoreToIR
 
 import Data.Char
 import Data.Monoid
+import Data.String
 import Data.Map (Map)
 import Data.Maybe
 import Data.Function
@@ -414,9 +415,11 @@ compFrag x = case x of
   A2 "ColorOp" (compBlending -> b) (compValue -> v) -> IR.ColorOp b v
   x -> error $ "compFrag " ++ ppShow x
 
+toGLSLType :: Data.String.IsString a => [Char] -> ExpTV -> a
 toGLSLType msg x = showGLSLType msg $ compInputType msg x
 
 -- move to lambdacube-ir?
+showGLSLType :: Data.String.IsString a => [Char] -> IR.InputType -> a
 showGLSLType msg = \case
     IR.Bool  -> "bool"
     IR.Word  -> "uint"

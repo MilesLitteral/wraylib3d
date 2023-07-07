@@ -266,7 +266,7 @@ textures/eerie/iron01_d_flicker
 	{
 		map textures/eerie/firewallb.tga
 		blendFunc GL_dst_color gl_src_alpha
-		tcMod scale .1 .1 0 10
+		tcMod scalex .1 .1 0 10
 		tcMod turb .2 .1 .1 1
 		tcMod scroll 0 10
 	}

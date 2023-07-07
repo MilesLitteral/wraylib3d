@@ -5,12 +5,11 @@ module HRayLib3d.GameEngine.Data.OBJ (
   , importObjFromFile
   ) where
 
-import Data.Either
-import Data.String
-import System.IO
-import Codec.Wavefront
-import Codec.Wavefront.IO
-import Control.Monad.IO.Class
+import Data.Either            ()
+import Data.String            ()
+import System.IO              ()
+import Codec.Wavefront        ( WavefrontOBJ, fromFile )
+import Control.Monad.IO.Class ( MonadIO )
 import qualified Data.Binary as BW
 
 importObjFromFile :: MonadIO m => FilePath -> m (Either String WavefrontOBJ) 

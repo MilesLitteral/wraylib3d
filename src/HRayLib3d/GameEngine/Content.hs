@@ -1,8 +1,8 @@
 {-# LANGUAGE ViewPatterns #-}
 module HRayLib3d.GameEngine.Content where
 
-import Data.Char
-import Data.Map (Map)
+import Data.Map  (Map)
+import Data.Char ( toLower )
 import Data.List (isPrefixOf,elemIndex,stripPrefix)
 import qualified Data.Map as Map
 import qualified Data.Text as T
@@ -10,18 +10,18 @@ import qualified Data.ByteString.Char8 as BS8
 import qualified Data.ByteString       as BS
 import qualified Data.ByteString.Lazy  as BL
 
-import MegaStore
-import Text.Printf
-import Control.Monad
-import Control.Applicative
-import System.Directory
-import System.FilePath
+import MegaStore     ( MegaStore(_contents), loadStore )
+import Text.Printf   ( printf )
+import Control.Monad ( forM )
+import Control.Applicative ()
+import System.Directory ( doesPathExist, getDirectoryContents  )
+import System.FilePath  ( (</>), takeExtension )
 
-import HRayLib3d.Core.ResourceBundler
-import HRayLib3d.GameEngine.Utils
-import HRayLib3d.GameEngine.Loader.Zip
-import HRayLib3d.GameEngine.Loader.ShaderParser
-import HRayLib3d.GameEngine.Data.Material hiding (Vec3)
+import HRayLib3d.Core.ResourceBundler           ( saveBundle   )
+import HRayLib3d.GameEngine.Utils               ( lc_q3_cache  )
+import HRayLib3d.GameEngine.Loader.Zip          ( readArchive, readEntry, Entry(eArchiveName) )
+import HRayLib3d.GameEngine.Loader.ShaderParser ( parseShaders )
+import HRayLib3d.GameEngine.Data.Material ( CommonAttrs )
 
 type AssetContent  = BS.ByteString
 type ShaderContent = BS.ByteString
@@ -29,7 +29,7 @@ type ShaderContent = BS.ByteString
 loadPK3 :: IO (Map String Entry)
 loadPK3 = do
   let takeExtensionCI = map toLower . takeExtension
-  Map.unions <$> (mapM readArchive =<< filter (\n -> ".pk3" == takeExtensionCI n) <$> getDirectoryContents ".")
+  Map.unions <$> (mapM readArchive . filter (\n -> ".pk3" == takeExtensionCI n) =<< getDirectoryContents ".")
 
 loadAssetBundle :: IO (Map String AssetContent)
 loadAssetBundle = do
@@ -44,7 +44,7 @@ pk3ToAssetBundle = do
   -- mst <- loadStore "./wrl3d-assets.assetBundle"
   pk3 <- loadPK3
   let fileData = Map.keys pk3
-  files      <- mapM BL.readFile fileData 
+  files      <- mapM BL.readFile fileData
   pathExists <- doesPathExist "./pak0.assetBundle"
   if pathExists
     then return (Map.fromList $ zip fileData $ map BL.toStrict files)
