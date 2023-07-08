@@ -65,7 +65,7 @@ loadShaderCache = do
 
 loadShaderMap :: Map String Entry -> IO (Map String CommonAttrs)
 loadShaderMap ar = do
-  l <- sequence <$> forM [(n,e) | (n,e) <- Map.toList ar, ".shader" == takeExtension n, isPrefixOf "scripts" n] (\(n,e) -> parseShaders (eArchiveName e ++ ":" ++ n) . BS8.unpack <$> readEntry e)
+  l <- sequence <$> forM [(n,e) | (n,e) <- Map.toList ar, ".shader" == takeExtension n, "scripts" `isPrefixOf` n] (\(n,e) -> parseShaders (eArchiveName e ++ ":" ++ n) . BS8.unpack <$> readEntry e)
   case l of
     Left err -> fail err
     Right (unzip -> (x,w)) -> do
