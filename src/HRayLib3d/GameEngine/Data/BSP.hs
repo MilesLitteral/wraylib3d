@@ -5,7 +5,7 @@ module HRayLib3d.GameEngine.Data.BSP where
 import Text.XML.Writer ()
 
 import GHC.Generics    (Generic)
-import Data.Aeson      (FromJSON, ToJSON(toJSON), object, KeyValue((.=)))
+import Data.Aeson      --(FromJSON(parseJSON), ToJSON(toJSON), Object, object, KeyValue((.=)))
 import Data.Binary     ()
 import Data.Word       (Word8)
 import Data.ByteString (ByteString)
@@ -48,7 +48,7 @@ data Node
     , ndChildren :: !(Int,Int)
     , ndMins     :: !Vec3
     , ndMaxs     :: !Vec3
-    } deriving (Eq, Show)
+    } deriving (Eq, Show, Generic)
 
 data Leaf
     = Leaf
@@ -209,25 +209,35 @@ instance ToJSON  BSPLevel where
 instance FromJSON  LightGrid
 instance FromJSON  Visibility
 
--- instance FromJSON  BSPLevel where             
---     parseJSON (Object v) = 
---         BSPLevel <$> v     .: "entities"      
---                     <*>  v .: "shaders" 
---                     <*>  v .: "planes"        
---                     <*>  v .: "nodes"         
---                     <*>  v .: "leaves"        
---                     <*>  v .: "leafSurfaces"  
---                     <*>  v .: "leafBrushes"   
---                     <*>  v .: "models"        
---                     <*>  v .: "brushes"       
---                     <*>  v .: "brushSides"    
---                     <*>  v .: "drawVertices"  
---                     <*>  v .: "drawIndices"   
---                     <*>  v .: "fogs"          
---                     <*>  v .: "surfaces"      
---                     <*>  v .: "lightmaps"     
---                     <*>  v .: "lightgrid"     
---                     <*>  v .: "visibility"  
+instance FromJSON  ByteString
+instance FromJSON  Vec2
+instance FromJSON  Vec3
+instance FromJSON  Vec4
+
+instance FromJSON  Node
+instance FromJSON  SurfaceType
+instance FromJSON  Surface
+instance FromJSON  Lightmap
+
+instance FromJSON  BSPLevel where             
+    parseJSON (Object v) = 
+        BSPLevel <$> v     .: "entities"      
+                    <*>  v .: "shaders" 
+                    <*>  v .: "planes"        
+                    <*>  v .: "nodes"         
+                    <*>  v .: "leaves"        
+                    <*>  v .: "leafSurfaces"  
+                    <*>  v .: "leafBrushes"   
+                    <*>  v .: "models"        
+                    <*>  v .: "brushes"       
+                    <*>  v .: "brushSides"    
+                    <*>  v .: "drawVertices"  
+                    <*>  v .: "drawIndices"   
+                    <*>  v .: "fogs"          
+                    <*>  v .: "surfaces"      
+                    <*>  v .: "lightmaps"     
+                    <*>  v .: "lightgrid"     
+                    <*>  v .: "visibility"  
 
 -- --fix this later for JSON and XML Support
 -- TODO: a custom data XML object with an ToXML and FromXML allegory

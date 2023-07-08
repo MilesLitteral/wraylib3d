@@ -53,9 +53,6 @@ pk3ToAssetBundle = do
       return (Map.fromList $ zip fileData $ map BL.toStrict files)
       -- Map.unions <$> (mapM loadStore =<< filter (\n -> ".assetBundle" == takeExtensionCI n) <$> getDirectoryContents ".")
 
--- saveBundle :: [(T.Text, BS.ByteString)] -> Bool -> String -> IO ()
--- saveBundle paths makeDir outpath
-
 loadShaderCache :: IO (Map String ShaderContent)
 loadShaderCache = do
   mst <- loadStore "./wrl3d-shaders.shadercache"
