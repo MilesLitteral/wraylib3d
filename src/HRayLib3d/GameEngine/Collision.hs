@@ -14,13 +14,27 @@ module HRayLib3d.GameEngine.Collision
 
 -- TODO - for box-box, etc collision see: code/qcommon/cm_trace.c
 
-import Data.Bits
+import Data.Bits   ( Bits((.&.), (.|.)) )
 import Data.Vector ((!))
 import Data.Vect.Float
-import Data.Vect.Float.Instances
+    ( Vec3(..),
+      AbelianGroup((&+), zero),
+      DotProd(dotprod),
+      Vector((*&)) 
+      )
+import Data.Vect.Float.Instances ()
 import qualified Data.Vector as V
 
 import HRayLib3d.GameEngine.Data.BSP
+    ( BSPLevel(..),
+      Brush(..),
+      BrushSide(bsPlaneNum),
+      Leaf(Leaf, lfCluster, lfNumLeafBrushes, lfFirstLeafBrush,
+           lfNumLeafSurfaces, lfFirstLeafSurface, lfMaxs, lfMins, lfArea),
+      Node(Node, ndPlaneNum, ndMaxs, ndMins, ndChildren),
+      Plane(Plane, plNormal, plDist),
+      Shader(shContentFlags) 
+      )
 
 data TraceHit
   = TraceHit
@@ -30,6 +44,11 @@ data TraceHit
   , outputBrushIndex  :: ![Int]
   }
   deriving Show
+  
+data TraceType
+  = TraceRay
+  | TraceSphere Float           -- radius
+  | TraceBox    Vec3 Vec3 Vec3  -- mins maxs extends
 
 traceRay :: BSPLevel -> Vec3 -> Vec3 -> Maybe (Vec3,TraceHit)
 traceRay = traceHit TraceRay
@@ -42,11 +61,6 @@ traceBox mins@(Vec3 x1 y1 z1) maxs@(Vec3 x2 y2 z2)
   | mins == zero && maxs == zero = traceRay
   | otherwise = traceHit $ TraceBox mins maxs $ Vec3 (f x1 x2) (f y1 y2) (f z1 z2)
   where f a b = max (abs a) (abs b)
-
-data TraceType
-  = TraceRay
-  | TraceSphere Float           -- radius
-  | TraceBox    Vec3 Vec3 Vec3  -- mins maxs extends
 
 traceHit :: TraceType -> BSPLevel -> Vec3 -> Vec3 -> Maybe (Vec3,TraceHit)
 traceHit traceType bsp inputStart inputEnd
@@ -72,7 +86,8 @@ instance Semigroup TraceHit where
   (TraceHit a1 b1 c1 d1) <> (TraceHit a2 b2 c2 d2) = TraceHit (min a1 a2) (b1 && b2) (c1 || c2) (d1 <> d2)
 #endif
 
-epsilon = 1/32 :: Float
+epsilon :: Float
+epsilon = 1/32
 
 clamp :: Float -> Float
 clamp = max 0 . min 1
