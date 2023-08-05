@@ -1,9 +1,9 @@
 {-# LANGUAGE LambdaCase, TemplateHaskell #-}
 module HRayLib3d.GameEngine.Realm.Visuals where
 
-import Data.Vect
-import Lens.Micro.Platform
-import Control.Monad
+import Data.Vect ( Vec3 )
+import Lens.Micro.Platform ( makeLenses )
+import Control.Monad ()
 
 -- visuals for game graphics
 data Particle
@@ -13,8 +13,6 @@ data Particle
   , _vpLifeTime   :: Float
   } deriving Show
 
-data Visual
-  = VParticle Particle
-  deriving Show
+newtype Visual = VParticle Particle deriving Show
 
 concat <$> mapM makeLenses [''Particle]

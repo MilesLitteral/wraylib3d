@@ -7,9 +7,9 @@ module HRayLib3d.GameEngine.Graphics.BSP
   , BSPInstance(..)
   ) where
 
-import Control.Monad
-import Data.Maybe
-import Data.HashSet (HashSet)
+import Control.Monad ( forM, forM_ )
+import Data.Maybe    ( fromMaybe )
+import Data.HashSet  (HashSet)
 import Data.Map (Map)
 import Data.Set (Set)
 import Data.Vector (Vector)
@@ -20,15 +20,42 @@ import qualified Data.Vector as V
 import qualified Data.Vector.Storable as SV
 import qualified Data.ByteString as SB
 import qualified Data.ByteString.Char8 as SB8
-import Text.Printf
-import Foreign
+import Text.Printf ( printf )
+import Foreign ( Word8, Word32, Bits((.&.)), castPtr )
 
 import Codec.Picture
+    ( DynamicImage(..),
+      Image(..),
+      generateImage,
+      PixelRGB8(..) )
 import LambdaCube.GL
+    ( TextureData,
+      GLStorage,
+      Primitive(..),
+      IndexStream(..),
+      Buffer,
+      Stream(..),
+      Object,
+      compileBuffer,
+      uploadTexture2DToGPU',
+      addObject,
+      objectUniformSetter,
+      uniformFTexture2D,
+      Array(..),
+      ArrayType(..),
+      StreamType(..) )
 
 import HRayLib3d.GameEngine.Data.BSP
+    ( BSPLevel(..),
+      DrawVertex(..),
+      Lightmap(..),
+      Shader(..),
+      Surface(..),
+      SurfaceType(..) )
 import HRayLib3d.GameEngine.Graphics.Storage
+    ( addObjectWithMaterial )
 import HRayLib3d.GameEngine.Graphics.BezierSurface
+    ( tessellatePatch )
 
 data GPUBSP
   = GPUBSP
@@ -151,10 +178,10 @@ addGPUBSP whiteTexture storage GPUBSP{..} = do
           o <- addObjectWithMaterial storage name prim (Just index) attrs objUnis
           o1 <- addObject storage "LightMapOnly" prim (Just index) attrs objUnis
           {-
-              #define LIGHTMAP_2D			-4		// shader is for 2D rendering
+              #define LIGHTMAP_2D			    -4		// shader is for 2D rendering
               #define LIGHTMAP_BY_VERTEX	-3		// pre-lit triangle models
               #define LIGHTMAP_WHITEIMAGE	-2
-              #define	LIGHTMAP_NONE		-1
+              #define	LIGHTMAP_NONE		    -1
           -}
           forM_ [o,o1] $ \b -> uniformFTexture2D "LightMap" (objectUniformSetter b) $ fromMaybe whiteTexture lightmap
           return [o,o1]

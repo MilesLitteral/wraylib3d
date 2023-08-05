@@ -3,26 +3,26 @@
 
 module HRayLib3d.GameEngine.Realm.Monads where
 
-import Control.Monad.RWS
-import Control.Monad.Random
-import Control.Monad.Writer.Strict
-import Control.Monad.Trans.Maybe
+import Control.Monad.RWS    ( MonadPlus(mzero), MonadWriter(tell), RWST, evalRWST )
+import Control.Monad.Random ( RandT, Rand, evalRand, runRandT )
+import Control.Monad.Writer.Strict ( WriterT, execWriterT )
+import Control.Monad.Trans.Maybe ( MaybeT(runMaybeT) )
 
-import HRayLib3d.GameEngine.Collision
-import HRayLib3d.GameEngine.Data.BSP
-import HRayLib3d.GameEngine.Data.MD3
-import HRayLib3d.GameEngine.RenderSystem
-import HRayLib3d.GameEngine.Realm.Entities
-import HRayLib3d.GameEngine.Realm.Visuals
-import HRayLib3d.GameEngine.Realm.World
+import HRayLib3d.GameEngine.Collision ()
+import HRayLib3d.GameEngine.Data.BSP ( BSPLevel )
+import HRayLib3d.GameEngine.Data.MD3 ()
+import HRayLib3d.GameEngine.RenderSystem ( ResourceCache )
+import HRayLib3d.GameEngine.Realm.Entities ( Action, Entity )
+import HRayLib3d.GameEngine.Realm.Visuals ( Visual )
+import HRayLib3d.GameEngine.Realm.World ( Input )
 
-import System.Random.Mersenne.Pure64
+import System.Random.Mersenne.Pure64 ( PureMT )
 
-import Data.Vect hiding (Vector)
-import Data.Vect.Float.Instances
-import Data.Vect.Float.Base hiding(Vector)
-import Data.Vector (Vector,(!),(//))
-import Data.Functor.Identity
+import Data.Vect ( Vec3 )
+import Data.Vect.Float.Instances ()
+import Data.Vect.Float.Base ( Vec3 )
+import Data.Vector (Vector)
+import Data.Functor.Identity ( Identity(runIdentity) )
 import qualified Data.Vector as V
 
 

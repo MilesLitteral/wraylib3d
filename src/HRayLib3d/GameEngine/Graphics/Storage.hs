@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase, OverloadedStrings, RecordWildCards #-}
 module HRayLib3d.GameEngine.Graphics.Storage where
 
-import Data.Map (Map)
+import Data.Map     (Map)
 import qualified Data.Map as Map
 import Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
@@ -10,22 +10,71 @@ import qualified Data.Vector as V
 import Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as SB
 import qualified Data.ByteString.Lazy as LB
-import Data.Digest.CRC32
-import Control.Monad
-import System.FilePath
-import System.Directory
-import Text.Show.Pretty (ppShow)
-import Text.Printf
-import Data.Aeson (encode,eitherDecode)
+import Data.Digest.CRC32   ( CRC32(crc32)  )
+import Control.Monad       ( when, filterM )
+import System.FilePath     ( (</>), dropExtension, replaceExtension )
+import System.Directory    ( doesFileExist )
+import Text.Show.Pretty    ( ppShow        )
+import Text.Printf         ( printf )
+import Data.Aeson          (encode,eitherDecode)
 import LambdaCube.Compiler (compileMain, Backend(..))
 
 import LambdaCube.GL
-import Codec.Picture hiding (decodeImage)
+    ( 
+        Object,
+        allocRenderer,
+        renderFrame,
+        setStorage,
+        uploadTexture2DToGPU',
+        addObject,
+        allocStorage,
+        setScreenSize,
+        uniformFTexture2D,
+        updateUniforms,
+        defUniforms,
+        makeSchema,
+        (@:),
+        (@=),
+        Buffer,
+        GLRenderer,
+        GLStorage(schema),
+        GLUniformName,
+        IndexStream,
+        InputSetter,
+        Primitive,
+        Stream,
+        TextureData,
+        FetchPrimitive(Triangles),
+        InputType(FTexture2D, M44F, Float, V3F),
+        ObjectArraySchema(ObjectArraySchema),
+        PipelineSchema(..),
+        StreamType(Attribute_V4F, Attribute_V2F, Attribute_V3F) 
+      )
+
+import Codec.Picture
+    ( 
+      DynamicImage(ImageRGB8, ImageRGBA8),
+      Image(Image),
+      generateImage,
+      PixelRGB8(PixelRGB8) 
+    )
 
 import HRayLib3d.GameEngine.Data.Material
-import HRayLib3d.GameEngine.Loader.Zip
-import HRayLib3d.GameEngine.Loader.Image
-import HRayLib3d.GameEngine.Utils
+    ( 
+      defaultCommonAttrs,
+      defaultStageAttrs,
+      Blending(B_Zero, B_DstColor),
+      CommonAttrs(caStages),
+      RGBGen(RGB_IdentityLighting),
+      StageAttrs(saTextureUniform, saDepthWrite, saTexture, saBlend,
+                 saTCGen, saRGBGen),
+      StageTexture(ST_Lightmap, ST_Map),
+      TCGen(TG_Lightmap, TG_Base) 
+    )
+
+import HRayLib3d.GameEngine.Loader.Zip   ( readEntry, Entry )
+import HRayLib3d.GameEngine.Loader.Image ( decodeImage )
+import HRayLib3d.GameEngine.Utils        ( lc_q3_cache, printTimeDiff )
 
 import Paths_hraylib3d --Paths_lambdacube_quake3_engine
 
@@ -54,9 +103,9 @@ initTableTextures = do
       noiseTexture = sinTexture -- TODO
 
       tableTexture t = uploadTexture2DToGPU' True False False False $ ImageRGB8 $ generateImage bitmap width 1 where
-        width       = length t
-        v           = V.fromList t
-        bitmap x y  = let a = floor $ min 255 $ max 0 $ 128 + 128 * v V.! x in PixelRGB8 a a a
+        width        = length t
+        v            = V.fromList t
+        bitmap x y   = let a = floor $ min 255 $ max 0 $ 128 + 128 * v V.! x in PixelRGB8 a a a
 
   TableTextures <$> tableTexture sinTexture
                 <*> tableTexture squareTexture
@@ -88,9 +137,9 @@ loadQ3Texture isMip isClamped defaultTex ar shName name = do
                 Left msg -> putStrLn (printf "error: %s - %s" fname msg) >> return defaultTex
                 Right img -> do
                   let (w,h) = case img of
-                        ImageRGB8 (Image w h _) -> (w,h)
-                        ImageRGBA8 (Image w h _) -> (w,h)
-                        _ -> (0,0)
+                        ImageRGB8  (Image w h _) -> (w, h)
+                        ImageRGBA8 (Image w h _) -> (w, h)
+                        _                        -> (0, 0)
                   putStrLn $ printf "load (%u x %u): %s" w h fname
                   uploadTexture2DToGPU' True True isMip isClamped img
 
@@ -119,7 +168,7 @@ loadQuake3Graphics storage name = do
     when (null validPaths) $ fail $ name ++ " is not found in " ++ show paths
     renderer <- printTimeDiff "allocate pipeline..." $ do
       eitherDecode <$> LB.readFile (head validPaths) >>= \case
-        Left err -> fail err
+        Left err  -> fail err
         Right ppl -> allocRenderer ppl
     printTimeDiff "setStorage..." $ setStorage renderer storage
     return $ Just renderer

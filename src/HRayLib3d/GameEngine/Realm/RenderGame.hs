@@ -1,25 +1,91 @@
 {-# LANGUAGE LambdaCase, FlexibleContexts, RecordWildCards, OverloadedStrings #-}
 module HRayLib3d.GameEngine.Realm.RenderGame where
 
-import Text.Printf
-import Data.Monoid
-import Data.Maybe
+import Text.Printf ( printf, PrintfArg )
+import Data.Monoid ( Last(Last) )
+import Data.Maybe ( fromJust, fromMaybe, isJust )
 import Control.Monad.Writer.Strict
+    ( forM_, MonadWriter(tell), execWriter )
 import Data.Vect
-import Data.Vect.Float.Instances
+    ( Vec3(Vec3),
+      Vec2(Vec2),
+      Vec4(Vec4),
+      normalize,
+      AbelianGroup(zero),
+      CrossProd(crossprod),
+      DotProd(dotprod),
+      LeftModule((*.)),
+      MultSemiGroup((.*.)),
+      Projective(scaling, fromProjective) )
+import Data.Vect.Float.Instances ()
 import Data.Map (Map, (!))
 import qualified Data.Map as Map
-import Lens.Micro.Platform
+import Lens.Micro.Platform ( (^.) )
 
-import Debug.Trace
+import Debug.Trace ()
 import HRayLib3d.GameEngine.Scene
+    ( frustum,
+      UnitQuaternion(U),
+      defaultMD3Data,
+      rotU,
+      Camera(Camera, cameraViewportSize, cameraPosition,
+             cameraOrientation, cameraProjection, cameraFrustum),
+      MD3Data(md3SkinName, md3Scale, md3Position, md3Orientation,
+              md3ModelFile, md3Attachments, md3Frame),
+      Picture(Picture, pictureShader, picturePosition, pictureSize,
+              pictureUV1, pictureUV2, pictureColor),
+      Renderable(MD3New, MD3, BSPMap),
+      Scene(Scene),
+      Tag(..), RGBA )
 import HRayLib3d.GameEngine.Utils
+    ( lookat, perspective, sphere_UV_toQuat )
 
 import HRayLib3d.GameEngine.Realm.Items
-import HRayLib3d.GameEngine.Realm.World
+    ( Item(itWorldModel, itIcon),
+      ItemType(IT_WEAPON, IT_AMMO, IT_ARMOR, IT_HEALTH, IT_HOLDABLE,
+               IT_POWERUP),
+      Weapon,
+      WeaponInfo(wiBarrelModel, wiMissileModel, wiFlashModel,
+                 wiHandModel) )
+import HRayLib3d.GameEngine.Realm.World ( WorldSnapshot(..) )
 import HRayLib3d.GameEngine.Realm.Entities
+    ( aPosition,
+      aTime,
+      aType,
+      bDirection,
+      bPosition,
+      bType,
+      hPosition,
+      hTime,
+      hType,
+      hoPosition,
+      hoTime,
+      hoType,
+      pAmmos,
+      pArmor,
+      pDirection,
+      pHealth,
+      pPosition,
+      pRotationUV,
+      pSelectedWeapon,
+      pShootTime,
+      puPosition,
+      puTime,
+      puType,
+      rPosition,
+      rTime,
+      rType,
+      ttPosition,
+      wPosition,
+      wTime,
+      wType,
+      Entity(ETarget, EPlayer, EBullet, EWeapon, EAmmo, EArmor, EHealth,
+             EHoldable, EPowerup),
+      Player )
 import HRayLib3d.GameEngine.Realm.LoadResources
+    ( digitMap, itemMap, weaponInfoMap )
 
+up :: Vec3
 up = Vec3 0 0 1
 
 cITEM_SCALEUP_TIME :: Float
@@ -33,7 +99,9 @@ data RenderSettings
   , mapFile         :: !String
   } deriving Show
 
+add :: MonadWriter (a1, Last a2, Last a3) m => a1 -> m ()
 add l = tell (l,Last Nothing, Last Nothing)
+white :: Vec4
 white = Vec4 1 1 1 1
 
 attachedTo :: (MD3Data, Tag) -> MD3Data -> MD3Data
@@ -182,6 +250,7 @@ playerModel name = defaultMD3Data
         , md3SkinName   = Just $ printf "models/players/%s/head_default.skin" name
         }
 
+renderNum :: Text.Printf.PrintfArg t => Float -> Float -> HRayLib3d.GameEngine.Scene.RGBA -> t -> [Picture]
 renderNum x y rgba value = concatMap digit $ zip [0..] $ printf "%d" value where
   digit (i,c) = case Map.lookup c digitMap of
     Nothing -> []
@@ -196,6 +265,7 @@ renderNum x y rgba value = concatMap digit $ zip [0..] $ printf "%d" value where
         }
       ]
 
+fun :: Vec3 -> Vec3 -> UnitQuaternion
 fun direction desiredUp = rot2 .*. rot1 where
   rot1 = rotationBetweenVectors (Vec3 1 0 0) direction
   right = direction `crossprod` desiredUp
@@ -203,6 +273,7 @@ fun direction desiredUp = rot2 .*. rot1 where
   newUp = rot1 *. Vec3 0 0 1
   rot2 = rotationBetweenVectors newUp desiredUp'
 
+rotationBetweenVectors :: Vec3 -> Vec3 -> UnitQuaternion
 rotationBetweenVectors start_ dest_ = U $ Vec4 (s * 0.5) (x * invs) (y * invs) (z * invs) where
   start = normalize start_
   dest = normalize dest_

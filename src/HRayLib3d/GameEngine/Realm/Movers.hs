@@ -2,29 +2,35 @@
 
 module HRayLib3d.GameEngine.Realm.Movers where
 
-import Control.Monad
-import Lens.Micro.Platform
-import Data.Vect hiding (Vector)
-import Data.Vect.Float.Instances
-import Data.Vect.Float.Base hiding(Vector)
-import Data.Vect.Float.Util.Quaternion
+import Control.Monad ( when )
+import Lens.Micro.Platform ()
+import Data.Vect
+    ( Vec3(..), normalize, AbelianGroup(zero), Vector((*&)) )
+import Data.Vect.Float.Instances ()
+import Data.Vect.Float.Base
+    ( Vec3(..), normalize, AbelianGroup(zero), Vector((*&)) )
+import Data.Vect.Float.Util.Quaternion ()
 import qualified Data.Vect.Float.Base as VB (_1, _2, _3)
 
-import Control.Monad.State.Strict
-import Control.Monad.Writer.Strict
-import Control.Monad.Reader
+import Control.Monad.State.Strict ( when, MonadState(put, get) )
+import Control.Monad.Writer.Strict ( when )
+import Control.Monad.Reader ( when, MonadReader(ask) )
 
-import HRayLib3d.GameEngine.RenderSystem
+import HRayLib3d.GameEngine.RenderSystem ()
 import HRayLib3d.GameEngine.Collision
-import HRayLib3d.GameEngine.Data.BSP
-import HRayLib3d.GameEngine.Data.MD3
+    ( traceBox, traceRay, TraceHit )
+import HRayLib3d.GameEngine.Data.BSP ( BSPLevel )
+import HRayLib3d.GameEngine.Data.MD3 ()
 import HRayLib3d.GameEngine.RenderSystem
 
-import HRayLib3d.GameEngine.Realm.Entities
-import HRayLib3d.GameEngine.Realm.Visuals
+import HRayLib3d.GameEngine.Realm.Entities ()
+import HRayLib3d.GameEngine.Realm.Visuals ()
 import HRayLib3d.GameEngine.Realm.World
-import HRayLib3d.GameEngine.Realm.Collision
+    ( Input(Input, forwardmove, jump, toggleHoldable, changeWeapon,
+            mouseV, mouseU, mouseY, mouseX, time, dtime, shoot, sidemove) )
+import HRayLib3d.GameEngine.Realm.Collision ()
 import HRayLib3d.GameEngine.Realm.Monads
+    ( EntityEnvironment(gravity, level, userInput), EntityM )
 
 -- general mover typeclass
 -- any type of object can be moved around the map provided that it implements this interface
@@ -64,6 +70,7 @@ tryMovingWith trace transformation corrigation = do
   Just (hitPos, traceHit) -> put object >> corrigation hitPos traceHit >> return False
 
 
+tryMovingWithBoxBounds :: Mover object => (Vec3, Vec3) -> EntityM object () -> (Vec3 -> TraceHit -> EntityM object ()) -> EntityM object Bool
 tryMovingWithBoxBounds (frMin, frMax) = tryMovingWith (traceBox frMin frMax)
 
 tryMovingWithRay :: Mover object => EntityM object () -> (Vec3 -> TraceHit -> EntityM object ()) -> EntityM object Bool 
@@ -72,6 +79,7 @@ tryMovingWithRay = tryMovingWith traceRay
 modifyZ :: (Float -> Float) -> Vec3 -> Vec3
 modifyZ f (Vec3 x y z) = Vec3 x y $ f z
 
+setZ :: Float -> Vec3 -> Vec3
 setZ z = modifyZ $ const z
 
 clearZ :: Vec3 -> Vec3

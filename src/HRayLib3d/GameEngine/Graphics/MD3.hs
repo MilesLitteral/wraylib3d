@@ -8,23 +8,43 @@ module HRayLib3d.GameEngine.Graphics.MD3
   , MD3Instance(..)
   ) where
 
-import Control.Monad
-import Data.HashSet (HashSet)
-import Data.Map (Map)
+import Foreign       ( castPtr )
+import Data.Map      (Map)
+import Data.Vector   (Vector)
+import Data.HashSet  (HashSet)
+import Control.Monad ( forM )
 import qualified Data.Map as Map
 import qualified Data.HashSet as HashSet
-import Data.Vector (Vector)
 import qualified Data.Vector as V
 import qualified Data.Vector.Storable as SV
 import qualified Data.ByteString.Char8 as SB8
-import Foreign
 
 import LambdaCube.GL
-import LambdaCube.GL.Mesh
+    ( V4(V4),
+      V2(V2),
+      GLStorage,
+      Primitive(TriangleList),
+      IndexStream(IndexStream),
+      Buffer,
+      Stream(ConstV2F, Stream, ConstV4F),
+      Object,
+      compileBuffer,
+      updateBuffer,
+      addObject,
+      Array(..),
+      ArrayType(ArrFloat, ArrWord32),
+      StreamType(Attribute_V3F, Attribute_V2F) )
+import LambdaCube.GL.Mesh ( addMeshToObjectArray, uploadMeshToGPU )
 
 import HRayLib3d.GameEngine.Data.MD3
-import HRayLib3d.GameEngine.Graphics.Storage
-import HRayLib3d.GameEngine.Utils
+    ( Frame(Frame, frMins, frName, frRadius, frOrigin, frMaxs),
+      MD3Model(..),
+      MD3Skin,
+      Shader(shName),
+      Surface(..) 
+      )
+import HRayLib3d.GameEngine.Graphics.Storage ( addObjectWithMaterial )
+import HRayLib3d.GameEngine.Utils            ( bbox, setNub, sphere  )
 
 data MD3Instance
   = MD3Instance

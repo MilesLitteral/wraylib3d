@@ -1,18 +1,44 @@
 {-# LANGUAGE LambdaCase, TemplateHaskell #-}
 module HRayLib3d.GameEngine.Realm.Collision where
 
-import Data.Maybe
-import Data.List
+import Data.Maybe ( fromMaybe )
+import Data.List  ( tails )
 import Data.Vect
+    ( Vec3(..), Mat4, AbelianGroup((&-)), DotProd(normsqr) )
 import qualified Data.Vector as V
-import Control.Monad.State
+import Control.Monad.State ( when, MonadState(get), runState )
 import Lens.Micro.Platform
+    ( ASetter, Getting, (^.), (%=), (.=), use, makeLenses )
 --import qualified Data.KdMap.Static as KDT
-import HRayLib3d.GameEngine.RenderSystem
-import HRayLib3d.GameEngine.Data.MD3
-import HRayLib3d.GameEngine.Collision
+import HRayLib3d.GameEngine.RenderSystem ( RenderSystem )
+import HRayLib3d.GameEngine.Data.MD3     ( MD3Model )
+import HRayLib3d.GameEngine.Collision ()
 import HRayLib3d.GameEngine.Realm.Entities
-import HRayLib3d.GameEngine.Realm.Monads
+    ( aPosition,
+      bPosition,
+      hPosition,
+      hoPosition,
+      pPosition,
+      puPosition,
+      rPosition,
+      tPosition,
+      wPosition,
+      Entity(EPowerup, EPlayer, EBullet, EWeapon, EAmmo, EArmor, EHealth,
+             ETeleport, EHoldable) )
+import HRayLib3d.GameEngine.Realm.Monads ( EntityM )
+
+newtype RayHit        = RayHit { fraction :: Float }
+data IntersectionData = IntersectionData
+ {
+   _tmin  :: Float
+ , _tmax  :: Float
+ , _tymin :: Float
+ , _tymax :: Float
+ , _tzmin :: Float
+ , _tzmax :: Float
+ }
+ 
+makeLenses ''IntersectionData
 
 getCollisions :: RenderSystem -> [Entity] -> [(Int,Int)]
 getCollisions engine entities = result where
@@ -40,25 +66,11 @@ getCollisions engine entities = result where
     EHoldable a -> Just (a^.hoPosition)
     EPowerup a  -> Just (a^.puPosition)
     _ -> Nothing
-
-  
   
 getModel :: Entity -> EntityM object MD3Model
 getModel _ = undefined
 
-data IntersectionData = IntersectionData
- {
-   _tmin  :: Float
- , _tmax  :: Float
- , _tymin :: Float
- , _tymax :: Float
- , _tzmin :: Float
- , _tzmax :: Float
- }
- 
-makeLenses ''IntersectionData
-
-
+swapField :: (MonadState s m, Ord b) => Getting b s b -> Getting b s b -> ASetter s s a1 b -> ASetter s s a2 b -> m ()
 swapField a b a' b' = do
  aval <- use a
  bval <- use b
@@ -66,7 +78,6 @@ swapField a b a' b' = do
   a' .= bval
   b' .= aval 
 
- 
 --source: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
 rayIntersectsAABB :: Vec3 -> Vec3 -> Vec3 -> Vec3 -> (Bool, (Float, Float))
 rayIntersectsAABB 
@@ -118,7 +129,6 @@ rayIntersectsAABB
   
   return . not $ conditionOne || conditionTwo
   
-
 {-
  Ray and AABB collision test (the box can be transformed with arbitrary matrix)
  let M = the transformation of the AABB
@@ -129,14 +139,11 @@ rayIntersectsAABB
   Intersection point: M * Q
 -}
 
+-- TODO
 rayIntersectsBox :: Vec3 -> Vec3 -> Mat4 -> Vec3 -> Vec3 -> Bool
 rayIntersectsBox rayOrigin rayDir transformation boxMin boxMax = undefined
-
-data RayHit = RayHit 
- {
-  fraction :: Float
- }
     
 getEntitiesIntersectingRay :: V.Vector Entity -> Vec3 -> Vec3 -> [(RayHit, Entity)]
 getEntitiesIntersectingRay ents pos dir = undefined
- where models = V.map getModel ents 
+ where 
+  models = V.map getModel ents 

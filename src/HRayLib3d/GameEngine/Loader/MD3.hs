@@ -118,7 +118,7 @@ loadMD3 :: String -> IO MD3Model
 loadMD3 n = readMD3 <$> LB.readFile n
 
 readMD3 :: LB.ByteString -> MD3Model
-readMD3 dat = runGet getMD3Model dat
+readMD3 = runGet getMD3Model
 
 readMD3Skin :: ByteString -> MD3Skin
 readMD3Skin txt = Map.fromList

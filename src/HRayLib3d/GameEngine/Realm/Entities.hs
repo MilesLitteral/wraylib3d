@@ -1,17 +1,18 @@
 {-# LANGUAGE TemplateHaskell, DeriveGeneric, StandaloneDeriving #-}
 module HRayLib3d.GameEngine.Realm.Entities where
 
-import GHC.Generics (Generic)
-
-import Data.Set
-import Data.Vect
-import Data.Binary
-import Data.Map.Strict
-import Lens.Micro.Platform
+import GHC.Generics        ( Generic )
+import Data.Set            ( Set )
+import Data.Vect           ( Vec3(..) )
+import Data.Binary         ( Binary )
+import Data.Map.Strict     ( Map )
+import Lens.Micro.Platform ( makeLenses )
 import qualified HRayLib3d.GameEngine.Realm.Items
 
 -- entities for game logic
 instance Eq Vec3
+instance Binary Vec3
+deriving instance Generic Vec3
 
 data Player
   = Player
@@ -146,15 +147,11 @@ data Entity
   
 isPlayer :: Entity -> Bool
 isPlayer (EPlayer _) = True
-isPlayer _ = False
+isPlayer _           = False
   
-data Action 
- = Damage Int --damage quantity
+data Action = Damage Int --damage quantity
 
 concat <$> mapM makeLenses [''Player, ''Bullet, ''Weapon, ''Ammo, ''Armor, ''Spawn, ''Health, ''Lava, ''Teleport, ''Target, ''Killbox, ''Holdable, ''Powerup]
-
-deriving instance Generic Vec3
-instance Binary Vec3
 
 instance Binary Player
 instance Binary Bullet

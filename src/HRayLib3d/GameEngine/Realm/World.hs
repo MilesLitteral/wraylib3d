@@ -1,13 +1,13 @@
 {-# LANGUAGE TemplateHaskell, DeriveGeneric #-}
 module HRayLib3d.GameEngine.Realm.World where
 
-import GHC.Generics (Generic)
-import Data.Binary
-import Lens.Micro.Platform
-import System.Random.Mersenne.Pure64
+import GHC.Generics ( Generic )
+import Data.Binary  ( Binary )
+import Lens.Micro.Platform ( makeLenses )
+import System.Random.Mersenne.Pure64 ( PureMT )
 
-import HRayLib3d.GameEngine.Realm.Visuals
-import HRayLib3d.GameEngine.Realm.Entities
+import HRayLib3d.GameEngine.Realm.Visuals ( Visual )
+import HRayLib3d.GameEngine.Realm.Entities ( Entity )
 import qualified HRayLib3d.GameEngine.Realm.Items
 
 data Input
@@ -37,6 +37,7 @@ data World
 
 makeLenses ''World
 
+initWorld :: [Entity] -> String -> PureMT -> World
 initWorld ents mapfile random = World
   { _wEntities  = ents
   , _wVisuals   = []
@@ -45,6 +46,7 @@ initWorld ents mapfile random = World
   , _wMapFile   = mapfile
   }
 
+initInput :: Input
 initInput = Input
   { forwardmove    = 0
   , sidemove       = 0
@@ -60,10 +62,7 @@ initInput = Input
   , jump           = False
   }
 
-data WorldSnapshot
-  = WorldSnapshot
-  { gameEntities :: ![Entity]
-  } deriving (Show, Generic)
+newtype WorldSnapshot = WorldSnapshot { gameEntities :: [Entity] } deriving (Show, Generic)
 
 instance Binary Input
 instance Binary WorldSnapshot

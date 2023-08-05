@@ -2,15 +2,17 @@ module HRayLib3d.GameEngine.Graphics.BezierSurface
   ( tessellatePatch
   ) where
 
-import Control.Monad
+import Control.Monad ( forM_ )
 import Data.List (foldl')
 import Data.Vect.Float hiding (Vector)
-import Data.Vect.Float.Instances
+import Data.Vect.Float.Instances ()
 import Data.Vector (Vector,(!))
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as MV
 
 import HRayLib3d.GameEngine.Data.BSP
+    ( DrawVertex(..),
+      Surface(..) )
 
 {-
   See more:

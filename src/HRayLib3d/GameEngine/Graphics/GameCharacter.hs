@@ -1,31 +1,57 @@
 {-# language LambdaCase, ViewPatterns, RecordWildCards, OverloadedStrings #-}
 module HRayLib3d.GameEngine.Graphics.GameCharacter where
 
-import Control.Monad
-import Data.Char
-import Data.List
-import Data.Maybe
+import Control.Monad ( forM_ )
+import Data.Char  ()
+import Data.List  ()
+import Data.Maybe ()
 import Data.Map (Map)
 import qualified Data.Map as Map
 import qualified Data.HashMap.Strict as HashMap
 import Data.ByteString.Char8 (ByteString,unpack)
 import qualified Data.ByteString.Lazy as LB
 import qualified Data.Vector as V
-import Text.Printf
+import Text.Printf ( printf )
 import Data.Vect
-import Data.Vect.Float.Util.Quaternion
+    ( Vec3(..),
+      Vec4,
+      Proj4,
+      translateAfter4,
+      Extend(trim),
+      HasCoordinates(_4),
+      Matrix(idmtx),
+      MultSemiGroup((.*.), one),
+      Orthogonal(toOrthoUnsafe),
+      Projective(orthogonal, fromProjective) )
+import Data.Vect.Float.Util.Quaternion ( UnitQuaternion )
 
 import LambdaCube.GL
-import LambdaCube.Linear
+    ( GLStorage,
+      enableObject,
+      objectUniformSetter,
+      uniformFloat,
+      uniformM44F,
+      uniformV3F )
+import LambdaCube.Linear ( M44F )
 
 import HRayLib3d.GameEngine.Data.GameCharacter
-import HRayLib3d.GameEngine.Data.MD3
-import HRayLib3d.GameEngine.Loader.MD3
-import HRayLib3d.GameEngine.Loader.GameCharacter
-import HRayLib3d.GameEngine.Loader.Zip
-import HRayLib3d.GameEngine.Graphics.MD3
-import HRayLib3d.GameEngine.Graphics.Frustum
-import HRayLib3d.GameEngine.Utils
+    ( Animation(aNumFrames, aFirstFrame),
+      AnimationType(LEGS_BACKWALK, BOTH_DEATH1, BOTH_DEAD1, BOTH_DEATH2,
+                    BOTH_DEAD2, BOTH_DEATH3, BOTH_DEAD3, TORSO_GESTURE, TORSO_ATTACK,
+                    TORSO_ATTACK2, TORSO_DROP, TORSO_RAISE, TORSO_STAND2,
+                    TORSO_GETFLAG, TORSO_GUARDBASE, TORSO_PATROL, TORSO_FOLLOWME,
+                    TORSO_AFFIRMATIVE, TORSO_NEGATIVE, LEGS_WALKCR, LEGS_WALK,
+                    LEGS_RUN, LEGS_BACK, LEGS_SWIM, LEGS_JUMP, LEGS_LAND, LEGS_JUMPB,
+                    LEGS_LANDB, LEGS_IDLE, LEGS_IDLECR, LEGS_TURN, LEGS_BACKCR,
+                    TORSO_STAND),
+      Character(..) )
+import HRayLib3d.GameEngine.Data.MD3   ( MD3Model(mdTags), Tag(..) )
+import HRayLib3d.GameEngine.Loader.MD3 ( readMD3, readMD3Skin )
+import HRayLib3d.GameEngine.Loader.GameCharacter ( parseCharacter )
+import HRayLib3d.GameEngine.Loader.Zip   ( readEntry, Entry )
+import HRayLib3d.GameEngine.Graphics.MD3 ( addMD3, setMD3Frame, MD3Instance(..) )
+import HRayLib3d.GameEngine.Graphics.Frustum ( pointInFrustum, Frustum )
+import HRayLib3d.GameEngine.Utils ( mat4ToM44F, rotationEuler, toWorldMatrix, vec3ToV3F )
 
 {-
   character:
@@ -96,6 +122,7 @@ addCharacterInstance pk3 storage name skin = do
     , characterinstanceLowerModel = lowerInstance
     }
 
+sampleCharacterAnimation :: V.Vector (AnimationType, AnimationType)
 sampleCharacterAnimation = V.fromList $
   [ (TORSO_GESTURE,LEGS_IDLE)
   , (TORSO_ATTACK,LEGS_IDLE)

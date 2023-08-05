@@ -2,20 +2,24 @@ module HRayLib3d.GameEngine.Graphics.GLB
   ( unpackChunk
   , unpackGLBChunk
   , addGLB
+  , loadGlTFFromGLB
   , GLBInstance(..)
   ) where
 
-import Data.Binary.Get
+import Data.Binary.Get ( Get(..), ByteOffset(..) )
 import qualified Data.Vector as V
 import qualified Data.ByteString as BS
 
-import HRayLib3d.GameEngine.Data.GLB
-import HRayLib3d.GameEngine.Data.GLTF
+import HRayLib3d.GameEngine.Data.GLB  ( GLBModel(..)  )
+import HRayLib3d.GameEngine.Data.GLTF ( GLTFModel(..) )
 import qualified Codec.GLB  as GLB
 import qualified Codec.GlTF as GlTF
 
 -- GLTF ByteStrings
-data GLBInstance = GLBInstance { glbInstanceModel  :: GLBModel, glbContents :: V.Vector (String, BS.ByteString) } deriving (Show)
+data GLBInstance = GLBInstance { 
+    glbInstanceModel  :: GLBModel, 
+    glbContents       :: V.Vector (String, BS.ByteString) 
+  } deriving (Show)
 
 unpackGLBChunk :: Either (ByteOffset, String) GLB.GLB -> Get GLB.GLB
 unpackGLBChunk chuk = case chuk of

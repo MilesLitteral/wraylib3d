@@ -1,14 +1,18 @@
-{-# LANGUAGE CPP #-}
-
 module HRayLib3d.GameEngine.Data.OBJ (
-   WavefrontOBJ
+  module Codec.Wavefront.Object
+  , module Codec.Wavefront 
   , importObjFromFile
+  , exportObjAsFile
+  -- , Frame(..)
+  -- , Surface(..)
+  -- , Shader(..)
   ) where
 
 import Data.Either            ()
 import Data.String            ()
 import System.IO              ()
-import Codec.Wavefront        ( WavefrontOBJ, fromFile )
+import Codec.Wavefront.Object
+import Codec.Wavefront        ( fromFile )
 import Control.Monad.IO.Class ( MonadIO )
 import qualified Data.Binary as BW
 

@@ -45,6 +45,7 @@ library
       HRayLib3d.GameEngine.Collision
       HRayLib3d.GameEngine.Content
       HRayLib3d.GameEngine.Data
+      HRayLib3d.GameEngine.Data.AssetIR
       HRayLib3d.GameEngine.Data.BSP
       HRayLib3d.GameEngine.Data.GameCharacter
       HRayLib3d.GameEngine.Data.GLB
@@ -73,6 +74,7 @@ library
       HRayLib3d.GameEngine.Graphics.GLB
       HRayLib3d.GameEngine.Graphics.GLTF
       HRayLib3d.GameEngine.Graphics.MD3
+      HRayLib3d.GameEngine.Graphics.OBJ
       HRayLib3d.GameEngine.Graphics.Quad
       HRayLib3d.GameEngine.Graphics.Storage
       HRayLib3d.GameEngine.Loader
@@ -80,7 +82,7 @@ library
       HRayLib3d.GameEngine.Loader.Entity
       HRayLib3d.GameEngine.Loader.GameCharacter
       HRayLib3d.GameEngine.Loader.GLB
-      HRayLib3d.GameEngine.Loader.GlTF
+      HRayLib3d.GameEngine.Loader.GLTF
       HRayLib3d.GameEngine.Loader.Image
       HRayLib3d.GameEngine.Loader.MD3
       HRayLib3d.GameEngine.Loader.ShaderParser

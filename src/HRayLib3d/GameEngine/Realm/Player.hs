@@ -2,32 +2,81 @@
 module HRayLib3d.GameEngine.Realm.Player where
 
 import HRayLib3d.GameEngine.Realm.Entities
+    ( pAmmos,
+      pArmor,
+      pArmorType,
+      pCanJump,
+      pDamageTimer,
+      pDirection,
+      pHealth,
+      pHoldables,
+      pPosition,
+      pRotationUV,
+      pSelectedWeapon,
+      pShootTime,
+      pVelocity,
+      pWeapons,
+      Ammo(Ammo),
+      Armor(Armor),
+      Bullet(Bullet, _bType, _bPosition, _bDirection, _bDamage,
+             _bLifeTime),
+      Entity(ESpawnPoint, EBullet, EAmmo, EWeapon, EArmor, PSpawn,
+             EPlayer),
+      Player(..),
+      Spawn(Spawn),
+      SpawnPoint(_spAngles, _spPosition),
+      Weapon(Weapon) )
 import HRayLib3d.GameEngine.Realm.World
+    ( wInput,
+      Input(Input, time, jump, toggleHoldable, changeWeapon, mouseV,
+            mouseU, mouseY, mouseX, dtime, shoot, sidemove, forwardmove),
+      World(_wEntities) )
 import HRayLib3d.GameEngine.Realm.Monads
+    ( addEntities,
+      addEntity,
+      addVisuals,
+      die,
+      EntityEnvironment(userInput, entities, level, gravity),
+      EntityM )
 import HRayLib3d.GameEngine.Realm.Visuals
+    ( Particle(Particle), Visual(VParticle) )
 import HRayLib3d.GameEngine.Realm.Items
+    ( Weapon(WP_ROCKET_LAUNCHER, WP_SHOTGUN, WP_GAUNTLET,
+             WP_MACHINEGUN),
+      WeaponInfo(WeaponInfo, wiMissileModel, wiRPM, wiType,
+                 wiBarrelModel, wiHandModel, wiFlashModel) )
 import HRayLib3d.GameEngine.Realm.Movers
+    ( jumpMover, updateMover, Mover(..) )
 import HRayLib3d.GameEngine.Realm.Collision
+    ( getEntitiesIntersectingRay )
 import HRayLib3d.GameEngine.Realm.LoadResources(itemMap, weaponInfoMap)
 
-import Control.Monad
-import Control.Monad.Writer.Strict
+import Control.Monad ( when, forM, unless )
+import Control.Monad.Writer.Strict ()
 import Control.Monad.Reader
+    ( when, forM, MonadReader(ask), unless )
 import Control.Monad.Random
-import Control.Monad.State
+    ( when, forM, unless, MonadRandom(getRandomR) )
+import Control.Monad.State ( when, forM, MonadState(get), unless )
 
-import Data.Maybe
-import Data.Foldable
+import Data.Maybe ( fromJust )
+import Data.Foldable ( find )
 import Data.Map.Strict((!))
-import Data.Vect hiding (Vector)
+import Data.Vect
+    ( Vec3(Vec3),
+      normalize,
+      CrossProd(crossprod),
+      DotProd((&.)),
+      Extend(extendZero),
+      Vector((*&)) )
 import qualified Data.Set as Set
 import qualified Data.Map.Strict as Map
 
-import Lens.Micro.Platform
+import Lens.Micro.Platform ( (^.), to, (%=), (.=), use )
 
-import HRayLib3d.GameEngine.Utils
-import HRayLib3d.GameEngine.Collision
-import Debug.Trace 
+import HRayLib3d.GameEngine.Utils ( unitVectorAtAngle )
+import HRayLib3d.GameEngine.Collision ( traceRay )
+import Debug.Trace () 
 
 
 ---Weapon behaviours

@@ -2,7 +2,7 @@ module HRayLib3d.GameEngine.Data.MD3 where
 
 import Data.Int
 import Data.Map (Map)
-import Data.HashMap.Strict
+import Data.HashMap.Strict ( HashMap )
 import Data.Vect hiding (Vector)
 import Data.Vector (Vector)
 import Data.ByteString (ByteString)
@@ -36,7 +36,7 @@ data Surface
     , srShaders     :: !(Vector Shader)
     , srTriangles   :: !(SV.Vector Int32)
     , srTexCoords   :: !(SV.Vector Vec2)
-    , srXyzNormal   :: !(Vector (SV.Vector Vec3,SV.Vector Vec3))
+    , srXyzNormal   :: !(Vector (SV.Vector Vec3, SV.Vector Vec3))
     } deriving Show
 
 data MD3Model

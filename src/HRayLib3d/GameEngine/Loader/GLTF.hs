@@ -1,8 +1,9 @@
 {-# LANGUAGE OverloadedStrings, ViewPatterns #-}
 module HRayLib3d.GameEngine.Loader.GlTF
-  ( --readGLTF
-  -- , loadGLTF
-  -- , readGLTFSkin
+  ( readGLTF
+  , loadGLTF
+  , getGLTFModel
+  , getGLTFFromGLB
   ) where
 
 import Data.Char
@@ -18,24 +19,24 @@ import qualified Data.ByteString.Char8 as SB8
 -- https://wirewhiz.com/read-gltf-files/
 
 -- GlTF	 
--- asset :: Asset	 
--- extensionsUsed :: Maybe (Vector Text)	 
+-- asset              :: Asset	 
+-- extensionsUsed     :: Maybe (Vector Text)	 
 -- extensionsRequired :: Maybe (Vector Text)	 
--- accessors :: Maybe (Vector Accessor)	 
--- animations :: Maybe (Vector Animation)	 
--- buffers :: Maybe (Vector Buffer)	 
+-- accessors   :: Maybe (Vector Accessor)	 
+-- animations  :: Maybe (Vector Animation)	 
+-- buffers     :: Maybe (Vector Buffer)	 
 -- bufferViews :: Maybe (Vector BufferView)	 
--- cameras :: Maybe (Vector Camera)	 
--- images :: Maybe (Vector Image)	 
--- materials :: Maybe (Vector Material)	 
--- meshes :: Maybe (Vector Mesh)	 
--- nodes :: Maybe (Vector Node)	 
--- samplers :: Maybe (Vector Sampler)	 
--- scenes :: Maybe (Vector Scene)	 
--- skins :: Maybe (Vector Skin)	 
--- textures :: Maybe (Vector Texture)	 
+-- cameras     :: Maybe (Vector Camera)	 
+-- images      :: Maybe (Vector Image)	 
+-- materials   :: Maybe (Vector Material)	 
+-- meshes     :: Maybe (Vector Mesh)	 
+-- nodes      :: Maybe (Vector Node)	 
+-- samplers   :: Maybe (Vector Sampler)	 
+-- scenes     :: Maybe (Vector Scene)	 
+-- skins      :: Maybe (Vector Skin)	 
+-- textures   :: Maybe (Vector Texture)	 
 -- extensions :: Maybe Object	 
--- extras :: Maybe Value
+-- extras     :: Maybe Value
 
 -- you would throw this at Codec.GLB.chunks (Vector Chunks) (ie: V.map getGLTFFromGLB $ chunks glb) -> Vector GLTFModel)
 -- to load all GlTF Instances

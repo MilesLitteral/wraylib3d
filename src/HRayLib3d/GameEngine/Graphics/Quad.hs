@@ -6,14 +6,29 @@ module HRayLib3d.GameEngine.Graphics.Quad
   ) where
 
 import Foreign (withArray, castPtr)
-import Data.Vect.Float
+import Data.Vect.Float ( MultSemiGroup(one), Vec2(Vec2) )
 import qualified Data.Map as Map
-import qualified Data.ByteString.Char8 as SB
 
 import LambdaCube.GL
-import HRayLib3d.GameEngine.Scene
-import HRayLib3d.GameEngine.Utils
-import HRayLib3d.GameEngine.Graphics.Storage
+    ( V3(V3),
+      V2(V2),
+      GLStorage,
+      Primitive(TriangleList),
+      Buffer,
+      Stream(ConstV2F, Stream, ConstV3F),
+      Object,
+      compileBuffer,
+      updateBuffer,
+      objectUniformSetter,
+      uniformFloat,
+      uniformM44F,
+      uniformV3F,
+      Array(Array),
+      ArrayType(ArrFloat),
+      StreamType(Attribute_V4F, Attribute_V2F, Attribute_V3F) )
+import HRayLib3d.GameEngine.Scene ( Picture(..) )
+import HRayLib3d.GameEngine.Utils ( mat4ToM44F )
+import HRayLib3d.GameEngine.Graphics.Storage ( addObjectWithMaterial )
 
 data QuadInstance
   = QuadInstance

@@ -2,16 +2,32 @@
 module HRayLib3d.GameEngine.Realm.LoadResources where
 
 import Data.List
-import Data.Maybe
+import Data.Maybe ( maybeToList )
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import Data.Map.Internal.Debug
-import Lens.Micro.Platform
+import Data.Map.Internal.Debug ()
+import Lens.Micro.Platform ( (^.), view )
 
 import HRayLib3d.GameEngine.Scene (Resource(..))
-import HRayLib3d.GameEngine.Realm.World
+import HRayLib3d.GameEngine.Realm.World ( wEntities, World )
 import HRayLib3d.GameEngine.Realm.Items
+    ( items,
+      weaponInfos,
+      Item(itIcon, itType, itWorldModel),
+      ItemType(IT_POWERUP, IT_WEAPON, IT_AMMO, IT_ARMOR, IT_HEALTH,
+               IT_HOLDABLE),
+      Weapon,
+      WeaponInfo(wiMissileModel, wiType) )
 import HRayLib3d.GameEngine.Realm.Entities
+    ( aType,
+      bType,
+      hType,
+      hoType,
+      puType,
+      rType,
+      wType,
+      Entity(EPowerup, EBullet, EWeapon, EAmmo, EArmor, EHealth,
+             EHoldable) )
 
 itemMap :: Map ItemType Item
 itemMap = Map.fromList [(itType i,i) | i <- items]

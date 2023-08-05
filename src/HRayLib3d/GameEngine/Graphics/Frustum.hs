@@ -1,8 +1,13 @@
 module HRayLib3d.GameEngine.Graphics.Frustum where
 
-import Data.List
+import Data.List ( foldl' )
 import Data.Vect.Float
-import Data.Vect.Float.Instances
+    ( Vec3(..),
+      normalize,
+      CrossProd(crossprod),
+      DotProd(dotprod),
+      Vector(scalarMul) )
+import Data.Vect.Float.Instances ()
 
 data Frustum
     = Frustum

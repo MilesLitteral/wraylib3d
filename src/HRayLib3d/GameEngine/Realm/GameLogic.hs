@@ -44,7 +44,7 @@ import HRayLib3d.GameEngine.RenderSystem
 import qualified HRayLib3d.GameEngine.Realm.Items
 import qualified HRayLib3d.GameEngine.Realm.Player
 
-type Time = Float
+type Time  = Float
 type DTime = Float
 
 -- visual item update monad + collect new visual items
