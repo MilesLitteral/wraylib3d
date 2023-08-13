@@ -8,15 +8,15 @@ module HRayLib3d.GameEngine.Loader.BSP
 import Data.Char ( toLower )
 import Data.Int  ( Int32 )
 import Data.Word ( Word8, Word32 )
-import Data.Binary as B
-import Data.Binary.Get as B
-import Data.Binary.IEEE754
-import Data.Vect hiding (Vector)
+import Data.Binary     as B ( Word8(..), Word32(..), Get(..), Binary(get) )
+import Data.Binary.Get as B ( runGet, getWord32le, skip, getByteString )
+import Data.Binary.IEEE754  ( getFloat32le )
+import Data.Vect ( Vec3(..), Vec2(..), Vec4(..) )
 import Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString as SB
 import qualified Data.ByteString.Char8 as SB8
 import qualified Data.ByteString.Lazy as LB
-import Data.Vector (Vector)
+import Data.Vector (Vector(..))
 import qualified Data.Vector as V
 import Control.Monad ( replicateM )
 
@@ -37,12 +37,14 @@ import HRayLib3d.GameEngine.Data.BSP
       SurfaceType(..),
       Visibility(Visibility)
       )
-import HRayLib3d.Network.Realms ( Query, sendRealmQueryBS )
+import HRayLib3d.Network.Realms ( Query(..), sendRealmQueryBS )
+
 {-
 Information:
   http://graphics.stanford.edu/~kekoa/q3/
   http://www.mralligator.com/q3/
 -}
+
 getLowerCaseString :: Int -> Get ByteString
 getLowerCaseString leng = SB8.map toLower . SB8.takeWhile (/= '\0') <$> getByteString leng
 

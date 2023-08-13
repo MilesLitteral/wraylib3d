@@ -4,26 +4,25 @@ module HRayLib3d.GameEngine.Loader.GLB
   , loadGLB
   ) where
 
-import Control.Monad
-import Data.Int
-import Data.Char
-import Data.List
-import Data.Maybe
-
+import Data.Int      ()
+import Data.Char     ()
+import Data.List     ()
+import Data.Maybe    ()
+import Data.Binary     as B ( Get )
+import Data.Binary.Get as B ( runGet, getRemainingLazyByteString, lookAhead )
+import Data.Binary.IEEE754  ()
+import Data.Vect ()
+import Data.ByteString ( ByteString )
 import qualified Data.Map as Map
 import qualified Data.HashMap.Strict as HashMap
-import Data.Binary as B
-import Data.Binary.Get as B
-import Data.Binary.IEEE754
-import Data.Vect hiding (Vector)
-import Data.ByteString (ByteString)
-import qualified Data.ByteString.Char8 as SB8
-import qualified Data.ByteString.Lazy as LB
 import qualified Data.Vector as V
-import qualified Data.Vector.Storable as SV
+import qualified Data.Vector.Storable  as SV
+import qualified Data.ByteString.Lazy  as LB
+import qualified Data.ByteString.Char8 as SB8
 
-import HRayLib3d.GameEngine.Data.GLB
-import HRayLib3d.GameEngine.Graphics.GLB
+import Control.Monad ( when )
+import HRayLib3d.GameEngine.Data.GLB     ( GLBModel(..) )
+import HRayLib3d.GameEngine.Graphics.GLB ( unpackGLBChunk )
 import qualified Codec.GLB as GLB
 
 -- https://wirewhiz.com/read-gltf-files/
@@ -37,16 +36,15 @@ import qualified Codec.GLB as GLB
 -- the GLB then is what is held in memory whilst the GLTFs
 -- are instances of data from these GLBs
 
+readGLB :: LB.ByteString -> GLBModel
+readGLB     = runGet getGLBModel
+
+loadGLB :: String -> IO GLBModel
+loadGLB n   = readGLB <$> LB.readFile n
+
 getGLBModel :: Get GLBModel
 getGLBModel = do
     dat   <- lookAhead getRemainingLazyByteString
     glb   <- unpackGLBChunk $ GLB.fromByteString (LB.toStrict dat) 
     when (GLB.version (GLB.header glb) < 1) $ fail "unsupported GLB version"
     return $ GLBModel { rawGlb  = GLB.GLB (GLB.header glb) (GLB.chunks glb) }
-
-readGLB :: LB.ByteString -> GLBModel
-readGLB = runGet getGLBModel
-
-loadGLB :: String -> IO GLBModel
-loadGLB n = readGLB <$> LB.readFile n
-

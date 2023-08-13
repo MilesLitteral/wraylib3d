@@ -3,21 +3,23 @@ module HRayLib3d.GameEngine.Loader.GameCharacter
   ( parseCharacter
   ) where
 
-import Control.Applicative hiding (many, some)
-import Control.Monad
-import Data.Char
-import Data.HashMap.Strict (HashMap,(!))
-import qualified Data.HashMap.Strict as HashMap
-import Data.ByteString (ByteString)
+import Control.Monad ( forM, void )
+import Control.Applicative ( Alternative((<|>)) )
+
+import LambdaCube.Linear (V3(..))
+import HRayLib3d.GameEngine.Data.GameCharacter ( Animation(..), AnimationType(..), Character(..), FootStep(..), Gender(..) )
+
+import Data.Char ( toLower )
+import Data.Void ( Void(..) )
+import Data.ByteString     (ByteString(..))
+import Data.HashMap.Strict (HashMap(..), (!))
 import qualified Data.ByteString.Char8 as SB8
-import Data.Void
-import Text.Megaparsec hiding (count)
-import Text.Megaparsec.Char
+import qualified Data.HashMap.Strict   as HashMap
+
+import Text.Megaparsec      ( MonadParsec(try, eof), Parsec(..), parse, errorBundlePretty, choice, many, some )
+import Text.Megaparsec.Char ( char, digitChar, spaceChar )
 import qualified Text.Megaparsec as L
 import qualified Text.Megaparsec.Char.Lexer as L
-import LambdaCube.Linear (V3(..))
-
-import HRayLib3d.GameEngine.Data.GameCharacter
 
 type Parser a = Parsec Void String a
 
@@ -63,27 +65,26 @@ characterAttributes = fmap (\l x -> foldr ($) x l) $ many $ choice
   , (\x y z c -> c {headOffset = V3 x y z}) <$ symbol "headoffset" <*> signedFloat <*> signedFloat <*> signedFloat
   ] <* spaceConsumer
 
+  {-
+    BOTH_DEATH1 - LEGS_TURN: must present
+    TORSO_GETFLAG <= x <= TORSO_NEGATIVE: special setup if it is missing
 
-{-
-  BOTH_DEATH1 - LEGS_TURN: must present
-  TORSO_GETFLAG <= x <= TORSO_NEGATIVE: special setup if it is missing
+    for each:
+      numFrames < 0: reverse = True && numFrames *= -1
+      frameLerp = 1000 / (max 1 fps)
+      initialLerp = 1000 / (max 1 fps)
 
-  for each:
-    numFrames < 0: reverse = True && numFrames *= -1
-    frameLerp = 1000 / (max 1 fps)
-    initialLerp = 1000 / (max 1 fps)
-
-  postprocess:
-    adjust first frame:
-      skip = animations[LEGS_WALKCR].firstFrame - animations[TORSO_GESTURE].firstFrame
-      LEGS_WALKCR <= x < TORSO_GETFLAG: firstFrame -= skip
-    custom special setup:
-      LEGS_BACKCR
-      LEGS_BACKWALK
-      FLAG_RUN
-      FLAG_STAND
-      FLAG_STAND2RUN
--}
+    postprocess:
+      adjust first frame:
+        skip = animations[LEGS_WALKCR].firstFrame - animations[TORSO_GESTURE].firstFrame
+        LEGS_WALKCR <= x < TORSO_GETFLAG: firstFrame -= skip
+      custom special setup:
+        LEGS_BACKCR
+        LEGS_BACKWALK
+        FLAG_RUN
+        FLAG_STAND
+        FLAG_STAND2RUN
+  -}
 
 character :: Parser Character
 character = do

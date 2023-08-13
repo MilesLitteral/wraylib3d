@@ -139,6 +139,7 @@ library
       HRayLib3d.Utils.PrettyPrint
       HRayLib3d.Utils.Prisms
       HRayLib3d.Utils.Project
+      HRayLib3d.Utils.Subprocess
       HRayLib3d.Utils.Tooltips
       HRayLib3d.WindowSystem
       HRayLib3d.WindowSystem.Core
