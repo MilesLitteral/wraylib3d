@@ -79,10 +79,9 @@
             
             This module also contains the language-glsl, and language-metal parsers used to validate all shaders
             
-            ? There is a Format the engine uses called "LC" a kind of custom scripting language that largely is used in relation to Engine Graphics, 
-            I desire to replace Quake Shaders and (perhaps) LC as well or re appropriate it so that shaders are instead GLSL, or some other format 
-            which can be used rather than emulating to make Quake happy, It also is a kind of future proofing, where LC is then a Rendering Pipeline Language
-            LC may be the language of LambdaCube, the renderer this Application is built ontop 
+            Currently the engine uses "LC" a kind of custom shader scripting language that largely is used in relation to Engine Graphics.
+            I desire to replace this as some point with GLSL and SPIR-V support,  which can be used rather than emulating to make Quake happy.
+            LC is an associated language of LambdaCube, the renderer this application is built ontop and forks it's own build of.
             
         - Window System
             Handles SDL2 Windowing and User Interface Creation at Application level
