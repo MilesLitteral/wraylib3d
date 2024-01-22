@@ -1,22 +1,22 @@
 # WRaylib3d (WRL3D)
 ## WRayLib3d Project Structure (Unity-Like Application)
 
-    + Core  (Module)
-        - Build Manager
-            Handles the Building of Projects (WRLP) Into
-            full native executables at the high level 
-            (planned support: Win32/64 (NSIS Executable), UWP, MacOS, iOS*, Linux      
-            Application, Android*, Wasm, XR*), It may need** a companion Launcer Manager.
+###+ Core  (Module)
+    - Build Manager
+        Handles the Building of Projects (WRLP) Into
+        full native executables at the high level 
+        (planned support: Win32/64 (NSIS Executable), UWP, MacOS, iOS*, Linux      
+        Application, Android*, Wasm, XR*), It may need** a companion Launcer Manager.
             
-            * = iOS Support is _theoretical_ whereas Android is possible but would require generating an
-                Android Studio Project, this is a similar issue currently facing the UWP functionality
-                which similarly has to convert this project into a functioning VS Solution/Project
+        * = iOS Support is _theoretical_ whereas Android is possible but would require generating an
+            Android Studio Project, this is a similar issue currently facing the UWP functionality
+            which similarly has to convert this project into a functioning VS Solution/Project
                 
-                Djinni (https://github.com/MilesLitteral/djinni) may be an interesting tool to help with translating 
-                code for making iOS and Android Project I will have to explore what is to be done for VS and XC though 
-                I am sure they have, atleast, means of generation through Command-Line, the question is then linking
+            Djinni (https://github.com/MilesLitteral/djinni) may be an interesting tool to help with translating 
+            code for making iOS and Android Project I will have to explore what is to be done for VS and XC though 
+            I am sure they have, atleast, means of generation through Command-Line, the question is then linking
 
-             ** = besides a Launcher it may also need a Cross Compiler (Xross is the working title)
+         ** = besides a Launcher it may also need a Cross Compiler (Xross is the working title)
              
         - Xross 
           a "Cross Compiler" full of low level functions and templates for generating the appropriate code to run the game on the applicable 
