@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
 
@@ -191,13 +191,13 @@ library
     , transformers >=0.5 && <0.7
     , vector >=0.12 && <0.14
     , wreq >=0.5.2 && <0.6
+  default-language: Haskell2010
   if os(windows)
     extra-libraries:
         glew32
   else
     extra-libraries:
         GLEW
-  default-language: Haskell2010
 
 executable books
   main-is: Main.hs
@@ -238,11 +238,11 @@ executable books
     , transformers >=0.5 && <0.7
     , vector >=0.12 && <0.14
     , wreq >=0.5.2 && <0.6
+  default-language: Haskell2010
   if flag(examples)
     buildable: True
   else
     buildable: False
-  default-language: Haskell2010
 
 executable dev-test-app
   main-is: Main.hs
@@ -324,11 +324,11 @@ executable generative
     , transformers >=0.5 && <0.7
     , vector >=0.12 && <0.14
     , wreq >=0.5.2 && <0.6
+  default-language: Haskell2010
   if flag(examples)
     buildable: True
   else
     buildable: False
-  default-language: Haskell2010
 
 executable opengl
   main-is: Main.hs
@@ -369,11 +369,11 @@ executable opengl
     , transformers >=0.5 && <0.7
     , vector >=0.12 && <0.14
     , wreq >=0.5.2 && <0.6
+  default-language: Haskell2010
   if flag(examples)
     buildable: True
   else
     buildable: False
-  default-language: Haskell2010
 
 executable ticker
   main-is: Main.hs
@@ -417,11 +417,11 @@ executable ticker
     , websockets ==0.12.*
     , wreq >=0.5.2 && <0.6
     , wuss >=1.1 && <2.3
+  default-language: Haskell2010
   if flag(examples)
     buildable: True
   else
     buildable: False
-  default-language: Haskell2010
 
 executable todo
   main-is: Main.hs
@@ -461,11 +461,11 @@ executable todo
     , transformers >=0.5 && <0.7
     , vector >=0.12 && <0.14
     , wreq >=0.5.2 && <0.6
+  default-language: Haskell2010
   if flag(examples)
     buildable: True
   else
     buildable: False
-  default-language: Haskell2010
 
 executable tutorial
   main-is: Main.hs
@@ -513,11 +513,11 @@ executable tutorial
     , transformers >=0.5 && <0.7
     , vector >=0.12 && <0.14
     , wreq >=0.5.2 && <0.6
+  default-language: Haskell2010
   if flag(examples)
     buildable: True
   else
     buildable: False
-  default-language: Haskell2010
 
 test-suite monomer-test
   type: exitcode-stdio-1.0
