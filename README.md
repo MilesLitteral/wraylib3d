@@ -144,23 +144,23 @@
   there is a desire to work Collision and Content into their own Modules (Physics, and Content respectively).
 
 + Network
-- Database
-    Low level Postgres-SQL Functions, so far it only contains Query, which is all that is necessary
-    for Realm purposes; you are required to have PostgresSQL installed on your system to use pgl
-    if you want to use this module and it is bound to pgl otherwise this module creates segfaults.
-
-- Requests
-    Low Level HTTP Functions, it can query web addressed in terms of HTTPS, JSON, or Binary and can handle all
-    those responses, in the future any UDP Streaming functions will be described here for Multiplayer functionality 
-    as will any SSH or Tunneling functions that are of future interest
-
-- Realms
-    Levels as described in their Web format, Levels can be queried and their assets downloaded.
-    This Module will probably be more important when Multiplayer is a thing in the future
-
-- Cloud 
-    A Module which handles interfacing with a SaaS like Firebase or Supabase if the User Desires,
-    look here for all analytic needs
+  - Database
+      Low level Postgres-SQL Functions, so far it only contains Query, which is all that is necessary
+      for Realm purposes; you are required to have PostgresSQL installed on your system to use pgl
+      if you want to use this module and it is bound to pgl otherwise this module creates segfaults.
+  
+  - Requests
+      Low Level HTTP Functions, it can query web addressed in terms of HTTPS, JSON, or Binary and can handle all
+      those responses, in the future any UDP Streaming functions will be described here for Multiplayer functionality 
+      as will any SSH or Tunneling functions that are of future interest
+  
+  - Realms
+      Levels as described in their Web format, Levels can be queried and their assets downloaded.
+      This Module will probably be more important when Multiplayer is a thing in the future
+  
+  - Cloud 
+      A Module which handles interfacing with a SaaS like Firebase or Supabase if the User Desires,
+      look here for all analytic needs
 
 + Script Engine
 - All Definitions for HRuby, later will be a generalized interface that the user can use to script ingame actions
@@ -319,8 +319,10 @@ gradle/
 Realms.db
 settings.localproperties
 build.gradle -> ./build/YourGame.app
+```
 
 XR Headsets
+```
 ../user/WRL/Games/Mobile/<YourGame>
 -- (Data URI)  AssetBundle(s)
 -- (Data URI)  ShaderCache(s)
