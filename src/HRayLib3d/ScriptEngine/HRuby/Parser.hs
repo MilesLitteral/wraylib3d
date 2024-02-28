@@ -1,19 +1,17 @@
 module HRayLib3d.ScriptEngine.HRuby.Parser where
 
 import Prelude hiding (break, exponent)
-
 import Text.ParserCombinators.Parsec hiding (State, parse)
 import Text.ParserCombinators.Parsec.Expr
-
 import HRayLib3d.ScriptEngine.HRuby.Syntax
 
 ----------------------------------------------------------------------
 -- Parser state, hold a symbol table.
 ----------------------------------------------------------------------
 
-data S = S
+data RS = RS
 
-type P a = GenParser Char S a
+type P a = GenParser Char RS a
 
 ----------------------------------------------------------------------
 -- Reserved words
@@ -22,61 +20,27 @@ type P a = GenParser Char S a
 -- List of keywords.
 keywords :: [String]
 keywords = concat $ map words $
-  [ "attribute const uniform varying"
-  , "layout"
-  , "centroid flat smooth noperspective"
-  , "break continue do for while switch case default"
-  , "if else"
-  , "in out inout"
-  , "float int void bool true false"
-  , "invariant"
-  , "discard return"
-  , "mat2 mat3 mat4"
-  , "mat2x2 mat2x3 mat2x4"
-  , "mat3x2 mat3x3 mat3x4"
-  , "mat4x2 mat4x3 mat4x4"
-  , "vec2 vec3 vec4 ivec2 ivec3 ivec4 bvec2 bvec3 bvec4"
-  , "uint uvec2 uvec3 uvec4"
-  , "lowp mediump highp precision"
-  , "sampler1D sampler2D sampler3D samplerCube"
-  , "sampler1DShadow sampler2DShadow samplerCubeShadow"
-  , "sampler1DArray sampler2DArray"
-  , "sampler1DArrayShadow sampler2DArrayShadow"
-  , "isampler1D isampler2D isampler3D isamplerCube"
-  , "isampler1DArray isampler2DArray"
-  , "usampler1D usampler2D usampler3D usamplerCube"
-  , "usampler1DArray usampler2DArray"
-  , "sampler2DRect sampler2DRectShadow isampler2DRect usampler2DRect"
-  , "samplerBuffer isamplerBuffer usamplerBuffer"
-  , "sampler2DMS isampler2DMS usampler2DMS"
-  , "sampler2DMSArray isampler2DMSArray usampler2DMSArray"
-  , "struct"
+  [ "__ENCODING__"
+  , "__LINE__"
+  , "__FILE__"
+  , "BEGIN END defined?"
+  , "alias class module undef"
+  , "def do"
+  , "for while when case until unless if elsif else next then break redo"
+  , "nil"
+  , "and or in not"
+  , "super yield"
+  , "begin rescue retry ensure"
+  , "self return"
+  , "end"
   ]
 
 -- List of keywords reserved for future use.
+-- Use to update Ruby beyond 2.2.0
 reservedWords :: [String]
 reservedWords = concat $ map words $
-  [ "common partition active"
-  , "asm"
-  , "class union enum typedef template this packed"
-  , "goto"
-  , "inline noinline volatile public static extern external interface"
-  , "long short double half fixed unsigned superp"
-  , "input output"
-  , "hvec2 hvec3 hvec4 dvec2 dvec3 dvec4 fvec2 fvec3 fvec4"
-  , "sampler3DRect"
-  , "filter"
-  , "image1D image2D image3D imageCube"
-  , "iimage1D iimage2D iimage3D iimageCube"
-  , "uimage1D uimage2D uimage3D uimageCube"
-  , "image1DArray image2DArray"
-  , "iimage1DArray iimage2DArray uimage1DArray uimage2DArray"
-  , "image1DShadow image2DShadow"
-  , "image1DArrayShadow image2DArrayShadow"
-  , "imageBuffer iimageBuffer uimageBuffer"
-  , "sizeof cast"
-  , "namespace using"
-  , "row_major"
+  [ "=begin"
+  , "=end"
   ]
 
 ----------------------------------------------------------------------
@@ -85,13 +49,10 @@ reservedWords = concat $ map words $
 
 comment :: P ()
 comment = do
-  _ <- char '/'
-  _ <- choice
-    [ do _ <- char '*'
-         manyTill anyChar (try $ string "*/")
-    , do _ <- char '/'
-         manyTill anyChar ((newline >> return ()) <|> eof)
-    ]
+  _ <- string "=begin"
+  _ <- manyTill anyChar (try $ string "=end")
+  _ <- char '#'
+  _ <- manyTill anyChar ((newline >> return ()) <|> eof)
   return ()
 
 blank :: P ()
@@ -107,7 +68,7 @@ lexeme p = do
 parse :: [Char] -> Either ParseError TranslationUnit
 parse =
   runParser (do {skipMany blank ; r <- translationUnit ; eof ; return r})
-    S "GLSL"
+    S "Ruby"
 
 ----------------------------------------------------------------------
 -- Lexical elements (tokens)
@@ -179,6 +140,9 @@ floatingConstant = choice
   , pointFloat
   ]
 
+nilConstant :: P Expr
+nilConstant = choice [ nil ]
+
 -- Try to parse a given string, and allow identifier characters
 -- (or anything else) to directly follow.
 operator :: String -> P String
@@ -201,6 +165,13 @@ hexadecimal = lexeme $ try $ do
   d <- many1 hexDigit
   m <- optionMaybe $ oneOf "Uu" -- TODO
   return $ IntConstant Hexadecimal $ read ("0x" ++ d)
+
+nil :: P Expr
+nil = lexeme $ try $ do
+  d <- oneOf "nil" -- TODO
+  if read d 
+    then return $ Nil
+    else return ()
 
 octal :: P Expr
 octal = lexeme $ try $ do
@@ -246,7 +217,7 @@ pointFloat = lexeme $ try $ do
 
 exponent :: P String
 exponent = lexeme $ try $ do
-  _ <- oneOf "Ee"
+  _ <- oneOf "**"
   s <- optionMaybe (oneOf "+-")
   d <- many1 digit
   return $ "e" ++ maybe "" (:[]) s ++ d
@@ -269,32 +240,33 @@ infixRight s r = Infix (lexeme (try $ string s) >> return r) AssocRight
 
 conditionalTable :: [[Operator Char S Expr]]
 conditionalTable =
-  [ [infixLeft' "*" Mul, infixLeft' "/" Div, infixLeft' "%" Mod]
-  , [infixLeft' "+" Add, infixLeft' "-" Sub]
+  [ [infixLeft' "*"  Mul, infixLeft' "/" Div, infixLeft' "%" Mod]
+  , [infixLeft' "+"  Add, infixLeft' "-" Sub]
   , [infixLeft' "<<" LeftShift, infixLeft' ">>" RightShift]
-  , [infixLeft' "<" Lt, infixLeft' ">" Gt
-    ,infixLeft "<=" Lte, infixLeft ">=" Gte]
-  , [infixLeft "==" Equ, infixLeft "!=" Neq]
+  , [infixLeft' "<"  Lt, infixLeft' ">" Gt]
+  , [infixLeft "<="  Lte, infixLeft ">=" Gte]
+  , [infixLeft "=="  Equ, infixLeft ".eql"  Equ, infixLeft "!=" Neq]
+  , [infixLeft "===" Equal, infixLeft "equal?"  Equal]
+  , [infixLeft "<=>" Cbe]
   , [infixLeft'' '&' BitAnd]
-  , [infixLeft' "^" BitXor]
+  , [infixLeft' "^"  BitXor]
   , [infixLeft'' '|' BitOr]
-  , [infixLeft "&&" And]
-  , [infixLeft "||" Or]
+  , [infixLeft "&&"  And]
+  , [infixLeft "||"  Or]
+  --, [infixLeft "!"  Neq]
+  --, [infixLeft' "?" TernaryIf, infixLeft' ":" TernaryElse]
   ]
 
 assignmentTable :: [[Operator Char S Expr]]
 assignmentTable =
-  [ [infixRight "=" Equal]
-  , [infixRight "+=" AddAssign]
-  , [infixRight "-=" SubAssign]
-  , [infixRight "*=" MulAssign]
-  , [infixRight "/=" DivAssign]
-  , [infixRight "%=" ModAssign]
-  , [infixRight "<<=" LeftAssign]
-  , [infixRight ">>=" RightAssign]
-  , [infixRight "&=" AndAssign]
-  , [infixRight "^=" XorAssign]
-  , [infixRight "|=" OrAssign]
+  [ [infixRight "="   Equal]
+  , [infixRight "+="  AddAssign]
+  , [infixRight "-="  SubAssign]
+  , [infixRight "*="  MulAssign]
+  , [infixRight "/="  DivAssign]
+  , [infixRight "%="  ModAssign]
+  , [infixRight "**=" ExpAssign]
+  , [infixRight "||=" OrAssign]
   ]
 
 expressionTable :: [[Operator Char S Expr]]
@@ -311,11 +283,10 @@ primaryExpression = choice
   [ Variable `fmap` try identifier
   -- int constant
   , intConstant
-  -- uint constant
   -- float constant
   , floatingConstant
   -- bool constant
-  , keyword "true" >> return (BoolConstant True)
+  , keyword "true"  >> return (BoolConstant True)
   , keyword "false" >> return (BoolConstant False)
   -- expression within parentheses
   , between lparen rparen expression
@@ -353,7 +324,7 @@ functionCallGeneric :: P (FunctionIdentifier, Parameters)
 functionCallGeneric = do
   i <- functionCallHeader
   p <- choice
-    [ keyword "void" >> return ParamVoid
+    [ keyword "def" >> return ParamVoid -- TODO: Functions that take parameters or don't, void is an optional condition rather than a type in ruby
     , assignmentExpression `sepBy` comma >>= return . Params
     ]
   rparen
@@ -389,22 +360,6 @@ unaryExpression = do
   e <- postfixExpression
   return $ foldr ($) e p
 
--- inside unaryExpression
--- unaryOperator = choice
-
--- implemented throught buildExpressionParser
--- multiplicativeExpression = undefined
--- additiveExpression = undefined
--- shiftExpression = undefined
--- relationalExpression = undefined
--- equalityExpression = undefined
--- andExpression = undefined
--- exclusiveOrExpression = undefined
--- inclusiveOrExpression = undefined
--- logicalAndExpression = undefined
--- logicalXorExpression = undefined
--- logicalOrExpression = undefined
-
 conditionalExpression :: P Expr
 conditionalExpression = do
   loe <- buildExpressionParser conditionalTable unaryExpression
@@ -427,7 +382,7 @@ expression = buildExpressionParser expressionTable assignmentExpression
 constantExpression :: P Expr
 constantExpression = conditionalExpression
 
--- The GLSL grammar include here function definition but we don't
+-- The Ruby grammar here includes a function definition but we don't
 -- do this here because they should occur only at top level (page 28).
 -- Function definitions are handled in externalDefinition instead.
 declaration :: P Declaration
@@ -435,16 +390,13 @@ declaration = choice
   [ try $ do
        t <- fullySpecifiedType
        l <- idecl `sepBy` comma
-       semicolon
        return $ InitDeclaration (TypeDeclarator t) l
   , do keyword "invariant"
        i <- idecl `sepBy` comma
-       semicolon
        return $ InitDeclaration InvariantDeclarator i
   , do keyword "precision"
        q <- precisionQualifier
        s <- typeSpecifierNoPrecision
-       semicolon
        return $ Precision q s
   , do q <- typeQualifier
        choice
@@ -457,7 +409,6 @@ declaration = choice
                 j <- identifier
                 n <- optionMaybe $ between lbracket rbracket $ optionMaybe constantExpression
                 return (j,n)
-              semicolon
               return $ Block q i s m
          ]
   ]
@@ -490,17 +441,6 @@ functionHeader = do
   lparen
   return (t, i)
 
--- inside parameterDeclaration
--- parameterDeclarator = undefined
-
--- expanding parameterDeclarator and parameterTypeSpecifier, the rule is:
--- parameterDeclaration:
---   parameterTypeQualifier [parameterQualifier] typeSpecifier identifier[[e]]
---                          [parameterQualifier] typeSpecifier identifier[[e]]
---   parameterTypeQualifier [parameterQualifier] typeSpecifier
---                          [parameterQualifier] typeSpecifier
--- which is simply
---   [parameterTypeQualifier] [parameterQualifier] typeSpecifier [identifier[[e]]]
 parameterDeclaration :: P ParameterDeclaration
 parameterDeclaration = do
   tq <- optionMaybe parameterTypeQualifier
@@ -519,23 +459,6 @@ parameterQualifier = choice
   , (try . lexeme . string) "in" >> return InParameter
   , (try . lexeme . string) "out" >> return OutParameter
   ]
-
--- inside parameterDeclaration
--- parameterTypeSpecifier = typeSpecifier
-
--- FIXME not correct w.r.t. the specs.
--- The specs allow
---   int
---   int, foo
---   invariant foo, bar[]
--- and disallow
---   invariant bar[]
-
--- It is not used, it is inside declaration.
--- initDeclaratorList = undefined
-
--- inside initDeclaratorList
--- singleDeclaration = undefined
 
 fullySpecifiedType :: P FullType
 fullySpecifiedType = choice
@@ -563,9 +486,6 @@ layoutQualifier = do
   rparen
   return $ Layout q
 
--- implemented directly in layoutQualifier
--- layoutQualifierIdList = undefined
-
 layoutQualifierId :: P LayoutQualifierId
 layoutQualifierId = do
   i <- identifier
@@ -575,11 +495,6 @@ layoutQualifierId = do
 parameterTypeQualifier :: P ParameterTypeQualifier
 parameterTypeQualifier = keyword "const" >> return ConstParameter
 
--- sto
--- lay [sto]
--- int [sto]
--- inv [sto]
--- inv int sto
 typeQualifier :: P TypeQualifier
 typeQualifier = choice
   [ do s <- storageQualifier
@@ -828,7 +743,7 @@ switchStatementList = many statement
 
 caseLabel :: P CaseLabel
 caseLabel = choice
-  [ keyword "case" >> expression >>= \e -> colon >> return (Case e)
+  [ keyword "case"    >> expression >>= \e -> colon >> return (Case e)
   , keyword "default" >> colon >> return Default
   ]
 
@@ -846,13 +761,11 @@ iterationStatement = choice
        lparen
        e <- expression
        rparen
-       semicolon
        return $ DoWhile s e
   , do keyword "for"
        lparen
        i <- forInitStatement
        c <- optionMaybe condition
-       semicolon
        e <- optionMaybe expression
        rparen
        s <- statementNoNewScope
@@ -862,12 +775,6 @@ iterationStatement = choice
 forInitStatement :: P (Either (Maybe Expr) Declaration)
 forInitStatement = (expressionStatement >>= return . Left)
   <|> (declarationStatement >>= return . Right)
-
--- inside iterationStatement
--- conditionOp = undefined
-
--- inside iterationStatement
--- forRestStatement = undefined
 
 jumpStatement :: P Statement
 jumpStatement = choice

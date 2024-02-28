@@ -3,7 +3,7 @@ module Main where
 import System.Environment (getArgs)
 import Text.PrettyPrint.HughesPJClass
 
-import Language.GLSL
+import HRayLib3d.Core.Parser.Language.GLSL 
 
 info :: [String]
 info = 

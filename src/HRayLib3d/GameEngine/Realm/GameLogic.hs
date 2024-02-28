@@ -200,8 +200,6 @@ stepRocket = do
  when (lifeTime < 0) die
  get
  
- 
-
 updateVisuals :: PureMT -> Time -> DTime -> [Visual] -> (PureMT,[Visual])
 updateVisuals randGen time dtime visuals = (randGen',catMaybes visuals' ++ newVisuals) where
   ((visuals',newVisuals),randGen') = collect randGen $ mapM stepVisual visuals
@@ -290,7 +288,6 @@ instance Spawnable Entity where
    EPowerup p  -> EPowerup  (p & puTime .~ t)
    e           -> e
    
-  
 updateEntity :: EntityEnvironment -> (e -> Entity) -> e -> EntityM e e -> CollectM ()
 updateEntity entityEnv transformation initialState action = do
   seed <- getRandom

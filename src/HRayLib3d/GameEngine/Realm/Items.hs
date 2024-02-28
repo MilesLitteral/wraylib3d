@@ -15,7 +15,6 @@ data Powerup
   | PW_INVIS
   | PW_REGEN
   | PW_FLIGHT
-
   | PW_SCOUT
   | PW_GUARD
   | PW_DOUBLER

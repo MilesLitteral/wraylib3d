@@ -25,7 +25,6 @@ import Data.Vector (Vector)
 import Data.Functor.Identity ( Identity(runIdentity) )
 import qualified Data.Vector as V
 
-
 -- Entities have access to this data
 data EntityEnvironment = EntityEnvironment 
  {
@@ -37,15 +36,10 @@ data EntityEnvironment = EntityEnvironment
  }
 
 type UpdateM w s = MaybeT (RWST EntityEnvironment w s (Rand PureMT))
-
 type Collected_Objects = ([Entity], [Visual], [(Int, Action)])
-
 type EntityM e = UpdateM Collected_Objects e
-
 type VisualM v = UpdateM [Visual] v
-
 type CollectMT m = WriterT Collected_Objects (RandT PureMT m)
-
 type CollectM = CollectMT Identity
 
 runUpdateM :: EntityEnvironment -> s -> UpdateM w s s -> PureMT -> (Maybe s, w)

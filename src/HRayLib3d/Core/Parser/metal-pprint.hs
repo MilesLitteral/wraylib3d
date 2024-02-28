@@ -3,16 +3,16 @@ module Main where
 import System.Environment (getArgs)
 import Text.PrettyPrint.HughesPJClass
 
-import Language.GLSL
+import HRayLib3d.Core.Parser.Language.Metal 
 
 info :: [String]
 info = 
-  [ "This is glsl-pprint."
+  [ "This is metal-pprint."
   ]
 
 usage :: [String]
 usage = info ++
-  ["usage:\n  glsl-pprint [-p] filename"]
+  ["usage:\n  metal-pprint [-p] filename"]
 
 main :: IO ()
 main = do

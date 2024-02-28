@@ -7,9 +7,7 @@ data Physics = Physics {world :: World, const :: GravityConstant} deriving (Eq, 
 
 instance Eq   World
 
--- // Copyright (c) 2020-2021 the Mondradiko contributors.
--- // SPDX-License-Identifier: LGPL-3.0-or-later
-
+-- TODO: Refactor code into rigidbody functionality
 -- #include "core/physics/Physics.h"
 
 -- #include "core/components/internal/WorldTransform.h"

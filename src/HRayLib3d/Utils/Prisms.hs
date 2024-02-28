@@ -63,4 +63,3 @@ x ##? y = case (y ^? x) of
 -- aka: (x ^. (y ^? x))
 (#^.) :: s -> Getting a s a -> a 
 x #^. y = x ^. y --(pre x)
---End

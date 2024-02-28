@@ -2,9 +2,28 @@
 module HRayLib3d.Core.MobileInterface where
 
     import qualified Data.Text as T
-    
+
+    -- This is a one way translation, it's not necessary to read *from* DJ types
+    -- as instances of these types will be auto-generated to make sure WRayLib3d 
+    -- (HRayLib3d) compatability is maintained on mobile, put succintly: 
+
+    -- where hs_init and hs_exit can be invoked by a C++ interface which Java(Android) 
+    -- or ObjC(iOS) can also use. Not so much for Haskell to talk to these platforms
+    -- per-se. 
+
+    -- Users are also not expected to invoke these DJ types, they will instead
+    -- invoke functions against Haskell types which handle putting Djinni in the 
+    -- bottle and the C++ interfaces bridge the engine to the platform.
+
+    -- Also keep in mind .djinni(s) can reference and import other .djinni files
+    -- thus each [Djinni] will create one .djinni file on export, keep this in mind
+    -- for how to most efficiently export these interfaces.
+
+    newtype DjinniFile          = DjinniFile     { djfRawFile     :: String       }
+    newtype DjinniManifest      = DjinniManifest { djmRawManifest :: [DjinniFile] }
+
     data Show a => DEnum   a    = DEnum     { enums          :: [a] } deriving (Eq, Show)
-    data DConst = DConst { constType :: String, constValues :: [String]} deriving (Eq, Show)
+    data Show a => DConst       = DConst    { constType :: String, constValues :: [String]} deriving (Eq, Show)
     data Show a => DFlags  a    = Flags     { flags          :: [a] } deriving (Eq, Show)
     data Show a => DRecord a    = Record    { recordContents :: [a] } deriving (Eq, Show)
     data Show a => DInterface a = Interface { iValues        :: [a], iComments :: String, iConstants :: [DConst]} deriving (Eq, Show)
@@ -16,18 +35,7 @@ module HRayLib3d.Core.MobileInterface where
             option3 :: Int
         } deriving (Eq, Show)
 
-    -- This is a one way translation, it's not necessary to read *from* DJ types
-    -- as instances of these types will be auto-generated to make sure WRayLib3d 
-    -- (HRayLib3d) compatability is maintained on mobile, put succintly: 
-    -- where hs_init and hs_exit can be invoked by a C++ interface which Java(Android) 
-    -- or ObjC(iOS) can also use. Not so much for Haskell to talk to these platforms
-    -- per-se. Users are also not expected to invoke these DJ types, they will instead
-    -- invoke functions against Haskell types which handle putting Djinni in the 
-    -- bottle and the C++ interfaces bridge the engine to the platform.
 
-    -- Also keep in mind .djinni(s) can reference and import other .djinni files
-    -- thus each [Djinni] will create one .djinni file on export, keep this in mind
-    -- for how to most efficiently export these interfaces.
     class ToMobile a where 
         makeEnum       :: a -> DEnum   a
         makeFlag       :: a -> DFlags  a
@@ -35,8 +43,6 @@ module HRayLib3d.Core.MobileInterface where
         makeRecordGist :: a -> DRecord a
         makeInterface  :: a -> DInterface a
 
-    -- Multi-line comments can be added here. This comment will be propagated
-    -- to each generated definition.
     -- my_enum = enum {
     --     option1;
     --     option2;
@@ -84,7 +90,7 @@ module HRayLib3d.Core.MobileInterface where
     djinniMakeRecordGist = makeRecordGist
 
     -- djinniMakeCPPInterface makes a compiled String which looks like this:
-    -- This interface will be implemented in C++ and can be called from any applicable language (C++, ObjC, Java).
+    -- # This interface will be implemented in C++ and can be called from any applicable language (C++, ObjC, Java).
     -- my_cpp_interface = interface +c {
     --     method_returning_nothing(value: i32);
     --     method_returning_some_type(key: string): another_record;
@@ -97,7 +103,7 @@ module HRayLib3d.Core.MobileInterface where
     djinniMakeCPPInterface = makeInterface
 
     -- djinniMakeOJInterface makes a compiled String which looks like this:
-    -- This interface will be implemented in Java and ObjC and can be called from C++.
+    -- # This interface will be implemented in Java and ObjC and can be called from C++.
     -- my_client_interface = interface +j +o {
     --     log_string(str: string): bool;
     -- }

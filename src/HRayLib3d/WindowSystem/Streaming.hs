@@ -4,16 +4,17 @@ module HRayLib3d.WindowSystem.Streaming where
 import Prelude hiding (IO, Show, fromInteger, (>>=), (>>), return, fail, ($), (.))
 import Prelude.Linear ( Show, IO )
   
-type Path   = String
-type FileIO = LState (S [String])
-
 -- |WRayLib3d's Data (File) Streaming Module (utilizing LinearTypes)
 -- The State Machine has one function, Run, which it acts on stream 
 -- with.
+
+type Path   = String
+type FileIO = LState (S [String])
+
 newtype LState s a = LState { runLState :: s ⊸ (s, a) }
 data    LHandle where Handle :: Int -> LHandle
 
--- | Record Keeper of the current State (S)
+-- | Record Keeper of the current LState (S)
 data S a where S :: a -> S a
   deriving (Show, Eq)
 

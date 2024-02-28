@@ -85,7 +85,6 @@ setZ z = modifyZ $ const z
 clearZ :: Vec3 -> Vec3
 clearZ = setZ 0
 
-
 updateMover :: Mover object => EntityM object ()
 updateMover = do
  Input{..} <- userInput <$> ask

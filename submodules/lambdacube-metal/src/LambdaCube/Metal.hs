@@ -1,21 +1,22 @@
+--TODO: Look at this code side by side with mtlpp to accurate reflect types
 module LambdaCube.Metal (
     -- Schema
     module LambdaCube.PipelineSchema,
     -- IR
     V2(..),V3(..),V4(..),
     -- Array, Buffer, Texture
-    Array(..),
-    ArrayType(..),
-    Buffer,
-    BufferSetter,
+    MetalBuffer(..),          --Array(..),         -- MetalBuffer
+    MetalBufferType(..),      --ArrayType(..),     -- MetalBufferType
+    MetalCommandBuffer,       --Buffer,            -- MetalCommandBuffer -- MetalBuffer
+    MetalCommandBufferSetter, --BufferSetter, -- MetalCommandBufferSetter -- Necessary?
     IndexStream(..),
-    Stream(..),
-    StreamSetter,
-    FetchPrimitive(..),
-    InputType(..),
-    Primitive(..),
+    Stream(..),         -- MetalEngine
+    StreamSetter,       -- MetalEngineSetter
+    FetchPrimitive(..), -- FetchMetalMeshPrimitive(..)
+    InputType(..),      -- MetalInputType(..)
+    Primitive(..),      -- MetalMeshPrimitive(..)
     SetterFun,
-    TextureData,
+    TextureData,        -- MetalTextureData
     InputSetter(..),
     fromStreamType,
     sizeOfArrayType,
@@ -30,11 +31,11 @@ module LambdaCube.Metal (
     uploadTexture2DToGPU',
     disposeTexture,
 
-    -- GL: Renderer, Storage, Object
-    GLUniformName,
-    GLRenderer,
-    GLStorage,
-    Object,
+    -- Metal: CommandQueue, CommandEncoder, Mesh
+    MetalUniformName,    --GLUniformName,
+    MetalCommandQueue,   --GLRenderer, --MetalCommandQueue
+    MetalCommandEncoder, --GLStorage,  --MetalCommandEncoder
+    MetalMesh,           --Object,     --MetalMesh
     schema,
     schemaFromPipeline,
     allocRenderer,
@@ -94,6 +95,13 @@ module LambdaCube.Metal (
     updateUniforms,
     updateObjectUniforms
 ) where
+
+{-
+"kernel", "device", "texture2d", "texture", "uint2",       "access::read",   "access::write",
+     "half",   "half4",  "bool",      "char",    "uchar",       "short",          "ushort",       
+     "long",   "ulong",  "float",     "half",    "double",      "size_t",         "ptrdiff_t",    
+     "int",    "uint",   "void", "[[thread_position_in_grid]]", "intptr_t",       "uintpyt_t" 
+-}
 
 import LambdaCube.IR
 import LambdaCube.Linear

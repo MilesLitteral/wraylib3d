@@ -5,7 +5,7 @@ import Data.Vect ( Vec3 )
 import Lens.Micro.Platform ( makeLenses )
 import Control.Monad ()
 
--- visuals for game graphics
+-- visual effects for game graphics
 data Particle
   = Particle
   { _vpPosition   :: Vec3

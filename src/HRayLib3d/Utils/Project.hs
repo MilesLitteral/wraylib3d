@@ -34,7 +34,7 @@ module HRayLib3d.Utils.Project where
                 |GLSL_SHADER    -- OpenGL Shading Language Program (.glsl)
                 |METAL_SHADER   -- Apple Metal Shader Language (.metal)
                 |METAL_LIB      -- Apple Metal Shader Language (.metallib)
-                -- |ALEMBIC     -- Alembic File Format (.abc)
+                |ALEMBIC        -- Alembic File Format (.abc)
                 |MATERIAL       -- Materials (.mat)
                 |ASSET_BUNDLE   -- Compiled Asset  Collections (.assetBundle)
                 |SHADER_CACHE   -- Compiled Shader Collections (.shaderCache)

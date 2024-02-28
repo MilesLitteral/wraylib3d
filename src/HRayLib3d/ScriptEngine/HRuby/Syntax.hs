@@ -3,14 +3,12 @@ module HRayLib3d.ScriptEngine.HRuby.Syntax where
 -- TODO:
 -- - add support for 'array of strings' ?
 -- - add support for macro preprocessing
--- - add support for optional macro #include
--- - applicative style (see http://github.com/markusle/husky)?
+-- - add support for optional macro(s) include and require
 -- - type checking
 -- - check for constant expression where expected
 -- - error reporting
 -- - pretty-printing
--- - basic queries (inputs and outputs of the shader)
--- - support GLSL 1.40?
+-- - basic queries (inputs and outputs of script)
 -- - proper testing (HUnit and QuickCheck)
 -- - use hpc with the tests
 -- - scoping
@@ -18,14 +16,8 @@ module HRayLib3d.ScriptEngine.HRuby.Syntax where
 -- - order of Syntax data types and Pretty instances should be the same
 -- - build with no warning
 -- - use hlint
--- - push to github
--- - push to hackage
 -- - use parsec 3
 -- - handle all possible newlines (\n, \r, \r\n, \n\r)
--- - 80-columns clean
-
--- - lot of restriction of Samplers use (section 4.1.7),
--- well in fact, for plenty of things.
 
 ----------------------------------------------------------------------
 -- Abstract syntax tree
@@ -157,70 +149,18 @@ data TypeSpecifierNoPrecision = TypeSpecNoPrecision TypeSpecifierNonArray (Maybe
 
 data TypeSpecifierNonArray =
     Void
+  | Def
+  | Alias 
+  | Class 
+  | RModule 
+  | Undef
   | Float
+  | Double
   | Int
   | UInt
   | Bool
-  | Vec2
-  | Vec3
-  | Vec4
-  | BVec2
-  | BVec3
-  | BVec4
-  | IVec2
-  | IVec3
-  | IVec4
-  | UVec2
-  | UVec3
-  | UVec4
-  | Mat2
-  | Mat3
-  | Mat4
-  | Mat2x2
-  | Mat2x3
-  | Mat2x4
-  | Mat3x2
-  | Mat3x3
-  | Mat3x4
-  | Mat4x2
-  | Mat4x3
-  | Mat4x4
-  | Sampler1D
-  | Sampler2D
-  | Sampler3D
-  | SamplerCube
-  | Sampler1DShadow
-  | Sampler2DShadow
-  | SamplerCubeShadow
-  | Sampler1DArray
-  | Sampler2DArray
-  | Sampler1DArrayShadow
-  | Sampler2DArrayShadow
-  | ISampler1D
-  | ISampler2D
-  | ISampler3D
-  | ISamplerCube
-  | ISampler1DArray
-  | ISampler2DArray
-  | USampler1D
-  | USampler2D
-  | USampler3D
-  | USamplerCube
-  | USampler1DArray
-  | USampler2DArray
-  | Sampler2DRect
-  | Sampler2DRectShadow
-  | ISampler2DRect
-  | USampler2DRect
-  | SamplerBuffer
-  | ISamplerBuffer
-  | USamplerBuffer
-  | Sampler2DMS
-  | ISampler2DMS
-  | USampler2DMS
-  | Sampler2DMSArray
-  | ISampler2DMSArray
-  | USampler2DMSArray
+  | List
+  | Dictionary
   | StructSpecifier (Maybe String) [Field]
   | TypeName String -- TODO user-defined type, should verify if it is declared
   deriving (Show, Eq)
@@ -268,6 +208,7 @@ data Expr =
   | Gt Expr Expr
   | Lte Expr Expr
   | Gte Expr Expr
+  | Cbe Expr Expr
   | Equ Expr Expr
   | Neq Expr Expr
   | BitAnd Expr Expr
@@ -310,4 +251,3 @@ data FunctionIdentifier =
     FuncIdTypeSpec TypeSpecifier
   | FuncId String
   deriving (Show, Eq)
-

@@ -7,10 +7,10 @@ This list will be ever expanding:
         a test with the Foreign, Process, and Type Interfaces was done, only the Type (which
         is in Haskell anyway) succeeded. Research into RubyC Source and building it for ghc
         is necessary the Engine doesn't work but it could
-        ~~Continue to Write out OpenXR-Raw, lambdacube-xr (Done)~~ 
+~~Continue to Write out OpenXR-Raw, lambdacube-xr (Done)~~ 
         Go as far with this as desired, it could be replaced with vulkan-lib's OpenXR module 
 
-        ~~Write lambdacube vulkan backend (Done)~~ 
+~~Write lambdacube vulkan backend (Done)~~
         This is what will happen: vulkan-api -> vulkan, where the vulkan 
         library will handle OpenXR and Metal rendering 
 
@@ -26,7 +26,7 @@ This list will be ever expanding:
         TODO: post the latest GHC Report here, there are new build issues and big things to tackle
         - Implement the Language Parser (GLSL, Metal) (also figure out where LambdaCube's glsl shaderpipeline is and edit it into WRayLib ShaderPipeline style), it currently is from a submodule that is in the interest of this feature    
         - Implement GPUCommand, rename it (PipelineCommand is now its name), it could be a means to have the backend communicate with SDL2 and the Raw Widget
-        - Cleanup code and consolidate any orphaned modules/functions
+~~Cleanup code and consolidate any orphaned modules/functions~~
 
     High Priorities:
         - fix search query, reevalute sess' use
@@ -38,7 +38,7 @@ This list will be ever expanding:
         - editor options, network prefs, in project prefs
         - external deps list in build list
         - add on to editinglayer context (ex:build list)
-        - fix footer features (dedicated server, tooltips, cameras on/off, net option
+        - fix footer features (dedicated server, tooltips, cameras on/off, net option)
         - fix project and level naming system
         - expand renderer window to include shader optiond
         - add button icon for CbType
@@ -48,8 +48,8 @@ This list will be ever expanding:
         - make meaningful ide integration
         -
         - Build a RenderPipelineWidget for 3d Rendering in the front-end
-        -~~Build a multi-composite widget setup with fades and transitions for alternative 
-        windows/functions~~ Done, window system is working, and fixed lists
+~~Build a multi-composite widget setup with fades and transitions for alternative windows/functions~~ 
+        Done, window system is working, and fixed lists
 
         - Figure out sdl2's place in the design and create a true UI        
         haskell modules and systems (This may be the main Window and "Renderer" as a handler, it may be able to create SDL2.OpenGL, SDL2.Vulkan(therefore openXR and Metal Handling)), This is still in progress, Monomer is being used to build the UI and GUI
@@ -64,7 +64,7 @@ This list will be ever expanding:
             MD3  -> GLB/GLTF (3d Models, md3 support can continue as a Legacy format)
             Q3S  -> GLSL (Shader Language, to be expanded beyond GLSL)
             vect -> V3 (Double) or Data.Vector a  (vect is a 12 year old library! and the inconsistent use of the same type is bad practice)
-        - get back into the submodules and continue to implement the Vulkan, GLES, Metal, and SPIR-V(OpenGL) backends
+        - get back into the submodules and continue to implement the Vulkan, ~~GLES~~, Metal, and ~~SPIR-V(OpenGL)~~ backends
         - get working demos of the backends working with SDL2 instead of GLFW or figure out a clever solution 
             (It's said SDL2 can take a GLContext which is then manipulated by GLEW?)
         - answer the various TODO comments in code, replace all instances of IORef for example with a better type (Monomer could be an inspiration here)

@@ -12,14 +12,22 @@ module HRayLib3d.Network.Realms (
     import HRayLib3d.Network.Database
     import qualified Data.ByteString.Lazy as LS
 
-    realmsLoadRealmList :: String -> IO String
-    realmsLoadRealmList query        = sendHTTPRequest $ "http://127.0.0.1/realms/query/" ++ query
+    -- #Realms
+    -- Realms are Project files represented as networked spaces.
+    -- By default, all realms are scaffolled but set to a 'Closed'
+    -- state. These functions allow the application to load Realms
+    -- associated information based on given IP.
 
-    realmsLoadRealmContentList :: String -> IO String
-    realmsLoadRealmContentList realm = sendHTTPRequest $ "http://127.0.0.1/realms/" ++ realm
+    type Host = String 
 
-    sendRealmQuery   :: Query -> IO Int
-    sendRealmQuery query = sendDBQuery "host=localhost port=5432 dbname=hrlRealms connect_timeout=10" query
+    realmsLoadRealmList :: Host -> String -> IO String
+    realmsLoadRealmList ip query         = sendHTTPRequest $ "http://" ++ ip ++ "/realms/query/" ++ query
 
-    sendRealmQueryBS :: Query -> IO LS.ByteString
-    sendRealmQueryBS query = sendDBQueryBS "host=localhost port=5432 dbname=hrlRealms connect_timeout=10" query
+    realmsLoadRealmContentList :: Host -> String -> IO String
+    realmsLoadRealmContentList  ip realm = sendHTTPRequest $ "http://" ++ ip ++ "/realms/" ++ realm
+
+    sendRealmQuery   :: Host -> Query -> IO Int
+    sendRealmQuery host query   = sendDBQuery "host=" ++ host ++ " port=5432 dbname=hrlRealms connect_timeout=10" query
+
+    sendRealmQueryBS :: Host -> Query -> IO LS.ByteString
+    sendRealmQueryBS host query = sendDBQueryBS "host=" ++ host ++ " port=5432 dbname=hrlRealms connect_timeout=10" query

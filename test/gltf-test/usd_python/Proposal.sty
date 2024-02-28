@@ -1,0 +1,326 @@
+Write a winning request for proposal (RFP) in a business document format, that is 3 pages long, in markdown, 
+and with titled sections for an IT contracting company named Bridgephase based on this SOO: 
+SOO Content for ATAT Follow On1 Background: On September 13, 2017, the Deputy Secretary of Defense Patrick Shanahan established a new initiative to accelerate adoption 
+of cloud computing technologies through the acquisition of a modern enterprise cloud services solution.
+2 Consistent with the 2018 DoD Cloud Strategy, 
+the DoD CIO intends for the Account Tracking and Automation Tool (ATAT) to be capable of supporting differing DoD enterprise cloud environments. 
+The ATAT capability will enable rapid access and adoption of enterprise cloud services by implementing a self-service, automated provisioning tool 
+offering common configurations and standards to take full advantage of cloud services acquired by the Department with built-in controls and oversight 
+for security, billing, and ease of use. The Government will receive an initial Minimally Viable Product (MVP) for ATAT in September 2020 specific to 
+the Joint Enterprise Defense Infrastructure (JEDI) Cloud. The resultant contract associated with this Statement of Objectives will support the development 
+of enhanced capabilities and sustainment of ATAT code baseline for JEDI Cloud as well as other cloud environments, as necessary, to support DoD’s enterprise
+ loud provisioning needs. ATAT Team: Key operating teams for ATAT include: CCPO: The Cloud Computing Program Office (CCPO) is the program office managing development 
+ and deployment of ATAT development for customers, and serves as the product owner of the ATAT capability. The CCPO team will provide oversight and guidance for design, 
+ technical development, and business process requirements. The CCPO is also the primary liaison between the 1 This Statement of Objectives document also includes two appendices 
+ that describe the Government’s approach to sprint management for this contract. 2 The ATAT provisioning tool was initially focused on the 
+ Joint Enterprise Defense Infrastructure (JEDI) Cloud program and, as a natural byproduct, 
+ the current ATAT open source software code base has embedded references to JEDI Cloud or other derivative names.
+
+  Page 1 HQ0034-20-C-0245 Attachment J-1 6 July 2020 DoD and the ATAT contractor, and will support the contractor by facilitating access to DoD personnel, 
+  advising on policies and regulations, and clearing blockers. 
+  
+  Contractor: The contractor is the ATAT design and development team contracted to build, integrate, enhance, and sustain the tool.
+   As the ATAT developer, the contractor is responsible for leading, planning, and executing the ATAT product and collaborating with 
+   the Government to deploy and maintain the ATAT capability in the Government identified CSP(s). 
+   Stakeholders: Beyond the ATAT Team, key stakeholders for 
+   ATAT include: Mission Teams - who are interested in procuring and using commercial cloud infrastructure and who will rely on ATAT as the primary tool to be able to
+    achieve this goal. 
+DoD Leadership - who is interested in: - Knowing how this contract (and therefore ATAT) has increased the success, speed, or lethality of the field and operating missions.
+ - Knowing how this contract has reduced operating costs and increased contracting efficiencies. 
+ - Knowing how to make this contract accessible to all Components within DoD. Program Support or Management Offices 
+ - who are specialized managed service offices or programs that support mission teams get what they need quickly and efficiently while keeping security in mind. 
+ Contracting Officers 
+ - who are interested in receiving the relevant details about ATAT so they can create or modify task orders and other documentation necessary for usage of the 
+ enterprise cloud offerings and services. Security Community 
+ - who are interested in ensuring that ATAT can help proactively thwart security threats and accurately trace the source of those threats. Cloud Service Provider(s) 
+ - who are interested in limiting the barriers between end users and their services. 
+ Objectives: Page 2 HQ0034-20-C-0245 Attachment J-1 6 July 2020 The purpose of ATAT is to deliver a cloud-provider agnostic, enterprise provisioning tool that fulfills 
+ the key goals of: self service, automation, ease of use, speed to cloud services, security enablement, and integration with various cloud service providers. 
+ 
+ In the event the Contractor suggests the code baseline requires significant rework and it would be optimal to start from scratch, the following constraints are specific and 
+ non-negotiable. 
+ 
+ From Scratch Constraints include: 
+ ● The entire set of capabilities that exists in the code baseline at contract award must be delivered in an operable state within 30 days from contract award. 
+ ● A complete design for all existing capabilities in the newly proposed deliverable must be delivered to CCPO within 30 days from contract award.
+ ● A full demonstration that clearly identifies each of the code baseline capabilities are present and operable and have been fully incorporated and integrated into the Contractor code 
+   baseline replacement. 
+ ● The entire code baseline replacement shall be completed using a Continuous Integration (CI) and Continuous Delivery (CD) pipeline, that the Government accepts as sufficient, and 
+   have delivery items (a discrete, independent, and operable software delivery) to demonstrate continual progress to satisfy all of the existing code baseline capabilities. 
+ ● There will be no additional cost to the Government if the scratch option is selected. 
+   The entire cost and risk is the contractor’s to bear to improve their ability to deliver a superior quality product. 
+   General Operating and Development Objectives: A successful vendor will possess and demonstrate proven expertise, including, but not limited to: 
+   ● Project management support, including but not limited to: 
+    ○ Attending meetings (in-person and remote as appropriate) 
+    ○ Providing activity status update 
+    ○ Generating post mortems on each delivery item 
+   ● Inputs into the overall CCPO program management information needs
+   ● Identify any resource challenges that impact delivery timeliness, performance, quality, or security considerations 
+   ● Providing status updates on typical management topics, including but not limited to: 
+    ○ Schedule 
+    ○ Budget 
+    ○ Risk 
+    ○ Delivery Page 3 HQ0034-20-C-0245 Attachment J-1 6 July 2020 
+    ○ Resources 
+   ● Software project/program management of delivery and sustainment of all development deliverables for the entire lifecycle of the project, including post development maintenance
+     (typically referred to as Tier-3 support), operations, and sustainment. The process should demonstrate compliance with the best practices as outlined in USDS 
+     Digital Service Playbook (https://playbook.cio.gov) and 12 Factor App (https://12factor.net/) or an alternative methodology that demonstrates all of the key elements 
+     of the USDS Digital Service Playbook and the 12 Factor App 
+   ● Management and integration of end-to-end User Experience (UX) design throughout the CI/CD pipeline 
+   ● Use of tools, technology, and software (stack) that avoids company lock-in for the delivery items, as well as minimizing or eliminating hosting environment 
+     lock-in to the vendor cloud environment 
+   ● Delivery items demonstrating the use of open source software and platforms, cloud- based design and development,  and commodity sourced solution components as 
+     a primary consideration 
+   ● Demonstration of corporate culture use of modern software development and management practices 
+   ● Expertise with formalized CI/CD Pipeline patterns (or equivalent approaches) 
+   ● Demonstrate the corporate approach to maintaining currency with evolving industry advancements or adoption of an improved equivalent lifecycle management framework 
+   ● The CI/CD pipeline will implement the following, at a minimum: 
+    ○ A shared code repository 
+    ○ A proven process to manage all code changes, approvals and baselines
+    ○ Automated software build tools for compiling of code and dependencies into software artifacts while maintaining version control 
+    ○ Automated functional testing tools for unit and integration testing 
+    ○ Automated security testing tools ○ Container registries for version control 
+    ○ An automated deployment process to manage ops (deployment operations) configurations and delivery 
+    ○ An ability to manage at least three parallel and continuous CI/CD (or equivalent) streams including, but not limited to: 
+        ■ Requirements elicitation (e.g. storytelling, storyboarding, use case creation) 
+        ■ Rapid DevSec continuous interaction cycles including all necessary testing 
+        ■ Optimized deployment (ops) with continuous process system injections/integration into the production environment 
+        ■ Continuous user feedback processes to influence DevSec content and ops behaviors and outcomes 
+    ● Research and validation should inform an iterative development cycle, continuously incorporating user feedback Page 4 HQ0034-20-C-0245 Attachment J-1 6 July 2020 
+    The contractor will be responsible for configuring and maintaining a pipeline to support their software development effort using the Government approved environment. 
+    The pipeline will provide CI/CD of software deliveries. The tools in the pipeline include the following automation, as necessary: 
+    ● A code repository to provide configuration management of code changes, approvals and baselines 
+    ● Software build tools to support compiling of code and dependencies into software artifacts while maintaining version control 
+    ● Functional testing tools for unit and integration testing 
+    ● Security testing tools 
+    ● Container registries for version control management System Objectives: Documentation The system shall be fully documented.
+     All processes and procedures that are used to create, develop (to include system design and UIX design), 
+     configure, install, test, administer, deploy, operate, sustain, and repair shall be, at a minimum, delivered with any system release to the Government 
+     or in the approved CSP operating domain. Reporting The system shall be capable of reporting information that is identified during requirements elicitation, 
+     UIX design and system design. 
+     
+     Reports shall be flexible to accommodate end user requests, intuitive to reduce or eliminate training needs, and dynamic to allow rapid modification to support the ever 
+     changing requirements of the Department. All reports shall provide the ability to capture information from any ATAT accessible data and present the information textually,
+    numerically and graphically based on both user requirements and optimal presentation projection. 
+    
+    Automation The level of system automation should strive for as little human intervention as practical to accomplish account management. 
+    The user accounts will be fully managed by the system. This includes, at a minimum: 
+    ● Individual account assignments for each user 
+    ● Authorizations and access controls applied to individual or group accounts, including permissions based on an specific Organization’s account management approach 
+    ● Ability to generate a billing report based on all costs associated with the account and the specific date and time the cost was incurred 
+    ● Application of all applicable appropriate cloud security policies, permissions, and security settings Page 5 HQ0034-20-C-0245 Attachment J-1 6 July 2020 Page 6 
+    HQ0034-20-C-0245 Attachment J-1 6 July 2020 General Security Considerations Figure 1 is included for reference to help the reader understand the national security 
+    considerations for the ATAT operating environment. 
+    
+    Figure 1 - ATAT Notional Security Model Provisioning A user with a valid ATAT account, consistent with specified 
+    permissions and roles, will be allocated a CSP account and be able to access the Cloud Service Provider’s (CSP) management interface and associated software for 
+    provisioning a cloud environment and initiating services. The level of system automation should strive for as little human intervention as practical to accomplish CSP access. 
+    The basic steps to achieve this objective include, but are not limited to: 
+    ● A request for an account by a DoD organization following a request lifecycle workflow 
+    ● Establishing the required IaaS and PaaS environment within the CSP according to enterprise security policy configuration 
+    ● Account owners must be able to manage users within the account, to include, but not limited to: 
+        ○ Role-based access control policies 
+        ■ Internal account management 
+        ■ Usage of cloud services 
+        ○ Reporting of cloud billing information Page 7 HQ0034-20-C-0245 Attachment J-1 6 July 2020 
+        ○ Application of security configurations 
+        ■ Initiate cloud services 
+        ■ Modify security settings of cloud services 
+        ○ Enable access to the CSP portal 
+        ○ Programmatic access to security and audit logs Enterprise System Interoperations The system interfaces are capable of the following, at minimum: 
+            ● Connection to specified DoD identity systems 
+            ● Connection to specified financial systems 
+            ● Connection to the CSP APIs 
+            ● Programmatic access and individual user access via: 
+                ○ Common Access Card (CAC)/Public Key Infrastructure (PKI) authentication 
+                ○ Multi-factor authentication 
+            ● Central management of: 
+                ○ Accounts 
+                ○ Users 
+                ○ Billing 
+                ○ Security policies 
+                ○ Security and audit logs 
+            ● Complete access to all organizational accounts for authorized security teams, with the ability to: 
+                ○ Audit accounts (both for billing and security policy compliance) 
+                ○ Evaluate and enforce policy enforcement 
+                ○ Approve process and implementation for policy deviations General Capability Development and Delivery The system will be developed to minimize the required user training (intuitive look, feel, and operation). 
+                  Any necessary training will be provided for each delivery. The CI/CD pipeline will solicit continuous user input and feedback for all pipeline resident items. The delivery 
+                  methodology will include opportunities for inspection of designs by the CCPO and feedback mechanisms of functional users for pre-deployment prototypes. The system must 
+                  demonstrate the ability to natively reside in a cloud environment, to include a commercial cloud (fully managed or hybrid) or a private cloud (hybrid or exclusively 
+                  managed by the Government), and use all native cloud features, including, but not limited to: 
+                    ● Resources provisioned on demand 
+                    ● Resources scale based on real-time user demand 
+                    ● Resources provisioned through an API 
+                    ● Resources available in multiple regions 
+                    ● Applications hosted on commodity hardware 
+                    ● Cloud based Database services (Kubernetes, etc) 
+                    ● Restrict charges to Government resources used Multi-Domain Operations Objective: Page 8 HQ0034-20-C-0245 Attachment J-1 6 July 2020 
+                    The development of all delivered items should use an unclassified CI/CD pipeline. Each of the delivered items, and all “assembled”
+                     items (integrated or interoperated), must support enhancements, or be natively qualified, to operate in a SECRET and Top Secret domain. 
+                     This will ensure that the ATAT look and feel is uniform for all operating domains and the end users will not need any additional training for unique domains. 
+                     The data that ATAT generates, from within each domain, should be consumable by any instance of ATAT in its respective domain. While it is unlikely that higher 
+                     classified data will be demoted to a lower level classification, it is not improbable that lower level data may be copied to a higher level classification 
+                     domain for comprehensive reporting. Data Management Objectives: The system will support full data management processes, 
+                     including but not limited to: 
+                     ● Data system design and management 
+                     ● Data utilization profiles 
+                     ● Data access optimization 
+                     ● Data creation, destruction, and sustainment 
+                     ● Data stewardship and ownership management processes 
+                     ● Data migration 
+                     ● Data labeling, indexing, tagging, or other necessary identification markings, including full meta-data 
+                     ● Data securitization (at-rest, in-transit [internal and external]) 
+                     ● Data sharing, internal and external, with appropriate control mechanisms 
+                     ● Support for data policy creation 
+                     ● Data exposure remediation 
+                     ● Data vulnerabilities remediation 
+                     ● Data warehousing (both short and long term) 
+                     ● Data visualization 
+                     ● Data Business Intelligence (BI) 
+                     ● Data mapping (technical and cartographic) 
+                     ● Data mediation and orchestration Conformance to applicable security policies including achieving DoD certification and an Authority to Operate (ATO). 
+                       Automated Testing Objectives: The system testing will be performed with automated testing tools. The tools support should include, at a minimum: 
+                        ● Ability to generate and simulate parametric testing scenarios
+                        ● Ability to run testing of large numbers of scenarios without human intervention 
+                        ● Ability to test pre-deployments in a pseudo-equivalent production domain 
+                        ● Ability to stress and load test each delivery for dynamic elasticity 
+                        and scalability.
+                        ● Ability to identify or capture self-cure recovery of constraining events, bottlenecks, or pathway defects 
+                        ● Ability to capture automated testing scripts to allow recurring execution Page 9 HQ0034-20-C-0245 Attachment J-1 6 July 2020 
+                        ● Ability to manually test any or all deliverables using white- or black-box methodology
+                        ● Ability to segment or connect testing elements from unit test to end-to-end scenarios within an automated tool management environment 
+                        ● Ability to perform status analysis on codebase, including any associated assets, such as libraries or other code elements 
+                        ● Ability to capture testing environment and “execute” a script to automatically recreate/establish identical environment
+                        ● Ability to integrate testing practices directly into the CI/CD pipeline or execute independently 
+                        ● Ability to collect a large number and significantly data-dense logs that may not normally be collected (verbose logging) of testing environments; especially
+                         when replicating and testing issues, breaches, or other non-desired events and behaviors occur User Experience (UX) Objectives: Incorporating modern UX 
+                         design into ATAT is a critical ATAT requirement to support ease of use, intuitive experience, and speed for customers. 
+                         Design encompasses ongoing user research and feedback, usability evaluation, user interface design, interaction design, 
+                         visual design, content strategy, and similar elements to the user experience. The system interface should minimally be web-enabled. 
+                         The user experience should support: 
+                            ● A limited connectivity modality (modem or phone data traffic rates) 
+                            ● Intuitive presentation and information flow (limited need for training) 
+                            ● Actuated in-line self-help information (e.g. mouse over bubble for context blurbs)
+                            ● Compliance with Section 508 of the Rehabilitation Act of 1973 (29 USC § 794d) (e.g. vision impairment assistance) 
+                            ● Capture and storage (in a consumable and reusable repository with unrestricted Government access) of all information 
+                              for goals, needs, behaviors, and preferences collected from the functional user community 
+                            ● All UX requirements artifacts are identified to the requirements elicitation event from which they were derived 
+                            ● All user engagement platforms ([e.g.: phones, tablets, laptops, desktops, G-terminals)], and for each mobile platform 
+                              it shall be “mobile friendly” (i.e. dynamic rendering based on the size and presentation capabilities of the device). 
+                        Training Objectives: The system is delivered with complete documentation to support future efforts, testing, training, security analysis and enhancement, 
+                        deployment, system administration, operations, sustainment, and end user training. The training approach should focus on self-motivated or 
+                        self-managed sessions for self- enrichment within the tool itself. The medium for training is not constrained to documentation, but any multimedia 
+                        presentation methods must be fully consumable under the User Interface Experience (UIX) considerations. 
+                        
+                        Page 10 HQ0034-20-C-0245 Attachment J-1 6 July 2020 Security Objectives: 
+                        The system will be a secure application adhering to a combination of commercial and Government best practices, 
+                        including, but not limited to: ● Event-based auditing, including, but not limited to: 
+                            ○ Creating and capturing all application logs 
+                            ○ Identifying security-relevant events from every log, including: 
+                            ■ User account creation 
+                            ■ Session lock 
+                            ■ Failed authentication 
+                            ■ Non-privileged account access 
+                            ■ Non-privileged user actions 
+                            ■ Privilege account access 
+                            ■ Privileged user actions 
+                            ■ Other security-relevant events (to be specified in the future or proposed by the team for Government consideration) 
+                            ○ Programmable retention periods and target storage types (i.e. . online for 7 days, warm storage for 30 days, offline for 1 year) 
+                            ● An audit log containing all relevant and significant fields to support correlation by including, at a minimum: 
+                                ○ Time stamps ○ Source and destination IP addresses 
+                                ○ Users 
+                                ○ Filenames involved in any processing action 
+                                ○ Access control rules invoked 
+                                ● Support for the Assessment and Authorization (A&A) process, to include any and all artifacts, testing and demonstrations necessary 
+                                  to achieve an approved package that allows the Delivery Item(s) to obtain an operational status in the DoD environment The system 
+                                  will include development and maintenance patterns to support testing via static code analysis, vulnerability scanning, and bug bounties. 
+                        The system will use resources and protection protocols, including, but not limited to: 
+                            ● FIPS 140.2 compliant in-transit encryption mechanisms for all communication 
+                            ● FIPS 140.12 compliant data at rest encryption for all stored data 
+                            ● Existing DoD approved Public Key Infrastructure (PKI) for federated identification 
+                            ● Authentication using Multi-Factor Authentication (MFA) via Government provided hard and soft tokens 
+                            ● Use of Open Web Application Security Project (OWASP) as a reference The system will be developed using 
+                              best practices for software-defined networking within the Government approved environment, including cloud, 
+                            for virtual networks, public and private subnets, virtual firewalls, and security groups so that the delivered 
+                            items can natively seat in a Government approved environment. The system will demonstrate the ability to: 
+                            Page 11 HQ0034-20-C-0245 Attachment J-1 6 July 2020 
+                                ● Integrate with Government Furnished Equipment (GFE) or CSP provided tools for Host- Based Intrusion Detection prevention (HIDS) and anti-malware 
+                                ● Ensure a least privilege model limiting access for both privileged and customer users 
+                                ● “Fail-safe” in the event of an application failure, customer data is not exposed 
+                                ● Employ cloud-native and CSP-provided security tools application and integration 
+                                ● Comply with the all relevant DoD cloud security and cybersecurity requirements 
+                                ● Achieve the intent of the Application Security and Development Secure Technical Implementation Guide (STIG), and maintain compliance with all DoD 
+                                  Security and Cyber requirements. The contractor will not be responsible for the Assessment and Authorization (A&A) of the application via the Risk 
+                                  Management Framework (RMF) process. The contractor shall support the A&A process to aid the Government in obtaining the necessary authorizations. 
+                                  Page 12 HQ0034-20-C-0245 Attachment J-1 6 July 2020 Appendix A: Planning Milestones and Sprints The Government establishes the objectives for each 
+                                  milestone period. There are four milestones per annum. This provides a clear and consistent basis for the scope of every milestone period and allows 
+                                  the vendor to identify the sprints needed to achieve the milestone’s objectives. When the Government establishes each milestone and its objectives
+                                   the vendor plans each sprint and its capability to achieve the appropriate objective outcome. A sprint provides a measurable enhancement to all 
+                                   prior sprint deliverables that is a direct benefit to achieving a successful objective outcome. The vendor and the Government reviews the proposed 
+                                   sprints for inclusion in the formal sprint backlog. Ultimately, the Government approves or rejects each sprint for inclusion in the formal sprint
+                                    backlog. The Government is able to influence capability delivery by approving each sprint. The vendor is able to identify where a sprint belongs 
+                                    (which milestone period and the specific objective) and optimize resources to achieve best outcomes and capability delivery. This approach bounds 
+                                    the risk of the vendor from the unknown future requirements using the defined milestone objective scope. The Government and vendor collaboratively
+                                     identify the acceptable functional capability for every sprint and the ability to achieve the objective outcome. This frees the Government from 
+                                     needing to pre-specify every requirement in a contrived schedule, enabling the Government and the vendor to shift requirements and capabilities 
+                                     as needs arise and demands change. During the sprint planning session there will be additional capability deliveries that are approved by the 
+                                     Government, as necessary, but which will be beyond the scope of the current milestone under consideration. These additional capability deliveries
+                                      are immediately added to the milestone planning as future objectives and will result in a formal sprint backlog addition, including the 
+                                      objective and milestone to which it will belong. The formal sprint backlog is the tool by which the Government and the vendor use to manage 
+                                      which milestone a sprint belongs. Any other capabilities that have not been rejected by the Government, not included in a sprint, and are not 
+                                      part of the formal sprint backlog, are moved to a proposed vendor sprint backlog for future consideration by the Government. This allows the 
+                                      vendor to identify capabilities they consider valuable and present these items to the Government for future consideration. The proposed vendor 
+                                      sprint backlog is not part of the formal sprint backlog, and, therefore, no item in the proposed vendor sprint backlog may be included in the 
+                                      delivered capabilities required for meeting any milestone objective or for inclusion or consideration as part of an incentive fee. A rejected 
+                                      capabilities log shall be maintained to prevent rework or revisiting items that the Government has rejected. Page 13 HQ0034-20-C-0245 Attachment
+                                    J-1 6 July 2020 Appendix B: Accelerating Capability Delivery This Appendix contains a discussion of the CCPO intent to manage milestones, 
+                                    objectives and sprints as well as the opportunity for incentives to accelerate work. Concept Discussion The ATAT system is intended to be a 
+                                    front-end provisioning tool to one or more DoD enterprise cloud suites. To this end, the Department has invested in the initial minimally viable 
+                                    product (MVP) to support the General Purpose Cloud (GPC) offering. The current ATAT MVP meets the Government’s basic initial requirements; 
+                                    however, the Government intends to continue to add functionality to the product based on user feedback and changing mission requirements. 
+                                    The CCPO will acquire additional software development services to continue development of the ATAT MVP to achieve full functional capability. 
+                                    The work will be managed using agile software development methodologies to allow continuous integration and continuous delivery/deployment (CI/CD). 
+                                    
+                                    This approach enables the DoD to obtain an extremely flexible development environment that is responsive to the evolving requirements of the functional and operational 
+                                    communities using GPC or other cloud services. To achieve optimal value out of the CI/CD pipeline process and align with agile development patterns, we are establishing 
+                                    a contracting approach that enables the Government to maintain commercial software development integration and deployment outcomes typically achieved with modern commercial 
+                                    software practices. The approach has a base element and an incentive option that provides the Government with excellent risk management and performance assessment, enabling 
+                                    flexibility to accelerate capability delivery. The approach also maintains the necessary minimum capability deployments for cloud services access and strategic roadmap alignment.
+                                     Base Element: The base element is a Firm-Fixed-Price Level of Effort construct that provides a fixed period of work with established milestones for delivery of capability to 
+                                     achieve one or more of the mission objectives. Within the period of work, the developer will collaborate with the Government to establish sprints that are both reasonable 
+                                     amounts of work and provide ever increasing incremental capability to ultimately meet the milestones objectives for each period. The contract is divided into milestone periods. 
+                                     Each milestone period will be a length of three months, so that there are four milestone periods per contract term (4 in the base year and 4 in each option year). The level of 
+                                     effort for each milestone period has a ceiling price for the vendor team and associated resources. This model allows the Government to manage the sprint delivery to achieve the
+                                      capabilities that address the specified objectives. This also affords the vendor the latitude to organize each sprint using an optimized team while managing the overall 
+                                      approach to milestone delivery (there are multiple sprints per milestone and the objectives). Together, this provides true flexibility for the vendor to organize the work in an 
+                                      optimal fashion, while enabling the Government to mitigate risk. The first milestone period (milestone 0) is used to assist the Government’s understanding of vendor ability to 
+                                      achieve positive work outcomes. Milestone 0 also provides the necessary learning window for the vendor and the Government to collaborate and solidify a meaningful and 
+                                      productive partnership. A Page 14 HQ0034-20-C-0245 Attachment J-1 6 July 2020 key outcome for Milestone 0 is the ability for the vendor to size sprints properly and demonstrate 
+                                      to the Government their ability to deliver capabilities that, when all sprints are completed for the period, achieve the full set of milestone objectives.
+                                      
+                                      Proposed Incentive Structure: The Government will use an incentive fee to entice the vendor to add capability to each milestone period to enhance the ATAT product. 
+                                      The added capability is an additional milestone objective shifted forward from a future planned milestone period. The incentive fee and the associated incentive milestone 
+                                      objectives will be established at the beginning of each incentive period (e.g. every six months). Each of these initial sprint backlog approval sessions, for a single 
+                                      milestone, is used to establish the number of additional capabilities (shifted milestone objectives) that are moved forward on the schedule. 
+                                      
+                                      Each objective that is shifted forward qualifies for an incentive fee, which is calculated as a percentage of the period of performance (recommended fixed constant); each 
+                                      accelerated objective is a fixed percentage constant of the total annual cost for the period of performance and the total available incentive is 10% 
+                                      of the value of CLIN XX01 and CLIN XX02. The incentive fee shall only be granted if all of the milestone objectives are accepted for delivery by the Government. 
+                                      The value of each incentive objective and the number of incentive objectives available will be documented in the incentive plan approved by the Government. 
+                                      How this works: The milestone 0 has no future events defined, and therefore no incentives are available for this specific milestone. 
+                                      This is the period that the collaborative relationship is formed and the initial milestone delivery is executed using sprints to achieve the prescribed objectives. 
+                                      Once the milestone 0 work commences, and the Government ascertains the contractor’s performance abilities, future milestone planning can begin. 
+                                      During the milestone planning session, the Government will identify the list of objectives required for the next milestone(s).
+                                      
+                                      Once a future milestone is established (beyond Milestone 1), the contractor is able to accelerate an objective delivery into the current milestone period 
+                                      (e.g. Milestone 2-Objective 3 shifts to Milestone 1). For any incentive to be possible, at least one milestone plan must exist beyond the current milestone, 
+                                      further encouraging the contractor to support the Government in the planning process. A milestone, as originally scoped, must be fully delivered and accepted 
+                                      by the Government to receive an incentive (i.e. incentives are only awarded if all of the objectives in the current milestone period are complete and at least 
+                                      one additional objective from a future milestone period is achieved). If the milestone is complete and delivered with additional objectives, the incentive fee is awarded. 
+                                      
+                                      Rationale: The base price of a milestone (constant price), and its scope, is pre-established prior to any discussion of an additional capability for the incentive fee. 
+                                      The vendor will be able to better plan for software development efficiencies by constantly monitoring the sprint backlog and future milestone objectives for opportunities 
+                                      to benefit from supplemental resource additions and natural pairing of capabilities for development. Benefit: The vendor has the opportunity to increase revenue capture 
+                                      during the annual period of performance, while the Government incentivises exceptional performance and receives additional capability earlier than planned. The Government 
+                                      and the vendor also benefit from schedule Page 15 HQ0034-20-C-0245 Attachment J-1 6 July 2020 compression. This potentially allows the Government to obtain more capabilities 
+                                      within the period of performance, and allows for a better product delivered to the Government.

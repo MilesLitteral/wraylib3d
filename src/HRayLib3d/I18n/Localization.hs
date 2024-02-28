@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 module HRayLib3d.I18n.Localization where
 
-    import Monomer       ( Color(Color), tooltipDelay, tooltipFollow, tooltip_, CmbBgColor(bgColor), CmbStyleBasic(styleBasic), CmbTextColor(textColor), WidgetNode ) 
+    import Monomer        ( Color(Color), tooltipDelay, tooltipFollow, tooltip_, CmbBgColor(bgColor), CmbStyleBasic(styleBasic), CmbTextColor(textColor), WidgetNode ) 
     import System.IO      ( Handle )
     import System.Process ( createProcess, proc, CreateProcess(std_out, cwd), StdStream(CreatePipe) ) 
     import GHC.Generics   (Generic)
@@ -10,9 +10,26 @@ module HRayLib3d.I18n.Localization where
     import Data.Maybe ( fromJust   )
     import Data.Aeson ( FromJSON, decodeFileStrict )
 
-    data    LJSON                   = LJSON                { lKey          :: String,           lValue    :: String }                      deriving (Generic, Eq, Show)
-    data    Internationalization    = Internationalization { translations  :: [(String, Text)], fallbacks :: Bool   }   deriving (Generic, Eq, Show)
-    newtype I18nCollection          = I18nCollection       { cTranslations :: [Internationalization]                }   deriving (Generic, Eq, Show)
+    -- Localization (I18N)
+    -- All Localization datatypes are used here
+    -- these functions are also related to tooltips
+    -- and getting the system locale.
+    data LJSON = 
+        LJSON  { 
+            lKey      :: String,           
+            lValue    :: String 
+        }   deriving (Generic, Eq, Show)
+
+    data Internationalization = 
+        Internationalization { 
+            translations  :: [(String, Text)], 
+            fallbacks     :: Bool   
+        }   deriving (Generic, Eq, Show)
+
+    newtype I18nCollection    = 
+        I18nCollection       { 
+            cTranslations :: [Internationalization]
+        }   deriving (Generic, Eq, Show)
 
     instance FromJSON LJSON 
     instance FromJSON Internationalization
@@ -43,30 +60,16 @@ module HRayLib3d.I18n.Localization where
         paths <- decodeFileStrict path
         return $ I18nCollection (fromJust paths)
 
-    defaultI18nKeysEN :: Bool -> Internationalization --[(String, Text)]
+    defaultI18nKeysEN :: Bool -> Internationalization
     defaultI18nKeysEN fallbacksAvailable = Internationalization [
-            ("manieye_sv_graph",                pack "Takes a ManiFile Source (a folder that contains a test_sv.mani and train_sv.mani),\n or a Generator (TBA)" ),
-            ("manieye_image_selector",          pack "View Images from Scene Vectors via On The Fly rendering (Point to the GroundTruths folder of the project in question)\n or point to a Image (Folder) source (such as /Seq/)\n *WARNING: SV Source is Disabled until maniapi/local_batch is merged into maniapi/manifest as these branches are incompatible currently"),
-            ("manieye_playback",                pack "Begin playback of loaded images and or graphs,\n It is suggested you run through the loaded images and graph atleast once with playback to allow for caching of the dataset\n then run it back to the beginning and begin screen capture"),
-            ("manieye_step_forward",            pack "Step forward  in index by one"),
-            ("manieye_step_backward",           pack "Step backward in index by one"),
-            ("manieye_timeline",                pack "Scrum through loaded images and or graphs\n also denotes index within loaded datasets"),
-            ("manieye_add_widget_dropdown",     pack "Select a Widget of defined Type to create, widget types consist of:\n Image Selectors\n SVGraphs\n new widgets will appear over time here"),
-            ("manieye_add_widget",              pack "Add a Widget to the viewing area a dialogue will appear when this button is clicked,\n click again to cancel the dialogue"),
-            ("test",                            pack "test")
+            ("en_load",                pack "Loading Files" ),
+            ("test",                   pack "test")
         ] fallbacksAvailable
 
-    defaultI18nKeysHY :: Bool -> Internationalization --[(String, Text)]
+    defaultI18nKeysHY :: Bool -> Internationalization
     defaultI18nKeysHY fallbacksAvailable = Internationalization [
-            ("manieye_sv_graph",                pack "Takes a ManiFile Source (a folder that contains a test_sv.mani and train_sv.mani),\n or a Generator (TBA)" ),
-            ("manieye_image_selector",          pack "View Images from Scene Vectors via On The Fly rendering (Point to the GroundTruths folder of the project in question)\n or point to a Image (Folder) source (such as /Seq/)\n *WARNING: SV Source is Disabled until maniapi/local_batch is merged into maniapi/manifest as these branches are incompatible currently"),
-            ("manieye_playback",                pack "Begin playback of loaded images and or graphs,\n It is suggested you run through the loaded images and graph atleast once with playback to allow for caching of the dataset\n then run it back to the beginning and begin screen capture"),
-            ("manieye_step_forward",            pack "Step forward  in index by one"),
-            ("manieye_step_backward",           pack "Step backward in index by one"),
-            ("manieye_timeline",                pack "Scrum through loaded images and or graphs\n also denotes index within loaded datasets"),
-            ("manieye_add_widget_dropdown",     pack "Select a Widget of defined Type to create, widget types consist of:\n Image Selectors\n SVGraphs\n new widgets will appear over time here"),
-            ("manieye_add_widget",              pack "Add a Widget to the viewing area a dialogue will appear when this button is clicked,\n click again to cancel the dialogue"),
-            ("test",                            pack "test")
+            ("hy_load",                pack "Takes a ManiFile Source (a folder that contains a test_sv.mani and train_sv.mani),\n or a Generator (TBA)" ),
+            ("test",                   pack "test")
         ] fallbacksAvailable
 
     getI18nBody :: String -> Internationalization -> Text

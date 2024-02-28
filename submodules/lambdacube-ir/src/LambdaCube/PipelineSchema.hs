@@ -1,8 +1,6 @@
--- generated file, do not modify!
--- 2016-11-11T11:17:03.470118000000Z
-
 {-# LANGUAGE OverloadedStrings, RecordWildCards, DeriveAnyClass #-}
 module LambdaCube.PipelineSchema where
+-- auto-generated file, do not modify!
 
 import Data.Int
 import Data.Word
@@ -54,7 +52,6 @@ data PipelineSchema
   , uniforms :: Map String InputType
   }
   deriving (Show, Eq, Ord, Semigroup)
-
 
 instance ToJSON StreamType where
   toJSON v = case v of

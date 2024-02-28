@@ -1,9 +1,18 @@
 
 {-# LANGUAGE OverloadedStrings #-}
-module HRayLib3d.Network.Cloud (Supabase(..), Firebase(..)) where
+module HRayLib3d.Network.Cloud (
+        Supabase(..), 
+        Firebase(..)
+    ) where
 
     import HRayLib3d.Network.Database
     import qualified Data.ByteString as BS
+
+    -- All Cloud Based communication happens here
+    -- there are necessary accompanying functions 
+    -- but it is also possible to condone communication
+    -- entirely with the Requests module to the appropriate
+    -- endpoints
 
     type HTTPAddress       = String
     type SupabaseKey       = String

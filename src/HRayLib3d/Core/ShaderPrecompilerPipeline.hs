@@ -19,8 +19,8 @@ module HRayLib3d.Core.ShaderPrecompilerPipeline where
     setShaderForPreCompC :: String -> IO String
     setShaderForPreCompC scriptBody = return $ show $ "R\"(" ++ scriptBody ++ ")\""
     
-    -- and then import it as a string like this:
-    --const std::string vs_source = "#include shaderName.vs";
+    -- declare an import as a string like this:
+    -- const std::string vs_source = "#include shaderName.vs";
     vs_source :: String -> String
     vs_source shaderName = "#include" ++ shaderName ++ ".vs";
     

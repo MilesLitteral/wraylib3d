@@ -1,22 +1,22 @@
 # WRaylib3d (WRL3D)
-## WRayLib3d Project Structure (Unity-Like FP Application)
+## WRayLib3d Project Structure (Unity-Like Application)
 
-  + Core  (Module)
-    - Build Manager
-        Handles the Building of Projects (WRLP) Into
-        full native executables at the high level 
-        (planned support: Win32/64 (NSIS Executable), UWP, MacOS, iOS*, Linux      
-        Application, Android*, Wasm, XR*), It may need** a companion Launcer Manager.
+    + Core  (Module)
+        - Build Manager
+            Handles the Building of Projects (WRLP) Into
+            full native executables at the high level 
+            (planned support: Win32/64 (NSIS Executable), UWP, MacOS, iOS*, Linux      
+            Application, Android*, Wasm, XR*), It may need** a companion Launcer Manager.
             
-        * = iOS Support is _theoretical_ whereas Android is possible but would require generating an
-            Android Studio Project, this is a similar issue currently facing the UWP functionality
-            which similarly has to convert this project into a functioning VS Solution/Project
+            * = iOS Support is _theoretical_ whereas Android is possible but would require generating an
+                Android Studio Project, this is a similar issue currently facing the UWP functionality
+                which similarly has to convert this project into a functioning VS Solution/Project
                 
-            Djinni (https://github.com/MilesLitteral/djinni) may be an interesting tool to help with translating 
-            code for making iOS and Android Project I will have to explore what is to be done for VS and XC though 
-            I am sure they have, atleast, means of generation through Command-Line, the question is then linking
+                Djinni (https://github.com/MilesLitteral/djinni) may be an interesting tool to help with translating 
+                code for making iOS and Android Project I will have to explore what is to be done for VS and XC though 
+                I am sure they have, atleast, means of generation through Command-Line, the question is then linking
 
-         ** = besides a Launcher it may also need a Cross Compiler (Xross is the working title)
+             ** = besides a Launcher it may also need a Cross Compiler (Xross is the working title)
              
         - Xross 
           a "Cross Compiler" full of low level functions and templates for generating the appropriate code to run the game on the applicable 
@@ -79,9 +79,10 @@
             
             This module also contains the language-glsl, and language-metal parsers used to validate all shaders
             
-            Currently the engine uses "LC" a kind of custom shader scripting language that largely is used in relation to Engine Graphics.
-            I desire to replace this as some point with GLSL and SPIR-V support,  which can be used rather than emulating to make Quake happy.
-            LC is an associated language of LambdaCube, the renderer this application is built ontop and forks it's own build of.
+            ? There is a Format the engine uses called "LC" a kind of custom scripting language that largely is used in relation to Engine Graphics, 
+            I desire to replace Quake Shaders and (perhaps) LC as well or re appropriate it so that shaders are instead GLSL, or some other format 
+            which can be used rather than emulating to make Quake happy, It also is a kind of future proofing, where LC is then a Rendering Pipeline Language
+            LC may be the language of LambdaCube, the renderer this Application is built ontop 
             
         - Window System
             Handles SDL2 Windowing and User Interface Creation at Application level
