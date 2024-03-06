@@ -17,7 +17,7 @@ import LambdaCube.Linear
 import LambdaCube.Metal.Bindings
 import LambdaCube.PipelineSchema
 
-type GLUniformName = ByteString
+type MetalUniformName = ByteString
 
 ---------------
 -- Input API --
@@ -68,8 +68,8 @@ data ArrayDesc
 -}
 data MetalUniform = forall a. Storable a => MetalUniform !InputType !(IORef a)
 
-instance Show GLUniform where
-    show (GLUniform t _) = "GLUniform " ++ show t
+instance Show MetalUniform where
+    show (GLUniform t _) = "MetalUniform " ++ show t
 
 data OrderJob
     = Generate
@@ -77,14 +77,14 @@ data OrderJob
     | Ordered
 
 data MetalSlot
-    = GLSlot
+    = MetalSlot
     { objectMap     :: IntMap Object
     , sortedObjects :: Vector (Int, Object)
     , orderJob      :: OrderJob
     }
 
 data MetalStorage
-    = GLStorage
+    = MetalStorage
     { schema        :: PipelineSchema
     , slotMap       :: Map String SlotName
     , slotVector    :: Vector (IORef GLSlot)
@@ -114,7 +114,7 @@ data Object -- internal type
 --------------
 
 data MetalProgram
-    = GLProgram
+    = MetalProgram
     { shaderObjects         :: [GLuint]
     , programObject         :: GLuint
     , inputUniforms         :: Map String GLint
@@ -176,10 +176,10 @@ data MetalRenderTarget
     , framebufferDrawbuffers    :: Maybe [GLenum]
     } deriving Eq
 
-type GLTextureUnit = Int
-type GLUniformBinding = GLint
+type MetalTextureUnit = Int
+type MetalUniformBinding = GLint
 
-data GLSamplerUniform
+data MetalSamplerUniform
   = GLSamplerUniform
   { glUniformBinding    :: !GLUniformBinding
   , glUniformBindingRef :: IORef GLUniformBinding
@@ -188,8 +188,8 @@ data GLSamplerUniform
 instance Eq GLSamplerUniform where
   a == b = glUniformBinding a == glUniformBinding b
 
-data GLDrawContext
-  = GLDrawContext
+data MetalDrawContext
+  = MetalDrawContext
   { glRasterContext         :: !RasterContext
   , glAccumulationContext   :: !AccumulationContext
   , glRenderTarget          :: !GLRenderTarget
@@ -199,22 +199,22 @@ data GLDrawContext
   , glSamplerUniformMapping :: ![(GLTextureUnit,GLSamplerUniform)]
   }
 
-data GLCommand
-  = GLRenderSlot          !GLDrawContext !SlotName !ProgramName
-  | GLRenderStream        !GLDrawContext !StreamName !ProgramName
-  | GLClearRenderTarget   !GLRenderTarget ![ClearImage]
+data MetalCommand
+  = MetalRenderSlot          !GLDrawContext !SlotName !ProgramName
+  | MetalRenderStream        !GLDrawContext !StreamName !ProgramName
+  | MetalClearRenderTarget   !GLRenderTarget ![ClearImage]
 
 instance Show (IORef GLint) where
     show _ = "(IORef GLint)"
 
-data GLObjectCommand
-    = GLSetUniform              !GLint !GLUniform
-    | GLBindTexture             !GLenum !(IORef GLint) !GLUniform               -- binds the texture from the gluniform to the specified texture unit and target
-    | GLSetVertexAttribArray    !GLuint !GLuint !GLint !GLenum !(Ptr ())        -- index buffer size type pointer
-    | GLSetVertexAttribIArray   !GLuint !GLuint !GLint !GLenum !(Ptr ())        -- index buffer size type pointer
-    | GLSetVertexAttrib         !GLuint !(Stream Buffer)                        -- index value
-    | GLDrawArrays              !GLenum !GLint !GLsizei                         -- mode first count
-    | GLDrawElements            !GLenum !GLsizei !GLenum !GLuint !(Ptr ())      -- mode count type buffer indicesPtr
+data MetalObjectCommand
+    = MetalSetUniform              !GLint !GLUniform
+    | MetalBindTexture             !GLenum !(IORef GLint) !GLUniform               -- binds the texture from the gluniform to the specified texture unit and target
+    | MetalSetVertexAttribArray    !GLuint !GLuint !GLint !GLenum !(Ptr ())        -- index buffer size type pointer
+    | MetalSetVertexAttribIArray   !GLuint !GLuint !GLint !GLenum !(Ptr ())        -- index buffer size type pointer
+    | MetalSetVertexAttrib         !GLuint !(Stream Buffer)                        -- index value
+    | MetalDrawArrays              !GLenum !GLint !GLsizei                         -- mode first count
+    | MetalDrawElements            !GLenum !GLsizei !GLenum !GLuint !(Ptr ())      -- mode count type buffer indicesPtr
     deriving Show
 
 type SetterFun a = a -> IO ()

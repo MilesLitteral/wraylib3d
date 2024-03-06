@@ -27,7 +27,7 @@ import qualified Data.Vector.Storable.Mutable as MV
 import qualified Data.ByteString.Char8 as SB
 import qualified Data.ByteString.Lazy as LB
 
-import LambdaCube.GL
+import LambdaCube.Metal
 import LambdaCube.Metal.Type as T
 import LambdaCube.IR as IR
 import LambdaCube.Linear as IR

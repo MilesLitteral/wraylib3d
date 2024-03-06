@@ -1,0 +1,219 @@
+2009/04/25
+Using DirectX from Haskell
+
+I try to use DirectX from Haskell. I heard that there were a bindings made by Esa Ilari Vuokko. I got archive, but I can't found the homepage or repositry now, archive only. Anyway, I try to use that bindins.
+
+Prepare
+
+This library are for MinGW/MSYS, and need transformation DirectX library for MinGW:
+cd $DXSDK
+mkdir Mingw
+cd Mingw
+cp ../Lib/x86/*.lib .
+rm DxErr*.lib
+ls | xargs -n 1 reimp
+
+
+Build
+
+When I tried to compile Setup.hs, raised compile error. The library was made on GHC 6.4, and Its need to be change:
+ main = defaultMainWithHooks defaultUserHooks{preConf=conf, postConf=ok}
+     where
+-        ok _ _ _ _ = return ExitSuccess
++        ok _ _ _ _ = return ()
+
+
+Building base
+
+When 'install', raise no 'LICENSE' file error. Copy it from root.
+
+Building d3d
+
+Need change d3d/DirectX9/D3D/Utility/Init.hs:
+{- Comment out:
+import Graphics.Win32   ( WindowClosure, HWND, mkClassName, loadIcon,
+                        , loadCursor, createSolidBrush, rgb, registerClass
+                        , showWindow, updateWindow, sendMessage, WPARAM
+                        , LPARAM, LRESULT, WindowMessage, defWindowProc
+                        , createWindow, getMessage, translateMessage
+                        , dispatchMessage, allocaMessage )
+import Graphics.Win32   ( iDI_APPLICATION, iDC_ARROW, cS_VREDRAW, cS_HREDRAW
+                        , wS_OVERLAPPEDWINDOW, sW_SHOWNORMAL, wM_DESTROY
+                        , wM_QUIT, wM_KEYDOWN, vK_ESCAPE )
+-}
+import Graphics.Win32
+
+
+Building d3dx
+No problems.
+Make test application
+Ok, the library was installed. I had tried making DirectX's Tutorial 2: Rendering Vertices:
+
+-- Use DirectX from Haskell
+ 
+{-# LANGUAGE ForeignFunctionInterface #-}
+ 
+import Graphics.Win32
+import System.Win32.DLL (getModuleHandle)
+import Data.Int (Int32)
+import Data.Maybe (isJust)
+import Control.Monad (when)
+ 
+import DirectX9.D3D
+import DirectX9.D3D.Utility.Basic (defaultD3DPRESENT_PARAMETERS, drawScene)
+import Foreign (unsafeForeignPtrToPtr)
+import Data.Bits ((.|.))
+import Foreign (peekByteOff, pokeByteOff, plusPtr)
+ 
+foreign import stdcall "PostQuitMessage" postQuitMessage :: Int32 -> IO ()
+ 
+main :: IO ()
+main = do
+	let className = mkClassName "My Window Class"
+	hInst <- getModuleHandle Nothing
+	let wc = (
+		cS_CLASSDC,	-- ClassStyle
+		hInst,		-- HINSTANCE
+		Nothing,	-- Maybe HICON
+		Nothing,	-- Maybe HCURSOR
+		Nothing,	-- Maybe HBRUSH
+		Nothing,	-- Maybe LPCTSTR (MenuName)
+		className	-- ClassName
+		)
+	mAtom <- registerClass  wc
+	when (isJust mAtom) $ do
+		hWnd <- createWindow
+			className				-- ClassName
+			"D3D Tutorial 02: Vertices"		-- Caption
+			wS_OVERLAPPEDWINDOW		-- WindowStyle
+			(Just 100) (Just 100)	-- x, y
+			(Just 300) (Just 300)	-- w, h
+			Nothing					-- Maybe HWND
+			Nothing					-- Maybe HMENU
+			hInst					-- HINSTANCE
+			wndProc					-- WindowClosure
+		m <- initD3D hWnd
+		case m of
+			Nothing -> print "Create D3D or Device failed"
+			Just (g_pD3D, g_pd3dDevice) -> do
+				g_pVB <- initVB g_pd3dDevice
+				if nullComPtr g_pVB
+					then print "Create VB failed"
+					else do
+						showWindow hWnd sW_SHOWNORMAL
+						updateWindow hWnd
+						allocaMessage $ pump $ render g_pd3dDevice g_pVB
+						comFree g_pVB
+						return ()
+				comFree g_pd3dDevice
+				comFree g_pD3D
+				return ()
+		unregisterClass className hInst
+ 
+render :: Device -> VertexBuffer -> IO ()
+render pd3dDevice pVB = do
+	devClear pd3dDevice [] d3DCLEAR_TARGET (d3DCOLOR_RGBA 0 0 255 255) 1.0 0
+	drawScene pd3dDevice nullPtr $ do
+		devSetStreamSource pd3dDevice 0 pVB 0 sizeofVertex
+		devSetFVF pd3dDevice d3DFVF_CUSTOMVERTEX
+		devDrawPrimitive pd3dDevice d3DPT_TRIANGLELIST 0 1
+	devPresentMinimal pd3dDevice nullPtr
+	return ()
+	where
+		sizeofVertex = fromIntegral $ sizeOf (undefined :: CUSTOMVERTEX)
+ 
+pump :: IO () -> LPMSG -> IO ()
+pump renderFunc pmsg = do
+	message <- peekByteOff pmsg 4 :: IO WindowMessage		-- pmsg->message
+	when (message /= wM_QUIT) $ do
+		r <- c_PeekMessage pmsg (maybePtr Nothing) 0 0 pM_REMOVE
+		if r /= 0
+			then do
+				translateMessage pmsg
+				dispatchMessage pmsg
+				return ()
+			else do
+				renderFunc
+				return ()
+		pump renderFunc pmsg
+ 
+pM_NOREMOVE, pM_REMOVE, pM_NOYIELD :: UINT
+pM_NOREMOVE	= 0x0000
+pM_REMOVE	= 0x0001
+pM_NOYIELD	= 0x0002
+ 
+wndProc :: WindowClosure
+wndProc hWnd msg wParam lParam
+	| msg == wM_DESTROY	= postQuitMessage 0 >> return 0
+	| otherwise			= defWindowProc (Just hWnd) msg wParam lParam
+ 
+ 
+d3DADAPTER_DEFAULT :: UINT
+d3DADAPTER_DEFAULT = 0
+ 
+nullComPtr :: (ComObject obj) -> Bool
+nullComPtr (ComObject obj) = unsafeForeignPtrToPtr obj == nullPtr
+ 
+initD3D :: HWND -> IO (Maybe (Direct3D,Device))
+initD3D hWnd = do
+	g_pD3D <- createDirect3D
+	if nullComPtr g_pD3D
+		then return Nothing
+		else do
+			(g_pd3dDevice, _) <- d3dCreateDevice
+									g_pD3D
+									d3DADAPTER_DEFAULT
+									d3DDEVTYPE_HAL
+									hWnd
+									d3DCREATE_SOFTWARE_VERTEXPROCESSING
+									d3dpp
+			if nullComPtr g_pd3dDevice
+				then return Nothing
+				else return $ Just (g_pD3D, g_pd3dDevice)
+	where
+		d3dpp = defaultD3DPRESENT_PARAMETERS {
+			d3DPRESENT_PARAMETERS_Windowed = True,
+			d3DPRESENT_PARAMETERS_SwapEffect = d3DSWAPEFFECT_DISCARD,
+			d3DPRESENT_PARAMETERS_BackBufferFormat = d3DFMT_UNKNOWN
+			}
+ 
+d3DFVF_CUSTOMVERTEX :: D3DFORMAT
+d3DFVF_CUSTOMVERTEX = d3DFVF_XYZRHW .|. d3DFVF_DIFFUSE
+data CUSTOMVERTEX = CUSTOMVERTEX Float Float Float Float DWORD
+ 
+instance Storable CUSTOMVERTEX where
+	sizeOf _ = (4 * 5)
+	alignment _ = 4
+	peek ptr = do
+		a0 <- peekByteOff ptr 0		-- x
+		a1 <- peekByteOff ptr 4		-- y
+		a2 <- peekByteOff ptr 8		-- z
+		a3 <- peekByteOff ptr 12	-- rhw
+		a4 <- peekByteOff ptr 16	-- color
+		return $ CUSTOMVERTEX a0 a1 a2 a3 a4
+	poke ptr (CUSTOMVERTEX  a0 a1 a2 a3 a4) = do
+		pokeByteOff ptr 0 a0		-- x
+		pokeByteOff ptr 4 a1		-- y
+		pokeByteOff ptr 8 a2		-- z
+		pokeByteOff ptr 12 a3		-- rhw
+		pokeByteOff ptr 16 a4		-- color
+ 
+initVB :: Device -> IO VertexBuffer
+initVB pd3dDevice = do
+	g_pVB <- devCreateVertexBuffer pd3dDevice sizeofVertices 0 d3DFVF_CUSTOMVERTEX d3DPOOL_DEFAULT
+	if nullComPtr g_pVB
+		then do
+			print "Create VB failed"
+			return g_pVB
+		else do
+			withLockedVertexBuffer g_pVB 0 sizeofVertices 0 $ \pVertices -> do
+				mapM_ (uncurry poke) $ zip (iterate (flip plusPtr sizeofVertex) pVertices) vertices
+			return g_pVB
+	where
+		vertices = [
+			CUSTOMVERTEX 150.0  50.0 0.5 1.0 0xffff0000,
+			CUSTOMVERTEX 250.0 250.0 0.5 1.0 0xff00ff00,
+			CUSTOMVERTEX  50.0 250.0 0.5 1.0 0xff00ffff
+			]
+		sizeofVertex = sizeOf (head vertices)
+		sizeofVertices = length vertices * sizeofVertex

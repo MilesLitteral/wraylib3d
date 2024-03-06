@@ -210,6 +210,6 @@ setupGameCharacter CharacterInstance{..} time cameraFrustum position orientation
   forM_ (md3instanceObject characterinstanceLowerModel) $ setup lowerMat
 
   -- set animation frame geometry
-  --setMD3Frame hLC frame
+  -- setMD3Frame hLC frame
   setMD3Frame characterinstanceUpperModel torsoFrame
   setMD3Frame characterinstanceLowerModel legFrame

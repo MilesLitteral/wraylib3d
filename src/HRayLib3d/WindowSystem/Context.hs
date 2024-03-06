@@ -1,0 +1,41 @@
+module HRayLib3d.WindowSystem.Context where 
+
+-- -- Handle Events
+-- appLoop :: Renderer -> IO ()
+-- appLoop renderer = do
+--     events <- pollEvents
+--     let eventIsQPress event =
+--             case eventPayload event of
+--             KeyboardEvent keyboardEvent -> keyboardEventKeyMotion keyboardEvent == Pressed && keysymKeycode (keyboardEventKeysym keyboardEvent) == KeycodeQ
+--             _ -> False
+--         qPressed = any eventIsQPress events
+--     rendererDrawColor renderer $= V4 100 0 255 255
+--     -- renderPrimitive  renderer $ mapM_ (\(x, y, z) -> vertex $ Vertex3 x y z) myPoints
+--     -- SDL.glSwapWindow window
+--     clear   renderer
+--     present renderer
+--     unless qPressed (appLoop renderer)
+
+-- createSDLWindow :: IO ()
+-- createSDLWindow = do
+--     initializeAll
+--     window   <- createWindow   "WRL3D (SDL2)" glWindowConfig -- vkWindowConfig --defaultWindow
+--     renderer <- createRenderer window (-1)    defaultRenderer
+--     icon     <- SDL.loadBMP "./assets/WRL3D.bmp"
+--     setWindowIcon window icon
+--     appLoop renderer
+--     destroyWindow window
+--     -- glSwapWindow window
+--     quit
+
+-- createVulkanWindow :: IO ()
+-- createVulkanWindow = do
+--     initializeAll
+--     window   <- createWindow   "WRL3D (SDL2)" glWindowConfig -- vkWindowConfig --defaultWindow
+--     renderer <- createRenderer window (-1)    defaultRenderer
+--     icon     <- Vulkan.loadBMP "./assets/WRL3D.bmp"
+--     setWindowIcon window icon
+--     appLoop renderer
+--     destroyWindow window
+--     -- glSwapWindow window
+--     quit

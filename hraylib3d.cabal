@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
 
@@ -26,7 +26,6 @@ source-repository head
 library
   exposed-modules:
       HRayLib3d
-      HRayLib3d.Benchmarks
       HRayLib3d.Core
       HRayLib3d.Core.BuildBundler
       HRayLib3d.Core.MobileInterface
@@ -38,6 +37,7 @@ library
       HRayLib3d.Core.Parser.Language.Metal.Parser
       HRayLib3d.Core.Parser.Language.Metal.Pretty
       HRayLib3d.Core.Parser.Language.Metal.Syntax
+      HRayLib3d.Core.Parser.STM
       HRayLib3d.Core.ResourceBundler
       HRayLib3d.Core.ShaderPrecompilerPipeline
       HRayLib3d.Core.StructuredData
@@ -52,19 +52,18 @@ library
       HRayLib3d.GameEngine.Data.GLTF
       HRayLib3d.GameEngine.Data.Material
       HRayLib3d.GameEngine.Data.MD3
-      HRayLib3d.GameEngine.Data.OBJ
-      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront
-      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Element
-      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Face
-      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.IO
-      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Lexer
-      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Line
-      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Location
-      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Normal
-      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Object
-      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Point
-      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.TexCoord
-      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Token
+      HRayLib3d.GameEngine.Data.WavefrontOBJ
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Element
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Face
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.IO
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Lexer
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Line
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Location
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Normal
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Object
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Point
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.TexCoord
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Token
       HRayLib3d.GameEngine.Graphics
       HRayLib3d.GameEngine.Graphics.BezierSurface
       HRayLib3d.GameEngine.Graphics.BSP
@@ -113,7 +112,6 @@ library
       HRayLib3d.GameEngine.RenderSystem
       HRayLib3d.GameEngine.Scene
       HRayLib3d.GameEngine.Utils
-      HRayLib3d.GuideWriter
       HRayLib3d.I18n.Localization
       HRayLib3d.Network
       HRayLib3d.Network.Cloud
@@ -122,7 +120,6 @@ library
       HRayLib3d.Network.Realms
       HRayLib3d.Network.Requests
       HRayLib3d.Network.UDP
-      HRayLib3d.Network.Web
       HRayLib3d.ScriptEngine
       HRayLib3d.ScriptEngine.HRuby
       HRayLib3d.ScriptEngine.HRuby.Parser
@@ -131,8 +128,11 @@ library
       HRayLib3d.ScriptEngine.HRubyHS
       HRayLib3d.ScriptEngine.HRubyHSInterface
       HRayLib3d.Utils
+      HRayLib3d.Utils.Benchmarks
+      HRayLib3d.Utils.Exception
       HRayLib3d.Utils.GLBShow
       HRayLib3d.Utils.GLTFShow
+      HRayLib3d.Utils.GuideWriter
       HRayLib3d.Utils.ImageBuffer
       HRayLib3d.Utils.LogMessage
       HRayLib3d.Utils.Md3Show
@@ -188,8 +188,10 @@ library
     , http-client
     , ilist
     , lambdacube-compiler
+    , lambdacube-directx
     , lambdacube-gl
     , lambdacube-ir
+    , lambdacube-metal
     , lens
     , linear
     , linear-base
@@ -224,7 +226,6 @@ library
     , vector
     , vulkan
     , vulkan-utils
-    , wavefront
     , wreq
     , xml
     , xml-conduit
@@ -274,8 +275,10 @@ executable RealmViewer-FE-Demo
     , http-client
     , ilist
     , lambdacube-compiler
+    , lambdacube-directx
     , lambdacube-gl
     , lambdacube-ir
+    , lambdacube-metal
     , lens
     , linear
     , linear-base
@@ -310,7 +313,6 @@ executable RealmViewer-FE-Demo
     , vector
     , vulkan
     , vulkan-utils
-    , wavefront
     , wreq
     , xml
     , xml-conduit
@@ -359,8 +361,10 @@ executable hraylib3d
     , http-client
     , ilist
     , lambdacube-compiler
+    , lambdacube-directx
     , lambdacube-gl
     , lambdacube-ir
+    , lambdacube-metal
     , lens
     , linear
     , linear-base
@@ -395,7 +399,6 @@ executable hraylib3d
     , vector
     , vulkan
     , vulkan-utils
-    , wavefront
     , wreq
     , xml
     , xml-conduit
@@ -446,8 +449,10 @@ test-suite hraylib3d-test
     , http-client
     , ilist
     , lambdacube-compiler
+    , lambdacube-directx
     , lambdacube-gl
     , lambdacube-ir
+    , lambdacube-metal
     , lens
     , linear
     , linear-base
@@ -483,7 +488,6 @@ test-suite hraylib3d-test
     , vector
     , vulkan
     , vulkan-utils
-    , wavefront
     , wreq
     , xml
     , xml-conduit

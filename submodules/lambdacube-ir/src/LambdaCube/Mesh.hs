@@ -42,7 +42,6 @@ data Mesh
   }
   deriving (Show, Eq, Ord)
 
-
 instance ToJSON MeshAttribute where
   toJSON v = case v of
     A_Float arg0 -> object [ "tag" .= ("A_Float" :: Text), "arg0" .= arg0]

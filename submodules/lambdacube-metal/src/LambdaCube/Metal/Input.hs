@@ -21,13 +21,12 @@ import qualified Data.Vector.Algorithms.Intro as I
 import Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as SB
 
-import Graphics.GL.Core33
-
 import LambdaCube.IR as IR
 import LambdaCube.Linear as IR
 import LambdaCube.PipelineSchema
 import LambdaCube.Metal.Type as T
 import LambdaCube.Metal.Util
+import LambdaCube.Metal.Bindings --Graphics.GL.Core33
 
 import qualified LambdaCube.IR as IR
 
@@ -71,11 +70,11 @@ allocStorage sch = do
         , pipelines     = ppls
         }
 
-disposeStorage :: GLStorage -> IO ()
+disposeStorage :: MetalStorage -> IO ()
 disposeStorage _ = putStrLn "not implemented: disposeStorage"
 
 -- object
-addObject :: GLStorage -> String -> Primitive -> Maybe (IndexStream Buffer) -> Map String (Stream Buffer) -> [String] -> IO Object
+addObject :: MetalStorage -> String -> Primitive -> Maybe (IndexStream Buffer) -> Map String (Stream Buffer) -> [String] -> IO Object
 addObject input slotName prim indices attribs uniformNames = do
     let sch = schema input
     forM_ uniformNames $ \n -> case Map.lookup n (uniforms sch) of
@@ -143,13 +142,13 @@ addObject input slotName prim indices attribs uniformNames = do
     writeIORef cmdsRef cmds
     return obj
 
-removeObject :: GLStorage -> Object -> IO ()
+removeObject :: MetalStorage -> Object -> IO ()
 removeObject p obj = modifyIORef (slotVector p ! objSlot obj) $ \(GLSlot objs _ _) -> GLSlot (IM.delete (objId obj) objs) V.empty Generate
 
 enableObject :: Object -> Bool -> IO ()
 enableObject obj b = writeIORef (objEnabled obj) b
 
-setObjectOrder :: GLStorage -> Object -> Int -> IO ()
+setObjectOrder :: MetalStorage -> Object -> Int -> IO ()
 setObjectOrder p obj i = do
     writeIORef (objOrder obj) i
     modifyIORef (slotVector p ! objSlot obj) $ \(GLSlot objs sorted _) -> GLSlot objs sorted Reorder
@@ -157,10 +156,10 @@ setObjectOrder p obj i = do
 objectUniformSetter :: Object -> Map GLUniformName InputSetter
 objectUniformSetter = objUniSetter
 
-setScreenSize :: GLStorage -> Word -> Word -> IO ()
+setScreenSize :: MetalStorage -> Word -> Word -> IO ()
 setScreenSize p w h = writeIORef (screenSize p) (w,h)
 
-sortSlotObjects :: GLStorage -> IO ()
+sortSlotObjects :: MetalStorage -> IO ()
 sortSlotObjects p = V.forM_ (slotVector p) $ \slotRef -> do
     GLSlot objMap sortedV ord <- readIORef slotRef
     let cmpFun (a,_) (b,_) = a `compare` b

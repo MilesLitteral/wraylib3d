@@ -5,17 +5,7 @@ module HRayLib3d.Utils.Subprocess (
     appendLens,
     appendHandles,
     appendIO,
-    startLocalManiapi,
-    runManiex,
-    rebootSystemManiapi,
-    startManieye,
-    startManigram,
-    startTensorBoard,
-    startManigramControl,
     startIDE,
-    configureManiex,
-    installManiex,
-    uninstallManiex
 )
 where
 

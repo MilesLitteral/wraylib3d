@@ -14,13 +14,14 @@ import qualified Data.Vector.Storable as SV
 
 --import Control.DeepSeq
 
-import Graphics.GL.Core33
 import Data.Word
 import Codec.Picture
 import Codec.Picture.Types
 
 import LambdaCube.Metal.Type
 import LambdaCube.Metal.Util
+import Graphics.GL.Core33
+--import LambdaCube.Metal.Bindings  --Graphics.GL.Core33
 
 -- Buffer
 disposeBuffer :: Buffer -> IO ()

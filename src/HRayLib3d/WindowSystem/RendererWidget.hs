@@ -183,11 +183,7 @@ toVectorVAO (Size w h) (Point ox oy) (Color r g b a) points = vec where
   row (x, y) = [px x, py y, 0, col r, col g, col b]
   vec = V.fromList . concat $ row <$> points
 
-drawVertices
-  :: forall a . Storable a
-  => OpenGLWidgetState
-  -> Vector a
-  -> IO ()
+drawVertices :: forall a . Storable a => OpenGLWidgetState -> Vector a -> IO ()
 drawVertices state vertices = do
   vao <- peek vaoPtr
   vbo <- peek vboPtr
@@ -202,6 +198,7 @@ drawVertices state vertices = do
       (fromIntegral (V.length vertices * floatSize))
       (castPtr vertsPtr)
       GL_STATIC_DRAW
+  --
 
   -- The vertex shader expects two arguments. Position:
   glVertexAttribPointer 0 3 GL_FLOAT GL_FALSE (fromIntegral (floatSize * 6)) nullPtr
@@ -214,7 +211,6 @@ drawVertices state vertices = do
   glUseProgram shaderId
   glBindVertexArray vao
   glDrawArrays GL_TRIANGLES 0 3
-
   where
     floatSize = sizeOf (undefined :: Float)
     OpenGLWidgetState _ shaderId vaoPtr vboPtr = state
@@ -227,13 +223,10 @@ createShaderProgram = do
 
   glAttachShader shaderProgram vertexShader
   glAttachShader shaderProgram fragmentShader
-
   glLinkProgram shaderProgram
   checkProgramLink shaderProgram
-
   glDeleteShader vertexShader
   glDeleteShader fragmentShader
-
   return shaderProgram
 
 compileShader :: GLenum -> FilePath -> IO GLuint

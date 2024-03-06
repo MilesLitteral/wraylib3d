@@ -7,6 +7,7 @@ module HRayLib3d.ScriptEngine.HRuby (
   ) where
 
 -- https://github.com/fjvallarino/monomer/issues/101
+-- TODO: ScriptEngine.Interface.HRuby (thus HLua, and HPython aren't too crazy)
 import HRayLib3d.ScriptEngine.HRuby.Syntax
 import HRayLib3d.ScriptEngine.HRuby.Parser
 import HRayLib3d.ScriptEngine.HRuby.Pretty

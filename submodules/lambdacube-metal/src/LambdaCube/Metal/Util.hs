@@ -53,8 +53,8 @@ import LambdaCube.Metal.Type
 setSampler :: GLint -> Int32 -> IO ()
 setSampler i v = glUniform1i i $ fromIntegral v
 
-z2 = V2 0 0 :: V2F
-z3 = V3 0 0 0 :: V3F
+z2 = V2 0 0     :: V2F
+z3 = V3 0 0 0   :: V3F
 z4 = V4 0 0 0 0 :: V4F
 
 -- uniform functions
@@ -67,7 +67,7 @@ queryUniforms po = do
     return $! (Map.fromList $! zip uNames uLocation, Map.fromList $! zip uNames uTypes)
 
 b2w :: Bool -> GLuint
-b2w True = 1
+b2w True  = 1
 b2w False = 0
 
 mkUniformSetter :: InputType -> IO (GLUniform, InputSetter)

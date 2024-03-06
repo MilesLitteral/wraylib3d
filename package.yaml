@@ -53,13 +53,12 @@ dependencies:
 - modern-uri
 - req
 - stm
+- split
 - digest
 - utf8-string
 - HaTeX
 - OpenGLRaw
 - GLFW-b 
-- split
-#- vulkan-api
 - vulkan
 - vulkan-utils
 - proteaaudio
@@ -71,10 +70,10 @@ dependencies:
 - lambdacube-compiler
 - lambdacube-ir
 - lambdacube-gl
+- lambdacube-metal
+- lambdacube-directx
 #- lambdacube-xr 
 #- lambdacube-vulkan
-#- lambdacube-metal
-#- lambdacube-renderer # obligatory
 - gltf-loader
 - gltf-codec
 - dlist
@@ -89,7 +88,6 @@ dependencies:
 - monomer
 - tinyfiledialogs
 - adjunctions
-- wavefront
 - wreq   # will be replaced with internal Network module features, currently in for compatibility 
 - text-show
 - criterion
@@ -124,8 +122,11 @@ library:
   # c-sources:
   #   - cbits/stb_image.c 
   #https://www.sasaprolic.com/2022/11/statically-linked-binaries-with-haskell.html
-
   #extra-include-dirs:  C:\ghcup\msys64\mingw64\include\SDL2
+
+#WRAYLIB needs to make DLLs, check out these links to this interest
+#https://downloads.haskell.org/~ghc/5.04.1/docs/html/users_guide/win32-dlls-create.html
+#https://downloads.haskell.org/~ghc/7.8.3/docs/html/users_guide/win32-dlls.html
 
 executables:
   hraylib3d:

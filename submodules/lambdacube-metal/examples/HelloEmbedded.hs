@@ -1,13 +1,11 @@
 {-# LANGUAGE PackageImports, LambdaCase, OverloadedStrings #-}
+import Codec.Picture as Juicy
 import "GLFW-b" Graphics.UI.GLFW as GLFW
-import qualified Data.Map as Map
+import qualified Data.Map    as Map
 import qualified Data.Vector as V
 
-import LambdaCube.GL as LambdaCubeGL -- renderer
-import LambdaCube.GL.Mesh as LambdaCubeGL
-
-import Codec.Picture as Juicy
-
+import LambdaCube.Metal       as LambdaCubeMetal -- renderer
+import LambdaCube.Metal.Mesh  as LambdaCubeMetal
 import LambdaCube.Compiler as LambdaCube -- compiler
 
 ----------------------------------------------------

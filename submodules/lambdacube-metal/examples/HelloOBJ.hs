@@ -10,8 +10,8 @@ import qualified Data.Map as Map
 import qualified Data.Vector as V
 import qualified Data.ByteString as SB
 
-import LambdaCube.GL as LambdaCubeGL -- renderer
-import LambdaCube.GL.Mesh as LambdaCubeGL
+import LambdaCube.Metal      as LambdaCubeMetal -- renderer
+import LambdaCube.Metal.Mesh as LambdaCubeMetal
 
 import Codec.Picture as Juicy
 import Data.Aeson
@@ -67,7 +67,7 @@ uploadMtlLib :: MtlLib -> IO (Map Text (ObjMaterial,TextureData))
 uploadMtlLib mtlLib = do
   -- collect used textures
   let usedTextures = nub . concatMap (maybeToList . mtl_map_Kd) $ Map.elems mtlLib
-      whiteImage = Juicy.ImageRGB8 $ Juicy.generateImage (\_ _ -> Juicy.PixelRGB8 255 255 255) 1 1
+      whiteImage   = Juicy.ImageRGB8 $ Juicy.generateImage (\_ _ -> Juicy.PixelRGB8 255 255 255) 1 1
       checkerImage = Juicy.ImageRGB8 $ Juicy.generateImage (\x y -> if mod (x + y) 2 == 0 then Juicy.PixelRGB8 0 0 0 else Juicy.PixelRGB8 255 255 0) 2 2
   checkerTex <- LambdaCubeGL.uploadTexture2DToGPU checkerImage
   -- load images and upload to gpu

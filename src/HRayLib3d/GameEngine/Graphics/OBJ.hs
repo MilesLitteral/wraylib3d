@@ -26,7 +26,7 @@ import Codec.Wavefront.TexCoord ( TexCoord(..) )
 import LambdaCube.GL
     ( V4(V4),
       V2(V2),
-      GLStorage,
+      GLStorage, --TODO Create a typeclass for converting between GLStorage and other storage types
       Primitive(TriangleList),
       IndexStream(IndexStream),
       Buffer,
@@ -44,8 +44,6 @@ import Data.Vect.Float.Base    ( Vec3(..)     )
 import qualified Data.Text as T
 import qualified Data.Foldable
 
-import LambdaCube.GL.Type      ( Object(..)   )
-import LambdaCube.GL.Mesh      ( addMeshToObjectArray, uploadMeshToGPU )
 import Codec.Wavefront         ( Location(..) )
 import Codec.Wavefront.Face    ( Face(..)     )
 import Codec.Wavefront.Element ( Element(..)  )
