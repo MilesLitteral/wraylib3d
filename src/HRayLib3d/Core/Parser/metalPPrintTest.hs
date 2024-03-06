@@ -1,18 +1,17 @@
-module Main where
+module HRayLib3d.Core.Parser.MetalPPrint where
 
 import System.Environment (getArgs)
 import Text.PrettyPrint.HughesPJClass
-
-import HRayLib3d.Core.Parser.Language.GLSL 
+import HRayLib3d.Core.Parser.Language.Metal 
 
 info :: [String]
 info = 
-  [ "This is glsl-pprint."
+  [ "This is metal-pprint."
   ]
 
 usage :: [String]
 usage = info ++
-  ["usage:\n  glsl-pprint [-p] filename"]
+  ["usage:\n  metal-pprint [-p] filename"]
 
 main :: IO ()
 main = do
@@ -20,7 +19,7 @@ main = do
   case args of
     [fn] -> do
       content <- readFile fn
-      putStrLn . show . parse $ content
+      print . parse $ content
     ["-p", fn] -> do
       content <- readFile fn
       case parse content of

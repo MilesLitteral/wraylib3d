@@ -52,6 +52,7 @@ library
       HRayLib3d.GameEngine.Data.GLTF
       HRayLib3d.GameEngine.Data.Material
       HRayLib3d.GameEngine.Data.MD3
+      HRayLib3d.GameEngine.Data.OBJ
       HRayLib3d.GameEngine.Data.WavefrontOBJ
       HRayLib3d.GameEngine.Data.WavefrontOBJ.Element
       HRayLib3d.GameEngine.Data.WavefrontOBJ.Face
@@ -64,6 +65,18 @@ library
       HRayLib3d.GameEngine.Data.WavefrontOBJ.Point
       HRayLib3d.GameEngine.Data.WavefrontOBJ.TexCoord
       HRayLib3d.GameEngine.Data.WavefrontOBJ.Token
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Element
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Face
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.IO
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Lexer
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Line
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Location
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Normal
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Object
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Point
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.TexCoord
+      HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Token
       HRayLib3d.GameEngine.Graphics
       HRayLib3d.GameEngine.Graphics.BezierSurface
       HRayLib3d.GameEngine.Graphics.BSP
@@ -142,6 +155,7 @@ library
       HRayLib3d.Utils.Subprocess
       HRayLib3d.Utils.Tooltips
       HRayLib3d.WindowSystem
+      HRayLib3d.WindowSystem.Context
       HRayLib3d.WindowSystem.Core
       HRayLib3d.WindowSystem.RendererWidget
       HRayLib3d.WindowSystem.RenderPipelineWidget
