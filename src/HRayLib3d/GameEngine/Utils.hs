@@ -134,7 +134,6 @@ rotationEuler :: Vec3 -> Proj4
 rotationEuler (Vec3 a b c) = orthogonal $ toOrthoUnsafe $ rotMatrixZ a .*. rotMatrixX b .*. rotMatrixY (-c)
 
 -- simple benchamrking functions
-
 showTime delta
     | t > 1e-1  = printf "%.3fs" t
     | t > 1e-3  = printf "%.1fms" (t/1e-3)
@@ -171,7 +170,7 @@ spherical mouseU mouseV = let sinMV = sin mouseV in Vec3 (cos mouseU * sinMV) (s
 
 unitVectorAtAngle = sinCos
 
-degToRad a = a/180*pi
+degToRad a = a / 180*pi
 
-clamp minVal maxVal = max minVal. min maxVal
+clamp minVal maxVal = max minVal . min maxVal
 

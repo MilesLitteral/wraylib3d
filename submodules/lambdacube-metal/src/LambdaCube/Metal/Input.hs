@@ -50,7 +50,7 @@ mkUniform l = do
     let (unis,setters) = unzip unisAndSetters
     return (Map.fromList setters, Map.fromList unis)
 
-allocStorage :: PipelineSchema -> IO GLStorage
+allocStorage :: PipelineSchema -> IO MetalStorage
 allocStorage sch = do
     let sm  = Map.fromList $ zip (Map.keys $ objectArrays sch) [0..]
         len = Map.size sm
@@ -59,7 +59,7 @@ allocStorage sch = do
     slotV <- V.replicateM len $ newIORef (GLSlot IM.empty V.empty Ordered)
     size <- newIORef (0,0)
     ppls <- newIORef $ V.singleton Nothing
-    return $ GLStorage
+    return $ MetalStorage
         { schema        = sch
         , slotMap       = sm
         , slotVector    = slotV
@@ -116,7 +116,7 @@ addObject input slotName prim indices attribs uniformNames = do
             , objCommands   = cmdsRef
             }
 
-    modifyIORef (slotVector input ! slotIdx) $ \(GLSlot objs _ _) -> GLSlot (IM.insert index obj objs) V.empty Generate
+    modifyIORef (slotVector input ! slotIdx) $ \(MetalSlot objs _ _) -> MetalSlot (IM.insert index obj objs) V.empty Generate
 
     -- generate GLObjectCommands for the new object
     {-
@@ -138,12 +138,14 @@ addObject input slotName prim indices attribs uniformNames = do
                     --putStrLn "slot is used!" 
                     --where
                     let emptyV = V.replicate (V.length $ glPrograms p) []
-                    return $ emptyV // [(prgIdx,createObjectCommands (glTexUnitMapping p) topUnis obj (glPrograms p ! prgIdx))| prgIdx <- glSlotPrograms p ! pSlotIdx]
+                    return $ emptyV // [
+                        (prgIdx, createObjectCommands (glTexUnitMapping p) topUnis obj (glPrograms p ! prgIdx)) | prgIdx <- glSlotPrograms p ! pSlotIdx
+                        ]
     writeIORef cmdsRef cmds
     return obj
 
 removeObject :: MetalStorage -> Object -> IO ()
-removeObject p obj = modifyIORef (slotVector p ! objSlot obj) $ \(GLSlot objs _ _) -> GLSlot (IM.delete (objId obj) objs) V.empty Generate
+removeObject p obj = modifyIORef (slotVector p ! objSlot obj) $ \(MetalSlot objs _ _) -> MetalSlot (IM.delete (objId obj) objs) V.empty Generate
 
 enableObject :: Object -> Bool -> IO ()
 enableObject obj b = writeIORef (objEnabled obj) b
@@ -151,7 +153,7 @@ enableObject obj b = writeIORef (objEnabled obj) b
 setObjectOrder :: MetalStorage -> Object -> Int -> IO ()
 setObjectOrder p obj i = do
     writeIORef (objOrder obj) i
-    modifyIORef (slotVector p ! objSlot obj) $ \(GLSlot objs sorted _) -> GLSlot objs sorted Reorder
+    modifyIORef (slotVector p ! objSlot obj) $ \(GLSlot objs sorted _) -> MetalSlot objs sorted Reorder
 
 objectUniformSetter :: Object -> Map GLUniformName InputSetter
 objectUniformSetter = objUniSetter
@@ -286,7 +288,6 @@ uniformM43F   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun M43
 uniformM44F   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun M44F
 
 uniformFTexture2D   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun TextureData
-
 uniformBool n is = case Map.lookup n is of
     Just (SBool fun)    -> fun
     _   -> nullSetter n "Bool"
@@ -398,31 +399,31 @@ class UniformSetter a where
 
 setUniM setUni n act = tell [\s -> let f = setUni n s in f =<< act]
 
-instance UniformSetter Bool   where (@=) = setUniM uniformBool
-instance UniformSetter V2B    where (@=) = setUniM uniformV2B
-instance UniformSetter V3B    where (@=) = setUniM uniformV3B
-instance UniformSetter V4B    where (@=) = setUniM uniformV4B
-instance UniformSetter Word32 where (@=) = setUniM uniformWord
-instance UniformSetter V2U    where (@=) = setUniM uniformV2U
-instance UniformSetter V3U    where (@=) = setUniM uniformV3U
-instance UniformSetter V4U    where (@=) = setUniM uniformV4U
-instance UniformSetter Int32  where (@=) = setUniM uniformInt
-instance UniformSetter V2I    where (@=) = setUniM uniformV2I
-instance UniformSetter V3I    where (@=) = setUniM uniformV3I
-instance UniformSetter V4I    where (@=) = setUniM uniformV4I
-instance UniformSetter Float  where (@=) = setUniM uniformFloat
-instance UniformSetter V2F    where (@=) = setUniM uniformV2F
-instance UniformSetter V3F    where (@=) = setUniM uniformV3F
-instance UniformSetter V4F    where (@=) = setUniM uniformV4F
-instance UniformSetter M22F   where (@=) = setUniM uniformM22F
-instance UniformSetter M23F   where (@=) = setUniM uniformM23F
-instance UniformSetter M24F   where (@=) = setUniM uniformM24F
-instance UniformSetter M32F   where (@=) = setUniM uniformM32F
-instance UniformSetter M33F   where (@=) = setUniM uniformM33F
-instance UniformSetter M34F   where (@=) = setUniM uniformM34F
-instance UniformSetter M42F   where (@=) = setUniM uniformM42F
-instance UniformSetter M43F   where (@=) = setUniM uniformM43F
-instance UniformSetter M44F   where (@=) = setUniM uniformM44F
+instance UniformSetter Bool        where (@=) = setUniM uniformBool
+instance UniformSetter V2B         where (@=) = setUniM uniformV2B
+instance UniformSetter V3B         where (@=) = setUniM uniformV3B
+instance UniformSetter V4B         where (@=) = setUniM uniformV4B
+instance UniformSetter Word32      where (@=) = setUniM uniformWord
+instance UniformSetter V2U         where (@=) = setUniM uniformV2U
+instance UniformSetter V3U         where (@=) = setUniM uniformV3U
+instance UniformSetter V4U         where (@=) = setUniM uniformV4U
+instance UniformSetter Int32       where (@=) = setUniM uniformInt
+instance UniformSetter V2I         where (@=) = setUniM uniformV2I
+instance UniformSetter V3I         where (@=) = setUniM uniformV3I
+instance UniformSetter V4I         where (@=) = setUniM uniformV4I
+instance UniformSetter Float       where (@=) = setUniM uniformFloat
+instance UniformSetter V2F         where (@=) = setUniM uniformV2F
+instance UniformSetter V3F         where (@=) = setUniM uniformV3F
+instance UniformSetter V4F         where (@=) = setUniM uniformV4F
+instance UniformSetter M22F        where (@=) = setUniM uniformM22F
+instance UniformSetter M23F        where (@=) = setUniM uniformM23F
+instance UniformSetter M24F        where (@=) = setUniM uniformM24F
+instance UniformSetter M32F        where (@=) = setUniM uniformM32F
+instance UniformSetter M33F        where (@=) = setUniM uniformM33F
+instance UniformSetter M34F        where (@=) = setUniM uniformM34F
+instance UniformSetter M42F        where (@=) = setUniM uniformM42F
+instance UniformSetter M43F        where (@=) = setUniM uniformM43F
+instance UniformSetter M44F        where (@=) = setUniM uniformM44F
 instance UniformSetter TextureData where (@=) = setUniM uniformFTexture2D
 
 updateUniforms storage m = sequence_ l where

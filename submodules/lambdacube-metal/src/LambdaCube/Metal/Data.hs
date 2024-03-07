@@ -25,29 +25,29 @@ import Graphics.GL.Core33
 
 -- Buffer
 disposeBuffer :: Buffer -> IO ()
-disposeBuffer (Buffer _ bo) = withArray [bo] $ glDeleteBuffers 1
+disposeBuffer (Buffer _ bo) = withArray [bo] $ -- glDeleteBuffers 1 -- Replace with Metal Equivalent
 
 compileBuffer :: [Array] -> IO Buffer
 compileBuffer arrs = do
     let calcDesc (offset,setters,descs) (Array arrType cnt setter) =
           let size = cnt * sizeOfArrayType arrType
-          in (size + offset, (offset,size,setter):setters, ArrayDesc arrType cnt offset size:descs)
+            in (size + offset, (offset, size,setter):setters, ArrayDesc arrType cnt offset size:descs)
         (bufSize,arrSetters,arrDescs) = foldl' calcDesc (0,[],[]) arrs
     bo <- alloca $! \pbo -> glGenBuffers 1 pbo >> peek pbo
-    glBindBuffer GL_ARRAY_BUFFER bo
-    glBufferData GL_ARRAY_BUFFER (fromIntegral bufSize) nullPtr GL_STATIC_DRAW
+    -- glBindBuffer GL_ARRAY_BUFFER bo
+    -- glBufferData GL_ARRAY_BUFFER (fromIntegral bufSize) nullPtr GL_STATIC_DRAW
     forM_ arrSetters $! \(offset,size,setter) -> setter $! glBufferSubData GL_ARRAY_BUFFER (fromIntegral offset) (fromIntegral size)
-    glBindBuffer GL_ARRAY_BUFFER 0
+    -- glBindBuffer GL_ARRAY_BUFFER 0
     return $! Buffer (V.fromList $! reverse arrDescs) bo
 
 updateBuffer :: Buffer -> [(Int,Array)] -> IO ()
 updateBuffer (Buffer arrDescs bo) arrs = do
-    glBindBuffer GL_ARRAY_BUFFER bo
+    --glBindBuffer GL_ARRAY_BUFFER bo
     forM arrs $ \(i,Array arrType cnt setter) -> do
         let ArrayDesc ty len offset size = arrDescs V.! i
         when (ty == arrType && cnt == len) $
             setter $! glBufferSubData GL_ARRAY_BUFFER (fromIntegral offset) (fromIntegral size)
-    glBindBuffer GL_ARRAY_BUFFER 0
+    --glBindBuffer GL_ARRAY_BUFFER 0
 
 bufferSize :: Buffer -> Int
 bufferSize = V.length . bufArrays
@@ -69,10 +69,10 @@ uploadTexture2DToGPU = uploadTexture2DToGPU' True False True False
 uploadTexture2DToGPU' :: Bool -> Bool -> Bool -> Bool -> DynamicImage -> IO TextureData
 uploadTexture2DToGPU' isFiltered isSRGB isMip isClamped bitmap' = do
     let bitmap = case bitmap' of
-          ImageRGB8 i@(Image w h _)   -> bitmap'
-          ImageRGBA8 i@(Image w h _)  -> bitmap'
-          ImageYCbCr8 i@(Image w h _) -> ImageRGB8 $ convertImage i
-          di -> ImageRGBA8 $ convertRGBA8 di
+                    ImageRGB8   i@(Image w h _) -> bitmap'
+                    ImageRGBA8  i@(Image w h _) -> bitmap'
+                    ImageYCbCr8 i@(Image w h _) -> ImageRGB8 $ convertImage i
+                    di -> ImageRGBA8 $ convertRGBA8 di
 
     glPixelStorei GL_UNPACK_ALIGNMENT 1
     to <- alloca $! \pto -> glGenTextures 1 pto >> peek pto

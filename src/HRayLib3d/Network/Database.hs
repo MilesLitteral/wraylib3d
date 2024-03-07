@@ -5,17 +5,16 @@ module HRayLib3d.Network.Database (sendDBQueryBS, sendDBQuery, Query(..)) where
     import Text.Printf
     import Data.UUID
 
-    
     import Database.PostgreSQL.Simple
     import qualified Data.ByteString as BS
     import qualified Data.ByteString.Lazy as LS  
-    
 
     -- #9395
     -- the PostgresSQL Service must be installed (running)
     -- this is otherwise something of an internal function
     -- unless a user is building out a Cloud Service connected
     -- to something that aren't Realms
+    
     createDBQuery :: BS.ByteString -> IO Int
     createDBQuery libpq = do
         conn     <- connectPostgreSQL libpq -- ex: "host=localhost port=5432 dbname=mydb connect_timeout=10"

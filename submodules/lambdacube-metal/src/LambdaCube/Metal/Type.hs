@@ -25,9 +25,9 @@ type MetalUniformName = ByteString
 {-
 -- Buffer
     compileBuffer   :: [Array] -> IO Buffer
-    bufferSize      :: Buffer -> Int
-    arraySize       :: Buffer -> Int -> Int
-    arrayType       :: Buffer -> Int -> ArrayType
+    bufferSize      :: Buffer  -> Int
+    arraySize       :: Buffer  -> Int -> Int
+    arrayType       :: Buffer  -> Int -> ArrayType
 
 -- Object
     addObject           :: Renderer -> ByteString -> Primitive -> Maybe (IndexStream Buffer) -> Trie (Stream Buffer) -> [ByteString] -> IO Object
@@ -58,7 +58,8 @@ data ArrayDesc
     buffers
     objects
 
-  GLStorage can be attached to GLRenderer
+  MetalStorage can be attached to MetalRenderer
+  MetalStorage represents a series of CommandBuffers ordered in a CommandQueue
 -}
 
 {-
@@ -176,8 +177,8 @@ data MetalRenderTarget
     , framebufferDrawbuffers    :: Maybe [GLenum]
     } deriving Eq
 
-type MetalTextureUnit = Int
-type MetalUniformBinding = GLint
+type MetalTextureUnit    = Int
+type MetalUniformBinding = Int
 
 data MetalSamplerUniform
   = GLSamplerUniform
@@ -185,7 +186,7 @@ data MetalSamplerUniform
   , glUniformBindingRef :: IORef GLUniformBinding
   }
 
-instance Eq GLSamplerUniform where
+instance Eq MetalSamplerUniform where
   a == b = glUniformBinding a == glUniformBinding b
 
 data MetalDrawContext
@@ -194,9 +195,9 @@ data MetalDrawContext
   , glAccumulationContext   :: !AccumulationContext
   , glRenderTarget          :: !GLRenderTarget
   , glProgram               :: !GLuint
-  , glTextureMapping        :: ![(GLTextureUnit,GLTexture)]
-  , glSamplerMapping        :: ![(GLTextureUnit,GLSampler)]
-  , glSamplerUniformMapping :: ![(GLTextureUnit,GLSamplerUniform)]
+  , glTextureMapping        :: ![(GLTextureUnit, MetalTexture)]
+  , glSamplerMapping        :: ![(GLTextureUnit, GLSampler)]
+  , glSamplerUniformMapping :: ![(GLTextureUnit, GLSamplerUniform)]
   }
 
 data MetalCommand
@@ -297,6 +298,10 @@ data InputSetter
 -- user will provide stream data using this setup function
 type BufferSetter = (Ptr () -> IO ()) -> IO ()
 
+-- describes an array in a buffer
+data Array  -- array type, element count (NOT byte size!), setter
+    = Array ArrayType Int BufferSetter
+
 -- specifies array component type (stream type in storage side)
 --  this type can be overridden in GPU side, e.g ArrWord8 can be seen as TFloat or TWord also
 data ArrayType
@@ -309,67 +314,6 @@ data ArrayType
     | ArrFloat
     | ArrHalf     -- Hint: half float is not supported in haskell
     deriving (Show,Eq,Ord)
-
-sizeOfArrayType :: ArrayType -> Int
-sizeOfArrayType ArrWord8  = 1
-sizeOfArrayType ArrWord16 = 2
-sizeOfArrayType ArrWord32 = 4
-sizeOfArrayType ArrInt8   = 1
-sizeOfArrayType ArrInt16  = 2
-sizeOfArrayType ArrInt32  = 4
-sizeOfArrayType ArrFloat  = 4
-sizeOfArrayType ArrHalf   = 2
-
--- describes an array in a buffer
-data Array  -- array type, element count (NOT byte size!), setter
-    = Array ArrayType Int BufferSetter
-
-toStreamType :: InputType -> Maybe StreamType
-toStreamType Word     = Just Attribute_Word
-toStreamType V2U      = Just Attribute_V2U
-toStreamType V3U      = Just Attribute_V3U
-toStreamType V4U      = Just Attribute_V4U
-toStreamType Int      = Just Attribute_Int
-toStreamType V2I      = Just Attribute_V2I
-toStreamType V3I      = Just Attribute_V3I
-toStreamType V4I      = Just Attribute_V4I
-toStreamType Float    = Just Attribute_Float
-toStreamType V2F      = Just Attribute_V2F
-toStreamType V3F      = Just Attribute_V3F
-toStreamType V4F      = Just Attribute_V4F
-toStreamType M22F     = Just Attribute_M22F
-toStreamType M23F     = Just Attribute_M23F
-toStreamType M24F     = Just Attribute_M24F
-toStreamType M32F     = Just Attribute_M32F
-toStreamType M33F     = Just Attribute_M33F
-toStreamType M34F     = Just Attribute_M34F
-toStreamType M42F     = Just Attribute_M42F
-toStreamType M43F     = Just Attribute_M43F
-toStreamType M44F     = Just Attribute_M44F
-toStreamType _          = Nothing
-
-fromStreamType :: StreamType -> InputType
-fromStreamType Attribute_Word    = Word
-fromStreamType Attribute_V2U     = V2U
-fromStreamType Attribute_V3U     = V3U
-fromStreamType Attribute_V4U     = V4U
-fromStreamType Attribute_Int     = Int
-fromStreamType Attribute_V2I     = V2I
-fromStreamType Attribute_V3I     = V3I
-fromStreamType Attribute_V4I     = V4I
-fromStreamType Attribute_Float   = Float
-fromStreamType Attribute_V2F     = V2F
-fromStreamType Attribute_V3F     = V3F
-fromStreamType Attribute_V4F     = V4F
-fromStreamType Attribute_M22F    = M22F
-fromStreamType Attribute_M23F    = M23F
-fromStreamType Attribute_M24F    = M24F
-fromStreamType Attribute_M32F    = M32F
-fromStreamType Attribute_M33F    = M33F
-fromStreamType Attribute_M34F    = M34F
-fromStreamType Attribute_M42F    = M42F
-fromStreamType Attribute_M43F    = M43F
-fromStreamType Attribute_M44F    = M44F
 
 -- user can specify streams using Stream type
 -- a stream can be constant (ConstXXX) or can came from a buffer
@@ -403,31 +347,6 @@ data Stream b
         , streamLength  :: Int
         }
     deriving Show
-
-streamToStreamType :: Stream a -> StreamType
-streamToStreamType s = case s of
-    ConstWord  _ -> Attribute_Word
-    ConstV2U   _ -> Attribute_V2U
-    ConstV3U   _ -> Attribute_V3U
-    ConstV4U   _ -> Attribute_V4U
-    ConstInt   _ -> Attribute_Int
-    ConstV2I   _ -> Attribute_V2I
-    ConstV3I   _ -> Attribute_V3I
-    ConstV4I   _ -> Attribute_V4I
-    ConstFloat _ -> Attribute_Float
-    ConstV2F   _ -> Attribute_V2F
-    ConstV3F   _ -> Attribute_V3F
-    ConstV4F   _ -> Attribute_V4F
-    ConstM22F  _ -> Attribute_M22F
-    ConstM23F  _ -> Attribute_M23F
-    ConstM24F  _ -> Attribute_M24F
-    ConstM32F  _ -> Attribute_M32F
-    ConstM33F  _ -> Attribute_M33F
-    ConstM34F  _ -> Attribute_M34F
-    ConstM42F  _ -> Attribute_M42F
-    ConstM43F  _ -> Attribute_M43F
-    ConstM44F  _ -> Attribute_M44F
-    Stream t _ _ _ _ -> t
 
 -- stream of index values (for index buffer)
 data IndexStream b
@@ -516,3 +435,90 @@ instance Storable a => Storable (V4 a) where
         pokeByteOff p k y
         pokeByteOff p (k*2) z
         pokeByteOff p (k*3) w
+
+sizeOfArrayType :: ArrayType -> Int
+sizeOfArrayType at = case at of 
+                        ArrWord8  -> 1
+                        ArrWord16 -> 2
+                        ArrWord32 -> 4
+                        ArrInt8   -> 1
+                        ArrInt16  -> 2
+                        ArrInt32  -> 4
+                        ArrFloat  -> 4
+                        ArrHalf   -> 2
+
+
+toStreamType :: InputType -> Maybe StreamType
+toStreamType it = case it of 
+                    Word     -> Just Attribute_Word
+                    V2U      -> Just Attribute_V2U
+                    V3U      -> Just Attribute_V3U
+                    V4U      -> Just Attribute_V4U
+                    Int      -> Just Attribute_Int
+                    V2I      -> Just Attribute_V2I
+                    V3I      -> Just Attribute_V3I
+                    V4I      -> Just Attribute_V4I
+                    Float    -> Just Attribute_Float
+                    V2F      -> Just Attribute_V2F
+                    V3F      -> Just Attribute_V3F
+                    V4F      -> Just Attribute_V4F
+                    M22F     -> Just Attribute_M22F
+                    M23F     -> Just Attribute_M23F
+                    M24F     -> Just Attribute_M24F
+                    M32F     -> Just Attribute_M32F
+                    M33F     -> Just Attribute_M33F
+                    M34F     -> Just Attribute_M34F
+                    M42F     -> Just Attribute_M42F
+                    M43F     -> Just Attribute_M43F
+                    M44F     -> Just Attribute_M44F
+                    _        -> Nothing
+
+fromStreamType :: StreamType -> InputType
+fromStreamType st = case st of 
+                        Attribute_Word    -> Word
+                        Attribute_V2U     -> V2U
+                        Attribute_V3U     -> V3U
+                        Attribute_V4U     -> V4U
+                        Attribute_Int     -> Int
+                        Attribute_V2I     -> V2I
+                        Attribute_V3I     -> V3I
+                        Attribute_V4I     -> V4I
+                        Attribute_Float   -> Float
+                        Attribute_V2F     -> V2F
+                        Attribute_V3F     -> V3F
+                        Attribute_V4F     -> V4F
+                        Attribute_M22F    -> M22F
+                        Attribute_M23F    -> M23F
+                        Attribute_M24F    -> M24F
+                        Attribute_M32F    -> M32F
+                        Attribute_M33F    -> M33F
+                        Attribute_M34F    -> M34F
+                        Attribute_M42F    -> M42F
+                        Attribute_M43F    -> M43F
+                        Attribute_M44F    -> M44F
+
+
+streamToStreamType :: Stream a -> StreamType
+streamToStreamType s = case s of
+    ConstWord  _ -> Attribute_Word
+    ConstV2U   _ -> Attribute_V2U
+    ConstV3U   _ -> Attribute_V3U
+    ConstV4U   _ -> Attribute_V4U
+    ConstInt   _ -> Attribute_Int
+    ConstV2I   _ -> Attribute_V2I
+    ConstV3I   _ -> Attribute_V3I
+    ConstV4I   _ -> Attribute_V4I
+    ConstFloat _ -> Attribute_Float
+    ConstV2F   _ -> Attribute_V2F
+    ConstV3F   _ -> Attribute_V3F
+    ConstV4F   _ -> Attribute_V4F
+    ConstM22F  _ -> Attribute_M22F
+    ConstM23F  _ -> Attribute_M23F
+    ConstM24F  _ -> Attribute_M24F
+    ConstM32F  _ -> Attribute_M32F
+    ConstM33F  _ -> Attribute_M33F
+    ConstM34F  _ -> Attribute_M34F
+    ConstM42F  _ -> Attribute_M42F
+    ConstM43F  _ -> Attribute_M43F
+    ConstM44F  _ -> Attribute_M44F
+    Stream t _ _ _ _ -> t

@@ -16,6 +16,22 @@ import qualified Data.ByteString.Lazy as BL
 
 type AssetBundle = MegaStore
 
+-- Load AssetBundle
+loadBundle :: FilePath -> IO AssetBundle
+loadBundle path = do loadStore path
+
+-- Creates an AssetBundle
+saveBundle :: [(T.Text, BS.ByteString)] -> Bool -> String -> IO ()
+saveBundle paths makeDir outpath = do
+    createDirectoryIfMissing makeDir outpath
+    saveStoreBundle outpath $ MegaStore paths 
+
+-- Creates a Shader Cache
+saveCache :: [(T.Text, BS.ByteString)] -> Bool -> String -> IO ()
+saveCache paths makeDir outpath = do
+    createDirectoryIfMissing makeDir outpath
+    saveStoreCache outpath $ MegaStore paths 
+
 -- use on .GLB and .GLTF files in filesystem
 asByteString :: FilePath -> IO BS.ByteString
 asByteString = BS.fromFilePath 
@@ -35,20 +51,4 @@ writeGLTF path gltf = BL.writeFile path $ Data.Aeson.encode $ Codec.GlTF.Prelude
 
 withGLBAsGLTF :: Chunk -> Either String GlTF
 withGLBAsGLTF = Codec.GlTF.fromChunk 
-
--- Load AssetBundle
-loadBundle :: FilePath -> IO AssetBundle
-loadBundle path = do loadStore path
-
--- Creates an AssetBundle
-saveBundle :: [(T.Text, BS.ByteString)] -> Bool -> String -> IO ()
-saveBundle paths makeDir outpath = do
-    createDirectoryIfMissing makeDir outpath
-    saveStoreBundle outpath $ MegaStore paths 
-
--- Creates a Shader Cache
-saveCache :: [(T.Text, BS.ByteString)] -> Bool -> String -> IO ()
-saveCache paths makeDir outpath = do
-    createDirectoryIfMissing makeDir outpath
-    saveStoreCache outpath $ MegaStore paths 
 

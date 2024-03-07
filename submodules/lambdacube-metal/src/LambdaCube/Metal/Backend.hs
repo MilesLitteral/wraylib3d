@@ -35,6 +35,33 @@ import LambdaCube.Metal.Input
 import LambdaCube.Metal.Util
 import LambdaCube.Metal.Bindings
 
+data CGState
+  = CGState
+  { drawCommands          :: [MetalCommand]
+  -- draw context data
+  , rasterContext         :: RasterContext
+  , accumulationContext   :: AccumulationContext
+  , renderTarget          :: MetalRenderTarget
+  , currentProgram        :: ProgramName
+  , samplerUniformMapping :: IntMap GLSamplerUniform
+  , textureMapping        :: IntMap MetalTexture
+  , samplerMapping        :: IntMap MetalSampler
+  }
+
+initCGState = CGState
+  { drawCommands          = mempty
+  -- draw context data
+  , rasterContext         = error "compileCommand: missing RasterContext"
+  , accumulationContext   = error "compileCommand: missing AccumulationContext"
+  , renderTarget          = error "compileCommand: missing RenderTarget"
+  , currentProgram        = error "compileCommand: missing Program"
+  , samplerUniformMapping = mempty
+  , textureMapping        = mempty
+  , samplerMapping        = mempty
+  }
+
+type CG a = State CGState a
+
 setupRasterContext :: RasterContext -> IO ()
 setupRasterContext = cvt
   where
@@ -282,7 +309,7 @@ compileProgram p = do
         , inputStreams          = Map.fromList [(n,(idx, attrName)) | (n,idx) <- Map.toList $ attributes, let attrName = fromMaybe (error $ "missing attribute: " ++ n) $ Map.lookup n lcStreamName]
         }
 
-compileRenderTarget :: Vector TextureDescriptor -> Vector GLTexture -> RenderTarget -> IO GLRenderTarget
+compileRenderTarget :: Vector TextureDescriptor -> Vector MetalTexture -> RenderTarget -> IO MetalRenderTarget
 compileRenderTarget texs glTexs (RenderTarget targets) = do
     let isFB (Framebuffer _)    = True
         isFB _                  = False
@@ -294,7 +321,7 @@ compileRenderTarget texs glTexs (RenderTarget targets) = do
                     Nothing                     -> GL_NONE
                     Just (Framebuffer Color)    -> GL_BACK_LEFT
                     _                           -> error "internal error (compileRenderTarget)!"
-            return $ GLRenderTarget
+            return $ MetalRenderTarget
                 { framebufferObject         = 0
                 , framebufferDrawbuffers    = Just bufs
                 }
@@ -367,8 +394,8 @@ compileStreamData :: StreamData -> IO GLStream
 compileStreamData s = do
   let withV w a f = w a (\p -> f $ castPtr p)
   let compileAttr (VFloatArray v) = Array ArrFloat (V.length v) (withV (SV.unsafeWith . V.convert) v)
-      compileAttr (VIntArray v) = Array ArrInt32 (V.length v) (withV (SV.unsafeWith . V.convert) v)
-      compileAttr (VWordArray v) = Array ArrWord32 (V.length v) (withV (SV.unsafeWith . V.convert) v)
+      compileAttr (VIntArray v)   = Array ArrInt32 (V.length v) (withV (SV.unsafeWith . V.convert) v)
+      compileAttr (VWordArray v)  = Array ArrWord32 (V.length v) (withV (SV.unsafeWith . V.convert) v)
       --TODO: compileAttr (VBoolArray v) = Array ArrWord32 (length v) (withV withArray v)
       (indexMap,arrays) = unzip [((n,i),compileAttr d) | (i,(n,d)) <- zip [0..] $ Map.toList $ streamData s]
       getLength n = l `div` c
@@ -487,7 +514,7 @@ createStreamCommands texUnitMap topUnis attrs primitive prg = streamUniCmds ++ s
             -- constant generic attribute
             constAttr -> GLSetVertexAttrib i constAttr
 
-allocRenderer :: Pipeline -> IO GLRenderer
+allocRenderer :: Pipeline -> IO MetalRenderer
 allocRenderer p = do
     smps <- V.mapM compileSampler $ samplers p
     texs <- V.mapM compileTexture $ textures p
@@ -525,7 +552,7 @@ allocRenderer p = do
         , glDrawCallCounterRef = drawCallCounterRef
         }
 
-disposeRenderer :: GLRenderer -> IO ()
+disposeRenderer :: MetalRenderer -> IO ()
 disposeRenderer p = do
     setStorage' p Nothing
     V.forM_ (glPrograms p) $ \prg -> do
@@ -554,12 +581,12 @@ data PipelineSchema
     }
     deriving Show
 -}
+
 isSubTrie :: (a -> a -> Bool) -> Map String a -> Map String a -> Bool
 isSubTrie eqFun universe subset = and [isMember a (Map.lookup n universe) | (n,a) <- Map.toList subset]
   where
     isMember a Nothing  = False
     isMember a (Just b) = eqFun a b
-
 -- TODO: if there is a mismatch thow detailed error message in the excoeption, containing the missing attributes and uniforms
 {-
     let sch = schema input
@@ -580,10 +607,10 @@ isSubTrie eqFun universe subset = and [isMember a (Map.lookup n universe) | (n,a
                 ]
 -}
 
-setStorage :: GLRenderer -> GLStorage -> IO (Maybe String)
+setStorage :: MetalRenderer -> MetalStorage -> IO (Maybe String)
 setStorage p input' = setStorage' p (Just input')
 
-setStorage' :: GLRenderer -> Maybe GLStorage -> IO (Maybe String)
+setStorage' :: MetalRenderer -> Maybe MetalStorage -> IO (Maybe String)
 setStorage' p@GLRenderer{..} input' = do
     -- TODO: check matching input schema
     {-
@@ -818,33 +845,6 @@ renderFrame GLRenderer{..} = do
         --isOk <- checkGL
         --putStrLn $ isOk ++ " - " ++ show cmd
     --readIORef glDrawCallCounterRef >>= \n -> putStrLn (show n ++ " draw calls")
-
-data CGState
-  = CGState
-  { drawCommands          :: [GLCommand]
-  -- draw context data
-  , rasterContext         :: RasterContext
-  , accumulationContext   :: AccumulationContext
-  , renderTarget          :: GLRenderTarget
-  , currentProgram        :: ProgramName
-  , samplerUniformMapping :: IntMap GLSamplerUniform
-  , textureMapping        :: IntMap GLTexture
-  , samplerMapping        :: IntMap GLSampler
-  }
-
-initCGState = CGState
-  { drawCommands          = mempty
-  -- draw context data
-  , rasterContext         = error "compileCommand: missing RasterContext"
-  , accumulationContext   = error "compileCommand: missing AccumulationContext"
-  , renderTarget          = error "compileCommand: missing RenderTarget"
-  , currentProgram        = error "compileCommand: missing Program"
-  , samplerUniformMapping = mempty
-  , textureMapping        = mempty
-  , samplerMapping        = mempty
-  }
-
-type CG a = State CGState a
 
 emit :: GLCommand -> CG ()
 emit cmd = modify $ \s -> s {drawCommands = cmd : drawCommands s}

@@ -32,9 +32,7 @@ data Frame
   { renderCount :: Int
   , frameUniforms :: Map String Value
   , frameTextures :: Map String Int
-  }
-
-  deriving (Show, Eq, Ord)
+  }deriving (Show, Eq, Ord)
 
 data Scene
   = Scene
@@ -42,17 +40,13 @@ data Scene
   , renderTargetWidth :: Int
   , renderTargetHeight :: Int
   , frames :: Vector Frame
-  }
-
-  deriving (Show, Eq, Ord)
+  }deriving (Show, Eq, Ord)
 
 data PipelineInfo
   = PipelineInfo
   { pipelineName :: String
   , pipeline :: Pipeline
-  }
-
-  deriving (Show, Eq, Ord)
+  }deriving (Show, Eq, Ord)
 
 data RenderJob
   = RenderJob

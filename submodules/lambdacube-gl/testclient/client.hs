@@ -114,7 +114,6 @@ processRenderJob win conn renderJob@RenderJob{..} = do
             WS.sendBinaryData conn . B64.encode =<< getFrameBuffer renderTargetWidth renderTargetHeight
 
 -- utility code
-
 initWindow :: String -> Int -> Int -> IO Window
 initWindow title width height = do
     GLFW.init

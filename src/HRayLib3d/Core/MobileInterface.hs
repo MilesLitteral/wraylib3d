@@ -19,14 +19,15 @@ module HRayLib3d.Core.MobileInterface where
     -- thus each [Djinni] will create one .djinni file on export, keep this in mind
     -- for how to most efficiently export these interfaces.
 
-    newtype DjinniFile          = DjinniFile     { djfRawFile     :: String       }
-    newtype DjinniManifest      = DjinniManifest { djmRawManifest :: [DjinniFile] }
+    newtype DjinniFile          = DjinniFile     { djfRawFile     :: String       } deriving (Eq, Show)
+    newtype DjinniManifest      = DjinniManifest { djmRawManifest :: [DjinniFile] } deriving (Eq, Show)
 
-    data Show a => DEnum   a    = DEnum     { enums          :: [a] } deriving (Eq, Show)
+    data Show a => DVar    a    = DVar      { iType          :: String, iValue :: a} deriving (Eq, Show)
+    data Show a => DEnum   a    = DEnum     { enums          :: [a] }                deriving (Eq, Show)
     data Show a => DConst       = DConst    { constType :: String, constValues :: [String]} deriving (Eq, Show)
     data Show a => DFlags  a    = Flags     { flags          :: [a] } deriving (Eq, Show)
     data Show a => DRecord a    = Record    { recordContents :: [a] } deriving (Eq, Show)
-    data Show a => DInterface a = Interface { iValues        :: [a], iComments :: String, iConstants :: [DConst]} deriving (Eq, Show)
+    data Show a => DInterface a = Interface { iValues        :: [a], iComments :: [String], iConstants :: [DConst]} deriving (Eq, Show)
    
     data DClass =
         DClass {
@@ -35,13 +36,16 @@ module HRayLib3d.Core.MobileInterface where
             option3 :: Int
         } deriving (Eq, Show)
 
-
     class ToMobile a where 
-        makeEnum       :: a -> DEnum   a
-        makeFlag       :: a -> DFlags  a
-        makeRecord     :: a -> DRecord a
-        makeRecordGist :: a -> DRecord a
+        makeVar        :: a -> DVar       a
+        makeEnum       :: a -> DEnum      a
+        makeFlag       :: a -> DFlags     a
+        makeRecord     :: a -> DRecord    a
+        makeRecordGist :: a -> DRecord    a
         makeInterface  :: a -> DInterface a
+
+    instance ToMobile Enum where 
+        makeEnum a = DEnum (show a)
 
     -- my_enum = enum {
     --     option1;
@@ -109,3 +113,5 @@ module HRayLib3d.Core.MobileInterface where
     -- }
     djinniMakeOJInterface  :: ToMobile a => a -> DInterface a
     djinniMakeOJInterface  = makeInterface
+
+    --TODO: makeInterface parser functionality

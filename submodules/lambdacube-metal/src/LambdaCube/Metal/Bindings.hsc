@@ -7,7 +7,8 @@ import Foreign
 import Foreign.C
 
 -- The Foreign Interface
-type FRValue  = Ptr CULong
+-- Every 'result' from Metal will be a Pointer 
+type MValue  = Ptr CULong
 
 -- | The Metal ID type, mostly used for symbols.
 type MID = CULong
@@ -27,7 +28,7 @@ type MID = CULong
 --         pokeArray arrayblock vals
 
 -- -- | The ruby built-in types
-data RBuiltin = RNONE
+data MBuiltin = RNONE
               | RNIL
               | ROBJECT
               | RCLASS
@@ -52,7 +53,7 @@ data RBuiltin = RNONE
               deriving (Show)
 
 -- | Ruby native types, as encoded in the Value type.
-data RType = RFixNum
+data MType = RFixNum
            | RNil
            | RFalse
            | RTrue
@@ -73,13 +74,15 @@ foreign import ccall "wrapper" mkRegistered1 :: Registered1 -> IO (FunPtr Regist
 foreign import ccall "wrapper" mkRegistered2 :: Registered2 -> IO (FunPtr Registered2)
 
 type RegisteredCB3 = FRValue -> FRValue -> FRValue -> IO Int
-foreign import ccall "wrapper" mkRegisteredCB3 :: RegisteredCB3 -> IO (FunPtr RegisteredCB3)
 
-foreign import ccall "ruby_finalize"                    ruby_finalize               :: IO ()
-foreign import ccall "ruby_initialization"              ruby_initialization         :: IO ()
-foreign import ccall "rb_str_new_cstr"                  c_rb_str_new2               :: CString -> IO FRValue
-foreign import ccall "rb_ary_new_capa"                  rb_ary_new2                 :: CLong -> IO FRValue
-foreign import ccall "rb_ary_new_from_values"           rb_ary_new4                 :: CLong -> Ptr FRValue -> IO FRValue
+--TODO Make Foreign Calls to MetalRendererPipeline, MetalEngine (Compute Pipeline), and MetalRendererPipeline CPU. These are the main means of using Metal
+--By the engine
+foreign import ccall        "wrapper" mkRegisteredCB3 :: RegisteredCB3 -> IO (FunPtr RegisteredCB3)
+foreign import ccall        "ruby_finalize"                    ruby_finalize               :: IO ()
+foreign import ccall        "ruby_initialization"              ruby_initialization         :: IO ()
+foreign import ccall        "rb_str_new_cstr"                  c_rb_str_new2               :: CString -> IO FRValue
+foreign import ccall        "rb_ary_new_capa"                  rb_ary_new2                 :: CLong -> IO FRValue
+foreign import ccall        "rb_ary_new_from_values"           rb_ary_new4                 :: CLong -> Ptr FRValue -> IO FRValue
 foreign import ccall   safe "rb_load_protect"           c_rb_load_protect           :: FRValue -> Int -> Ptr Int -> IO ()
 foreign import ccall   safe "rb_funcall"                c_rb_funcall_0              :: FRValue -> RID -> Int -> IO FRValue
 foreign import ccall   safe "rb_funcall"                c_rb_funcall_1              :: FRValue -> RID -> Int -> FRValue -> IO FRValue

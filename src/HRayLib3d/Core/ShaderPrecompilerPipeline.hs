@@ -12,9 +12,25 @@ module HRayLib3d.Core.ShaderPrecompilerPipeline where
     import qualified Data.ByteString.Lazy as BL
 
     type ShaderCache = MegaStore
+    
+    -- Shader Cache Sources
+    glesShaderCache   :: IO [FilePath]
+    glesShaderCache   = getDirectoryContents  "./shaders/GLES/"
 
-    saveCache :: String -> ShaderCache -> IO ()
-    saveCache name store = BL.writeFile (name ++ ".shaderCache") (compress $ encode store)
+    glslShaderCache   :: IO [FilePath]
+    glslShaderCache   = getDirectoryContents  "./shaders/GLSL/"
+
+    vulkanShaderCache :: IO [FilePath]
+    vulkanShaderCache = getDirectoryContents  "./shaders/Vulkan/"
+
+    hlslShaderCache   :: IO [FilePath]
+    hlslShaderCache   = getDirectoryContents  "./shaders/HLSL/"
+
+    metalShaderCache  :: IO [FilePath]
+    metalShaderCache  = getDirectoryContents  "./shaders/Metal/"
+
+    saveShaderCache :: String -> ShaderCache -> IO ()
+    saveShaderCache name store = BL.writeFile (name ++ ".shaderCache") (compress $ encode store)
 
     setShaderForPreCompC :: String -> IO String
     setShaderForPreCompC scriptBody = return $ show $ "R\"(" ++ scriptBody ++ ")\""
@@ -34,19 +50,3 @@ module HRayLib3d.Core.ShaderPrecompilerPipeline where
     writeShaderCache cacheName store = do
         createDirectoryIfMissing False "./shaderCache/"
         saveCache ("./shaderCache/" ++ cacheName)  store
-    
-    -- Shader Cache Sources
-    glesShaderCache   :: IO [FilePath]
-    glesShaderCache   = getDirectoryContents  "./shaders/GLES/"
-
-    glslShaderCache   :: IO [FilePath]
-    glslShaderCache   = getDirectoryContents  "./shaders/GLSL/"
-
-    vulkanShaderCache :: IO [FilePath]
-    vulkanShaderCache = getDirectoryContents  "./shaders/Vulkan/"
-
-    hlslShaderCache   :: IO [FilePath]
-    hlslShaderCache   = getDirectoryContents  "./shaders/HLSL/"
-
-    metalShaderCache  :: IO [FilePath]
-    metalShaderCache  = getDirectoryContents  "./shaders/Metal/"
