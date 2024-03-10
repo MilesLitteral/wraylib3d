@@ -361,20 +361,20 @@ comparisonFunctionToGLType a = case a of
 logicOperationToGLType :: LogicOperation -> GLenum
 logicOperationToGLType a = case a of
     LambdaCube.IR.And             -> GL_AND
-    AndInverted     -> GL_AND_INVERTED
-    AndReverse      -> GL_AND_REVERSE
-    Clear           -> GL_CLEAR
-    Copy            -> GL_COPY
-    CopyInverted    -> GL_COPY_INVERTED
-    Equiv           -> GL_EQUIV
-    Invert          -> GL_INVERT
-    Nand            -> GL_NAND
-    Noop            -> GL_NOOP
-    Nor             -> GL_NOR
-    Or              -> GL_OR
-    OrInverted      -> GL_OR_INVERTED
-    OrReverse       -> GL_OR_REVERSE
-    Set             -> GL_SET
+    AndInverted                   -> GL_AND_INVERTED
+    AndReverse                    -> GL_AND_REVERSE
+    Clear                         -> GL_CLEAR
+    Copy                          -> GL_COPY
+    CopyInverted                  -> GL_COPY_INVERTED
+    Equiv                         -> GL_EQUIV
+    Invert                        -> GL_INVERT
+    Nand                          -> GL_NAND
+    Noop                          -> GL_NOOP
+    Nor                           -> GL_NOR
+    Or                            -> GL_OR
+    OrInverted                    -> GL_OR_INVERTED
+    OrReverse                     -> GL_OR_REVERSE
+    Set                           -> GL_SET
     LambdaCube.IR.Xor             -> GL_XOR
 
 blendEquationToGLType :: BlendEquation -> GLenum
@@ -442,40 +442,23 @@ textureDataTypeToGLArityType Stencil a = case a of
     a           -> error $ "FIXME: This texture format is not yet supported" ++ show a
 {-
 Texture and renderbuffer color formats (R):
-    R11F_G11F_B10F
-    R16
-    R16F
-    R16I
-    R16UI
-    R32F
-    R32I
-    R32UI
-    R8
-    R8I
-    R8UI
-    RG16
-    RG16F
-    RG16I
-    RG16UI
-    RG32F
-    RG32I
-    RG32UI
-    RG8
-    RG8I
-    RG8UI
-    RGB10_A2
-    RGB10_A2UI
-    RGBA16
-    RGBA16F
-    RGBA16I
-    RGBA16UI
-    RGBA32F
-    RGBA32I
-    RGBA32UI
-    RGBA8
-    RGBA8I
-    RGBA8UI
-    SRGB8_ALPHA8
+  R8Snorm                        -- An ordinary format with one 8-bit, normalized, signed integer component.
+  R8Unorm                        -- An ordinary format with one 8-bit, normalized, unsigned integer component.
+  RG8Snorm                       -- An ordinary format with two 8-bit, normalized, signed integer components.
+  RG8Unorm                       -- An ordinary format with two 8-bit, normalized, unsigned integer components.
+  RGBA8Snorm                     -- An ordinary format with four 8-bit, normalized, signed integer components in RGBA order.
+  RGBA8Unorm                     -- An ordinary format with four 8-bit, normalized, unsigned integer components in RGBA order.
+  RGBA8Unorm_srgb                -- An ordinary format with four 8-bit, normalized, unsigned integer components in RGBA order with conversion between sRGB and linear space.
+  R16Snorm                       -- An ordinary format with one 16-bit, normalized, signed integer component.
+  R16Unorm                       -- An ordinary format with one 16-bit, normalized, unsigned integer component.
+  RG16Snorm                      -- An ordinary format with two 16-bit, normalized, signed integer components.
+  RG16Unorm                      -- An ordinary format with two 16-bit, normalized, unsigned integer components.
+  RGBA16Snorm                    -- An ordinary format with four 16-bit, normalized, signed integer components in RGBA order.
+  RGBA16Unorm                    -- An ordinary format with four 16-bit, normalized, unsigned integer components in RGBA order.
+  RGB9e5Float                    -- A packed 32-bit format with three 9-bit, floating-point color components.
+  RGB10a2Unorm                   -- A packed 32-bit format with normalized, unsigned integer color components.
+  RG11b10Float                   -- A packed 32-bit format with two 11-bit (for red and green) and one 10-bit (for blue) floating-point color components.
+
 -}
 
 glGetIntegerv1 :: GLenum -> IO GLint

@@ -11,27 +11,28 @@ module LambdaCube.Metal.Mesh (
     meshData
 ) where
 
-import Data.Maybe
-import Control.Applicative
-import Control.Monad
-import Foreign.Ptr
 import Data.Int
+import Data.Map (Map)
+import Data.Maybe
+import Control.Monad
+import Control.Applicative
+import Foreign.Ptr
 import Foreign.Storable
 import Foreign.Marshal.Utils
 import System.IO.Unsafe
-import Data.Map (Map)
-import qualified Data.Map as Map
+
+import qualified Data.Map    as Map
 import qualified Data.Vector as V
-import qualified Data.Vector.Storable as SV
+import qualified Data.Vector.Storable  as SV
 import qualified Data.Vector.Storable.Mutable as MV
 import qualified Data.ByteString.Char8 as SB
-import qualified Data.ByteString.Lazy as LB
+import qualified Data.ByteString.Lazy  as LB
 
 import LambdaCube.Metal
-import LambdaCube.Metal.Type as T
-import LambdaCube.IR as IR
-import LambdaCube.Linear as IR
 import LambdaCube.Mesh
+import LambdaCube.IR         as IR
+import LambdaCube.Linear     as IR
+import LambdaCube.Metal.Type as T
 
 data GPUData
     = GPUData
@@ -79,7 +80,6 @@ meshAttrToStream b i t = case t of
                           (A_Int   v) -> Stream Attribute_Int   b i 0 (V.length v)
                           (A_Word  v) -> Stream Attribute_Word  b i 0 (V.length v)
 
-
 updateMesh :: GPUMesh -> [(String,MeshAttribute)] -> Maybe MeshPrimitive -> IO ()
 updateMesh (GPUMesh (Mesh dMA dMP) (GPUData _ dS dI _)) al mp = do
   -- check type match
@@ -91,15 +91,6 @@ updateMesh (GPUMesh (Mesh dMA dMP) (GPUData _ dS dI _)) al mp = do
         case Map.lookup n dS of
           Just (Stream _ b i _ _) -> updateBuffer b [(i,meshAttrToArray a)]
           _ -> return ()
-{-
-      case mp of
-        Nothing -> return ()
-        Just p -> do
-          let ok2 = case (dMP,p) of
-                (Just (P_TriangleStripI v1, P_TriangleStripI v2) -> V.length v1 == V.length v2
-                (P_TrianglesI v1, P_TrianglesI v2) -> V.length v1 == V.length v2
-                (a,b) -> a == b
--}
 
 uploadMeshToGPU :: Mesh -> IO GPUMesh
 uploadMeshToGPU mesh@(Mesh attrs mPrim) = do

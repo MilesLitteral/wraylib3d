@@ -137,107 +137,107 @@ foreign import ccall unsafe "&rb_cObject"               rb_cObject              
 
 mtype :: MValue -> IO MBuiltin
 mtype v = metalType v >>= \x -> case x of
-    (#const none)           -> return MNone
-    (#const kernel)  -> return Kernel)
-    (#const bool1)          -> return Bool1
-    (#const bool2)          -> return (MBuiltin Bool2)
-    (#const bool3)          -> return (MBuiltin Bool3)
-    (#const bool4)          -> return (MBuiltin Bool4)
-    (#const char1)          -> return (MBuiltin Char1)
-    (#const char2)          -> return (MBuiltin Char2)
-    (#const char3)          -> return (MBuiltin Char3)
-    (#const char4)          -> return (MBuiltin Char4)
-    (#const uchar)          -> return (MBuiltin UChar)
-    (#const uchar2)         -> return (MBuiltin UChar2)
-    (#const uchar3)         -> return (MBuiltin UChar3)
-    (#const uchar4)         -> return (MBuiltin UChar4)
-    (#const short1)         -> return (MBuiltin Short1)
-    (#const short2)         -> return (MBuiltin Short2)
-    (#const short3)         -> return (MBuiltin Short3)
-    (#const short4)         -> return (MBuiltin Short4)
-    (#const ushort)         -> return (MBuiltin UShort)
-    (#const ushort2)        -> return (MBuiltin UShort2)
-    (#const ushort3)        -> return (MBuiltin UShort3)
-    (#const ushort4)        -> return (MBuiltin UShort4)
-    (#const int1)           -> return (MBuiltin Int1)
-    (#const int2)           -> return (MBuiltin Int2)
-    (#const int3)           -> return (MBuiltin Int3)
-    (#const int4)           -> return (MBuiltin Int4)
-    (#const uint)           -> return (MBuiltin UInt)
-    (#const uint2)          -> return (MBuiltin UInt2)
-    (#const uint3)          -> return (MBuiltin UInt3)
-    (#const uint4)          -> return (MBuiltin UInt4)
-    (#const long1)          -> return (MBuiltin Long1)
-    (#const long2)          -> return (MBuiltin Long2)
-    (#const long3)          -> return (MBuiltin Long3)
-    (#const long4)          -> return (MBuiltin Long4)
-    (#const ulong)          -> return (MBuiltin ULong)
-    (#const ulong2)         -> return (MBuiltin ULong2)
-    (#const ulong3)         -> return (MBuiltin ULong3)
-    (#const ulong4)         -> return (MBuiltin ULong4)
-    (#const float1)         -> return (MBuiltin Float1)
-    (#const float2)         -> return (MBuiltin Float2)
-    (#const float3)         -> return (MBuiltin Float3)
-    (#const float4)         -> return (MBuiltin Float4)
-    (#const float2x2)       -> return (MBuiltin Float2x2)
-    (#const float2x3)       -> return (MBuiltin Float2x3)
-    (#const float2x4)       -> return (MBuiltin Float2x4)
-    (#const float3x2)       -> return (MBuiltin Float3x2)
-    (#const float2x3)       -> return (MBuiltin Float2x3)
-    (#const float2x4)       -> return (MBuiltin Float2x4)
-    (#const float2x4)       -> return (MBuiltin Float3x3)
-    (#const float2x4)       -> return (MBuiltin Float3x4)
-    (#const float2x4)       -> return (MBuiltin Float4x2)
-    (#const float2x4)       -> return (MBuiltin Float4x3)
-    (#const float2x4)       -> return (MBuiltin Float4x4) 
+    (#const none)          -> return MNone
+    (#const kernel)        -> return Kernel
+    (#const bool1)         -> return Bool1
+    (#const bool2)         -> return Bool2
+    (#const bool3)         -> return Bool3
+    (#const bool4)         -> return Bool4
+    (#const char1)         -> return Char1
+    (#const char2)         -> return Char2
+    (#const char3)         -> return Char3
+    (#const char4)         -> return Char4
+    (#const uchar)         -> return UChar
+    (#const uchar2)        -> return UChar2
+    (#const uchar3)        -> return UChar3
+    (#const uchar4)        -> return UChar4
+    (#const short1)        -> return Short1
+    (#const short2)        -> return Short2
+    (#const short3)        -> return Short3
+    (#const short4)        -> return Short4
+    (#const ushort)        -> return UShort
+    (#const ushort2)       -> return UShort2
+    (#const ushort3)       -> return UShort3
+    (#const ushort4)       -> return UShort4
+    (#const int1)          -> return Int1
+    (#const int2)          -> return Int2
+    (#const int3)          -> return Int3
+    (#const int4)          -> return Int4
+    (#const uint)          -> return UInt
+    (#const uint2)         -> return UInt2
+    (#const uint3)         -> return UInt3
+    (#const uint4)         -> return UInt4
+    (#const long1)         -> return Long1
+    (#const long2)         -> return Long2
+    (#const long3)         -> return Long3
+    (#const long4)         -> return Long4
+    (#const ulong)         -> return ULong
+    (#const ulong2)        -> return ULong2
+    (#const ulong3)        -> return ULong3
+    (#const ulong4)        -> return ULong4
+    (#const float1)        -> return Float1
+    (#const float2)        -> return Float2
+    (#const float3)        -> return Float3
+    (#const float4)        -> return Float4
+    (#const float2x2)      -> return Float2x2
+    (#const float2x3)      -> return Float2x3
+    (#const float2x4)      -> return Float2x4
+    (#const float3x2)      -> return Float3x2
+    (#const float2x3)      -> return Float2x3
+    (#const float2x4)      -> return Float2x4
+    (#const float2x4)      -> return Float3x3
+    (#const float2x4)      -> return Float3x4
+    (#const float2x4)      -> return Float4x2
+    (#const float2x4)      -> return Float4x3
+    (#const float2x4)      -> return Float4x4 
     (#const thread_position_in_grid)   -> return ThreadPositionInGrid
-    (#const structure)      -> return (MBuiltin Structure)
-    (#const half)          -> return (MBuiltin Half)
-    (#const half2)          -> return (MBuiltin Half2)
-    (#const half3)          -> return (MBuiltin Half3)
-    (#const half4)          -> return (MBuiltin Half4)
-    (#const half2x2)        -> return (MBuiltin Half2x2)
-    (#const half2x3)        -> return (MBuiltin Half2x3)
-    (#const half2x4)        -> return (MBuiltin Half2x4)
-    (#const half3x2)        -> return (MBuiltin Half3x2)
-    (#const half3x3)        -> return (MBuiltin Half3x3)
-    (#const half3x4)         -> return (MBuiltin Half3x4)
-    (#const half4x2)         -> return (MBuiltin Half4x2)
-    (#const half4x3)         -> return (MBuiltin Half4x3)
-    (#const half4x4)       -> return (MBuiltin Half4x4)
-    (#const r8Snorm)       -> return (MBuiltin R8Snorm)                        -- An ordinary format with one 8-bit, normalized, signed integer component.
-    (#const r8Unorm)       -> return (MBuiltin R8Unorm)                        -- An ordinary format with one 8-bit, normalized, unsigned integer component.
-    (#const half4x4)       -> return (MBuiltin RG8Snorm)                       -- An ordinary format with two 8-bit, normalized, signed integer components.
-    (#const half4x4)       -> return (MBuiltin RG8Unorm)                       -- An ordinary format with two 8-bit, normalized, unsigned integer components.
-    (#const half4x4)       -> return (MBuiltin RGBA8Snorm)                     -- An ordinary format with four 8-bit, normalized, signed integer components in RGBA order.
-    (#const half4x4)       -> return (MBuiltin RGBA8Unorm)                     -- An ordinary format with four 8-bit, normalized, unsigned integer components in RGBA order.
-    (#const half4x4)       -> return (MBuiltin RGBA8Unorm_srgb)                -- An ordinary format with four 8-bit, normalized, unsigned integer components in RGBA order with conversion between sRGB and linear space.
-    (#const half4x4)       -> return (MBuiltin R16Snorm)                       -- An ordinary format with one 16-bit, normalized, signed integer component.
-    (#const half4x4)       -> return (MBuiltin R16Unorm)                       -- An ordinary format with one 16-bit, normalized, unsigned integer component.
-    (#const half4x4)       -> return (MBuiltin RG16Snorm)                      -- An ordinary format with two 16-bit, normalized, signed integer components.
-    (#const half4x4)       -> return (MBuiltin RG16Unorm)                      -- An ordinary format with two 16-bit, normalized, unsigned integer components.
-    (#const rgba16Snorm)       -> return (MBuiltin RGBA16Snorm)                    -- An ordinary format with four 16-bit, normalized, signed integer components in RGBA order.
-    (#const rgba16Unorm)       -> return (MBuiltin RGBA16Unorm)                    -- An ordinary format with four 16-bit, normalized, unsigned integer components in RGBA order.
-    (#const rgb9e5Float)       -> return (MBuiltin RGB9e5Float)                    -- A packed 32-bit format with three 9-bit, floating-point color components.
-    (#const rgb10a2Unorm)       -> return (MBuiltin RGB10a2Unorm)                   -- A packed 32-bit format with normalized, unsigned integer color components.
-    (#const rg11b10Float)       -> return (MBuiltin RG11b10Float)                   -- A packed 32-bit format with two 11-bit (for red and green) and one 10-bit (for blue) floating-point color components.
-    (#const texture)       -> return (MBuiltin MTLTexture)                        -- A texture.
-    (#const sampler)       -> return (MBuiltin MTLSampler)                        -- A texture sampler.
-    (#const indirectCommandBuffer)        -> return (MBuiltin IndirectCommandBuffer)          -- An indirect command buffer.
-    (#const renderPipeline)                       -> return (MBuiltin RenderPipeline)                 -- A render pipeline.
-    (#const computePipeline)                      -> return (MBuiltin ComputePipeline)                -- A compute pipeline.
-    (#const visibleFunctionTable)                 -> return (MBuiltin VisibleFunctionTable)           -- A table of visible functions that the pipeline can call.
-    (#const intersectionFunctionTable)            -> return (MBuiltin IntersectionFunctionTable)      -- A table of intersection functions that the pipeline can call.
-    (#const primitiveAccelerationStructure)       -> return (MBuiltin PrimitiveAccelerationStructure) -- A low-level ray-tracing acceleration structure for a set of primitives.
-    (#const instanceAccelerationStructure)        -> return (MBuiltin InstanceAccelerationStructure)  -- A high-level ray-tracing acceleration structure for a set of instances of low-level primitives.
-    (#const true)    -> return MTrue
-    (#const false)   -> return MFalse
-    (#const array)     -> return (MBuiltin Array)
-    (#const pointer)   -> return (MBuiltin Pointer)
-    (#const kernel)    -> return (MBuiltin Kernel)
-    (#const device)    -> return (MBuiltin Device)
-    (#const void)      -> return (MBuiltin Void)
-    (#const METAL_SHADER_FILE)    -> return (MBuiltin MFile)
+    (#const structure)     -> return  Structure
+    (#const half)          -> return   Half
+    (#const half2)         -> return  Half2
+    (#const half3)         -> return  Half3
+    (#const half4)         -> return  Half4
+    (#const half2x2)       -> return  Half2x2
+    (#const half2x3)       -> return  Half2x3
+    (#const half2x4)       -> return  Half2x4
+    (#const half3x2)       -> return  Half3x2
+    (#const half3x3)       -> return  Half3x3
+    (#const half3x4)       -> return Half3x4
+    (#const half4x2)       -> return Half4x2
+    (#const half4x3)       -> return Half4x3
+    (#const half4x4)       -> return Half4x4
+    (#const r8Snorm)       -> return R8Snorm                        -- An ordinary format with one 8-bit, normalized, signed integer component.
+    (#const r8Unorm)       -> return R8Unorm                        -- An ordinary format with one 8-bit, normalized, unsigned integer component.
+    (#const half4x4)       -> return RG8Snorm                       -- An ordinary format with two 8-bit, normalized, signed integer components.
+    (#const half4x4)       -> return RG8Unorm                       -- An ordinary format with two 8-bit, normalized, unsigned integer components.
+    (#const half4x4)       -> return RGBA8Snorm                     -- An ordinary format with four 8-bit, normalized, signed integer components in RGBA order.
+    (#const half4x4)       -> return RGBA8Unorm                     -- An ordinary format with four 8-bit, normalized, unsigned integer components in RGBA order.
+    (#const half4x4)       -> return RGBA8Unorm_srgb                -- An ordinary format with four 8-bit, normalized, unsigned integer components in RGBA order with conversion between sRGB and linear space.
+    (#const half4x4)       -> return R16Snorm                       -- An ordinary format with one 16-bit, normalized, signed integer component.
+    (#const half4x4)       -> return R16Unorm                       -- An ordinary format with one 16-bit, normalized, unsigned integer component.
+    (#const half4x4)       -> return RG16Snorm                      -- An ordinary format with two 16-bit, normalized, signed integer components.
+    (#const half4x4)       -> return RG16Unorm                      -- An ordinary format with two 16-bit, normalized, unsigned integer components.
+    (#const rgba16Snorm)   -> return RGBA16Snorm                    -- An ordinary format with four 16-bit, normalized, signed integer components in RGBA order.
+    (#const rgba16Unorm)   -> return RGBA16Unorm                    -- An ordinary format with four 16-bit, normalized, unsigned integer components in RGBA order.
+    (#const rgb9e5Float)   -> return RGB9e5Float                    -- A packed 32-bit format with three 9-bit, floating-point color components.
+    (#const rgb10a2Unorm)  -> return RGB10a2Unorm                  -- A packed 32-bit format with normalized, unsigned integer color components.
+    (#const rg11b10Float)  -> return RG11b10Float                   -- A packed 32-bit format with two 11-bit (for red and green) and one 10-bit (for blue) floating-point color components.
+    (#const texture)       -> return MTLTexture                        -- A texture.
+    (#const sampler)       -> return MTLSampler                      -- A texture sampler.
+    (#const indirectCommandBuffer)        -> return IndirectCommandBuffer          -- An indirect command buffer.
+    (#const renderPipeline)                       -> return RenderPipeline                 -- A render pipeline.
+    (#const computePipeline)                      -> return ComputePipeline                -- A compute pipeline.
+    (#const visibleFunctionTable)                 -> return VisibleFunctionTable           -- A table of visible functions that the pipeline can call.
+    (#const intersectionFunctionTable)            -> return IntersectionFunctionTable      -- A table of intersection functions that the pipeline can call.
+    (#const primitiveAccelerationStructure)       -> return PrimitiveAccelerationStructure -- A low-level ray-tracing acceleration structure for a set of primitives.
+    (#const instanceAccelerationStructure)        -> return InstanceAccelerationStructure  -- A high-level ray-tracing acceleration structure for a set of instances of low-level primitives.
+    (#const true)      -> return MTrue
+    (#const false)     -> return MFalse
+    (#const array)     -> return Array
+    (#const pointer)   -> return Pointer
+    (#const kernel)    -> return Kernel
+    (#const device)    -> return Device
+    (#const void)      -> return Void
+    (#const METAL_SHADER_FILE)    -> return MFile
     _                       -> return MNone
 
 -- | Defines an instance method.
