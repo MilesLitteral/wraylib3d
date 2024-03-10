@@ -3,7 +3,7 @@ namespace mtlpp {
         // Overview
         // Don’t implement this protocol; you get objects of this type by asking a MTLIndirectCommandBuffer for them.
         // Use this object to reset or encode a command. You must always reset a command before encoding a new command.
-
+        public:
         //Topics
         //Setting Command Arguments
         void setRenderPipelineState(mtlpp::RenderPipelineState state);
@@ -21,7 +21,7 @@ namespace mtlpp {
         // Encodes a command to render a number of instances of primitives using vertex data in contiguous array elements, starting from the base instance.
         // Required.
 
-        void drawIndexedPrimitives(mtlpp::PrimitiveType, int indexCount, indexType: mtlpp::IndexType, mtlpp::Buffer indexBuffer, int indexBufferOffset, int instanceCount, int baseVertex, int baseInstance);
+        void drawIndexedPrimitives(mtlpp::PrimitiveType, int indexCount, mtlpp::IndexType indexType, mtlpp::Buffer indexBuffer, int indexBufferOffset, int instanceCount, int baseVertex, int baseInstance);
         // Encodes a command to render a number of instances of primitives using an index list specified in a buffer, starting from the base vertex of the base instance.
         // Required.
 
@@ -37,8 +37,5 @@ namespace mtlpp {
         void reset();
         // Resets the command to its default state.
         // Required.
-        // Relationships
-        // Inherits From
-        // NSObjectProtocol
-    }
+    };
 }

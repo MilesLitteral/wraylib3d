@@ -47,7 +47,7 @@ data GPUMesh
   , gpuData   :: GPUData
   }
 
-addMeshToObjectArray :: GLStorage -> String -> [String] -> GPUMesh -> IO Object
+addMeshToObjectArray :: MetalStorage -> String -> [String] -> GPUMesh -> IO Object
 addMeshToObjectArray input slotName objUniNames (GPUMesh _ (GPUData prim streams indices _)) = do
     -- select proper attributes
     let (ObjectArraySchema slotPrim slotStreams) = fromMaybe (error $ "addMeshToObjectArray - missing object array: " ++ slotName) $ Map.lookup slotName $! objectArrays $! schema input

@@ -7,8 +7,8 @@ execConnection win conn = do
   putStrLn "Connected!"
   -- register backend
   WS.sendTextData conn . encode $ ClientInfo
-    { clientName    = "Haskell DirectX 11"
-    , clientBackend = OpenGL33
+    { clientName    = "Haskell Metal 3"
+    , clientBackend = Metal3 --OpenGL33
     }
   chan <- newEmptyMVar :: IO (MVar RenderJob)
   -- wait for incoming render jobs

@@ -214,28 +214,6 @@ namespace mtlpp {
                 generateRandomFloatData(_mBufferB);
             }
 
-            void sendComputeCommand(mtlpp::CommandQueue commandQueue)
-            {
-                // Create a command buffer to hold commands.
-                mtlpp::CommandBuffer commandBuffer = commandQueue.CommandBuffer();
-                // Start a compute pass.
-                mtlpp::ComputeCommandEncoder computeEncoder = commandBuffer.ComputeCommandEncoder();// computeCommandEncoder];
-
-                encodeCommand(computeEncoder);
-                // End the compute pass.
-                computeEncoder.EndEncoding();
-
-                // Execute the command.
-                commandBuffer.Commit();
-
-                // Normally, you want to do other work in your app while the GPU is running,
-                // but in this example, the code simply blocks until the calculation is complete.
-                commandBuffer.WaitUntilCompleted();
-
-                verifyResults();
-            }
-
-
             void encodeCommand(mtlpp::ComputeCommandEncoder computeEncoder) {
 
                 // Encode the pipeline state object and its parameters.
@@ -259,6 +237,26 @@ namespace mtlpp {
                 computeEncoder.DispatchThreadgroups(gridSize, threadgroupSize);
             }
 
+            void sendComputeCommand(mtlpp::CommandQueue commandQueue)
+            {
+                // Create a command buffer to hold commands.
+                mtlpp::CommandBuffer commandBuffer = commandQueue.CommandBuffer();
+                // Start a compute pass.
+                mtlpp::ComputeCommandEncoder computeEncoder = commandBuffer.ComputeCommandEncoder();// computeCommandEncoder];
+
+                encodeCommand(computeEncoder);
+                // End the compute pass.
+                computeEncoder.EndEncoding();
+
+                // Execute the command.
+                commandBuffer.Commit();
+
+                // Normally, you want to do other work in your app while the GPU is running,
+                // but in this example, the code simply blocks until the calculation is complete.
+                commandBuffer.WaitUntilCompleted();
+
+                verifyResults();
+            }
 
             void verifyResults()
             {
@@ -323,7 +321,6 @@ namespace mtlpp {
                     ns::Error* error = NULL;
 
                     // Load the shader files with a .metal file extension in the project
-
                     mtlpp::Library defaultLibrary = _mDevice.NewLibrary("fut.metallib", error);
                     if (defaultLibrary.GetFunctionNames() == NULL)
                     {
@@ -334,7 +331,6 @@ namespace mtlpp {
 
                     // Create a compute pipeline state object.
                     _mFunctionPSO =  _mDevice.NewComputePipelineState(addFunction, error);
-                
                     _mCommandQueue = _mDevice.NewCommandQueue();
             };
         
@@ -490,7 +486,7 @@ namespace mtlpp {
                         //Encode the ICB into the argument buffer:
                         mtlpp::ArgumentEncoder argumentEncoder = GPUCommandEncodingKernel.newArgumentEncoderWithBufferIndex(AAPLKernelBufferIndexCommandBufferContainer);
 
-                        _icbArgumentBuffer = device.newBuffer(argumentEncoder.encodedLength, ResourceStorageMode::Shared);
+                        _icbArgumentBuffer = _mDevice.makeIndirectCommandBuffer(argumentEncoder.encodedLength, ResourceStorageMode::Shared);
                         _icbArgumentBuffer.label = "ICB Argument Buffer";
 
                         argumentEncoder.setArgumentBuffer(_icbArgumentBuffer, 0);
@@ -541,7 +537,6 @@ namespace mtlpp {
                     // Normally, you want to do other work in your app while the GPU is running,
                     // but in this example, the code simply blocks until the calculation is complete.
                     commandBuffer.WaitUntilCompleted();
-                    verifyResults();
                 }
 
                 void execute(mtlpp::RenderCommandEncoder renderEncoder, int AAPLNumObjects){
@@ -560,6 +555,15 @@ namespace mtlpp {
         };
 
     class MetalRenderingEngineCPU {
+        public:
+            mtlpp::Device _mDevice = mtlpp::Device::CreateSystemDefaultDevice();
+
+            // The compute pipeline generated from the compute kernel in the .metal shader file.
+            mtlpp::ComputePipelineState _mFunctionPSO;
+
+            // The command queue used to pass commands to the device.
+            mtlpp::CommandQueue _mCommandQueue;
+
         // Create an Indirect Command Buffer
         // The sample creates _indirectCommandBuffer from a MTLIndirectCommandBufferDescriptor, which defines the features and limits of an indirect command buffer.
         MetalRenderingEngineCPU() {
@@ -633,7 +637,7 @@ namespace mtlpp {
             // Encode blit commands to update the buffer holding the frame state.
             mtlpp::BlitCommandEncoder blitEncoder = commandBuffer.blitCommandEncoder;
 
-            blitEncoder.copyFromBuffer(_frameStateBuffer[_inFlightIndex], 0,//sourceOffset:
+            blitEncoder.Copy(_frameStateBuffer[_inFlightIndex], 0,//sourceOffset:
                             _indirectFrameStateBuffer, 0,                   //toBuffer: , destinationOffset:
                             _indirectFrameStateBuffer.length); // size:
 

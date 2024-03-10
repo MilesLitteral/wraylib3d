@@ -195,7 +195,7 @@ module HRayLib3d.Core.BuildBundler (
         
     -- TODO: Add Build functions for VR Headsets. This step can vastly vary depending on headset.
     -- For starters lets go with a Quest headset as the build largely requires using Djinni for Android
-    -- and building an APK. The required functions would need to use commandline: 
+    -- and building an APK and certifying GLSL shaders for SPIR-V. The required functions would need to use commandline: 
     --`adb devices` (lists devices)
 
     -- WIFI MODE:
@@ -211,6 +211,7 @@ module HRayLib3d.Core.BuildBundler (
     -- `adb disconnect` (close connection on quit)
     -- `adb shell ip route` (Useful util command)
 
+    -- compileProgram p (where spirv == true)
     -- It is necessary to emulate the same method, as much as possible, across headsets
 
     {-
@@ -220,13 +221,13 @@ module HRayLib3d.Core.BuildBundler (
     -}
 
     buildQuestVRApp  :: IO ()
-    buildQuestVRApp = undefined
+    buildQuestVRApp   = undefined
 
     buildHoloLensApp :: IO ()
-    buildQuestVRApp = undefined
+    buildQuestVRApp   = undefined
 
     buildViveApp :: IO ()
-    buildViveApp = undefined
+    buildViveApp      = undefined
 
     buildMagicLeapApp :: IO ()
     buildMagicLeapApp = undefined

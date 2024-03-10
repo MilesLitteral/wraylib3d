@@ -70,33 +70,33 @@ b2w :: Bool -> GLuint
 b2w True  = 1
 b2w False = 0
 
-mkUniformSetter :: InputType -> IO (GLUniform, InputSetter)
-mkUniformSetter t@Bool  = do {r <- newIORef 0;                            return $! (GLUniform t r, SBool $!  writeIORef r . b2w)}
-mkUniformSetter t@V2B   = do {r <- newIORef (V2 0 0);                     return $! (GLUniform t r, SV2B $!   writeIORef r . fmap b2w)}
-mkUniformSetter t@V3B   = do {r <- newIORef (V3 0 0 0);                   return $! (GLUniform t r, SV3B $!   writeIORef r . fmap b2w)}
-mkUniformSetter t@V4B   = do {r <- newIORef (V4 0 0 0 0);                 return $! (GLUniform t r, SV4B $!   writeIORef r . fmap b2w)}
-mkUniformSetter t@Word  = do {r <- newIORef 0;                            return $! (GLUniform t r, SWord $!  writeIORef r)}
-mkUniformSetter t@V2U   = do {r <- newIORef (V2 0 0);                     return $! (GLUniform t r, SV2U $!   writeIORef r)}
-mkUniformSetter t@V3U   = do {r <- newIORef (V3 0 0 0);                   return $! (GLUniform t r, SV3U $!   writeIORef r)}
-mkUniformSetter t@V4U   = do {r <- newIORef (V4 0 0 0 0);                 return $! (GLUniform t r, SV4U $!   writeIORef r)}
-mkUniformSetter t@Int   = do {r <- newIORef 0;                            return $! (GLUniform t r, SInt $!   writeIORef r)}
-mkUniformSetter t@V2I   = do {r <- newIORef (V2 0 0);                     return $! (GLUniform t r, SV2I $!   writeIORef r)}
-mkUniformSetter t@V3I   = do {r <- newIORef (V3 0 0 0);                   return $! (GLUniform t r, SV3I $!   writeIORef r)}
-mkUniformSetter t@V4I   = do {r <- newIORef (V4 0 0 0 0);                 return $! (GLUniform t r, SV4I $!   writeIORef r)}
-mkUniformSetter t@Float = do {r <- newIORef 0;                            return $! (GLUniform t r, SFloat $! writeIORef r)}
-mkUniformSetter t@V2F   = do {r <- newIORef (V2 0 0);                     return $! (GLUniform t r, SV2F $!   writeIORef r)}
-mkUniformSetter t@V3F   = do {r <- newIORef (V3 0 0 0);                   return $! (GLUniform t r, SV3F $!   writeIORef r)}
-mkUniformSetter t@V4F   = do {r <- newIORef (V4 0 0 0 0);                 return $! (GLUniform t r, SV4F $!   writeIORef r)}
-mkUniformSetter t@M22F  = do {r <- newIORef (V2 z2 z2);                   return $! (GLUniform t r, SM22F $!  writeIORef r)}
-mkUniformSetter t@M23F  = do {r <- newIORef (V3 z2 z2 z2);                return $! (GLUniform t r, SM23F $!  writeIORef r)}
-mkUniformSetter t@M24F  = do {r <- newIORef (V4 z2 z2 z2 z2);             return $! (GLUniform t r, SM24F $!  writeIORef r)}
-mkUniformSetter t@M32F  = do {r <- newIORef (V2 z3 z3);                   return $! (GLUniform t r, SM32F $!  writeIORef r)}
-mkUniformSetter t@M33F  = do {r <- newIORef (V3 z3 z3 z3);                return $! (GLUniform t r, SM33F $!  writeIORef r)}
-mkUniformSetter t@M34F  = do {r <- newIORef (V4 z3 z3 z3 z3);             return $! (GLUniform t r, SM34F $!  writeIORef r)}
-mkUniformSetter t@M42F  = do {r <- newIORef (V2 z4 z4);                   return $! (GLUniform t r, SM42F $!  writeIORef r)}
-mkUniformSetter t@M43F  = do {r <- newIORef (V3 z4 z4 z4);                return $! (GLUniform t r, SM43F $!  writeIORef r)}
-mkUniformSetter t@M44F  = do {r <- newIORef (V4 z4 z4 z4 z4);             return $! (GLUniform t r, SM44F $!  writeIORef r)}
-mkUniformSetter t@FTexture2D = do {r <- newIORef (TextureData 0);         return $! (GLUniform t r, SFTexture2D $! writeIORef r)}
+mkUniformSetter :: InputType -> IO (MetalUniform, InputSetter) --GLUniform
+mkUniformSetter t@Bool  = do {r <- newIORef 0;                            return $! (MetalUniform t r, SBool  $!  writeIORef r . b2w)}
+mkUniformSetter t@V2B   = do {r <- newIORef (V2 0 0);                     return $! (MetalUniform t r, SV2B   $!  writeIORef r . fmap b2w)}
+mkUniformSetter t@V3B   = do {r <- newIORef (V3 0 0 0);                   return $! (MetalUniform t r, SV3B   $!  writeIORef r . fmap b2w)}
+mkUniformSetter t@V4B   = do {r <- newIORef (V4 0 0 0 0);                 return $! (MetalUniform t r, SV4B   $!  writeIORef r . fmap b2w)}
+mkUniformSetter t@Word  = do {r <- newIORef 0;                            return $! (MetalUniform t r, SWord  $!  writeIORef r)}
+mkUniformSetter t@V2U   = do {r <- newIORef (V2 0 0);                     return $! (MetalUniform t r, SV2U   $!  writeIORef r)}
+mkUniformSetter t@V3U   = do {r <- newIORef (V3 0 0 0);                   return $! (MetalUniform t r, SV3U   $!  writeIORef r)}
+mkUniformSetter t@V4U   = do {r <- newIORef (V4 0 0 0 0);                 return $! (MetalUniform t r, SV4U   $!  writeIORef r)}
+mkUniformSetter t@Int   = do {r <- newIORef 0;                            return $! (MetalUniform t r, SInt   $!  writeIORef r)}
+mkUniformSetter t@V2I   = do {r <- newIORef (V2 0 0);                     return $! (MetalUniform t r, SV2I   $!  writeIORef r)}
+mkUniformSetter t@V3I   = do {r <- newIORef (V3 0 0 0);                   return $! (MetalUniform t r, SV3I   $!  writeIORef r)}
+mkUniformSetter t@V4I   = do {r <- newIORef (V4 0 0 0 0);                 return $! (MetalUniform t r, SV4I   $!  writeIORef r)}
+mkUniformSetter t@Float = do {r <- newIORef 0;                            return $! (MetalUniform t r, SFloat $!  writeIORef r)}
+mkUniformSetter t@V2F   = do {r <- newIORef (V2 0 0);                     return $! (MetalUniform t r, SV2F   $!  writeIORef r)}
+mkUniformSetter t@V3F   = do {r <- newIORef (V3 0 0 0);                   return $! (MetalUniform t r, SV3F   $!  writeIORef r)}
+mkUniformSetter t@V4F   = do {r <- newIORef (V4 0 0 0 0);                 return $! (MetalUniform t r, SV4F   $!  writeIORef r)}
+mkUniformSetter t@M22F  = do {r <- newIORef (V2 z2 z2);                   return $! (MetalUniform t r, SM22F  $!  writeIORef r)}
+mkUniformSetter t@M23F  = do {r <- newIORef (V3 z2 z2 z2);                return $! (MetalUniform t r, SM23F  $!  writeIORef r)}
+mkUniformSetter t@M24F  = do {r <- newIORef (V4 z2 z2 z2 z2);             return $! (MetalUniform t r, SM24F  $!  writeIORef r)}
+mkUniformSetter t@M32F  = do {r <- newIORef (V2 z3 z3);                   return $! (MetalUniform t r, SM32F  $!  writeIORef r)}
+mkUniformSetter t@M33F  = do {r <- newIORef (V3 z3 z3 z3);                return $! (MetalUniform t r, SM33F  $!  writeIORef r)}
+mkUniformSetter t@M34F  = do {r <- newIORef (V4 z3 z3 z3 z3);             return $! (MetalUniform t r, SM34F  $!  writeIORef r)}
+mkUniformSetter t@M42F  = do {r <- newIORef (V2 z4 z4);                   return $! (MetalUniform t r, SM42F  $!  writeIORef r)}
+mkUniformSetter t@M43F  = do {r <- newIORef (V3 z4 z4 z4);                return $! (MetalUniform t r, SM43F  $!  writeIORef r)}
+mkUniformSetter t@M44F  = do {r <- newIORef (V4 z4 z4 z4 z4);             return $! (MetalUniform t r, SM44F  $!  writeIORef r)}
+mkUniformSetter t@FTexture2D = do {r <- newIORef (TextureData 0);         return $! (MetalUniform t r, SFTexture2D $! writeIORef r)}
 
 -- sets value based uniforms only (does not handle textures)
 setUniform :: Storable a => GLint -> InputType -> IORef a -> IO ()

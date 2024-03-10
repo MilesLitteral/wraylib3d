@@ -38,7 +38,7 @@ type MetalUniformName = ByteString
 data Buffer -- internal type
     = Buffer
     { bufArrays :: Vector ArrayDesc
-    , bufGLObj  :: GLuint
+    , bufGLObj  :: MBuiltin
     }
     deriving (Show,Eq)
 
@@ -88,12 +88,12 @@ data MetalStorage
     = MetalStorage
     { schema        :: PipelineSchema
     , slotMap       :: Map String SlotName
-    , slotVector    :: Vector (IORef GLSlot)
+    , slotVector    :: Vector (IORef MetalSlot)
     , objSeed       :: IORef Int
-    , uniformSetter :: Map GLUniformName InputSetter
-    , uniformSetup  :: Map String GLUniform
-    , screenSize    :: IORef (Word,Word)
-    , pipelines     :: IORef (Vector (Maybe GLRenderer)) -- attached pipelines
+    , uniformSetter :: Map MetalUniformName InputSetter
+    , uniformSetup  :: Map String MetalUniform
+    , screenSize    :: IORef (Word, Word)
+    , pipelines     :: IORef (Vector (Maybe MetalRenderer)) -- attached pipelines
     }
 
 data Object -- internal type
@@ -102,12 +102,12 @@ data Object -- internal type
     , objPrimitive  :: Primitive
     , objIndices    :: Maybe (IndexStream Buffer)
     , objAttributes :: Map String (Stream Buffer)
-    , objUniSetter  :: Map GLUniformName InputSetter
-    , objUniSetup   :: Map String GLUniform
+    , objUniSetter  :: Map MetalUniformName InputSetter
+    , objUniSetup   :: Map String MetalUniform
     , objOrder      :: IORef Int
     , objEnabled    :: IORef Bool
     , objId         :: Int
-    , objCommands   :: IORef (Vector (Vector [GLObjectCommand]))  -- pipeline id, program name, commands
+    , objCommands   :: IORef (Vector (Vector [MetalObjectCommand]))  -- pipeline id, program name, commands
     }
 
 --------------
@@ -116,31 +116,31 @@ data Object -- internal type
 
 data MetalProgram
     = MetalProgram
-    { shaderObjects         :: [GLuint]
-    , programObject         :: GLuint
-    , inputUniforms         :: Map String GLint
-    , inputTextures         :: Map String GLint   -- all input textures (render texture + uniform texture)
-    , inputTextureUniforms  :: Set String
-    , inputStreams          :: Map String (GLuint,String)
+    { shaderObjects         :: [MBuiltin] -- Vertex and Fragment Shaders
+    , programObject         :: MBuiltin   -- The
+    , inputUniforms         :: Map String MBuiltin
+    , inputTextures         :: Map String MBuiltin   -- all input textures (MTLTexture)
+    , inputMeshes           :: Map String MBuiltin 
+    , inputStreams          :: Map String (Int, String)
     }
 
 data MetalTexture
     = MetalTexture
-    { glTextureObject   :: GLuint
-    , glTextureTarget   :: GLenum
+    { mtlTextureObject   :: MBuiltin
+    , mtlTextureTarget   :: Device
     } deriving Eq
 
 data InputConnection
     = InputConnection
     { icId                      :: Int              -- identifier (vector index) for attached pipeline
-    , icInput                   :: GLStorage
+    , icInput                   :: MetalStorage
     , icSlotMapPipelineToInput  :: Vector SlotName  -- GLRenderer to GLStorage slot name mapping
     , icSlotMapInputToPipeline  :: Vector (Maybe SlotName)  -- GLStorage to GLRenderer slot name mapping
     }
 
 data MetalStream
     = MetalStream
-    { glStreamCommands    :: IORef [GLObjectCommand]
+    { glStreamCommands    :: IORef [MetalObjectCommand]
     , glStreamPrimitive   :: Primitive
     , glStreamAttributes  :: Map String (Stream Buffer)
     , glStreamProgram     :: ProgramName
@@ -148,32 +148,32 @@ data MetalStream
 
 data MetalRenderer
     = MetalRenderer
-    { glPrograms        :: Vector GLProgram
-    , glTextures        :: Vector GLTexture
-    , glSamplers        :: Vector GLSampler
-    , glTargets         :: Vector GLRenderTarget
-    , glCommands        :: [GLCommand]
+    { mtlLibraries      :: Vector MTLIB
+    , mtlTextures       :: Vector MetalTexture
+    , mtlSamplers       :: Vector MetalSampler
+    , mtlTargets         :: Vector MetalRenderTarget
+    , mtlCommands        :: [MetalCommand]
     , glSlotPrograms    :: Vector [ProgramName] -- programs depend on a slot
     , glInput           :: IORef (Maybe InputConnection)
     , glSlotNames       :: Vector String
-    , glVAO             :: GLuint
+    , glVAO             :: MBuiltin
     , glTexUnitMapping  :: Map String (IORef GLint)   -- maps texture uniforms to texture units
-    , glStreams         :: Vector GLStream
+    , glStreams         :: Vector MetalStream
     , glDrawContextRef  :: IORef GLDrawContext
     , glForceSetup      :: IORef Bool
-    , glVertexBufferRef :: IORef GLuint
-    , glIndexBufferRef  :: IORef GLuint
+    , glVertexBufferRef :: IORef MBuiltin
+    , glIndexBufferRef  :: IORef MBuiltin
     , glDrawCallCounterRef :: IORef Int
     }
 
 data MetalSampler
     = MetalSampler
-    { glSamplerObject :: GLuint
+    { glSamplerObject :: UInt
     } deriving Eq
 
 data MetalRenderTarget
     = MetalRenderTarget
-    { framebufferObject         :: GLuint
+    { framebufferObject         :: UInt
     , framebufferDrawbuffers    :: Maybe [GLenum]
     } deriving Eq
 
@@ -193,29 +193,28 @@ data MetalDrawContext
   = MetalDrawContext
   { glRasterContext         :: !RasterContext
   , glAccumulationContext   :: !AccumulationContext
-  , glRenderTarget          :: !GLRenderTarget
-  , glProgram               :: !GLuint
+  , glRenderTarget          :: !MetalRenderTarget
+  , glProgram               :: !UInt
   , glTextureMapping        :: ![(GLTextureUnit, MetalTexture)]
   , glSamplerMapping        :: ![(GLTextureUnit, GLSampler)]
   , glSamplerUniformMapping :: ![(GLTextureUnit, GLSamplerUniform)]
   }
 
 data MetalCommand
-  = MetalRenderSlot          !GLDrawContext !SlotName !ProgramName
-  | MetalRenderStream        !GLDrawContext !StreamName !ProgramName
-  | MetalClearRenderTarget   !GLRenderTarget ![ClearImage]
+  = MetalRenderSlot          !Device !SlotName !ProgramName
+  | MetalRenderStream        !Device !StreamName !ProgramName
+  | MetalClearRenderTarget   !MetalRenderTarget ![ClearImage]
 
-instance Show (IORef GLint) where
-    show _ = "(IORef GLint)"
-
+instance Show (IORef MBuiltin) where
+    show _ = "(IORef MBuiltin)"
+CommandQueue
 data MetalObjectCommand
-    = MetalSetUniform              !GLint !GLUniform
-    | MetalBindTexture             !GLenum !(IORef GLint) !GLUniform               -- binds the texture from the gluniform to the specified texture unit and target
-    | MetalSetVertexAttribArray    !GLuint !GLuint !GLint !GLenum !(Ptr ())        -- index buffer size type pointer
-    | MetalSetVertexAttribIArray   !GLuint !GLuint !GLint !GLenum !(Ptr ())        -- index buffer size type pointer
-    | MetalSetVertexAttrib         !GLuint !(Stream Buffer)                        -- index value
-    | MetalDrawArrays              !GLenum !GLint !GLsizei                         -- mode first count
-    | MetalDrawElements            !GLenum !GLsizei !GLenum !GLuint !(Ptr ())      -- mode count type buffer indicesPtr
+    = MetalSetCommandQueue         !MBuiltin !MBuiltin
+    | MetalBindTexture             !Device !(IORef MBuiltin) !MetalUniform               -- binds the texture from the gluniform to the specified texture unit and target
+    | MetalSetVertexArray          !MBuiltin !MBuiltin !MBuiltin !Device !(Ptr ())        -- index buffer size type pointer
+    | MetalSetVertexAttrib         !MBuiltin !(MBuiltin Buffer)                        -- index value
+    | MetalDrawArrays              !Device !MBuiltin !MetalSizeN                         -- mode first count
+    | MetalDrawElements            !Device !MetalSizeN !MBuiltin !(Ptr ())      -- mode count type buffer indicesPtr
     deriving Show
 
 type SetterFun a = a -> IO ()
@@ -359,7 +358,7 @@ data IndexStream b
 
 newtype TextureData
     = TextureData
-    { textureObject :: GLuint
+    { textureObject :: UInt
     }
     deriving Storable
 
@@ -374,7 +373,7 @@ data Primitive
     | TriangleListAdjacency
     | LineStripAdjacency
     | LineListAdjacency
-    deriving (Eq,Ord,Bounded,Enum,Show)
+    deriving (Eq, Ord, Bounded, Enum, Show)
 
 type StreamSetter = Stream Buffer -> IO ()
 

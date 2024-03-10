@@ -34,6 +34,84 @@ import LambdaCube.DirectX.Type
 import LambdaCube.DirectX.Input
 import LambdaCube.DirectX.Util
 
+
+data CGState
+  = CGState
+  { drawCommands          :: [DXCommand]
+  -- draw context data
+  , rasterContext         :: RasterContext
+  , accumulationContext   :: AccumulationContext
+  , renderTarget          :: DX11RenderTarget -- GLRenderTarget
+  , currentProgram        :: ProgramName
+  , samplerUniformMapping :: IntMap GLSamplerUniform
+  , textureMapping        :: IntMap DX11Texture -- GLTexture 
+  , samplerMapping        :: IntMap GLSampler
+  }
+
+initCGState = CGState
+  { drawCommands          = mempty
+  -- draw context data
+  , rasterContext         = error "compileCommand: missing RasterContext"
+  , accumulationContext   = error "compileCommand: missing AccumulationContext"
+  , renderTarget          = error "compileCommand: missing RenderTarget"
+  , currentProgram        = error "compileCommand: missing Program"
+  , samplerUniformMapping = mempty
+  , textureMapping        = mempty
+  , samplerMapping        = mempty
+  }
+
+type CG a = State CGState a
+
+emit :: GLCommand -> CG ()
+emit cmd = modify $ \s -> s {drawCommands = cmd : drawCommands s}
+
+drawContext programs = do
+  GLProgram{..} <- (programs !) <$> gets currentProgram
+  let f = take (Map.size inputTextures) . IntMap.toList
+  GLDrawContext <$> gets rasterContext
+                <*> gets accumulationContext
+                <*> gets renderTarget
+                <*> pure programObject
+                <*> gets (f . textureMapping)
+                <*> gets (f . samplerMapping)
+                <*> gets (f . samplerUniformMapping)
+
+compileCommand :: Map String (IORef GLint) -> Vector GLSampler -> Vector GLTexture -> Vector GLRenderTarget -> Vector GLProgram -> Command -> CG ()
+compileCommand texUnitMap samplers textures targets programs cmd = case cmd of
+    SetRasterContext rCtx       -> modify $ \s -> s {rasterContext = rCtx}
+    SetAccumulationContext aCtx -> modify $ \s -> s {accumulationContext = aCtx}
+    SetRenderTarget rt          -> modify $ \s -> s {renderTarget = targets ! rt}
+    SetProgram p                -> modify $ \s -> s {currentProgram = p}
+    SetSamplerUniform n tu      -> do
+                                    p <- currentProgram <$> get
+                                    case Map.lookup n (inputTextures $ programs ! p) of
+                                        Nothing -> return () -- TODO: some drivers does heavy cross stage (vertex/fragment) dead code elimination; fail $ "internal error (SetSamplerUniform)! - " ++ show cmd
+                                        Just i  -> case Map.lookup n texUnitMap of
+                                            Nothing -> error  $ "internal error (SetSamplerUniform - IORef)! - " ++ show cmd
+                                            Just r  -> modify $ \s -> s {samplerUniformMapping = IntMap.insert tu (GLSamplerUniform i r) $ samplerUniformMapping s}
+    SetTexture tu t             -> modify $ \s -> s {textureMapping = IntMap.insert tu (textures ! t) $ textureMapping s}
+    SetSampler tu i             -> modify $ \s -> s {samplerMapping = IntMap.insert tu (maybe (GLSampler 0) (samplers !) i) $ samplerMapping s}
+
+    -- draw commands
+    RenderSlot slot             -> do
+                                    p <- gets currentProgram
+                                    ctx <- drawContext programs
+                                    emit $ GLRenderSlot ctx slot p
+    RenderStream stream         -> do
+                                    p <- gets currentProgram
+                                    ctx <- drawContext programs
+                                    emit $ GLRenderStream ctx stream p
+    ClearRenderTarget vals      -> do
+                                    rt <- gets renderTarget
+                                    emit $ GLClearRenderTarget rt $ V.toList vals
+{-
+    GenerateMipMap tu           -> do
+                                    tb <- textureBinding <$> get
+                                    case IM.lookup tu tb of
+                                        Nothing     -> fail "internal error (GenerateMipMap)!"
+                                        Just tex    -> return $ GLGenerateMipMap (GL_TEXTURE0 + fromIntegral tu) (glTextureTarget tex)
+-}
+
 setupRasterContext :: RasterContext -> IO ()
 setupRasterContext = cvt
   where
@@ -192,10 +270,10 @@ clearRenderTarget values = do
     glClear $ fromIntegral mask
 
 
-printGLStatus = checkGL >>= print
+printGLStatus  = checkGL >>= print
 printFBOStatus = checkFBO >>= print
 
-compileProgram :: Program -> IO GLProgram
+compileProgram :: Program -> IO DXProgram --GLProgram
 compileProgram p = do
     po <- glCreateProgram
     --putStrLn $ "compile program: " ++ show po
@@ -808,80 +886,3 @@ renderFrame GLRenderer{..} = do
         --isOk <- checkGL
         --putStrLn $ isOk ++ " - " ++ show cmd
     --readIORef glDrawCallCounterRef >>= \n -> putStrLn (show n ++ " draw calls")
-
-data CGState
-  = CGState
-  { drawCommands          :: [GLCommand]
-  -- draw context data
-  , rasterContext         :: RasterContext
-  , accumulationContext   :: AccumulationContext
-  , renderTarget          :: GLRenderTarget
-  , currentProgram        :: ProgramName
-  , samplerUniformMapping :: IntMap GLSamplerUniform
-  , textureMapping        :: IntMap GLTexture
-  , samplerMapping        :: IntMap GLSampler
-  }
-
-initCGState = CGState
-  { drawCommands          = mempty
-  -- draw context data
-  , rasterContext         = error "compileCommand: missing RasterContext"
-  , accumulationContext   = error "compileCommand: missing AccumulationContext"
-  , renderTarget          = error "compileCommand: missing RenderTarget"
-  , currentProgram        = error "compileCommand: missing Program"
-  , samplerUniformMapping = mempty
-  , textureMapping        = mempty
-  , samplerMapping        = mempty
-  }
-
-type CG a = State CGState a
-
-emit :: GLCommand -> CG ()
-emit cmd = modify $ \s -> s {drawCommands = cmd : drawCommands s}
-
-drawContext programs = do
-  GLProgram{..} <- (programs !) <$> gets currentProgram
-  let f = take (Map.size inputTextures) . IntMap.toList
-  GLDrawContext <$> gets rasterContext
-                <*> gets accumulationContext
-                <*> gets renderTarget
-                <*> pure programObject
-                <*> gets (f . textureMapping)
-                <*> gets (f . samplerMapping)
-                <*> gets (f . samplerUniformMapping)
-
-compileCommand :: Map String (IORef GLint) -> Vector GLSampler -> Vector GLTexture -> Vector GLRenderTarget -> Vector GLProgram -> Command -> CG ()
-compileCommand texUnitMap samplers textures targets programs cmd = case cmd of
-    SetRasterContext rCtx       -> modify $ \s -> s {rasterContext = rCtx}
-    SetAccumulationContext aCtx -> modify $ \s -> s {accumulationContext = aCtx}
-    SetRenderTarget rt          -> modify $ \s -> s {renderTarget = targets ! rt}
-    SetProgram p                -> modify $ \s -> s {currentProgram = p}
-    SetSamplerUniform n tu      -> do
-                                    p <- currentProgram <$> get
-                                    case Map.lookup n (inputTextures $ programs ! p) of
-                                        Nothing -> return () -- TODO: some drivers does heavy cross stage (vertex/fragment) dead code elimination; fail $ "internal error (SetSamplerUniform)! - " ++ show cmd
-                                        Just i  -> case Map.lookup n texUnitMap of
-                                            Nothing -> error  $ "internal error (SetSamplerUniform - IORef)! - " ++ show cmd
-                                            Just r  -> modify $ \s -> s {samplerUniformMapping = IntMap.insert tu (GLSamplerUniform i r) $ samplerUniformMapping s}
-    SetTexture tu t             -> modify $ \s -> s {textureMapping = IntMap.insert tu (textures ! t) $ textureMapping s}
-    SetSampler tu i             -> modify $ \s -> s {samplerMapping = IntMap.insert tu (maybe (GLSampler 0) (samplers !) i) $ samplerMapping s}
-
-    -- draw commands
-    RenderSlot slot             -> do
-                                    p <- gets currentProgram
-                                    ctx <- drawContext programs
-                                    emit $ GLRenderSlot ctx slot p
-    RenderStream stream         -> do
-                                    p <- gets currentProgram
-                                    ctx <- drawContext programs
-                                    emit $ GLRenderStream ctx stream p
-    ClearRenderTarget vals      -> do
-                                    rt <- gets renderTarget
-                                    emit $ GLClearRenderTarget rt $ V.toList vals
-{-
-    GenerateMipMap tu           -> do
-                                    tb <- textureBinding <$> get
-                                    case IM.lookup tu tb of
-                                        Nothing     -> fail "internal error (GenerateMipMap)!"
-                                        Just tex    -> return $ GLGenerateMipMap (GL_TEXTURE0 + fromIntegral tu) (glTextureTarget tex)
--}

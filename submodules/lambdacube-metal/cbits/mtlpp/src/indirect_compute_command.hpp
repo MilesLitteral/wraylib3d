@@ -1,7 +1,7 @@
 #include "ns.hpp"
 
 namespace mtlpp {
-    class mtlpp::IndirectComputeCommand : ns::Object {
+    class IndirectComputeCommand : ns::Object {
         //Overview
         //Don’t implement this protocol; you get objects of this type by asking a MTLIndirectCommandBuffer for them.
         //Use this object to reset or encode a command. You must always reset a command before encoding a new command.

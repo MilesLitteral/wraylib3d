@@ -5,7 +5,8 @@
 
 namespace mtlpp
 {
-    class IndirectCommandBuffer : public ns::Object
+    //To create an indirect command buffer, first create a MTLIndirectCommandBufferDescriptor object and configure the descriptor’s properties. Then call makeIndirectCommandBuffer(descriptor:maxCommandCount:options:) on a MTLDevice object to create the indirect command buffer.
+    class IndirectCommandBuffer : public mtlpp::Resource
     {
         public:
             IndirectCommandBuffer();
@@ -14,7 +15,8 @@ namespace mtlpp
             // Determining the Maximum Number of Commands
             int size;
             ns::String label;
-            
+            mtlpp::Buffer contents;
+
             // The number of commands contained in the indirect command buffer. Required.
             mtlpp::ResourceID gpuResourceID; // Instance Variable Required.    
 

@@ -97,9 +97,9 @@ addObject input slotName prim indices attribs uniformNames = do
             Nothing -> error $ "internal error (slot index): " ++ show slotName
             Just i  -> i
         seed = objSeed input
-    order <- newIORef 0
+    order   <- newIORef 0
     enabled <- newIORef True
-    index <- readIORef seed
+    index   <- readIORef seed
     modifyIORef seed (1+)
     (setters,unis) <- mkUniform [(n,t) | n <- uniformNames, let t = fromMaybe (error $ "missing uniform: " ++ n) $ Map.lookup n (uniforms sch)]
     cmdsRef <- newIORef (V.singleton V.empty)
@@ -183,7 +183,7 @@ sortSlotObjects p = V.forM_ (slotVector p) $ \slotRef -> do
                 return (ord,obj)
             doSort objs
 
-createObjectCommands :: Map String (IORef GLint) -> Map String GLUniform -> Object -> GLProgram -> [GLObjectCommand]
+createObjectCommands :: Map String (IORef GLint) -> Map String GLUniform -> Object -> MTLProgram -> [MetalObjectCommand] --GLProgram --GLObjectCommand
 createObjectCommands texUnitMap topUnis obj prg = objUniCmds ++ objStreamCmds ++ [objDrawCmd]
   where
     -- object draw command

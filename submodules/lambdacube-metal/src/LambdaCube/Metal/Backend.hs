@@ -223,7 +223,21 @@ clearRenderTarget values = do
 printGLStatus = checkGL >>= print
 printFBOStatus = checkFBO >>= print
 
-compileProgram :: Program -> IO GLProgram
+compileLibrary :: Program -> IO MTLIB
+compileLibrary = undefined 
+{-
+do
+    po <- glCreateProgram
+    --putStrLn $ "compile program: " ++ show po
+    let createAndAttach src t = do
+            o <- glCreateShader t
+            compileShader o [src]
+            glAttachShader po o
+            --putStr "    + compile shader source: " >> printGLStatus
+            return o
+-}
+
+compileProgram :: Program -> IO MTLProgram
 compileProgram p = do
     po <- glCreateProgram
     --putStrLn $ "compile program: " ++ show po
@@ -239,9 +253,7 @@ compileProgram p = do
         Just s  -> [createAndAttach s GL_GEOMETRY_SHADER]
 
     forM_ (zip (V.toList $ programOutput p) [0..]) $ \(Parameter n t,i) -> withCString n $ \pn -> do
-        --putStrLn ("variable " ++ show n ++ " attached to color number #" ++ show i)
         glBindFragDataLocation po i $ castPtr pn
-    --putStr "    + setup shader output mapping: " >> printGLStatus
 
     glLinkProgram po
     log <- printProgramLog po
@@ -251,10 +263,8 @@ compileProgram p = do
     when (status /= fromIntegral GL_TRUE) $ fail $ unlines ["link program failed:",log]
 
     -- check program input
-    (uniforms,uniformsType) <- queryUniforms po
+    (uniforms,uniformsType)     <- queryUniforms po
     (attributes,attributesType) <- queryStreams po
-    --print uniforms
-    --print attributes
     let lcUniforms = (programUniforms p) `Map.union` (programInTextures p)
         lcStreams = fmap ty (programStreams p)
         check a m = and $ map go $ Map.toList m
@@ -273,34 +283,12 @@ compileProgram p = do
         inTextureNames = programInTextures p
         inTextures = L.filter (\(n,v) -> Map.member n inTextureNames) $ Map.toList $ uniforms
         texUnis = [n | (n,_) <- inTextures, Map.member n (programUniforms p)]
-    let prgInTextures = Map.keys inTextureNames
+        prgInTextures = Map.keys inTextureNames
         uniInTextures = map fst inTextures
-    {-
-    unless (S.fromList prgInTextures == S.fromList uniInTextures) $ fail $ unlines
-      [ "shader program uniform texture input mismatch!"
-      , "expected: " ++ show prgInTextures
-      , "actual: " ++ show uniInTextures
-      , "vertex shader:"
-      , vertexShader p
-      , "geometry shader:"
-      , fromMaybe "" (geometryShader p)
-      , "fragment shader:"
-      , fragmentShader p
-      ]
-    -}
-    --putStrLn $ "uniTrie: " ++ show (Map.keys uniTrie)
-    --putStrLn $ "inUniNames: " ++ show inUniNames
-    --putStrLn $ "inUniforms: " ++ show inUniforms
-    --putStrLn $ "inTextureNames: " ++ show inTextureNames
-    --putStrLn $ "inTextures: " ++ show inTextures
-    --putStrLn $ "texUnis: " ++ show texUnis
-    let valA = Map.toList $ attributes
+        valA = Map.toList $ attributes
         valB = Map.toList $ programStreams p
-    --putStrLn "------------"
-    --print $ Map.toList $ attributes
-    --print $ Map.toList $ programStreams p
-    let lcStreamName = fmap name (programStreams p)
-    return $ GLProgram
+        lcStreamName = fmap name (programStreams p)
+    return $ MTLProgram
         { shaderObjects         = objs
         , programObject         = po
         , inputUniforms         = Map.fromList inUniforms
@@ -329,31 +317,14 @@ compileRenderTarget texs glTexs (RenderTarget targets) = do
             when (any isFB images) $ fail "internal error (compileRenderTarget)!"
             fbo <- alloca $! \pbo -> glGenFramebuffers 1 pbo >> peek pbo
             glBindFramebuffer GL_DRAW_FRAMEBUFFER fbo
-            {-
-                void glFramebufferTexture1D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
-                    GL_TEXTURE_1D
-                void glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
-                    GL_TEXTURE_2D
-                    GL_TEXTURE_RECTANGLE
-                    GL_TEXTURE_CUBE_MAP_POSITIVE_X
-                    GL_TEXTURE_CUBE_MAP_POSITIVE_Y
-                    GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-                    GL_TEXTURE_CUBE_MAP_NEGATIVE_X
-                    GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
-                    GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
-                    GL_TEXTURE_2D_MULTISAMPLE
-                void glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer);
-                void glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
-                void glFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level);
-            -}
             let attach attachment (TextureImage texIdx level (Just layer)) =
                     glFramebufferTextureLayer GL_DRAW_FRAMEBUFFER attachment (glTextureTarget $ glTexs ! texIdx) (fromIntegral level) (fromIntegral layer)
                 attach attachment (TextureImage texIdx level Nothing) = do
-                    let glTex = glTexs ! texIdx
-                        tex = texs ! texIdx
-                        txLevel = fromIntegral level
+                    let glTex    = glTexs ! texIdx
+                        tex      = texs ! texIdx
+                        txLevel  = fromIntegral level
                         txTarget = glTextureTarget glTex
-                        txObj = glTextureObject glTex
+                        txObj    = glTextureObject glTex
                         attachArray = glFramebufferTexture GL_DRAW_FRAMEBUFFER attachment txObj txLevel
                         attach2D    = glFramebufferTexture2D GL_DRAW_FRAMEBUFFER attachment txTarget txObj txLevel
                     case textureType tex of
@@ -390,7 +361,7 @@ compileRenderTarget texs glTexs (RenderTarget targets) = do
                 , framebufferDrawbuffers    = Nothing
                 }
 
-compileStreamData :: StreamData -> IO GLStream
+compileStreamData :: StreamData -> IO MetalStream --GLStream
 compileStreamData s = do
   let withV w a f = w a (\p -> f $ castPtr p)
   let compileAttr (VFloatArray v) = Array ArrFloat (V.length v) (withV (SV.unsafeWith . V.convert) v)
@@ -453,7 +424,7 @@ compileStreamData s = do
     , glStreamProgram     = V.head $ streamPrograms s
     }
 
-createStreamCommands :: Map String (IORef GLint) -> Map String GLUniform -> Map String (Stream Buffer) -> Primitive -> GLProgram -> [GLObjectCommand]
+createStreamCommands :: Map String (IORef GLint) -> Map String GLUniform -> Map String (Stream Buffer) -> Primitive -> MTLProgram -> [MetalObjectCommand] --GLProgram -> [GLObjectCommand]
 createStreamCommands texUnitMap topUnis attrs primitive prg = streamUniCmds ++ streamCmds ++ [drawCmd]
   where
     -- object draw command
@@ -566,46 +537,11 @@ disposeRenderer p = do
     withArray (map glSamplerObject $ V.toList samplers) $ (glDeleteSamplers . fromIntegral . V.length $ glSamplers p)
     with (glVAO p) $ (glDeleteVertexArrays 1)
 
-{-
-data ObjectArraySchema
-    = ObjectArraySchema
-    { primitive     :: FetchPrimitive
-    , attributes    :: Trie StreamType
-    }
-    deriving Show
-
-data PipelineSchema
-    = PipelineSchema
-    { objectArrays  :: Trie ObjectArraySchema
-    , uniforms      :: Trie InputType
-    }
-    deriving Show
--}
-
 isSubTrie :: (a -> a -> Bool) -> Map String a -> Map String a -> Bool
 isSubTrie eqFun universe subset = and [isMember a (Map.lookup n universe) | (n,a) <- Map.toList subset]
   where
     isMember a Nothing  = False
     isMember a (Just b) = eqFun a b
--- TODO: if there is a mismatch thow detailed error message in the excoeption, containing the missing attributes and uniforms
-{-
-    let sch = schema input
-    forM_ uniformNames $ \n -> case Map.lookup n (uniforms sch) of
-        Nothing -> throw $ userError $ "Unknown uniform: " ++ show n
-        _ -> return ()
-    case Map.lookup slotName (objectArrays sch) of
-        Nothing -> throw $ userError $ "Unknown slot: " ++ show slotName
-        Just (ObjectArraySchema sPrim sAttrs) -> do
-            when (sPrim /= (primitiveToFetchPrimitive prim)) $ throw $ userError $
-                "Primitive mismatch for slot (" ++ show slotName ++ ") expected " ++ show sPrim  ++ " but got " ++ show prim
-            let sType = fmap streamToStreamType attribs
-            when (sType /= sAttrs) $ throw $ userError $ unlines $ 
-                [ "Attribute stream mismatch for slot (" ++ show slotName ++ ") expected "
-                , show sAttrs
-                , " but got "
-                , show sType
-                ]
--}
 
 setStorage :: MetalRenderer -> MetalStorage -> IO (Maybe String)
 setStorage p input' = setStorage' p (Just input')
@@ -720,7 +656,7 @@ setStorage' p@GLRenderer{..} input' = do
     buffer binding on various targets: GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER
     glEnable/DisableVertexAttribArray
 -}
-renderSlot :: IORef Int -> IORef GLuint -> IORef GLuint -> [GLObjectCommand] -> IO ()
+renderSlot :: IORef Int -> IORef GLuint -> IORef GLuint -> [MetalObjectCommand] -> IO () --GLObjectCommand
 renderSlot glDrawCallCounterRef glVertexBufferRef glIndexBufferRef cmds = forM_ cmds $ \cmd -> do
     let setup ref v m = do
           old <- readIORef ref
@@ -805,8 +741,8 @@ setupDrawContext glForceSetup glDrawContextRef glInput new = do
     glUniform1i glUniformBinding (fromIntegral textureUnit)
     writeIORef glUniformBindingRef (fromIntegral textureUnit)
 
-renderFrame :: GLRenderer -> IO ()
-renderFrame GLRenderer{..} = do
+renderFrame :: MetalRenderer -> IO () --GLRenderer
+renderFrame MetalRenderer{..} = do
     writeIORef glForceSetup True
     writeIORef glVertexBufferRef 0
     writeIORef glIndexBufferRef 0
@@ -846,7 +782,7 @@ renderFrame GLRenderer{..} = do
         --putStrLn $ isOk ++ " - " ++ show cmd
     --readIORef glDrawCallCounterRef >>= \n -> putStrLn (show n ++ " draw calls")
 
-emit :: GLCommand -> CG ()
+emit :: MetalCommand -> CG ()
 emit cmd = modify $ \s -> s {drawCommands = cmd : drawCommands s}
 
 drawContext programs = do
@@ -860,7 +796,7 @@ drawContext programs = do
                 <*> gets (f . samplerMapping)
                 <*> gets (f . samplerUniformMapping)
 
-compileCommand :: Map String (IORef GLint) -> Vector GLSampler -> Vector GLTexture -> Vector GLRenderTarget -> Vector GLProgram -> Command -> CG ()
+compileCommand :: Map String (IORef GLint) -> Vector MetalSampler -> Vector MetalTexture -> Vector MetalRenderTarget -> Vector MTLProgram -> Command -> CG () --GLSampler --GLTexture --GLRenderTarget
 compileCommand texUnitMap samplers textures targets programs cmd = case cmd of
     SetRasterContext rCtx       -> modify $ \s -> s {rasterContext = rCtx}
     SetAccumulationContext aCtx -> modify $ \s -> s {accumulationContext = aCtx}
