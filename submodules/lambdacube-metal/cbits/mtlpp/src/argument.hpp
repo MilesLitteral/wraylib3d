@@ -141,10 +141,10 @@ namespace mtlpp
         ArrayType(const ns::Handle& handle) : ns::Object(handle) { }
 
         uint32_t   GetArrayLength() const;
-        DataType   GetElementType() const;
+        mtlpp::DataType   GetElementType() const;
         uint32_t   GetStride() const;
-        StructType GetElementStructType() const;
-        ArrayType  GetElementArrayType() const;
+        mtlpp::StructType GetElementStructType() const;
+        mtlpp::ArrayType  GetElementArrayType() const;
     }
     MTLPP_AVAILABLE(10_11, 8_0);
 
@@ -155,22 +155,22 @@ namespace mtlpp
         Argument(const ns::Handle& handle) : ns::Object(handle) { }
 
         ns::String     GetName() const;
-        ArgumentType   GetType() const;
-        ArgumentAccess GetAccess() const;
+        mtlpp::ArgumentType   GetType() const;
+        mtlpp::ArgumentAccess GetAccess() const;
         uint32_t       GetIndex() const;
 
         bool           IsActive() const;
 
         uint32_t       GetBufferAlignment() const;
         uint32_t       GetBufferDataSize() const;
-        DataType       GetBufferDataType() const;
-        StructType     GetBufferStructType() const;
+        mtlpp::DataType       GetBufferDataType() const;
+        mtlpp::StructType     GetBufferStructType() const;
 
         uint32_t       GetThreadgroupMemoryAlignment() const;
         uint32_t       GetThreadgroupMemoryDataSize() const;
 
-        TextureType    GetTextureType() const;
-        DataType       GetTextureDataType() const;
+        mtlpp::TextureType    GetTextureType() const;
+        mtlpp::DataType       GetTextureDataType() const;
 
         bool           IsDepthTexture() const MTLPP_AVAILABLE(10_12, 10_0);
     }

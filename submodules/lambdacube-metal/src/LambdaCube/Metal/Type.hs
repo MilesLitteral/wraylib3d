@@ -138,12 +138,12 @@ data InputConnection
     , icSlotMapInputToPipeline  :: Vector (Maybe SlotName)  -- GLStorage to GLRenderer slot name mapping
     }
 
-data MetalStream
+data MetalRenderPipeline --MetalStream
     = MetalStream
-    { glStreamCommands    :: IORef [MetalObjectCommand]
-    , glStreamPrimitive   :: Primitive
-    , glStreamAttributes  :: Map String (Stream Buffer)
-    , glStreamProgram     :: ProgramName
+    { mtlStreamCommands    :: IORef [MetalObjectCommand]
+    , mtlStreamPrimitive   :: Primitive
+    , mtlStreamAttributes  :: Map String (Stream Buffer)
+    , mtlStreamProgram     :: ProgramName
     }
 
 data MetalRenderer

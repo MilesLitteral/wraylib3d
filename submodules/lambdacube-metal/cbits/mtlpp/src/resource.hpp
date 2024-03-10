@@ -43,13 +43,13 @@ namespace mtlpp
 
     enum class ResourceOptions
     {
-        CpuCacheModeDefaultCache                                = uint32_t(CpuCacheMode::DefaultCache)  << ResourceCpuCacheModeShift,
-        CpuCacheModeWriteCombined                               = uint32_t(CpuCacheMode::WriteCombined) << ResourceCpuCacheModeShift,
+        CpuCacheModeDefaultCache                                = uint32_t(mtlpp::CpuCacheMode::DefaultCache)  << ResourceCpuCacheModeShift,
+        CpuCacheModeWriteCombined                               = uint32_t(mtlpp::CpuCacheMode::WriteCombined) << ResourceCpuCacheModeShift,
 
-        StorageModeShared           MTLPP_AVAILABLE(10_11, 9_0) = uint32_t(StorageMode::Shared)     << ResourceStorageModeShift,
-        StorageModeManaged          MTLPP_AVAILABLE(10_11, NA)  = uint32_t(StorageMode::Managed)    << ResourceStorageModeShift,
-        StorageModePrivate          MTLPP_AVAILABLE(10_11, 9_0) = uint32_t(StorageMode::Private)    << ResourceStorageModeShift,
-        StorageModeMemoryless       MTLPP_AVAILABLE(NA, 10_0)   = uint32_t(StorageMode::Memoryless) << ResourceStorageModeShift,
+        StorageModeShared           MTLPP_AVAILABLE(10_11, 9_0) = uint32_t(mtlpp::StorageMode::Shared)     << ResourceStorageModeShift,
+        StorageModeManaged          MTLPP_AVAILABLE(10_11, NA)  = uint32_t(mtlpp::StorageMode::Managed)    << ResourceStorageModeShift,
+        StorageModePrivate          MTLPP_AVAILABLE(10_11, 9_0) = uint32_t(mtlpp::StorageMode::Private)    << ResourceStorageModeShift,
+        StorageModeMemoryless       MTLPP_AVAILABLE(NA, 10_0)   = uint32_t(mtlpp::StorageMode::Memoryless) << ResourceStorageModeShift,
 
         HazardTrackingModeUntracked MTLPP_AVAILABLE(NA, 10_0)   = 0x1 << ResourceHazardTrackingModeShift,
 
@@ -65,15 +65,15 @@ namespace mtlpp
         Resource(const ns::Handle& handle) : ns::Object(handle) { }
 
         ns::String   GetLabel() const;
-        CpuCacheMode GetCpuCacheMode() const;
-        StorageMode  GetStorageMode() const MTLPP_AVAILABLE(10_11, 9_0);
-        Heap         GetHeap() const MTLPP_AVAILABLE(NA, 10_0);
+        mtlpp::CpuCacheMode GetCpuCacheMode() const;
+        mtlpp::StorageMode  GetStorageMode() const MTLPP_AVAILABLE(10_11, 9_0);
+        mtlpp::Heap         GetHeap() const MTLPP_AVAILABLE(NA, 10_0);
         bool         IsAliasable() const MTLPP_AVAILABLE(NA, 10_0);
 
         void SetLabel(const ns::String& label);
 
-        PurgeableState SetPurgeableState(PurgeableState state);
+        mtlpp::PurgeableState SetPurgeableState(mtlpp::PurgeableState state);
         void MakeAliasable() const MTLPP_AVAILABLE(NA, 10_0);
-    }
+    };
     MTLPP_AVAILABLE(10_11, 8_0);
 }
