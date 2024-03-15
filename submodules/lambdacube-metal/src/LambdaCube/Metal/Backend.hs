@@ -499,27 +499,27 @@ allocRenderer p = do
     -- default Vertex Array Object
     vao <- alloca $! \pvao -> glGenVertexArrays 1 pvao >> peek pvao
     strs <- V.mapM compileStreamData $ streams p
-    drawContextRef <- newIORef $ error "missing DrawContext"
-    forceSetup <- newIORef True
+    drawContextRef  <- newIORef $ error "missing DrawContext"
+    forceSetup      <- newIORef True
     vertexBufferRef <- newIORef 0
-    indexBufferRef <- newIORef 0
+    indexBufferRef  <- newIORef 0
     drawCallCounterRef <- newIORef 0
     return $ GLRenderer
-        { glPrograms        = prgs
-        , glTextures        = texs
-        , glSamplers        = smps
-        , glTargets         = trgs
-        , glCommands        = reverse $ drawCommands st
-        , glSlotPrograms    = V.map (V.toList . slotPrograms) $ IR.slots p
-        , glInput           = input
-        , glSlotNames       = V.map slotName $ IR.slots p
-        , glVAO             = vao
-        , glTexUnitMapping  = texUnitMapRefs
-        , glStreams         = strs
-        , glDrawContextRef  = drawContextRef
-        , glForceSetup      = forceSetup
-        , glVertexBufferRef = vertexBufferRef
-        , glIndexBufferRef  = indexBufferRef
+        { glPrograms           = prgs
+        , glTextures           = texs
+        , glSamplers           = smps
+        , glTargets            = trgs
+        , glCommands           = reverse $ drawCommands st
+        , glSlotPrograms       = V.map (V.toList . slotPrograms) $ IR.slots p
+        , glInput              = input
+        , glSlotNames          = V.map slotName $ IR.slots p
+        , glVAO                = vao
+        , glTexUnitMapping     = texUnitMapRefs
+        , glStreams            = strs
+        , glDrawContextRef     = drawContextRef
+        , glForceSetup         = forceSetup
+        , glVertexBufferRef    = vertexBufferRef
+        , glIndexBufferRef     = indexBufferRef
         , glDrawCallCounterRef = drawCallCounterRef
         }
 

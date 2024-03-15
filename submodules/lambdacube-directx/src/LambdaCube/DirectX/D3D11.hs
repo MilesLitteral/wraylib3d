@@ -1,28 +1,4 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-module Main where
-import GHC.Generics (Generic)
-  
-import System.Exit
-  
-import Data.Int
-import Data.Word
-import Data.Vect.Float
-import System.CPUTime
-
-import Control.Exception
-import Control.Monad
-
-import Foreign (peekByteOff)
-import Foreign.CStorable
-import Foreign.Storable
-import Foreign.Ptr
-
-import Graphics.Win32
-import System.Win32.DLL (getModuleHandle)
-
-import Graphics.D3D11
-
+-- D3D11
 foreign import stdcall "PostQuitMessage" postQuitMessage :: Int32 -> IO ()
 
 data SimpleVertex = SimpleVertex Vertex3 Color deriving (Generic)
@@ -38,7 +14,7 @@ instance HasSubresourceData SimpleVertex
 
 data ConstantBuffer = ConstantBuffer 
  { world :: Mat4
- , view :: Mat4
+ , view  :: Mat4
  , projection :: Mat4 } deriving (Generic)
 
 instance CStorable ConstantBuffer
@@ -49,7 +25,6 @@ instance Storable ConstantBuffer where
   peek = cPeek
 
 instance HasSubresourceData ConstantBuffer
-
 instance HasSubresourceData Word16
 
 
@@ -354,3 +329,4 @@ render deviceContext swapChain renderTargetView depthStencilView vs ps cb = do
   
   present swapChain 0 0
   return ()
+--

@@ -35,6 +35,27 @@ import LambdaCube.DirectX.Input
 import LambdaCube.DirectX.Util
 
 
+import GHC.Generics (Generic)
+  
+
+import Data.Int
+import Data.Word
+import Data.Vect.Float
+import System.Exit
+import System.CPUTime
+import System.Win32.DLL (getModuleHandle)
+
+import Control.Exception
+import Control.Monad
+
+import Foreign (peekByteOff)
+import Foreign.CStorable
+import Foreign.Storable
+import Foreign.Ptr
+
+import Graphics.Win32
+import Graphics.D3D11
+
 data CGState
   = CGState
   { drawCommands          :: [DXCommand]
@@ -62,6 +83,17 @@ initCGState = CGState
 
 type CG a = State CGState a
 
+windowWidth :: (Num a) => a
+windowWidth = 640
+
+windowHeight :: (Num a) => a
+windowHeight = 480
+
+useDevice hWnd proc = do
+  (s, d, dc, r, ds) <- initDevice hWnd
+  use s $ \swapChain -> use d $ \device -> use dc $ \deviceContext -> use r $ \renderTargetView -> use ds $ \depthStencilView ->
+    proc swapChain device deviceContext renderTargetView depthStencilView
+  
 emit :: GLCommand -> CG ()
 emit cmd = modify $ \s -> s {drawCommands = cmd : drawCommands s}
 
@@ -269,9 +301,21 @@ clearRenderTarget values = do
     (mask,_) <- foldM setClearValue (0,0) values
     glClear $ fromIntegral mask
 
-
 printGLStatus  = checkGL >>= print
 printFBOStatus = checkFBO >>= print
+
+compileShaderFromFile :: String -> String -> String -> IO (Ptr ID3DBlob)
+compileShaderFromFile fileName entryPoint shaderModel = do
+  Right res <- d3dCompileFromFile 
+      fileName
+      Nothing
+      Nothing
+      nullPtr
+      (Just entryPoint)
+      shaderModel
+      [d3dCompileEnableStrictness]
+      []
+  return res
 
 compileProgram :: Program -> IO DXProgram --GLProgram
 compileProgram p = do
@@ -434,9 +478,9 @@ compileRenderTarget texs glTexs (RenderTarget targets) = do
 compileStreamData :: StreamData -> IO GLStream
 compileStreamData s = do
   let withV w a f = w a (\p -> f $ castPtr p)
-  let compileAttr (VFloatArray v) = Array ArrFloat (V.length v) (withV (SV.unsafeWith . V.convert) v)
-      compileAttr (VIntArray v) = Array ArrInt32 (V.length v) (withV (SV.unsafeWith . V.convert) v)
-      compileAttr (VWordArray v) = Array ArrWord32 (V.length v) (withV (SV.unsafeWith . V.convert) v)
+      compileAttr (VFloatArray v) = Array ArrFloat  (V.length v) (withV (SV.unsafeWith . V.convert) v)
+      compileAttr (VIntArray v)   = Array ArrInt32  (V.length v) (withV (SV.unsafeWith . V.convert) v)
+      compileAttr (VWordArray v)  = Array ArrWord32 (V.length v) (withV (SV.unsafeWith . V.convert) v)
       --TODO: compileAttr (VBoolArray v) = Array ArrWord32 (length v) (withV withArray v)
       (indexMap,arrays) = unzip [((n,i),compileAttr d) | (i,(n,d)) <- zip [0..] $ Map.toList $ streamData s]
       getLength n = l `div` c
@@ -575,22 +619,22 @@ allocRenderer p = do
     indexBufferRef <- newIORef 0
     drawCallCounterRef <- newIORef 0
     return $ GLRenderer
-        { glPrograms        = prgs
-        , glTextures        = texs
-        , glSamplers        = smps
-        , glTargets         = trgs
-        , glCommands        = reverse $ drawCommands st
-        , glSlotPrograms    = V.map (V.toList . slotPrograms) $ IR.slots p
-        , glInput           = input
-        , glSlotNames       = V.map slotName $ IR.slots p
-        , glVAO             = vao
-        , glTexUnitMapping  = texUnitMapRefs
-        , glStreams         = strs
-        , glDrawContextRef  = drawContextRef
-        , glForceSetup      = forceSetup
-        , glVertexBufferRef = vertexBufferRef
-        , glIndexBufferRef  = indexBufferRef
-        , glDrawCallCounterRef = drawCallCounterRef
+        { dxPrograms        = prgs
+        , dxTextures        = texs
+        , dxSamplers        = smps
+        , dxTargets         = trgs
+        , dxCommands        = reverse $ drawCommands st
+        , dxSlotPrograms    = V.map (V.toList . slotPrograms) $ IR.slots p
+        , dxInput           = input
+        , dxSlotNames       = V.map slotName $ IR.slots p
+        , dxVAO             = vao
+        , dxTexUnitMapping  = texUnitMapRefs
+        , dxStreams         = strs
+        , dxDrawContextRef  = drawContextRef
+        , dxForceSetup      = forceSetup
+        , dxVertexBufferRef = vertexBufferRef
+        , dxIndexBufferRef  = indexBufferRef
+        , dxDrawCallCounterRef = drawCallCounterRef
         }
 
 disposeRenderer :: GLRenderer -> IO ()
@@ -648,11 +692,11 @@ isSubTrie eqFun universe subset = and [isMember a (Map.lookup n universe) | (n,a
                 ]
 -}
 
-setStorage :: GLRenderer -> GLStorage -> IO (Maybe String)
+setStorage :: DX11Renderer -> DX11Storage -> IO (Maybe String)
 setStorage p input' = setStorage' p (Just input')
 
-setStorage' :: GLRenderer -> Maybe GLStorage -> IO (Maybe String)
-setStorage' p@GLRenderer{..} input' = do
+setStorage' :: DX11Renderer -> Maybe DX11Storage -> IO (Maybe String)
+setStorage' p@DX11Storage{..} input' = do
     -- TODO: check matching input schema
     {-
     case input' of
@@ -664,7 +708,7 @@ setStorage' p@GLRenderer{..} input' = do
             - remove pipeline's object commands from used objectArrays
             - remove pipeline from attached pipelines vector
     -}
-    readIORef glInput >>= \case
+    readIORef dxInput >>= \case
         Nothing -> return ()
         Just InputConnection{..} -> do
             let slotRefs = slotVector icInput
@@ -681,7 +725,7 @@ setStorage' p@GLRenderer{..} input' = do
             - update used objectArrays, and generate object commands for objects in the related objectArrays
     -}
     case input' of
-        Nothing -> writeIORef glInput Nothing >> return Nothing
+        Nothing -> writeIORef dxInput Nothing >> return Nothing
         Just input -> do
             let pipelinesRef = pipelines input
             oldPipelineV <- readIORef pipelinesRef
@@ -698,7 +742,7 @@ setStorage' p@GLRenderer{..} input' = do
             let sm      = slotMap input
                 pToI    = [i | n <- glSlotNames, let i = fromMaybe (error $ "setStorage - missing object array: " ++ n) $ Map.lookup n sm]
                 iToP    = V.update (V.replicate (Map.size sm) Nothing) (V.imap (\i v -> (v, Just i)) pToI)
-            writeIORef glInput $ Just $ InputConnection idx input pToI iToP
+            writeIORef dxInput $ Just $ InputConnection idx input pToI iToP
 
             -- generate object commands for related objectArrays
             {-
@@ -799,9 +843,9 @@ renderSlot glDrawCallCounterRef glVertexBufferRef glIndexBufferRef cmds = forM_ 
     --isOk <- checkGL
     --putStrLn $ isOk ++ " - " ++ show cmd
 
-setupRenderTarget glInput GLRenderTarget{..} = do
+setupRenderTarget dxInput GLRenderTarget{..} = do
   -- set target viewport
-  ic' <- readIORef glInput
+  ic' <- readIORef dxInput
   case ic' of
       Nothing -> return ()
       Just ic -> do
@@ -814,7 +858,7 @@ setupRenderTarget glInput GLRenderTarget{..} = do
       Nothing -> return ()
       Just bl -> withArray bl $ glDrawBuffers (fromIntegral $ length bl)
 
-setupDrawContext glForceSetup glDrawContextRef glInput new = do
+setupDrawContext glForceSetup glDrawContextRef dxInput new = do
   old <- readIORef glDrawContextRef
   writeIORef glDrawContextRef new
   force <- readIORef glForceSetup
@@ -827,7 +871,7 @@ setupDrawContext glForceSetup glDrawContextRef glInput new = do
           let a = f new
           unless (a == f old) $ m a
 
-  setup glRenderTarget $ setupRenderTarget glInput
+  setup glRenderTarget $ setupRenderTarget dxInput
   setup glRasterContext $ setupRasterContext
   setup glAccumulationContext setupAccumulationContext
   setup glProgram glUseProgram
@@ -856,24 +900,24 @@ renderFrame GLRenderer{..} = do
     forM_ glCommands $ \cmd -> do
         case cmd of
             GLClearRenderTarget rt vals -> do
-              setupRenderTarget glInput rt
+              setupRenderTarget dxInput rt
               clearRenderTarget vals
               modifyIORef glDrawContextRef $ \ctx -> ctx {glRenderTarget = rt}
 
             GLRenderStream ctx streamIdx progIdx -> do
-              setupDrawContext glForceSetup glDrawContextRef glInput ctx
+              setupDrawContext glForceSetup glDrawContextRef dxInput ctx
               drawcmd <- readIORef (glStreamCommands $ glStreams ! streamIdx)
               renderSlot glDrawCallCounterRef glVertexBufferRef glIndexBufferRef drawcmd
 
             GLRenderSlot ctx slotIdx progIdx -> do
-              input <- readIORef glInput
+              input <- readIORef dxInput
               case input of
                   Nothing -> putStrLn "Warning: No pipeline input!" >> return ()
                   Just ic -> do
                       let draw setupDone obj = readIORef (objEnabled obj) >>= \case
                             False -> return setupDone
                             True  -> do
-                              unless setupDone $ setupDrawContext glForceSetup glDrawContextRef glInput ctx
+                              unless setupDone $ setupDrawContext glForceSetup glDrawContextRef dxInput ctx
                               drawcmd <- readIORef $ objCommands obj
                               --putStrLn "Render object"
                               renderSlot glDrawCallCounterRef glVertexBufferRef glIndexBufferRef ((drawcmd ! icId ic) ! progIdx)
