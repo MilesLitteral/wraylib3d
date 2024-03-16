@@ -1,6 +1,12 @@
 # WRaylib3d (WRL3D)
-## WRayLib3d Project Structure (Unity-Like FP Application)
+## Install Requirements
+You will need the following libraries and applications installed, in the future the library will search for these requirements by itself and install them:
+* Haskell Toolchain (ghc, stack, cabal), ghcup is a convenient solution: https://www.haskell.org/ghcup/
+* sdl   (window management), Ubuntu: run sudo apt install libsdl2-2.0-0; Windows: Run this command in your Haskell MinGW application: `pacman -S mingw-w64-x86_64-SDL2`
+* glfw  (low level window functions), available here: https://www.glfw.org/
+* libpq (to support Realm/DB functions), available here: https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
 
+## WRayLib3d Project Structure (Unity-Like FP Application)
   + Core  (Module)
     - Build Manager
         Handles the Building of Projects (WRLP) Into
@@ -185,6 +191,7 @@
 
 Config.Yaml
 Will be expanded to include Tests, examples, and alternative builds based on simple flags passed
+as well as flags for conditions like if sdl2 is not installed leaving only the need to install libpq.
     
 Stack.Yaml
 used to control which extra modules are being built like which lambdacude backend the Application will
