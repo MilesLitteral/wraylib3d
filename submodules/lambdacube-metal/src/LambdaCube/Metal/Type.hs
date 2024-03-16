@@ -36,10 +36,10 @@ type MetalUniformName = ByteString
 -}
 
 data Buffer -- internal type
-    = Buffer
-    { bufArrays :: Vector ArrayDesc
-    , bufGLObj  :: MBuiltin
-    }
+    = Buffer{ 
+        bufArrays    :: Vector ArrayDesc
+    ,   bufMetalObj  :: MTLBuffer
+    } 
     deriving (Show,Eq)
 
 data ArrayDesc
@@ -89,9 +89,6 @@ data MetalStorage
     { schema        :: PipelineSchema
     , slotMap       :: Map String SlotName
     , slotVector    :: Vector (IORef MetalSlot)
-    , objSeed       :: IORef Int
-    , uniformSetter :: Map MetalUniformName InputSetter
-    , uniformSetup  :: Map String MetalUniform
     , screenSize    :: IORef (Word, Word)
     , pipelines     :: IORef (Vector (Maybe MetalRenderer)) -- attached pipelines
     }
@@ -102,8 +99,6 @@ data Object -- internal type
     , objPrimitive  :: Primitive
     , objIndices    :: Maybe (IndexStream Buffer)
     , objAttributes :: Map String (Stream Buffer)
-    , objUniSetter  :: Map MetalUniformName InputSetter
-    , objUniSetup   :: Map String MetalUniform
     , objOrder      :: IORef Int
     , objEnabled    :: IORef Bool
     , objId         :: Int
@@ -119,14 +114,14 @@ data MetalProgram
     { shaderObjects         :: [MBuiltin] -- Vertex and Fragment Shaders
     , programObject         :: MBuiltin   -- The
     , inputUniforms         :: Map String MBuiltin
-    , inputTextures         :: Map String MBuiltin   -- all input textures (MTLTexture)
-    , inputMeshes           :: Map String MBuiltin 
+    , inputTextures         :: Map String MTLTexture   -- all input textures (MTLTexture)
+    , inputMeshes           :: Map String MTLMesh 
     , inputStreams          :: Map String (Int, String)
     }
 
 data MetalTexture
     = MetalTexture
-    { mtlTextureObject   :: MBuiltin
+    { mtlTextureObject   :: MTLTexture
     , mtlTextureTarget   :: Device
     } deriving Eq
 
@@ -146,24 +141,24 @@ data MetalRenderPipeline --MetalStream
     , mtlStreamProgram     :: ProgramName
     }
 
-data MetalRenderer
+data MetalRenderer --This is more or less an ICB pipeline
     = MetalRenderer
-    { mtlLibraries      :: Vector MTLIB
+    { mtlLibraries      :: Vector MetalProgram
     , mtlTextures       :: Vector MetalTexture
     , mtlSamplers       :: Vector MetalSampler
     , mtlTargets         :: Vector MetalRenderTarget
     , mtlCommands        :: [MetalCommand]
-    , glSlotPrograms    :: Vector [ProgramName] -- programs depend on a slot
-    , glInput           :: IORef (Maybe InputConnection)
-    , glSlotNames       :: Vector String
-    , glVAO             :: MBuiltin
-    , glTexUnitMapping  :: Map String (IORef GLint)   -- maps texture uniforms to texture units
-    , glStreams         :: Vector MetalStream
-    , glDrawContextRef  :: IORef GLDrawContext
-    , glForceSetup      :: IORef Bool
-    , glVertexBufferRef :: IORef MBuiltin
-    , glIndexBufferRef  :: IORef MBuiltin
-    , glDrawCallCounterRef :: IORef Int
+    , mtlSlotPrograms    :: Vector [ProgramName] -- programs depend on a slot
+    , mtlInput           :: IORef (Maybe InputConnection)
+    , mtlSlotNames       :: Vector String
+    , mtlCmdQ            :: MTLCommandQueue
+    , mtlTexUnitMapping  :: Map String (IORef MTLUniform)   -- maps texture uniforms to texture units
+    , mtlStreams         :: Vector MetalStream -- CommandQueue
+    , mtlDrawContextRef  :: IORef MetalDrawContext
+    , mtlForceSetup      :: IORef Bool
+    , mtlVertexBufferRef    :: IORef MTLVertex
+    , mtlFragmentBufferRef  :: IORef MTLFragment
+    , mtlDrawCallCounterRef :: IORef Int
     }
 
 data MetalSampler
@@ -194,10 +189,10 @@ data MetalDrawContext
   { glRasterContext         :: !RasterContext
   , glAccumulationContext   :: !AccumulationContext
   , glRenderTarget          :: !MetalRenderTarget
-  , glProgram               :: !UInt
-  , glTextureMapping        :: ![(GLTextureUnit, MetalTexture)]
-  , glSamplerMapping        :: ![(GLTextureUnit, GLSampler)]
-  , glSamplerUniformMapping :: ![(GLTextureUnit, GLSamplerUniform)]
+  , glProgram               :: !MetalProgram
+  , glTextureMapping        :: ![(MetalTextureUnit, MetalTexture)]
+  , glSamplerMapping        :: ![(MetalTextureUnit, MetalSampler)]
+  , glSamplerUniformMapping :: ![(MetalTextureUnit, MetalSamplerUniform)]
   }
 
 data MetalCommand
@@ -209,12 +204,12 @@ instance Show (IORef MBuiltin) where
     show _ = "(IORef MBuiltin)"
 CommandQueue
 data MetalObjectCommand
-    = MetalSetCommandQueue         !MBuiltin !MBuiltin
-    | MetalBindTexture             !Device !(IORef MBuiltin) !MetalUniform               -- binds the texture from the gluniform to the specified texture unit and target
-    | MetalSetVertexArray          !MBuiltin !MBuiltin !MBuiltin !Device !(Ptr ())        -- index buffer size type pointer
-    | MetalSetVertexAttrib         !MBuiltin !(MBuiltin Buffer)                        -- index value
-    | MetalDrawArrays              !Device !MBuiltin !MetalSizeN                         -- mode first count
-    | MetalDrawElements            !Device !MetalSizeN !MBuiltin !(Ptr ())      -- mode count type buffer indicesPtr
+    = MetalSetCommandQueue         !MTLBuffer !MTLCommandQueue
+    | MetalBindTexture             !Device    !(IORef MTLTexture) !MetalUniform               -- binds the texture from the gluniform to the specified texture unit and target
+    | MetalSetVertexArray          !MTLVertex !MTLFragment !MTLKernel !Device !(Ptr ())        -- index buffer size type pointer
+    | MetalSetVertexAttrib         !MTLFragment  !(MBuiltin Buffer)                        -- index value
+    | MetalDrawArrays              !Device !MTLCommandBuffer !MetalSizeN                         -- mode first count
+    | MetalDrawElements            !Device !MetalSizeN !MTLCommandBuffer !(Ptr ())      -- mode count type buffer indicesPtr
     deriving Show
 
 type SetterFun a = a -> IO ()
@@ -358,7 +353,7 @@ data IndexStream b
 
 newtype TextureData
     = TextureData
-    { textureObject :: UInt
+    { textureObject :: MBuiltin
     }
     deriving Storable
 

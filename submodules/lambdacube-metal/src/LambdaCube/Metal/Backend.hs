@@ -226,19 +226,6 @@ printFBOStatus = checkFBO >>= print
 compileLibrary :: Program -> IO MTLIB
 compileLibrary = undefined 
 {-
-do
-    po <- glCreateProgram
-    --putStrLn $ "compile program: " ++ show po
-    let createAndAttach src t = do
-            o <- glCreateShader t
-            compileShader o [src]
-            glAttachShader po o
-            --putStr "    + compile shader source: " >> printGLStatus
-            return o
--}
-
-compileProgram :: Program -> IO MTLProgram
-compileProgram p = do
     po <- glCreateProgram
     --putStrLn $ "compile program: " ++ show po
     let createAndAttach src t = do
@@ -296,6 +283,7 @@ compileProgram p = do
         , inputTextureUniforms  = Set.fromList $ texUnis
         , inputStreams          = Map.fromList [(n,(idx, attrName)) | (n,idx) <- Map.toList $ attributes, let attrName = fromMaybe (error $ "missing attribute: " ++ n) $ Map.lookup n lcStreamName]
         }
+-}
 
 compileRenderTarget :: Vector TextureDescriptor -> Vector MetalTexture -> RenderTarget -> IO MetalRenderTarget
 compileRenderTarget texs glTexs (RenderTarget targets) = do

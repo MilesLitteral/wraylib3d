@@ -1,3 +1,6 @@
 metal-cpp is an, in theory, more complete version of mtlpp maintained by Apple themselves.
 If mtlpp proves too troublesome/problematic (it is not totally Metal 3 compliant and would need tweaks)
 then make mtlpp.h and .cc an interface to utilize metal-cpp instead. 
+
+implement the use of metal-cpp instead from now on (3/15/24). The interface shall be called mtlpp.h in honor
+of the original interface written.

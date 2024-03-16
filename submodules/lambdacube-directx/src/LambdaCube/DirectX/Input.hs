@@ -1,24 +1,24 @@
 {-# LANGUAGE FlexibleContexts, TypeSynonymInstances, FlexibleInstances #-}
 module LambdaCube.DirectX.Input where
 
+import Foreign
+import Data.Word
+import Data.Maybe
+import Data.IORef
+import Data.String
+import Data.Map    (Map)
+import Data.IntMap (IntMap)
+import Data.Vector (Vector,(//),(!))
 import Control.Applicative
 import Control.Exception
 import Control.Monad
 import Control.Monad.Writer
-import Data.Maybe
-import Data.IORef
-import Data.Map (Map)
-import Data.IntMap (IntMap)
-import Data.Vector (Vector,(//),(!))
-import Data.Word
-import Data.String
-import Foreign
+import Data.ByteString.Char8 (ByteString)
 import qualified Data.IntMap as IM
-import qualified Data.Set as S
-import qualified Data.Map as Map
+import qualified Data.Set    as S
+import qualified Data.Map    as Map
 import qualified Data.Vector as V
 import qualified Data.Vector.Algorithms.Intro as I
-import Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as SB
 
 import Graphics.D3D11.Interface --Graphics.GL.Core33
@@ -255,14 +255,7 @@ nullSetter :: GLUniformName -> String -> a -> IO ()
 nullSetter n t _ = return ()
 --nullSetter n t _ = Prelude.putStrLn $ "WARNING: unknown uniform: " ++ show n ++ " :: " ++ t
 
-uniformBool  :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun Bool
-uniformV2B   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V2B
-uniformV3B   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V3B
-uniformV4B   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V4B
 
-uniformWord  :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun Word32
-uniformV2U   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V2U
-uniformV3U   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V3U
 uniformV4U   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V4U
 
 uniformInt   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun Int32
@@ -287,30 +280,37 @@ uniformM44F   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun M44
 
 uniformFTexture2D   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun TextureData
 
+uniformBool  :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun Bool
 uniformBool n is = case Map.lookup n is of
     Just (SBool fun)    -> fun
     _   -> nullSetter n "Bool"
 
+uniformV2B   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V2B
 uniformV2B n is = case Map.lookup n is of
     Just (SV2B fun)    -> fun
     _   -> nullSetter n "V2B"
 
+uniformV3B   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V3B
 uniformV3B n is = case Map.lookup n is of
     Just (SV3B fun)    -> fun
     _   -> nullSetter n "V3B"
 
+uniformV4B   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V4B
 uniformV4B n is = case Map.lookup n is of
     Just (SV4B fun)    -> fun
     _   -> nullSetter n "V4B"
 
+uniformWord  :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun Word32
 uniformWord n is = case Map.lookup n is of
     Just (SWord fun)    -> fun
     _   -> nullSetter n "Word"
 
+uniformV2U   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V2U
 uniformV2U n is = case Map.lookup n is of
     Just (SV2U fun)    -> fun
     _   -> nullSetter n "V2U"
-
+    
+uniformV3U   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V3U
 uniformV3U n is = case Map.lookup n is of
     Just (SV3U fun)    -> fun
     _   -> nullSetter n "V3U"

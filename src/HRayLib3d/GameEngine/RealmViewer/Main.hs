@@ -115,13 +115,13 @@ run = do
       loop
 
     -- upload graphics data to GPU
-    storage <- allocStorage inputSchema
+    storage      <- allocStorage inputSchema
     graphicsData <- setupStorage pk3Data levelData storage
     putStrLn "storage created"
 
     simpleRenderer <- fromJust <$> loadQuake3Graphics storage "SimpleGraphics.json"
     setStorage simpleRenderer storage
-    rendererRef <- newIORef =<< fromJust <$> loadQuake3Graphics storage "SimpleGraphics.json"
+    rendererRef    <- newIORef =<< fromJust <$> loadQuake3Graphics storage "SimpleGraphics.json"
 
     -- play level music
     case getMusicFile levelData of
@@ -187,7 +187,6 @@ doInScissor winSize dpr offset vp action = do
   -- OpenGL's Y axis increases from bottom to top
   glScissor (round (rx + ox)) (round $ winH - ry - oy - rh) (round rw) (round rh)
   action
-
 -}
 
 runAsWidget :: Size -> Double -> Point -> Rect -> IO ()

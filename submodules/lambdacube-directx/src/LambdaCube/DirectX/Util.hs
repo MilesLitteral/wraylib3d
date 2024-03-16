@@ -18,7 +18,7 @@ module LambdaCube.DirectX.Util (
     logicOperationToGLType,
     blendEquationToGLType,
     blendingFactorToGLType,
-    checkGL,
+    checkDX,
     textureDataTypeToGLType,
     textureDataTypeToGLArityType,
     glGetIntegerv1,
@@ -302,14 +302,14 @@ compileShader o srcl = withMany withCString srcl $! \l -> withArray l $! \p -> d
     status <- glGetShaderiv1 GL_COMPILE_STATUS o
     when (status /= fromIntegral GL_TRUE) $ fail $ unlines ["compileShader failed:",log]
 
-checkGL :: IO String
-checkGL = do
-    let f e | e == GL_INVALID_ENUM                  = "INVALID_ENUM"
-            | e == GL_INVALID_VALUE                 = "INVALID_VALUE"
-            | e == GL_INVALID_OPERATION             = "INVALID_OPERATION"
-            | e == GL_INVALID_FRAMEBUFFER_OPERATION = "INVALID_FRAMEBUFFER_OPERATION"
-            | e == GL_OUT_OF_MEMORY                 = "OUT_OF_MEMORY"
-            | e == GL_NO_ERROR                      = "OK"
+checkDX :: IO String
+checkDX = do
+    let f e | e == DX_INVALID_ENUM                  = "INVALID_ENUM"
+            | e == DX_INVALID_VALUE                 = "INVALID_VALUE"
+            | e == DX_INVALID_OPERATION             = "INVALID_OPERATION"
+            | e == DX_INVALID_FRAMEBUFFER_OPERATION = "INVALID_FRAMEBUFFER_OPERATION"
+            | e == DX_OUT_OF_MEMORY                 = "OUT_OF_MEMORY"
+            | e == DX_NO_ERROR                      = "OK"
             | otherwise                             = "Unknown error"
     e <- glGetError
     return $ f e

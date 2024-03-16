@@ -42,7 +42,7 @@ schemaFromPipeline a = PipelineSchema (Map.fromList sl) (foldl Map.union Map.emp
         Just v  -> v
         Nothing -> error "internal error (schemaFromPipeline)"
 
-mkUniform :: [(String,InputType)] -> IO (Map GLUniformName InputSetter, Map String GLUniform)
+mkUniform :: [(String,InputType)] -> IO (Map MetalUniformName InputSetter, Map String MetalUniform)
 mkUniform l = do
     unisAndSetters <- forM l $ \(n,t) -> do
         (uni, setter) <- mkUniformSetter t
@@ -155,7 +155,7 @@ setObjectOrder p obj i = do
     writeIORef (objOrder obj) i
     modifyIORef (slotVector p ! objSlot obj) $ \(GLSlot objs sorted _) -> MetalSlot objs sorted Reorder
 
-objectUniformSetter :: Object -> Map GLUniformName InputSetter
+objectUniformSetter :: Object -> Map MetalUniformName InputSetter
 objectUniformSetter = objUniSetter
 
 setScreenSize :: MetalStorage -> Word -> Word -> IO ()

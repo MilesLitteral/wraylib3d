@@ -57,26 +57,28 @@ addMeshToObjectArray input slotName objUniNames (GPUMesh _ (GPUData prim streams
 withV w a f = w a (\p -> f $ castPtr p)
 
 meshAttrToArray :: MeshAttribute -> Array
-meshAttrToArray (A_Float v) = Array ArrFloat  (1 *  V.length v) $ withV SV.unsafeWith $ V.convert v
-meshAttrToArray (A_V2F   v) = Array ArrFloat  (2 *  V.length v) $ withV SV.unsafeWith $ V.convert v
-meshAttrToArray (A_V3F   v) = Array ArrFloat  (3 *  V.length v) $ withV SV.unsafeWith $ V.convert v
-meshAttrToArray (A_V4F   v) = Array ArrFloat  (4 *  V.length v) $ withV SV.unsafeWith $ V.convert v
-meshAttrToArray (A_M22F  v) = Array ArrFloat  (4 *  V.length v) $ withV SV.unsafeWith $ V.convert v
-meshAttrToArray (A_M33F  v) = Array ArrFloat  (9 *  V.length v) $ withV SV.unsafeWith $ V.convert v
-meshAttrToArray (A_M44F  v) = Array ArrFloat  (16 * V.length v) $ withV SV.unsafeWith $ V.convert v
-meshAttrToArray (A_Int   v) = Array ArrInt32  (1 *  V.length v) $ withV SV.unsafeWith $ V.convert v
-meshAttrToArray (A_Word  v) = Array ArrWord32 (1 *  V.length v) $ withV SV.unsafeWith $ V.convert v
+meshAttrToArray m = case m of 
+                      (A_Float v) -> Array ArrFloat  (1 *  V.length v) $ withV SV.unsafeWith $ V.convert v
+                      (A_V2F   v) -> Array ArrFloat  (2 *  V.length v) $ withV SV.unsafeWith $ V.convert v
+                      (A_V3F   v) -> Array ArrFloat  (3 *  V.length v) $ withV SV.unsafeWith $ V.convert v
+                      (A_V4F   v) -> Array ArrFloat  (4 *  V.length v) $ withV SV.unsafeWith $ V.convert v
+                      (A_M22F  v) -> Array ArrFloat  (4 *  V.length v) $ withV SV.unsafeWith $ V.convert v
+                      (A_M33F  v) -> Array ArrFloat  (9 *  V.length v) $ withV SV.unsafeWith $ V.convert v
+                      (A_M44F  v) -> Array ArrFloat  (16 * V.length v) $ withV SV.unsafeWith $ V.convert v
+                      (A_Int   v) -> Array ArrInt32  (1 *  V.length v) $ withV SV.unsafeWith $ V.convert v
+                      (A_Word  v) -> Array ArrWord32 (1 *  V.length v) $ withV SV.unsafeWith $ V.convert v
 
 meshAttrToStream :: Buffer -> Int -> MeshAttribute -> Stream Buffer
-meshAttrToStream b i (A_Float v) = Stream Attribute_Float b i 0 (V.length v)
-meshAttrToStream b i (A_V2F   v) = Stream Attribute_V2F b i 0 (V.length v)
-meshAttrToStream b i (A_V3F   v) = Stream Attribute_V3F b i 0 (V.length v)
-meshAttrToStream b i (A_V4F   v) = Stream Attribute_V4F b i 0 (V.length v)
-meshAttrToStream b i (A_M22F  v) = Stream Attribute_M22F b i 0 (V.length v)
-meshAttrToStream b i (A_M33F  v) = Stream Attribute_M33F b i 0 (V.length v)
-meshAttrToStream b i (A_M44F  v) = Stream Attribute_M44F b i 0 (V.length v)
-meshAttrToStream b i (A_Int   v) = Stream Attribute_Int b i 0 (V.length v)
-meshAttrToStream b i (A_Word  v) = Stream Attribute_Word b i 0 (V.length v)
+meshAttrToStream b i m = case m of 
+                          b i (A_Float v) -> Stream Attribute_Float b i 0 (V.length v)
+                          b i (A_V2F   v) -> Stream Attribute_V2F b i 0 (V.length v)
+                          b i (A_V3F   v) -> Stream Attribute_V3F b i 0 (V.length v)
+                          b i (A_V4F   v) -> Stream Attribute_V4F b i 0 (V.length v)
+                          b i (A_M22F  v) -> Stream Attribute_M22F b i 0 (V.length v)
+                          b i (A_M33F  v) -> Stream Attribute_M33F b i 0 (V.length v)
+                          b i (A_M44F  v) -> Stream Attribute_M44F b i 0 (V.length v)
+                          b i (A_Int   v) -> Stream Attribute_Int b i 0 (V.length v)
+                          b i (A_Word  v) -> Stream Attribute_Word b i 0 (V.length v)
 
 updateMesh :: GPUMesh -> [(String,MeshAttribute)] -> Maybe MeshPrimitive -> IO ()
 updateMesh (GPUMesh (Mesh dMA dMP) (GPUData _ dS dI _)) al mp = do

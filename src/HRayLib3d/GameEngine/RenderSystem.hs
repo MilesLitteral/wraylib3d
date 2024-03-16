@@ -353,8 +353,8 @@ updateModelCache RenderSystem{..} resources pictures = do
   bspShaderCache <- readIORef rsBSPShaderCache
   let pictureMaterials  = HashSet.fromList (map pictureShader pictures ++ [name | R_Shader name <- resources])
       skinMaterials     = HashSet.fromList (concatMap Map.elems newSkins)
-      newMD3Materials = HashSet.unions (pictureMaterials : skinMaterials : map gpumd3Shaders newModels) `HashSet.difference` md3ShaderCache
-      newBSPMaterials = HashSet.unions (map gpubspShaders newBSPs) `HashSet.difference` bspShaderCache
+      newMD3Materials   = HashSet.unions (pictureMaterials : skinMaterials : map gpumd3Shaders newModels) `HashSet.difference` md3ShaderCache
+      newBSPMaterials   = HashSet.unions (map gpubspShaders newBSPs) `HashSet.difference` bspShaderCache
   return (newMD3Materials,newBSPMaterials,md3Cache',bspCache',skinCache')
 
 updateRenderCache :: RenderSystem -> HashSet String -> HashSet String -> IO (GLStorage,GLRenderer,MD3InstanceCache,BSPInstanceCache,CharacterCache,QuadCache)

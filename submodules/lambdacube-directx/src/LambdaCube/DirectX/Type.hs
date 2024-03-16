@@ -60,12 +60,6 @@ data ArrayDesc
 
   DX11Storage can be attached to DX11Renderer
 -}
-
-{-
-  pipeline input:
-    - independent from pipeline
-    - per object features: enable/disable visibility, set render ordering
--}
 data DX11Uniform = forall a. Storable a => DX11Uniform !InputType !(IORef a)
 
 instance Show DX11Uniform where
@@ -115,17 +109,17 @@ data Object -- internal type
 
 data DX11Program
     = DX11Program
-    { shaderObjects         :: [GLuint]
-    , programObject         :: GLuint
-    , inputUniforms         :: Map String GLint
-    , inputTextures         :: Map String GLint   -- all input textures (render texture + uniform texture)
+    { shaderObjects         :: [ID3D11Buffer]
+    , programObject         :: ID3D11Buffer
+    , inputUniforms         :: Map String ID3D11Buffer
+    , inputTextures         :: Map String D3D11Texture2D   -- all input textures (render texture + uniform texture)
     , inputTextureUniforms  :: Set String
-    , inputStreams          :: Map String (GLuint,String)
+    , inputStreams          :: Map String (ID3D11Buffer,String)
     }
 
 data DX11Texture
     = DX11Texture
-    { dxTextureObject   :: GLuint
+    { dxTextureObject   :: ID3D11Buffer
     , dxTextureTarget   :: GLenum
     } deriving Eq
 
@@ -155,25 +149,25 @@ data DX11Renderer
     , dxSlotPrograms    :: Vector [ProgramName] -- programs depend on a slot
     , dxInput           :: IORef (Maybe InputConnection)
     , dxSlotNames       :: Vector String
-    , dxVAO             :: GLuint
-    , dxTexUnitMapping  :: Map String (IORef GLint)   -- maps texture uniforms to texture units
+    , dxVAO             :: ID3D11Buffer
+    , dxTexUnitMapping  :: Map String (IORef ID3D11Buffer)   -- maps texture uniforms to texture units
     , dxStreams         :: Vector DX11Stream
     , dxDrawContextRef  :: IORef DX11DrawContext
     , dxForceSetup      :: IORef Bool
-    , dxVertexBufferRef :: IORef GLuint
-    , dxIndexBufferRef  :: IORef GLuint
+    , dxVertexBufferRef :: IORef ID3D11Buffer
+    , dxIndexBufferRef  :: IORef ID3D11Buffer
     , dxDrawCallCounterRef :: IORef Int
     }
 
 data DX11Sampler
     = DX11Sampler
-    { dxSamplerObject :: GLuint
+    { dxSamplerObject :: ID3D11Buffer
     } deriving Eq
 
 data DX11RenderTarget
     = DX11RenderTarget
-    { framebufferObject         :: GLuint
-    , framebufferDrawbuffers    :: Maybe [GLenum]
+    { framebufferObject         :: ID3D11Buffer
+    , framebufferDrawbuffers    :: Maybe [ID3D11Buffer]
     } deriving Eq
 
 type DX11TextureUnit    = Int
@@ -190,18 +184,16 @@ instance Eq GLSamplerUniform where
 
 data DX11DrawContext
   = DX11DrawContext
-  { dxRasterContext         :: !RasterContext
-  , dxAccumulationContext   :: !AccumulationContext
-  , dxRenderTarget          :: !GLRenderTarget
-  , dxProgram               :: !GLuint
-  , dxTextureMapping        :: ![(GLTextureUnit,GLTexture)]
-  , dxSamplerMapping        :: ![(GLTextureUnit,GLSampler)]
-  , dxSamplerUniformMapping :: ![(GLTextureUnit,GLSamplerUniform)]
+  { dxDeviceContext         :: !DeviceContext
+  , dxRenderTarget          :: !IDxgiSwapChain
+  , dxProgram               :: !ID3D11Buffer
+  , dxTextureMapping        :: ![(DX11TextureUnit,DX11Texture)]
+  , dxSamplerMapping        :: ![(DX11TextureUnit,DX11Sampler)]
   }
 
 data DX11Command
-  = DX11RenderSlot          !GLDrawContext !SlotName   !ProgramName
-  | DX11RenderStream        !GLDrawContext !StreamName !ProgramName
+  = DX11RenderSlot          !DX11DrawContext !SlotName   !ProgramName
+  | DX11RenderStream        !DX11DrawContext !StreamName !ProgramName
   | DX11ClearRenderTarget   !GLRenderTarget ![ClearImage]
 
 instance Show (IORef GLint) where
@@ -209,13 +201,102 @@ instance Show (IORef GLint) where
 
 data DX11ObjectCommand
     = DX11SetUniform              !GLint !GLUniform
-    | DX11BindTexture             !GLenum !(IORef GLint) !GLUniform               -- binds the texture from the gluniform to the specified texture unit and target
-    | DX11SetVertexAttribArray    !GLuint !GLuint !GLint !GLenum !(Ptr ())        -- index buffer size type pointer
-    | DX11SetVertexAttribIArray   !GLuint !GLuint !GLint !GLenum !(Ptr ())        -- index buffer size type pointer
-    | DX11SetVertexAttrib         !GLuint !(Stream Buffer)                        -- index value
-    | DX11DrawArrays              !GLenum !GLint !GLsizei                         -- mode first count
-    | DX11DrawElements            !GLenum !GLsizei !GLenum !GLuint !(Ptr ())      -- mode count type buffer indicesPtr
+    | DX11BindTexture             !(IORef GLint) !GLUniform                    -- binds the texture from the gluniform to the specified texture unit and target
+    | DX11SetVertexAttribArray    !ID3D11Buffer !ID3D11Buffer !(Ptr ())        -- index buffer size type pointer
+    | DX11SetVertexAttribIArray   !ID3D11Buffer !ID3D11Buffer !(Ptr ())        -- index buffer size type pointer
+    | DX11SetVertexAttrib         !ID3D11Buffer !(Stream Buffer)               -- index value
+    | DX11DrawArrays              !GLenum !GLint !GLsizei                      -- mode first count
+    | DX11DrawElements            !GLenum !GLsizei !GLenum !GLuint !(Ptr ())   -- mode count type buffer indicesPtr
     deriving Show
+
+
+-- stream of index values (for index buffer)
+data IndexStream b
+    = IndexStream
+    { indexBuffer   :: b
+    , indexArrIdx   :: Int
+    , indexStart    :: Int
+    , indexLength   :: Int
+    }
+
+newtype TextureData
+    = TextureData
+    { textureObject :: ID3D11Buffer
+    }
+    deriving Storable
+
+data Primitive
+    = TriangleStrip
+    | TriangleList
+    | TriangleFan
+    | LineStrip
+    | LineList
+    | PointList
+    | TriangleStripAdjacency
+    | TriangleListAdjacency
+    | LineStripAdjacency
+    | LineListAdjacency
+    deriving (Eq,Ord,Bounded,Enum,Show)
+
+type StreamSetter = Stream Buffer -> IO ()
+
+-- storable instances
+instance Storable a => Storable (V2 a) where
+    sizeOf    _ = 2 * sizeOf (undefined :: a)
+    alignment _ = sizeOf (undefined :: a)
+
+    peek q = do
+        let p = castPtr q :: Ptr a
+            k = sizeOf (undefined :: a)
+        x <- peek        p 
+        y <- peekByteOff p k
+        return $! (V2 x y)
+
+    poke q (V2 x y) = do
+        let p = castPtr q :: Ptr a
+            k = sizeOf (undefined :: a)
+        poke        p   x
+        pokeByteOff p k y
+
+instance Storable a => Storable (V3 a) where
+    sizeOf    _ = 3 * sizeOf (undefined :: a)
+    alignment _ = sizeOf (undefined :: a)
+
+    peek q = do
+        let p = castPtr q :: Ptr a
+            k = sizeOf (undefined :: a)
+        x <- peek        p 
+        y <- peekByteOff p k
+        z <- peekByteOff p (k*2)
+        return $! (V3 x y z)
+
+    poke q (V3 x y z) = do
+        let p = castPtr q :: Ptr a
+            k = sizeOf (undefined :: a)
+        poke        p   x
+        pokeByteOff p k y
+        pokeByteOff p (k*2) z
+
+instance Storable a => Storable (V4 a) where
+    sizeOf    _ = 4 * sizeOf (undefined :: a)
+    alignment _ = sizeOf (undefined :: a)
+
+    peek q = do
+        let p = castPtr q :: Ptr a
+            k = sizeOf (undefined :: a)
+        x <- peek        p 
+        y <- peekByteOff p k
+        z <- peekByteOff p (k*2)
+        w <- peekByteOff p (k*3)
+        return $! (V4 x y z w)
+
+    poke q (V4 x y z w) = do
+        let p = castPtr q :: Ptr a
+            k = sizeOf (undefined :: a)
+        poke        p   x
+        pokeByteOff p k y
+        pokeByteOff p (k*2) z
+        pokeByteOff p (k*3) w
 
 type SetterFun a = a -> IO ()
 
@@ -297,6 +378,10 @@ data InputSetter
 -- user will provide stream data using this setup function
 type BufferSetter = (Ptr () -> IO ()) -> IO ()
 
+-- describes an array in a buffer
+data Array  -- array type, element count (NOT byte size!), setter
+    = Array ArrayType Int BufferSetter
+
 -- specifies array component type (stream type in storage side)
 --  this type can be overridden in GPU side, e.g ArrWord8 can be seen as TFloat or TWord also
 data ArrayType
@@ -309,67 +394,6 @@ data ArrayType
     | ArrFloat
     | ArrHalf     -- Hint: half float is not supported in haskell
     deriving (Show,Eq,Ord)
-
-sizeOfArrayType :: ArrayType -> Int
-sizeOfArrayType ArrWord8  = 1
-sizeOfArrayType ArrWord16 = 2
-sizeOfArrayType ArrWord32 = 4
-sizeOfArrayType ArrInt8   = 1
-sizeOfArrayType ArrInt16  = 2
-sizeOfArrayType ArrInt32  = 4
-sizeOfArrayType ArrFloat  = 4
-sizeOfArrayType ArrHalf   = 2
-
--- describes an array in a buffer
-data Array  -- array type, element count (NOT byte size!), setter
-    = Array ArrayType Int BufferSetter
-
-toStreamType :: InputType -> Maybe StreamType
-toStreamType Word     = Just Attribute_Word
-toStreamType V2U      = Just Attribute_V2U
-toStreamType V3U      = Just Attribute_V3U
-toStreamType V4U      = Just Attribute_V4U
-toStreamType Int      = Just Attribute_Int
-toStreamType V2I      = Just Attribute_V2I
-toStreamType V3I      = Just Attribute_V3I
-toStreamType V4I      = Just Attribute_V4I
-toStreamType Float    = Just Attribute_Float
-toStreamType V2F      = Just Attribute_V2F
-toStreamType V3F      = Just Attribute_V3F
-toStreamType V4F      = Just Attribute_V4F
-toStreamType M22F     = Just Attribute_M22F
-toStreamType M23F     = Just Attribute_M23F
-toStreamType M24F     = Just Attribute_M24F
-toStreamType M32F     = Just Attribute_M32F
-toStreamType M33F     = Just Attribute_M33F
-toStreamType M34F     = Just Attribute_M34F
-toStreamType M42F     = Just Attribute_M42F
-toStreamType M43F     = Just Attribute_M43F
-toStreamType M44F     = Just Attribute_M44F
-toStreamType _          = Nothing
-
-fromStreamType :: StreamType -> InputType
-fromStreamType Attribute_Word    = Word
-fromStreamType Attribute_V2U     = V2U
-fromStreamType Attribute_V3U     = V3U
-fromStreamType Attribute_V4U     = V4U
-fromStreamType Attribute_Int     = Int
-fromStreamType Attribute_V2I     = V2I
-fromStreamType Attribute_V3I     = V3I
-fromStreamType Attribute_V4I     = V4I
-fromStreamType Attribute_Float   = Float
-fromStreamType Attribute_V2F     = V2F
-fromStreamType Attribute_V3F     = V3F
-fromStreamType Attribute_V4F     = V4F
-fromStreamType Attribute_M22F    = M22F
-fromStreamType Attribute_M23F    = M23F
-fromStreamType Attribute_M24F    = M24F
-fromStreamType Attribute_M32F    = M32F
-fromStreamType Attribute_M33F    = M33F
-fromStreamType Attribute_M34F    = M34F
-fromStreamType Attribute_M42F    = M42F
-fromStreamType Attribute_M43F    = M43F
-fromStreamType Attribute_M44F    = M44F
 
 -- user can specify streams using Stream type
 -- a stream can be constant (ConstXXX) or can came from a buffer
@@ -404,6 +428,69 @@ data Stream b
         }
     deriving Show
 
+sizeOfArrayType :: ArrayType -> Int
+sizeOfArrayType at = 
+    case at of 
+        ArrWord8  -> 1
+        ArrWord16 -> 2
+        ArrWord32 -> 4
+        ArrInt8   -> 1
+        ArrInt16  -> 2
+        ArrInt32  -> 4
+        ArrFloat  -> 4
+        ArrHalf   -> 2
+
+toStreamType :: InputType -> Maybe StreamType
+toStreamType i = 
+    case i of
+        Word     -> Just Attribute_Word
+        V2U      -> Just Attribute_V2U
+        V3U      -> Just Attribute_V3U
+        V4U      -> Just Attribute_V4U
+        Int      -> Just Attribute_Int
+        V2I      -> Just Attribute_V2I
+        V3I      -> Just Attribute_V3I
+        V4I      -> Just Attribute_V4I
+        Float    -> Just Attribute_Float
+        V2F      -> Just Attribute_V2F
+        V3F      -> Just Attribute_V3F
+        V4F      -> Just Attribute_V4F
+        M22F     -> Just Attribute_M22F
+        M23F     -> Just Attribute_M23F
+        M24F     -> Just Attribute_M24F
+        M32F     -> Just Attribute_M32F
+        M33F     -> Just Attribute_M33F
+        M34F     -> Just Attribute_M34F
+        M42F     -> Just Attribute_M42F
+        M43F     -> Just Attribute_M43F
+        M44F     -> Just Attribute_M44F
+        _        -> Nothing
+
+fromStreamType :: StreamType -> InputType
+fromStreamType s = 
+    case s of 
+        Attribute_Word    -> Word
+        Attribute_V2U     -> V2U
+        Attribute_V3U     -> V3U
+        Attribute_V4U     -> V4U
+        Attribute_Int     -> Int
+        Attribute_V2I     -> V2I
+        Attribute_V3I     -> V3I
+        Attribute_V4I     -> V4I
+        Attribute_Float   -> Float
+        Attribute_V2F     -> V2F
+        Attribute_V3F     -> V3F
+        Attribute_V4F     -> V4F
+        Attribute_M22F    -> M22F
+        Attribute_M23F    -> M23F
+        Attribute_M24F    -> M24F
+        Attribute_M32F    -> M32F
+        Attribute_M33F    -> M33F
+        Attribute_M34F    -> M34F
+        Attribute_M42F    -> M42F
+        Attribute_M43F    -> M43F
+        Attribute_M44F    -> M44F
+
 streamToStreamType :: Stream a -> StreamType
 streamToStreamType s = case s of
     ConstWord  _ -> Attribute_Word
@@ -428,91 +515,3 @@ streamToStreamType s = case s of
     ConstM43F  _ -> Attribute_M43F
     ConstM44F  _ -> Attribute_M44F
     Stream t _ _ _ _ -> t
-
--- stream of index values (for index buffer)
-data IndexStream b
-    = IndexStream
-    { indexBuffer   :: b
-    , indexArrIdx   :: Int
-    , indexStart    :: Int
-    , indexLength   :: Int
-    }
-
-newtype TextureData
-    = TextureData
-    { textureObject :: GLuint
-    }
-    deriving Storable
-
-data Primitive
-    = TriangleStrip
-    | TriangleList
-    | TriangleFan
-    | LineStrip
-    | LineList
-    | PointList
-    | TriangleStripAdjacency
-    | TriangleListAdjacency
-    | LineStripAdjacency
-    | LineListAdjacency
-    deriving (Eq,Ord,Bounded,Enum,Show)
-
-type StreamSetter = Stream Buffer -> IO ()
-
--- storable instances
-instance Storable a => Storable (V2 a) where
-    sizeOf    _ = 2 * sizeOf (undefined :: a)
-    alignment _ = sizeOf (undefined :: a)
-
-    peek q = do
-        let p = castPtr q :: Ptr a
-            k = sizeOf (undefined :: a)
-        x <- peek        p 
-        y <- peekByteOff p k
-        return $! (V2 x y)
-
-    poke q (V2 x y) = do
-        let p = castPtr q :: Ptr a
-            k = sizeOf (undefined :: a)
-        poke        p   x
-        pokeByteOff p k y
-
-instance Storable a => Storable (V3 a) where
-    sizeOf    _ = 3 * sizeOf (undefined :: a)
-    alignment _ = sizeOf (undefined :: a)
-
-    peek q = do
-        let p = castPtr q :: Ptr a
-            k = sizeOf (undefined :: a)
-        x <- peek        p 
-        y <- peekByteOff p k
-        z <- peekByteOff p (k*2)
-        return $! (V3 x y z)
-
-    poke q (V3 x y z) = do
-        let p = castPtr q :: Ptr a
-            k = sizeOf (undefined :: a)
-        poke        p   x
-        pokeByteOff p k y
-        pokeByteOff p (k*2) z
-
-instance Storable a => Storable (V4 a) where
-    sizeOf    _ = 4 * sizeOf (undefined :: a)
-    alignment _ = sizeOf (undefined :: a)
-
-    peek q = do
-        let p = castPtr q :: Ptr a
-            k = sizeOf (undefined :: a)
-        x <- peek        p 
-        y <- peekByteOff p k
-        z <- peekByteOff p (k*2)
-        w <- peekByteOff p (k*3)
-        return $! (V4 x y z w)
-
-    poke q (V4 x y z w) = do
-        let p = castPtr q :: Ptr a
-            k = sizeOf (undefined :: a)
-        poke        p   x
-        pokeByteOff p k y
-        pokeByteOff p (k*2) z
-        pokeByteOff p (k*3) w

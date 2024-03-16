@@ -25,7 +25,7 @@ import Graphics.GL.Core33
 
 -- Buffer
 disposeBuffer :: Buffer -> IO ()
-disposeBuffer (Buffer _ bo) = withArray [bo] $ -- glDeleteBuffers 1 -- Replace with Metal Equivalent
+disposeBuffer (Buffer _ bo) = withArray [bo] $ resetCommandsInBuffer 1 
 
 compileBuffer :: [Array] -> IO Buffer
 compileBuffer arrs = do
@@ -34,20 +34,15 @@ compileBuffer arrs = do
             in (size + offset, (offset, size,setter):setters, ArrayDesc arrType cnt offset size:descs)
         (bufSize,arrSetters,arrDescs) = foldl' calcDesc (0,[],[]) arrs
     bo <- alloca $! \pbo -> glGenBuffers 1 pbo >> peek pbo
-    -- glBindBuffer GL_ARRAY_BUFFER bo
-    -- glBufferData GL_ARRAY_BUFFER (fromIntegral bufSize) nullPtr GL_STATIC_DRAW
     forM_ arrSetters $! \(offset,size,setter) -> setter $! glBufferSubData GL_ARRAY_BUFFER (fromIntegral offset) (fromIntegral size)
-    -- glBindBuffer GL_ARRAY_BUFFER 0
     return $! Buffer (V.fromList $! reverse arrDescs) bo
 
 updateBuffer :: Buffer -> [(Int,Array)] -> IO ()
 updateBuffer (Buffer arrDescs bo) arrs = do
-    --glBindBuffer GL_ARRAY_BUFFER bo
     forM arrs $ \(i,Array arrType cnt setter) -> do
         let ArrayDesc ty len offset size = arrDescs V.! i
         when (ty == arrType && cnt == len) $
             setter $! glBufferSubData GL_ARRAY_BUFFER (fromIntegral offset) (fromIntegral size)
-    --glBindBuffer GL_ARRAY_BUFFER 0
 
 bufferSize :: Buffer -> Int
 bufferSize = V.length . bufArrays
