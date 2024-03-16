@@ -45,7 +45,6 @@ library
       HRayLib3d.GameEngine.Collision
       HRayLib3d.GameEngine.Content
       HRayLib3d.GameEngine.Data
-      HRayLib3d.GameEngine.Data.AssetIR
       HRayLib3d.GameEngine.Data.BSP
       HRayLib3d.GameEngine.Data.GameCharacter
       HRayLib3d.GameEngine.Data.GLB
@@ -202,10 +201,8 @@ library
     , http-client
     , ilist
     , lambdacube-compiler
-    , lambdacube-directx
     , lambdacube-gl
     , lambdacube-ir
-    , lambdacube-metal
     , lens
     , linear
     , linear-base
@@ -289,10 +286,8 @@ executable RealmViewer-FE-Demo
     , http-client
     , ilist
     , lambdacube-compiler
-    , lambdacube-directx
     , lambdacube-gl
     , lambdacube-ir
-    , lambdacube-metal
     , lens
     , linear
     , linear-base
@@ -375,10 +370,8 @@ executable hraylib3d
     , http-client
     , ilist
     , lambdacube-compiler
-    , lambdacube-directx
     , lambdacube-gl
     , lambdacube-ir
-    , lambdacube-metal
     , lens
     , linear
     , linear-base
@@ -463,10 +456,8 @@ test-suite hraylib3d-test
     , http-client
     , ilist
     , lambdacube-compiler
-    , lambdacube-directx
     , lambdacube-gl
     , lambdacube-ir
-    , lambdacube-metal
     , lens
     , linear
     , linear-base

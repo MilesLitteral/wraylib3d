@@ -44,9 +44,9 @@ library:
   source-dirs:  src
   include-dirs: cbits
   install-includes:
-    - mtlpp.hpp
+    - cbits/mtlpp.h
   c-sources:
-    - mtlpp.mm
+    - cbits/mtlpp.cc
   extra-source-files: CHANGELOG.md
                       examples/Hello.hs
                       examples/HelloEmbedded.hs

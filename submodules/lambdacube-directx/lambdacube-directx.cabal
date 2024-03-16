@@ -27,6 +27,7 @@ library
   exposed-modules:
       LambdaCube.DirectX
       LambdaCube.DirectX.Backend
+      LambdaCube.DirectX.D3D11
       LambdaCube.DirectX.Data
       LambdaCube.DirectX.Input
       LambdaCube.DirectX.Mesh

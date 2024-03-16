@@ -66,14 +66,11 @@ dependencies:
 - attoparsec
 - data-default-class
 - ilist
-#- graphql
 - lambdacube-compiler
 - lambdacube-ir
 - lambdacube-gl
-- lambdacube-metal
-- lambdacube-directx
-#- lambdacube-xr 
-#- lambdacube-vulkan
+#- lambdacube-metal
+#- lambdacube-directx
 - gltf-loader
 - gltf-codec
 - dlist
