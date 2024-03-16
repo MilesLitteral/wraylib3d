@@ -33,7 +33,7 @@ namespace NS
 {
 using TimeInterval = double;
 
-using Integer = std::intptr_t;
+using Integer  = std::intptr_t;
 using UInteger = std::uintptr_t;
 
 const Integer  IntegerMax = INTPTR_MAX;

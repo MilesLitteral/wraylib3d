@@ -94,7 +94,8 @@ updateMesh (GPUMesh (Mesh dMA dMP) (GPUData _ dS dI _)) al mp = do
 
 uploadMeshToGPU :: Mesh -> IO GPUMesh
 uploadMeshToGPU mesh@(Mesh attrs mPrim) = do
-    let mkIndexBuf v = do
+  let streams = Map.fromList $! zipWith (\i (n,a) -> (n,meshAttrToStream vBuf i a)) [0..] (Map.toList attrs)
+      mkIndexBuf v = do
             iBuf <- compileBuffer [Array ArrWord32 (V.length v) $ withV SV.unsafeWith $ V.convert v]
             return $! Just $! IndexStream iBuf 0 0 (V.length v)
     vBuf <- compileBuffer [meshAttrToArray a | a <- Map.elems attrs]
@@ -104,7 +105,6 @@ uploadMeshToGPU mesh@(Mesh attrs mPrim) = do
         P_Triangles         -> return (Nothing,TriangleList)
         P_TriangleStripI v  -> (,TriangleStrip) <$> mkIndexBuf v
         P_TrianglesI v      -> (,TriangleList) <$> mkIndexBuf v
-    let streams = Map.fromList $! zipWith (\i (n,a) -> (n,meshAttrToStream vBuf i a)) [0..] (Map.toList attrs)
     return $! GPUMesh mesh (GPUData prim streams indices (vBuf:[iBuf | IndexStream iBuf _ _ _ <- maybeToList indices]))
 
 disposeMesh :: GPUMesh -> IO ()

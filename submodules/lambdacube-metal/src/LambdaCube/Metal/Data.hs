@@ -22,27 +22,28 @@ import LambdaCube.Metal.Type
 import LambdaCube.Metal.Util
 import Graphics.GL.Core33
 --import LambdaCube.Metal.Bindings  --Graphics.GL.Core33
+--Utility Functions
+calcDesc (offset,setters,descs) (Array arrType cnt setter) =
+          let size = cnt * sizeOfArrayType arrType
+            in (size + offset, (offset, size,setter):setters, ArrayDesc arrType cnt offset size:descs)
 
 -- Buffer
 disposeBuffer :: Buffer -> IO ()
 disposeBuffer (Buffer _ bo) = withArray [bo] $ resetCommandsInBuffer 1 
 
-compileBuffer :: [Array] -> IO Buffer
-compileBuffer arrs = do
-    let calcDesc (offset,setters,descs) (Array arrType cnt setter) =
-          let size = cnt * sizeOfArrayType arrType
-            in (size + offset, (offset, size,setter):setters, ArrayDesc arrType cnt offset size:descs)
-        (bufSize,arrSetters,arrDescs) = foldl' calcDesc (0,[],[]) arrs
-    bo <- alloca $! \pbo -> glGenBuffers 1 pbo >> peek pbo
-    forM_ arrSetters $! \(offset,size,setter) -> setter $! glBufferSubData GL_ARRAY_BUFFER (fromIntegral offset) (fromIntegral size)
+compileBuffer :: MTLDevice -> [Array] -> IO Buffer
+compileBuffer dev arrs = do
+    let (bufSize,arrSetters,arrDescs) = foldl' calcDesc (0,[],[]) arrs
+    bo <- alloca $! \pbo -> makeBuffer dev pbo 1 MTLResourceOptionCPUCacheModeDefault >> peek pbo --glGenBuffers
+    forM_ arrSetters $! \(offset,size,setter) -> setter $! makeBuffer dev (fromIntegral offset) (fromIntegral size) MTLResourceOptionCPUCacheModeDefault
     return $! Buffer (V.fromList $! reverse arrDescs) bo
 
-updateBuffer :: Buffer -> [(Int,Array)] -> IO ()
-updateBuffer (Buffer arrDescs bo) arrs = do
-    forM arrs $ \(i,Array arrType cnt setter) -> do
+updateBuffer :: MTLDevice -> Buffer -> [(Int,Array)] -> IO ()
+updateBuffer (Buffer arrDescs bo) arrs = forM arrs $ 
+    \(i,Array arrType cnt setter) -> do
         let ArrayDesc ty len offset size = arrDescs V.! i
-        when (ty == arrType && cnt == len) $
-            setter $! glBufferSubData GL_ARRAY_BUFFER (fromIntegral offset) (fromIntegral size)
+        when (ty == arrType && cnt == len) $ 
+            setter $! makeBuffer dev (fromIntegral offset) (fromIntegral size) MTLResourceOptionCPUCacheModeDefault
 
 bufferSize :: Buffer -> Int
 bufferSize = V.length . bufArrays
@@ -55,49 +56,27 @@ arrayType buf arrIdx = arrType $! bufArrays buf V.! arrIdx
 
 -- Texture
 disposeTexture :: TextureData -> IO ()
-disposeTexture (TextureData to) = withArray [to] $ glDeleteTextures 1
+disposeTexture (TextureData to) = withArray [to] $ metalDeleteTextures --glDeleteTextures 1
 
 -- FIXME: Temporary implemenation
 uploadTexture2DToGPU :: DynamicImage -> IO TextureData
 uploadTexture2DToGPU = uploadTexture2DToGPU' True False True False
 
-uploadTexture2DToGPU' :: Bool -> Bool -> Bool -> Bool -> DynamicImage -> IO TextureData
-uploadTexture2DToGPU' isFiltered isSRGB isMip isClamped bitmap' = do
+uploadTexture2DToGPU' :: Bool -> DynamicImage -> IO TextureData
+uploadTexture2DToGPU' isMip bitmap' = do
     let bitmap = case bitmap' of
                     ImageRGB8   i@(Image w h _) -> bitmap'
                     ImageRGBA8  i@(Image w h _) -> bitmap'
                     ImageYCbCr8 i@(Image w h _) -> ImageRGB8 $ convertImage i
                     di -> ImageRGBA8 $ convertRGBA8 di
-
-    glPixelStorei GL_UNPACK_ALIGNMENT 1
-    to <- alloca $! \pto -> glGenTextures 1 pto >> peek pto
-    glBindTexture GL_TEXTURE_2D to
-    let (width,height) = bitmapSize bitmap
-        bitmapSize (ImageRGB8 (Image w h _)) = (w,h)
-        bitmapSize (ImageRGBA8 (Image w h _)) = (w,h)
-        bitmapSize _ = error "unsupported image type :("
-        withBitmap (ImageRGB8 (Image w h v)) f = SV.unsafeWith v $ f (w,h) 3 0
-        withBitmap (ImageRGBA8 (Image w h v)) f = SV.unsafeWith v $ f (w,h) 4 0
-        withBitmap _ _ = error "unsupported image type :("
-        texFilter = if isFiltered then GL_LINEAR else GL_NEAREST
-        wrapMode = case isClamped of
-            True    -> GL_CLAMP_TO_EDGE
-            False   -> GL_REPEAT
-        (minFilter,maxLevel) = case isFiltered && isMip of
-            False   -> (texFilter,0)
-            True    -> (GL_LINEAR_MIPMAP_LINEAR, floor $ log (fromIntegral $ max width height) / log 2)
-    glTexParameteri GL_TEXTURE_2D GL_TEXTURE_WRAP_S $ fromIntegral wrapMode
-    glTexParameteri GL_TEXTURE_2D GL_TEXTURE_WRAP_T $ fromIntegral wrapMode
-    glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER $ fromIntegral minFilter
-    glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER $ fromIntegral texFilter
-    glTexParameteri GL_TEXTURE_2D GL_TEXTURE_BASE_LEVEL 0
-    glTexParameteri GL_TEXTURE_2D GL_TEXTURE_MAX_LEVEL $ fromIntegral maxLevel
-    withBitmap bitmap $ \(w,h) nchn 0 ptr -> do
-        let internalFormat  = fromIntegral $ if isSRGB then (if nchn == 3 then GL_SRGB8 else GL_SRGB8_ALPHA8) else (if nchn == 3 then GL_RGB8 else GL_RGBA8)
-            dataFormat      = fromIntegral $ case nchn of
-                3   -> GL_RGB
-                4   -> GL_RGBA
-                _   -> error "unsupported texture format!"
-        glTexImage2D GL_TEXTURE_2D 0 internalFormat (fromIntegral w) (fromIntegral h) 0 dataFormat GL_UNSIGNED_BYTE $ castPtr ptr
-    when isMip $ glGenerateMipmap GL_TEXTURE_2D
+        (width,height) = bitmapSize bitmap
+                         bitmapSize (ImageRGB8  (Image w h _)) = (w,h)
+                         bitmapSize (ImageRGBA8 (Image w h _)) = (w,h)
+                         bitmapSize _ = error "unsupported image type :("
+                         withBitmap (ImageRGB8 (Image w h v))  f = SV.unsafeWith v $ f (w,h) 3 0
+                         withBitmap (ImageRGBA8 (Image w h v)) f = SV.unsafeWith v $ f (w,h) 4 0
+                         withBitmap _ _ = error "unsupported image type :("
+        to <- alloca $! \pto -> newTextureWithDescriptor pto >> MTLTextureDescriptor PixelFormatBGRA8Unorm width height --peek pto
+        replaceRegion 0 v $ castPtr ptr
+    when isMip $ replaceRegion 1 v $ castPtr ptr
     return $ TextureData to

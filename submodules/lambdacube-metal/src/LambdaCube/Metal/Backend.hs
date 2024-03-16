@@ -37,9 +37,9 @@ import LambdaCube.Metal.Bindings
 
 data CGState
   = CGState
-  { drawCommands          :: [MetalCommand]
+  { drawCommands          :: [MetalCommand] --MTLFunctions
   -- draw context data
-  , rasterContext         :: RasterContext
+  , deviceContext         :: DeviceContext
   , accumulationContext   :: AccumulationContext
   , renderTarget          :: MetalRenderTarget
   , currentProgram        :: ProgramName
@@ -51,7 +51,7 @@ data CGState
 initCGState = CGState
   { drawCommands          = mempty
   -- draw context data
-  , rasterContext         = error "compileCommand: missing RasterContext"
+  , rasterContext         = error "compileCommand: missing DeviceContext"
   , accumulationContext   = error "compileCommand: missing AccumulationContext"
   , renderTarget          = error "compileCommand: missing RenderTarget"
   , currentProgram        = error "compileCommand: missing Program"
@@ -200,10 +200,10 @@ clearRenderTarget values = do
     let setClearValue (m,i) value = case value of
             ClearImage Depth (VFloat v) -> do
                 glDepthMask 1
-                glClearDepth $ realToFrac v
+                indirectRenderCommand $ realToFrac v --glClearDepth 
                 return (m .|. GL_DEPTH_BUFFER_BIT, i)
             ClearImage Stencil (VWord v) -> do
-                glClearStencil $ fromIntegral v
+                indirectRenderCommand $ fromIntegral v --glClearStencil
                 return (m .|. GL_STENCIL_BUFFER_BIT, i)
             ClearImage Color c -> do
                 let (r,g,b,a) = case c of
@@ -535,7 +535,7 @@ setStorage :: MetalRenderer -> MetalStorage -> IO (Maybe String)
 setStorage p input' = setStorage' p (Just input')
 
 setStorage' :: MetalRenderer -> Maybe MetalStorage -> IO (Maybe String)
-setStorage' p@GLRenderer{..} input' = do
+setStorage' p@MetalRenderer{..} input' = do
     -- TODO: check matching input schema
     {-
     case input' of
