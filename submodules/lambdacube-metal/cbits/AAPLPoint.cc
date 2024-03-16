@@ -1,14 +1,23 @@
+#include "mtlpp.h"
 
-class AAPLVertex
+class AAPLPoint
 {
     float2 position;
     float4 color;
+}
+
+class AAPLShape{
+    AAPLShape* shape;
+
+    AAPLShape(AAPLPoint s){
+        shape = s;
+    }
 
     //Define a custom AAPLTriangle class that provides an interface to a default triangle, which is made up of 3 vertices:
-    AAPLVertex* makeTriangle()
+    AAPLShape* makeTriangle()
     {
         const float TriangleSize = 64;
-        static const AAPLVertex triangleVertices[] =
+        static const AAPLPoint triangleVertices[] =
         {
             // Pixel Positions,                          RGBA colors.
             { { -0.5*TriangleSize, -0.5*TriangleSize },  { 1, 1, 1, 1 } },
@@ -31,9 +40,9 @@ class AAPLVertex
             trianglePosition.y = 0.0;
 
             // Create the triangle, set its properties, and add it to the array.
-            AAPLVertex* triangle   = makeTriangle();
-            triangle.position      = trianglePosition;
-            triangle.color         = Colors[t % NumColors];
+            AAPLShape* triangle = new AAPLShape(makeTriangle());
+            triangle.position   = trianglePosition;
+            triangle.color      = Colors[t % NumColors];
             triangles.addObject(triangle);
         }
         _mesh = triangles;

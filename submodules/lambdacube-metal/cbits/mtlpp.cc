@@ -59,7 +59,7 @@ class AAPLRenderer {
         if(self)
         {
             _device = mtkView.device;
-            _inFlightSemaphore = dispatch_semaphore_create(AAPLMaxFramesInFlight);
+            //_inFlightSemaphore = dispatch_semaphore_create(AAPLMaxFramesInFlight);
             self.loadMetal(mtkView);
             self.loadAssets();
         }
@@ -168,10 +168,9 @@ class AAPLRenderer {
         NS::Assert(_computePipeline, "Error creating pipeline which links library from source: %@", error);
     }
 
-    /// Load assets into metal objects
     void loadAssets(){
-        // Create a buffer with positions to draw the cube.
-        static const vector_float3 cubePositions[] =
+        // Describe positions of the cube vertexies
+        entityPositions = static const vector_float3 cubePositions[] =
         {
             // Front
             { -1, -1,  1 },
@@ -209,10 +208,7 @@ class AAPLRenderer {
             { -1,  1,  1 },
             { -1, -1,  1 }
         };
-
-        _positionBuffer = _device.newBufferWithBytes(cubePositions, sizeof(cubePositions), 0);
-        
-        // Create a buffer with texture coordinates to draw the cube.
+        // Describe the UVs/Texture Coordinates of the cube
         static const vector_float2 cubeTexCoords[] =
         {
             // Front
@@ -252,8 +248,6 @@ class AAPLRenderer {
             { 1, 0 },
         };
 
-        _texCoordBuffer = _device.newBufferWithBytes(cubeTexCoords, sizeof(cubeTexCoords), 0);
-        
         // Create the index buffer to draw the cube.
         static uint16_t indices[] =
         {
@@ -275,10 +269,32 @@ class AAPLRenderer {
             // Left
             20, 22, 21, 20, 23, 22,
         };
+        
+        _positionBuffer = _device.newBufferWithBytes(cubePositions, sizeof(cubePositions), 0);
+        _texCoordBuffer = _device.newBufferWithBytes(cubeTexCoords, sizeof(cubeTexCoords), 0);
+        _indexBuffer    = _device.newBufferWithBytes(indices, sizeof(indices), 0);
+        
+        // Load color texture from asset catalog
+        MTKTextureLoader* textureLoader = MTKTextureLoader::alloc(_device);
+        NS::Dictionary *textureLoaderOptions = {
+            MTK::TextureLoaderOptionTextureUsage       = MTL::TextureUsageShaderRead,
+            MTK::TextureLoaderOptionTextureStorageMode = MTL::StorageModePrivate
+            };
 
+        NS::Error *error;
+        _colorMap = textureLoader.newTextureWithName("ColorMap", scaleFactor:1.0, NULL, textureLoaderOptions, &error);
+        NS::Assert(_colorMap, "Error creating the Metal texture, error: %@.", error);
+    }
+
+
+    /// Load assets into metal objects
+    // Create a buffer with positions to draw the provided MeshAsset.
+    void loadAssets(vector_float3 entityPositions[], vector_float2 entityTexCoords[], uint16_t indices[]){
+        NS::Error *error;
+        _positionBuffer = _device.newBufferWithBytes(cubePositions, sizeof(cubePositions), 0);
+        _texCoordBuffer = _device.newBufferWithBytes(cubeTexCoords, sizeof(cubeTexCoords), 0);
         _indexBuffer = _device.newBufferWithBytes(indices, sizeof(indices), 0);
         
-
         // Load color texture from asset catalog
         MTKTextureLoader* textureLoader = MTKTextureLoader::alloc(_device);
         NS::Dictionary *textureLoaderOptions = {
@@ -286,9 +302,7 @@ class AAPLRenderer {
             MTKTextureLoaderOptionTextureStorageMode = MTL::StorageModePrivate
             };
 
-        NS::Error *error;
-
-        _colorMap = textureLoader.newTextureWithName("ColorMap", scaleFactor:1.0, NULL, textureLoaderOptions, &error);
+        _colorMap = textureLoader.newTextureWithName("ColorMap", 1.0, NULL, textureLoaderOptions, &error);
         NS::Assert(_colorMap, "Error creating the Metal texture, error: %@.", error);
     }
 
@@ -296,17 +310,13 @@ class AAPLRenderer {
     void updateSceneState()
     {
         NS::UInteger frameDataBufferIndex = _frameNumber % AAPLMaxFramesInFlight;
+        AAPLPerFrameData *frameData  = (AAPLPerFrameData*)_frameDataBuffer[frameDataBufferIndex].contents;
+        frameData->projectionMatrix  = _projectionMatrix;
 
-        AAPLPerFrameData *frameData = (AAPLPerFrameData*)_frameDataBuffer[frameDataBufferIndex].contents;
-
-        frameData->projectionMatrix = _projectionMatrix;
-
-        vector_float3   rotationAxis  = { 1, 1, 0 };
-        matrix_float4x4 modelMatrix = matrix4x4_rotation(_rotation, rotationAxis);
-        matrix_float4x4 viewMatrix  = matrix4x4_translation(0.0, 0.0, -6.0);
-
-        frameData->modelViewMatrix = matrix_multiply(viewMatrix, modelMatrix);
-
+        vector_float3   rotationAxis = { 1, 1, 0 };
+        matrix_float4x4 modelMatrix  = matrix4x4_rotation(_rotation, rotationAxis);
+        matrix_float4x4 viewMatrix   = matrix4x4_translation(0.0, 0.0, -6.0);
+        frameData->modelViewMatrix   = matrix_multiply(viewMatrix, modelMatrix);
         _rotation += .01;
     }
 
@@ -321,7 +331,7 @@ class AAPLRenderer {
     /// Create render targets for compute kernel inputs
     void createRenderTargetsWithSize(CGSize size)
     {
-        MTLTextureDescriptor *renderTargetDesc = [MTLTextureDescriptor new];
+        MTL::TextureDescriptor *renderTargetDesc = new MTL::TextureDescriptor();
 
         // Set up properties common to both color and depth textures.
         renderTargetDesc.width  = size.width;

@@ -8,14 +8,13 @@ Header for the renderer class that performs Metal setup and per-frame rendering.
 #ifndef AAPLRenderer_h
 #define AAPLRenderer_h
 
-@import MetalKit;
+#include "MetalKit.h";
+#include "mtlpp.h"
 
 // Platform independent renderer class
-@interface AAPLRenderer : NSObject<MTKViewDelegate>
-
-- (nonnull instancetype)initWithMetalKitView:(nonnull MTKView *)mtkView;
-- (void)compileDylibWithString:(NSString *_Nonnull)programString;
-
-@end
+class AAPLRenderer : NS::Object<MTK::ViewDelegate>{
+    AAPLRenderer initWithMetalKitView(MTKView* mtkView);
+    void compileDylibWithString(NS::String*    programString);
+}
 
 #endif /* AAPLRenderer_h */

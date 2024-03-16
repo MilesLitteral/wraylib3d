@@ -127,9 +127,7 @@ data MBuiltin = None                           -- The argument doesn't have a va
             |MTrue
             deriving (Show)
 
-foreign import ccall        "createComputeInstance"            createComputeInstance       :: IO ()
-foreign import ccall        "createRenderingInstanceGPU"       createRenderingInstanceGPU  :: IO ()
-foreign import ccall        "createRenderingInstanceCPU"       createRenderingInstanceCPU  :: IO ()
+foreign import ccall        "createRendererInstance"          createRendererInstance  :: IO ()
 foreign import ccall unsafe "&metal_kernel"                    metal_kernel                :: Ptr MValue
 foreign import ccall   safe "metal_krncall"                    metal_krncall              :: MValue -> MValue -> MValue -> IO MValue
 {-
