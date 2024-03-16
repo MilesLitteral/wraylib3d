@@ -256,7 +256,6 @@ nullSetter n t _ = return ()
 --nullSetter n t _ = Prelude.putStrLn $ "WARNING: unknown uniform: " ++ show n ++ " :: " ++ t
 
 
-uniformV4U   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V4U
 
 uniformInt   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun Int32
 uniformV2I   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V2I
@@ -309,12 +308,13 @@ uniformV2U   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V2U
 uniformV2U n is = case Map.lookup n is of
     Just (SV2U fun)    -> fun
     _   -> nullSetter n "V2U"
-    
+
 uniformV3U   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V3U
 uniformV3U n is = case Map.lookup n is of
     Just (SV3U fun)    -> fun
     _   -> nullSetter n "V3U"
-
+    
+uniformV4U   :: GLUniformName -> Map GLUniformName InputSetter -> SetterFun V4U
 uniformV4U n is = case Map.lookup n is of
     Just (SV4U fun)    -> fun
     _   -> nullSetter n "V4U"

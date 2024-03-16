@@ -1,5 +1,1 @@
-#include "mtlpp/mtlpp.hpp"
-
-MetalEngine             createComputeInstance();
-MetalRenderingEngine    createRenderingInstanceGPU();
-MetalRenderingEngineCPU createRenderingInstanceCPU();
+#include "metal-cpp/Metal/Metal.hpp"
