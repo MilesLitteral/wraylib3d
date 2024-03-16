@@ -1,6 +1,6 @@
 {-# LANGUAGE ForeignFunctionInterface, FlexibleInstances, CPP #-}
 
-#include "mtlpp/mtlpp.hpp"
+#include "cbits/mtlpp.h"
 module LambdaCube.Metal.Bindings where
 
 import Foreign
@@ -8,8 +8,7 @@ import Foreign.C
 
 -- The Foreign Interface
 -- Every 'result' from Metal will be a Pointer 
-type MValue  = Ptr CULong
-
+type MValue     = Ptr CULong
 type MetalSizeN = CInt
 
 metal_stdlib :: String
@@ -21,6 +20,8 @@ data MBuiltin = None                           -- The argument doesn't have a va
             |Array                          -- An array.
             |Pointer                         -- A pointer.
             |Kernel
+            |Vertex
+            |Fragment
             |Device
             |Void
             |ThreadPositionInGrid
@@ -109,8 +110,8 @@ data MBuiltin = None                           -- The argument doesn't have a va
             |RGB10a2Unorm                   -- A packed 32-bit format with normalized, unsigned integer color components.
             |RG11b10Float                   -- A packed 32-bit format with two 11-bit (for red and green) and one 10-bit (for blue) floating-point color components.
             -- Metal Object Data Types
-            |MTLTexture                        -- A texture.
-            |MTLSampler                        -- A texture sampler.
+            |MTexture                        -- A texture.
+            |MSampler                        -- A texture sampler.
             |IndirectCommandBuffer          -- An indirect command buffer.
             |CommandBuffer
             |CommandQueue
@@ -139,6 +140,8 @@ mtype :: MValue -> IO MBuiltin
 mtype v = metalType v >>= \x -> case x of
     (#const none)          -> return MNone
     (#const kernel)        -> return Kernel
+    (#const vertex)        -> return Vertex
+    (#const fragment)      -> return Fragment
     (#const bool1)         -> return Bool1
     (#const bool2)         -> return Bool2
     (#const bool3)         -> return Bool3
