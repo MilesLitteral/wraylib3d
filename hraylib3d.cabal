@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
 
@@ -82,7 +82,7 @@ library
       HRayLib3d.GameEngine.Loader.Entity
       HRayLib3d.GameEngine.Loader.GameCharacter
       HRayLib3d.GameEngine.Loader.GLB
-      HRayLib3d.GameEngine.Loader.GLTF
+      HRayLib3d.GameEngine.Loader.GlTF
       HRayLib3d.GameEngine.Loader.Image
       HRayLib3d.GameEngine.Loader.MD3
       HRayLib3d.GameEngine.Loader.ShaderParser

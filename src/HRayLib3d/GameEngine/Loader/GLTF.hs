@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings, ViewPatterns #-}
-module HRayLib3d.GameEngine.Loader.GLTF
+module HRayLib3d.GameEngine.Loader.GlTF
   ( readGLTF
   , loadGLTF
   , getGLTFModel

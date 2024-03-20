@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE FlexibleInstances, RecordWildCards #-}
 module HRayLib3d.GameEngine.Graphics.OBJ
   ( addOBJ
   , addGPUOBJ
