@@ -190,7 +190,7 @@ data PrecisionQualifier = HighP | MediumP | LowP
 
 -- TODO The type qualifier can be present only when there is one or more declarators.
 -- There other restrictions, see 4.1.8.
-data Field = Field (Maybe TypeQualifier) TypeSpecifier [QualifierDeclarator]
+data Field = Field (Maybe TypeQualifier) TypeSpecifier [StructDeclarator]
   deriving (Show, Eq)
 
 data QualifierDeclarator = QualifierDeclarator String (Maybe (Maybe Expr)) -- constant expression

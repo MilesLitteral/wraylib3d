@@ -74,6 +74,8 @@ dependencies:
 - gltf-loader
 - gltf-codec
 - dlist
+- wavefront
+- network
 #- unix
 - extra
 - prettyclass
@@ -86,6 +88,7 @@ dependencies:
 - tinyfiledialogs
 - adjunctions
 - wreq   # will be replaced with internal Network module features, currently in for compatibility 
+- http-types
 - text-show
 - criterion
 - monomer-hagrid

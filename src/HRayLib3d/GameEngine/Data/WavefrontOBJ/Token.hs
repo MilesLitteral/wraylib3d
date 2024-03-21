@@ -10,14 +10,20 @@
 -----------------------------------------------------------------------------
 
 {-# LANGUAGE OverloadedStrings #-}
-module HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Token where
+module HRayLib3d.GameEngine.Data.WavefrontOBJ.Token where
 
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Face
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Line
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Location
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Normal
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Point
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.TexCoord
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Face
+    ( Face(..), FaceIndex(FaceIndex) )
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Line
+    ( Line(Line), LineIndex(LineIndex) )
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Location
+    ( Location(Location) )
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Normal
+    ( Normal(Normal) )
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Point
+    ( Point(Point) )
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.TexCoord
+    ( TexCoord(TexCoord) )
 import Control.Applicative ( Alternative(..) )
 import Data.Attoparsec.Text as AP
 import Data.Char ( isSpace )

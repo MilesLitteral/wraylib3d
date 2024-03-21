@@ -10,6 +10,7 @@ module HRayLib3d.Network.Realms (
 
     import HRayLib3d.Network.Requests
     import HRayLib3d.Network.Database
+    import Data.ByteString.UTF8 as BSU      -- from utf8-string
     import qualified Data.ByteString.Lazy as LS
 
     -- #Realms
@@ -27,7 +28,12 @@ module HRayLib3d.Network.Realms (
     realmsLoadRealmContentList  ip realm = sendHTTPRequest $ "http://" ++ ip ++ "/realms/" ++ realm
 
     sendRealmQuery   :: Host -> Query -> IO Int
-    sendRealmQuery host query   = sendDBQuery "host=" ++ host ++ " port=5432 dbname=hrlRealms connect_timeout=10" query
+    sendRealmQuery host query   =
+        do 
+        let libpqStr = BSU.fromString ("host=" ++ host ++ " port=5432 dbname=hrlRealms connect_timeout=10")
+        sendDBQuery libpqStr query
 
     sendRealmQueryBS :: Host -> Query -> IO LS.ByteString
-    sendRealmQueryBS host query = sendDBQueryBS "host=" ++ host ++ " port=5432 dbname=hrlRealms connect_timeout=10" query
+    sendRealmQueryBS host query = do
+        let libpqStr = BSU.fromString ("host=" ++ host ++ " port=5432 dbname=hrlRealms connect_timeout=10") 
+        sendDBQueryBS libpqStr query

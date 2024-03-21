@@ -9,7 +9,7 @@
 --
 -----------------------------------------------------------------------------
 
-module HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.TexCoord where
+module HRayLib3d.GameEngine.Data.WavefrontOBJ.TexCoord where
 
 -- |A texture coordinate is a 3D-floating vector. You can access to its components by pattern
 -- matching on them:

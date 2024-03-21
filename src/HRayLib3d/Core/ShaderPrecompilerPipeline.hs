@@ -5,8 +5,9 @@ module HRayLib3d.Core.ShaderPrecompilerPipeline where
     import MegaStore              ( MegaStore(MegaStore) )
     import System.Directory       ( createDirectoryIfMissing, getDirectoryContents )
     import Codec.Compression.GZip ( compress )
-
     import Data.Binary ( encode )
+    import HRayLib3d.Core.ResourceBundler ( saveCache ) 
+
     import qualified Data.Text as T
     import qualified Data.ByteString      as BS
     import qualified Data.ByteString.Lazy as BL
@@ -42,11 +43,11 @@ module HRayLib3d.Core.ShaderPrecompilerPipeline where
     
     createShaderCache :: [FilePath] -> IO ShaderCache
     createShaderCache cache = do
-        bytes <- mapM (BS.fromFilePath) cache
+        bytes <- mapM BS.fromFilePath cache
         let compiledCache   = zip (map T.pack cache) bytes
         return $ MegaStore compiledCache
 
-    writeShaderCache :: String -> ShaderCache -> IO ()
+    writeShaderCache :: String -> [(T.Text, BS.ByteString)] -> IO ()
     writeShaderCache cacheName store = do
         createDirectoryIfMissing False "./shaderCache/"
-        saveCache ("./shaderCache/" ++ cacheName)  store
+        saveCache store True ("./" ++ cacheName ++ "/")

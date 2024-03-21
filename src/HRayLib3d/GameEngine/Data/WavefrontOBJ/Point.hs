@@ -9,7 +9,7 @@
 --
 -----------------------------------------------------------------------------
 
-module HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Point where
+module HRayLib3d.GameEngine.Data.WavefrontOBJ.Point where
 
 -- |A point is a single index that references the locations. It’s a canonical type that truly
 -- represents a polygonal point.

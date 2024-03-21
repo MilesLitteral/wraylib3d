@@ -45,6 +45,7 @@ library
       HRayLib3d.GameEngine.Collision
       HRayLib3d.GameEngine.Content
       HRayLib3d.GameEngine.Data
+      HRayLib3d.GameEngine.Data.AssetIR
       HRayLib3d.GameEngine.Data.BSP
       HRayLib3d.GameEngine.Data.GameCharacter
       HRayLib3d.GameEngine.Data.GLB
@@ -199,6 +200,7 @@ library
     , gltf-loader
     , hashable
     , http-client
+    , http-types
     , ilist
     , lambdacube-compiler
     , lambdacube-gl
@@ -214,6 +216,7 @@ library
     , monomer
     , monomer-hagrid
     , mtl
+    , network
     , nsis
     , parsec
     , postgresql-simple
@@ -237,6 +240,7 @@ library
     , vector
     , vulkan
     , vulkan-utils
+    , wavefront
     , wreq
     , xml
     , xml-conduit
@@ -284,6 +288,7 @@ executable RealmViewer-FE-Demo
     , hashable
     , hraylib3d
     , http-client
+    , http-types
     , ilist
     , lambdacube-compiler
     , lambdacube-gl
@@ -299,6 +304,7 @@ executable RealmViewer-FE-Demo
     , monomer
     , monomer-hagrid
     , mtl
+    , network
     , nsis
     , parsec
     , postgresql-simple
@@ -322,6 +328,7 @@ executable RealmViewer-FE-Demo
     , vector
     , vulkan
     , vulkan-utils
+    , wavefront
     , wreq
     , xml
     , xml-conduit
@@ -368,6 +375,7 @@ executable hraylib3d
     , hashable
     , hraylib3d
     , http-client
+    , http-types
     , ilist
     , lambdacube-compiler
     , lambdacube-gl
@@ -383,6 +391,7 @@ executable hraylib3d
     , monomer
     , monomer-hagrid
     , mtl
+    , network
     , nsis
     , parsec
     , postgresql-simple
@@ -406,6 +415,7 @@ executable hraylib3d
     , vector
     , vulkan
     , vulkan-utils
+    , wavefront
     , wreq
     , xml
     , xml-conduit
@@ -454,6 +464,7 @@ test-suite hraylib3d-test
     , hashable
     , hraylib3d
     , http-client
+    , http-types
     , ilist
     , lambdacube-compiler
     , lambdacube-gl
@@ -469,6 +480,7 @@ test-suite hraylib3d-test
     , monomer
     , monomer-hagrid
     , mtl
+    , network
     , nsis
     , parsec
     , postgresql-simple
@@ -493,6 +505,7 @@ test-suite hraylib3d-test
     , vector
     , vulkan
     , vulkan-utils
+    , wavefront
     , wreq
     , xml
     , xml-conduit

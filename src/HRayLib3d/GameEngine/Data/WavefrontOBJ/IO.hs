@@ -1,6 +1,6 @@
 module HRayLib3d.GameEngine.Data.WavefrontOBJ.IO (
   module HRayLib3d.GameEngine.Data.WavefrontOBJ.Object
-  , module HRayLib3d.GameEngine.Data.WavefrontOBJ 
+  --, module HRayLib3d.GameEngine.Data.WavefrontOBJ 
   , importObjFromFile
   , exportObjAsFile
   -- , Frame(..)

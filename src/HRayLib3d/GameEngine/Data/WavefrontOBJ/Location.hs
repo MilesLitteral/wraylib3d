@@ -9,7 +9,7 @@
 --
 -----------------------------------------------------------------------------
 
-module HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Location where
+module HRayLib3d.GameEngine.Data.WavefrontOBJ.Location where
 
 -- |A location is a 4-floating vector. You can access to its components by pattern matching on them:
 --

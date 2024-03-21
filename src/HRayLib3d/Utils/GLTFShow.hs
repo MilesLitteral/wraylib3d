@@ -3,7 +3,8 @@ module HRayLib3d.Utils.GLTFShow where
     import Control.Monad
     import Text.Show.Pretty
     import System.Environment
-    import HRayLib3d.GameEngine.Loader.GlTF
+    import HRayLib3d.GameEngine.Loader.GLTF ( loadGLTF )
 
     gltfShow :: IO ()
     gltfShow = getArgs >>= mapM_ (loadGLTF >=> pPrint)
+

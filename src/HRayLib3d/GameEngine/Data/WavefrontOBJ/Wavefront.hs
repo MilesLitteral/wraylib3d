@@ -35,15 +35,15 @@ module HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront (
     -- * Object
   , WavefrontOBJ(..)
     -- * Re-exports
-  , module HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.IO
+  , module HRayLib3d.GameEngine.Data.WavefrontOBJ.IO
   ) where
 
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Element
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Face
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.IO
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Line
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Location
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Normal
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Object
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Point
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.TexCoord
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Element
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Face
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.IO
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Line
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Location
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Normal
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Object
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Point
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.TexCoord

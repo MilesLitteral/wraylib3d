@@ -2,37 +2,22 @@
 {-# OPTIONS_GHC -fwarn-incomplete-patterns #-}
 
 module HRayLib3d.Network.Requests where
-
-    import Data.Text
-    import Data.Proxy
-    import Data.Aeson
-    import Data.Aeson.KeyMap
-    import Data.Maybe
-    import Data.Word
-    import Data.Monoid
+    import Data.Proxy ( Proxy )
+    import Data.Aeson ( decode, (.:?), FromJSON(parseJSON), Value(Object), ToJSON )
     import Data.Hashable (Hashable(..))
-    import Data.Map.Strict
+    import Data.Map.Strict ( (!), Map )
 
-    import GHC.Exts
-    import GHC.Generics
-    import Text.URI (URI)
-    import Control.Concurrent
-    import Control.Monad.IO.Class
+    import GHC.Exts ( IsList )
+    import Control.Monad.IO.Class ( MonadIO(..) )
     import Control.Exception (catch, SomeException)
-    import Control.Lens hiding ((.=))
 
-    import Numeric (showHex)
     import qualified Text.URI  as URI
-    import qualified Data.UUID as UD
     import qualified Data.Text as T
-    import qualified Data.Time.Clock as T
-    import qualified Data.Time.Clock.System as T
     import qualified Data.ByteString as B
     import qualified Data.ByteString.Lazy as BL
     import qualified Data.ByteString.Char8 as BC
     import qualified Network.HTTP.Req as R
-    import qualified Network.HTTP.Client.MultipartFormData as R
-    import qualified Network.HTTP.Client as C
+
 
     -- # Requests 
     -- All HTTP request related functions go here.

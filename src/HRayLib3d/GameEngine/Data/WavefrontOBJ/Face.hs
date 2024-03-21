@@ -11,7 +11,7 @@
 --
 -----------------------------------------------------------------------------
 
-module HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Face where
+module HRayLib3d.GameEngine.Data.WavefrontOBJ.Face where
 
 -- |A face index is a triplet of indices. @'FaceIndex' vi vti vni@ is a face that indexes the
 -- locations with @vi@, the texture coordinates with @vti@ and the normals with @vni@. An index set

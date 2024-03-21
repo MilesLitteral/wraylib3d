@@ -198,4 +198,6 @@ loadBSP n = readBSP <$> LB.readFile n
 -- where this will result in a Lazy ByteString that is then
 -- read by readBSP in IO
 sendRealmBSPQuery :: Query -> IO BSPLevel
-sendRealmBSPQuery q = readBSP <$> sendRealmQueryBS q
+sendRealmBSPQuery q = do
+  let bts = sendRealmQueryBS "" q --TODO: Replace "" with a known host
+  readBSP <$> bts

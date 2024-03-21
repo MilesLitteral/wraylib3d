@@ -224,7 +224,7 @@ module HRayLib3d.Core.BuildBundler (
     buildQuestVRApp   = undefined
 
     buildHoloLensApp :: IO ()
-    buildQuestVRApp   = undefined
+    buildHoloLensApp   = undefined
 
     buildViveApp :: IO ()
     buildViveApp      = undefined
@@ -237,7 +237,7 @@ module HRayLib3d.Core.BuildBundler (
     buildVRApp = undefined
 
     buildARApp  :: IO ()
-    buildVRApp = undefined
+    buildARApp = undefined
 
     buildXRApp  :: IO ()
-    buildVRApp = undefined
+    buildXRApp = undefined

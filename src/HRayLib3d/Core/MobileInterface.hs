@@ -1,4 +1,5 @@
---{-# LANGUAGE DatatypeContexts #-}
+{-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
+{-# LANGUAGE InstanceSigs #-}
 module HRayLib3d.Core.MobileInterface where
 
     import qualified Data.Text as T
@@ -23,11 +24,13 @@ module HRayLib3d.Core.MobileInterface where
     newtype DjinniManifest      = DjinniManifest { djmRawManifest :: [DjinniFile] } deriving (Eq, Show)
 
     data Show a => DVar    a    = DVar      { iType          :: String, iValue :: a} deriving (Eq, Show)
-    data Show a => DEnum   a    = DEnum     { enums          :: [a] }                deriving (Eq, Show)
-    data Show a => DConst       = DConst    { constType :: String, constValues :: [String]} deriving (Eq, Show)
+    data Show a => DEnum   a    = DEnum     { enums          :: [String] }           deriving (Eq, Show)
+
+    data Show a => DConst  a     = DConst    { constType :: a, constValues :: [String]} deriving (Eq, Show)
+
     data Show a => DFlags  a    = Flags     { flags          :: [a] } deriving (Eq, Show)
     data Show a => DRecord a    = Record    { recordContents :: [a] } deriving (Eq, Show)
-    data Show a => DInterface a = Interface { iValues        :: [a], iComments :: [String], iConstants :: [DConst]} deriving (Eq, Show)
+    data Show a => DInterface a = Interface { iValues        :: [a], iComments :: [String], iConstants :: [DConst a]} deriving (Eq, Show)
    
     data DClass =
         DClass {
@@ -44,8 +47,8 @@ module HRayLib3d.Core.MobileInterface where
         makeRecordGist :: a -> DRecord    a
         makeInterface  :: a -> DInterface a
 
-    instance ToMobile Enum where 
-        makeEnum a = DEnum (show a)
+    instance ToMobile String where 
+        makeEnum a = DEnum $ map show a
 
     -- my_enum = enum {
     --     option1;

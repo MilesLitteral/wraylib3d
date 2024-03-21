@@ -9,16 +9,16 @@
 --
 -----------------------------------------------------------------------------
 
-module HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Object where
+module HRayLib3d.GameEngine.Data.WavefrontOBJ.Object where
 
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Element
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Face
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Lexer ( Ctxt(..) )
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Line
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Location
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Normal
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Point
-import HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.TexCoord
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Element
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Face
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Lexer ( Ctxt(..) )
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Line
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Location
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Normal
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.Point
+import HRayLib3d.GameEngine.Data.WavefrontOBJ.TexCoord
 import Data.DList ( DList, toList )
 import Data.Text ( Text )
 import Data.Vector ( Vector, fromList )

@@ -9,7 +9,7 @@
 --
 -----------------------------------------------------------------------------
 
-module HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Line where
+module HRayLib3d.GameEngine.Data.WavefrontOBJ.Line where
 
 -- |A line index is a pair of indices. @'LineIndex' vi vti@. @vi@ references the locations and @vti@
 -- indexes the texture coordinates. If @vti == 'Nothing'@, then that 'LineIndex' doesn’t have

@@ -181,8 +181,8 @@ data TypeSpecifierNonArray =
   | Texture2d
   | AccessRead
   | AccessWrite
-  | AttributeQualifier (Maybe String) Field
-  -- Does Metal Even HAVE User defined types? -- | TypeName String -- TODO user-defined type, should verify if it is declared
+  | AttributeQualifier (Maybe String) [Field]
+  | TypeName String -- TODO user-defined type, should verify if it is declared, in Metal all defined types are explicit Structs
   deriving (Show, Eq)
 
 data PrecisionQualifier = HighP | MediumP | LowP
@@ -190,7 +190,8 @@ data PrecisionQualifier = HighP | MediumP | LowP
 
 -- TODO The type qualifier can be present only when there is one or more declarators.
 -- There other restrictions, see 4.1.8.
-data Field = Field (Maybe TypeQualifier) TypeSpecifier [QualifierDeclarator]
+data Field = 
+  Field (Maybe TypeQualifier) TypeSpecifier [StructDeclarator]
   deriving (Show, Eq)
 
 data QualifierDeclarator = QualifierDeclarator String (Maybe (Maybe Expr)) -- constant expression

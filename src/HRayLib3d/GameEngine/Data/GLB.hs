@@ -2,6 +2,7 @@ module HRayLib3d.GameEngine.Data.GLB where
 
 import Data.Text ( Text )
 import Data.Map  ( Map )
+import Data.Binary.Get (ByteOffset(..))
 import Codec.GLB ( fromFile, GLB )
 import Codec.GlTF.Material ( Material )
 
@@ -14,14 +15,14 @@ import Codec.GlTF.Material ( Material )
 type    GLBSkin  = Map Text Material
 newtype GLBModel = GLBModel { rawGlb :: GLB } deriving Show
 
-validateGLB :: Either String GLB -> IO GLBModel
+validateGLB :: Either (ByteOffset, String) GLB -> IO GLBModel
 validateGLB gl = case gl of
-                    Left s     -> error $ "Parse Error" ++ s
+                    Left s     -> error $ "Parse Error, Raw Parse Output:" ++ show s
                     Right glb -> return $ GLBModel glb
 
 -- A convenience function to read GLBModel types easier
 readGLB :: String -> IO GLBModel
-readGLTF glbFilename = do
+readGLB glbFilename = do
     -- open the glb file
     glbFile <- fromFile glbFilename
-    validateGLTF glbFile
+    validateGLB glbFile

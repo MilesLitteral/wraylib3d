@@ -9,7 +9,7 @@
 --
 -----------------------------------------------------------------------------
 
-module HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Normal where
+module HRayLib3d.GameEngine.Data.WavefrontOBJ.Normal where
 
 -- |A normal is a 3-floating vector. You can access to its components by pattern matching on them:
 --

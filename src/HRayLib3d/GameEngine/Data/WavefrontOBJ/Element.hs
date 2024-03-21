@@ -9,7 +9,7 @@
 --
 -----------------------------------------------------------------------------
 
-module HRayLib3d.GameEngine.Data.WavefrontOBJ.Wavefront.Element (
+module HRayLib3d.GameEngine.Data.WavefrontOBJ.Element (
     -- * Element
     Element(..)
   ) where

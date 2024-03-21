@@ -3,8 +3,8 @@ module HRayLib3d.Core.Parser.Language.Metal.Parser where
 import Prelude hiding (break, exponent)
 import Text.ParserCombinators.Parsec.Expr
 import Text.ParserCombinators.Parsec hiding (State, parse)
-import HRayLib3d.Core.Parser.Language.Metal.Syntax
-
+import HRayLib3d.Core.Parser.Language.Metal.Syntax 
+import Data.Maybe (fromJust)
 ----------------------------------------------------------------------
 -- Parser state, hold a symbol table.
 ----------------------------------------------------------------------
@@ -20,6 +20,12 @@ type P a = GenParser Char S a
 basicIncludes :: String
 basicIncludes = "#include <metal_stdlib>\n using namespace metal\n"
 
+identifierHead :: P Char
+identifierHead = letter <|> char '_'
+
+identifierTail :: P Char
+identifierTail = alphaNum <|> char '_'
+
 -- exts :: [M.Extensions]
 -- exts = [M.Metal]
 
@@ -32,88 +38,57 @@ keywords = concatMap words
      "int",    "uint",   "void", "[[thread_position_in_grid]]", "intptr_t",       "uintpyt_t" 
      ]
 
--- structDeclarationList :: P [Field]
--- structDeclarationList = many1 structDeclaration
+structDeclarationList :: P [Field]
+structDeclarationList = many1 structDeclaration
 
--- structDeclaration :: P Field
--- structDeclaration = do
---   q <- optionMaybe typeQualifier
---   s <- typeSpecifier
---   l <- structDeclaratorList
---   semicolon
---   return $ Field q s l
+structDeclaration :: P Field
+structDeclaration = do
+  q <- optionMaybe typeQualifier
+  s <- typeSpecifier
+  l <- structDeclaratorList
+  semicolon
+  return $ Field q s l
 
--- structDeclaratorList :: P [StructDeclarator]
--- structDeclaratorList = structDeclarator `sepBy` comma
+structDeclaratorList :: P [StructDeclarator]
+structDeclaratorList = structDeclarator `sepBy` comma
 
--- structDeclarator :: P StructDeclarator
--- structDeclarator = do
---   i <- identifier
---   choice
---     [ do 
---         lbracket
---         e <- optionMaybe constantExpression
---         rbracket
---         return $ StructDeclarator i (Just e)
---     , return $ StructDeclarator i Nothing
---     ]
-     
---   -- [ "attribute const uniform varying"
---   -- , "layout"
---   -- , "centroid flat smooth noperspective"
---   -- , "break continue do for while switch case default"
---   -- , "if else"
---   -- , "in out inout"
---   -- , "float int void bool true false"
---   -- , "invariant"
---   -- , "discard return"
---   -- , "mat2 mat3 mat4"
---   -- , "mat2x2 mat2x3 mat2x4"
---   -- , "mat3x2 mat3x3 mat3x4"
---   -- , "mat4x2 mat4x3 mat4x4"
---   -- , "vec2 vec3 vec4 ivec2 ivec3 ivec4 bvec2 bvec3 bvec4"
---   -- , "uint uvec2 uvec3 uvec4"
---   -- , "lowp mediump highp precision"
---   -- , "sampler1D sampler2D sampler3D samplerCube"
---   -- , "sampler1DShadow sampler2DShadow samplerCubeShadow"
---   -- , "sampler1DArray sampler2DArray"
---   -- , "sampler1DArrayShadow sampler2DArrayShadow"
---   -- , "isampler1D isampler2D isampler3D isamplerCube"
---   -- , "isampler1DArray isampler2DArray"
---   -- , "usampler1D usampler2D usampler3D usamplerCube"
---   -- , "usampler1DArray usampler2DArray"
---   -- , "sampler2DRect sampler2DRectShadow isampler2DRect usampler2DRect"
---   -- , "samplerBuffer isamplerBuffer usamplerBuffer"
---   -- , "sampler2DMS isampler2DMS usampler2DMS"
---   -- , "sampler2DMSArray isampler2DMSArray usampler2DMSArray"
---   -- , "struct"
---   -- ]
+structDeclarator :: P StructDeclarator
+structDeclarator = do
+  i <- identifier
+  choice
+    [ do 
+        lbracket
+        e <- optionMaybe constantExpression
+        rbracket
+        return $ StructDeclarator i (Just e)
+    , return $ StructDeclarator i Nothing
+    ]
 
 -- -- List of keywords reserved for future use.
--- reservedWords :: [String]
--- reservedWords = concat $ map words $
---   [-- [ "common partition active"
---   -- , "asm"
---   -- , "class union enum typedef template this packed"
---   -- , "goto"
---   -- , "inline noinline volatile public static extern external interface"
---   -- , "long short double half fixed unsigned superp"
---   -- , "input output"
---   -- , "hvec2 hvec3 hvec4 dvec2 dvec3 dvec4 fvec2 fvec3 fvec4"
---   -- , "sampler3DRect"
---   -- , "filter"
---   -- , "image1D image2D image3D imageCube"
---   -- , "iimage1D iimage2D iimage3D iimageCube"
---   -- , "uimage1D uimage2D uimage3D uimageCube"
---   -- , "image1DArray image2DArray"
---   -- , "iimage1DArray iimage2DArray uimage1DArray uimage2DArray"
---   -- , "image1DShadow image2DShadow"
---   -- , "image1DArrayShadow image2DArrayShadow"
---   -- , "imageBuffer iimageBuffer uimageBuffer"
---   -- , "sizeof cast"
---   -- , "namespace using"
---   -- , "row_major"
---   ]
+reservedWords :: [String]
+reservedWords = concat $ map words $
+  ["common partition active"
+  , "asm"
+  , "class union enum typedef template this packed"
+  , "goto"
+  , "inline noinline volatile public static extern external interface"
+  , "long short double half fixed unsigned superp"
+  , "input output"
+  , "hvec2 hvec3 hvec4 dvec2 dvec3 dvec4 fvec2 fvec3 fvec4"
+  , "sampler3DRect"
+  , "filter"
+  , "image1D image2D image3D imageCube"
+  , "iimage1D iimage2D iimage3D iimageCube"
+  , "uimage1D uimage2D uimage3D uimageCube"
+  , "image1DArray image2DArray"
+  , "iimage1DArray iimage2DArray uimage1DArray uimage2DArray"
+  , "image1DShadow image2DShadow"
+  , "image1DArrayShadow image2DArrayShadow"
+  , "imageBuffer iimageBuffer uimageBuffer"
+  , "sizeof cast"
+  , "namespace using"
+  , "row_major"
+  ]
 
 ----------------------------------------------------------------------
 -- Convenience parsers
@@ -204,6 +179,24 @@ identifier = lexeme $ do
           i ++ " is reserved (two consecutive underscores)"
         checkUnderscore i (_:cs) = checkUnderscore i cs
         checkUnderscore i [] = return i
+
+hexadecimal :: P Expr
+hexadecimal = lexeme $ try $ do
+  _ <- char '0'
+  _ <- oneOf "Xx"
+  d <- many1 hexDigit
+  m <- optionMaybe $ oneOf "Uu" -- TODO
+  return $ IntConstant Hexadecimal $ read ("0x" ++ d)
+
+octal :: P Expr
+octal = lexeme $ try $ do
+  _ <- char '0'
+  d <- many1 octDigit
+  m <- optionMaybe $ oneOf "Uu" -- TODO
+  return $ IntConstant Octal $ read  ("0o" ++ d)
+
+badOctal :: P ()
+badOctal = lexeme $ try  $ char '0' >> many1 hexDigit >> return ()
 
 -- TODO the size of the int should fit its type.
 intConstant :: P Expr
@@ -348,299 +341,300 @@ expressionTable =
 -- -- Grammar
 -- ----------------------------------------------------------------------
 
--- primaryExpression :: P Expr
--- primaryExpression = choice
---   [ Variable `fmap` try identifier
---   -- int constant
---   , intConstant
---   -- uint constant
---   -- float constant
---   , floatingConstant
---   -- bool constant
---   , keyword "true" >> return (BoolConstant True)
---   , keyword "false" >> return (BoolConstant False)
---   -- expression within parentheses
---   , between lparen rparen expression
---   ]
+primaryExpression :: P Expr
+primaryExpression = choice
+  [ Variable `fmap` try identifier
+  -- int constant
+  , intConstant
+  -- uint constant
+  -- float constant
+  , floatingConstant
+  -- bool constant
+  , keyword "true" >> return (BoolConstant True)
+  , keyword "false" >> return (BoolConstant False)
+  -- expression within parentheses
+  , between lparen rparen expression
+  ]
 
--- postfixExpression :: P Expr
--- postfixExpression = do
---   e <- try (functionCallGeneric >>= \(i,p) -> return (FunctionCall i p))
---        <|> primaryExpression
---   p <- many $ choice
---     [ between lbracket rbracket integerExpression >>= return . flip Bracket
---     , dotFunctionCallGeneric
---     , dotFieldSelection
---     , operator "++" >> return PostInc
---     , operator "--" >> return PostDec
---     ]
---   return $ foldl (flip ($)) e p
+postfixExpression :: P Expr
+postfixExpression = do
+  e <- try (functionCallGeneric >>= \(i,p) -> return (FunctionCall i p))
+       <|> primaryExpression
+  p <- many $ choice
+    [ between lbracket rbracket integerExpression >>= return . flip Bracket
+    , dotFunctionCallGeneric
+    , dotFieldSelection
+    , operator "++" >> return PostInc
+    , operator "--" >> return PostDec
+    ]
+  return $ foldl (flip ($)) e p
 
--- dotFunctionCallGeneric :: P (Expr -> Expr)
--- dotFunctionCallGeneric =
---   lexeme (try $ string "." >> functionCallGeneric) >>= \(i,p) -> return (\e -> MethodCall e i p)
+dotFunctionCallGeneric :: P (Expr -> Expr)
+dotFunctionCallGeneric =
+  lexeme (try $ string "." >> functionCallGeneric) >>= \(i,p) -> return (\e -> MethodCall e i p)
 
--- dotFieldSelection :: P (Expr -> Expr)
--- dotFieldSelection =
---   lexeme (try $ string "." >> identifier) >>= return . flip FieldSelection
+dotFieldSelection :: P (Expr -> Expr)
+dotFieldSelection =
+  lexeme (try $ string "." >> identifier) >>= return . flip FieldSelection
 
--- integerExpression :: P Expr
--- integerExpression = expression
+integerExpression :: P Expr
+integerExpression = expression
 
--- -- Those productions are pushed inside postfixExpression.
--- -- functionCall = functionCallOrMethod
--- -- functionCallOrMethod = functionCallGeneric <|> postfixExpression DOT functionCallGeneric
+-- Those productions are pushed inside postfixExpression.
+-- functionCall = functionCallOrMethod
+-- functionCallOrMethod = functionCallGeneric <|> postfixExpression DOT functionCallGeneric
 
--- functionCallGeneric :: P (FunctionIdentifier, Parameters)
--- functionCallGeneric = do
---   i <- functionCallHeader
---   p <- choice
---     [ keyword "void" >> return ParamVoid
---     , assignmentExpression `sepBy` comma >>= return . Params
---     ]
---   rparen
---   return (i, p)
+functionCallGeneric :: P (FunctionIdentifier, Parameters)
+functionCallGeneric = do
+  i <- functionCallHeader
+  p <- choice
+    [ keyword "void" >> return ParamVoid
+    , assignmentExpression `sepBy` comma >>= return . Params
+    ]
+  rparen
+  return (i, p)
   
--- -- Those productions are pushed inside functionCallGeneric.
--- -- functionCallHeaderNoParameters = undefined
--- -- functionCallHeaderWithParameters = undefined
+-- Those productions are pushed inside functionCallGeneric.
+functionCallHeaderNoParameters   = undefined
+functionCallHeaderWithParameters = undefined
 
--- functionCallHeader :: P FunctionIdentifier
--- functionCallHeader = do
---   i <- functionIdentifier
---   lparen
---   return i
+functionCallHeader :: P FunctionIdentifier
+functionCallHeader = do
+  i <- functionIdentifier
+  lparen
+  return i
 
--- functionIdentifier :: P FunctionIdentifier
--- functionIdentifier = choice
---   [ try identifier >>= return . FuncId
---   , typeSpecifier >>= return . FuncIdTypeSpec -- TODO if the 'identifier' is declared as a type, should be this case
---   -- no need for fieldSelection
---   ]
+functionIdentifier :: P FunctionIdentifier
+functionIdentifier = choice
+  [ try identifier >>= return . FuncId
+  , typeSpecifier >>= return . FuncIdTypeSpec -- TODO if the 'identifier' is declared as a type, should be this case
+  -- no need for fieldSelection
+  ]
 
--- unaryExpression :: P Expr
--- unaryExpression = do
---   p <- many $ choice
---     [ operator "++" >> return PreInc
---     , operator "--" >> return PreDec
---     , operator "+" >> return UnaryPlus
---     , operator "-" >> return UnaryNegate
---     , operator "!" >> return UnaryNot
---     , operator "~" >> return UnaryOneComplement
---     ] 
---   e <- postfixExpression
---   return $ foldr ($) e p
+unaryExpression :: P Expr
+unaryExpression = do
+  p <- many $ choice
+    [ operator "++" >> return PreInc
+    , operator "--" >> return PreDec
+    , operator "+" >> return UnaryPlus
+    , operator "-" >> return UnaryNegate
+    , operator "!" >> return UnaryNot
+    , operator "~" >> return UnaryOneComplement
+    ] 
+  e <- postfixExpression
+  return $ foldr ($) e p
 
--- -- inside unaryExpression
--- -- unaryOperator = choice
+-- inside unaryExpression
+unaryOperator :: [P Expr] -> P Expr
+unaryOperator = choice
 
--- -- implemented throught buildExpressionParser
--- -- multiplicativeExpression = undefined
--- -- additiveExpression = undefined
--- -- shiftExpression = undefined
--- -- relationalExpression = undefined
--- -- equalityExpression = undefined
--- -- andExpression = undefined
--- -- exclusiveOrExpression = undefined
--- -- inclusiveOrExpression = undefined
--- -- logicalAndExpression = undefined
--- -- logicalXorExpression = undefined
--- -- logicalOrExpression = undefined
+-- implemented throught buildExpressionParser
+-- multiplicativeExpression = undefined
+-- additiveExpression = undefined
+-- shiftExpression = undefined
+-- relationalExpression = undefined
+-- equalityExpression = undefined
+-- andExpression = undefined
+-- exclusiveOrExpression = undefined
+-- inclusiveOrExpression = undefined
+-- logicalAndExpression = undefined
+-- logicalXorExpression = undefined
+-- logicalOrExpression = undefined
 
--- conditionalExpression :: P Expr
--- conditionalExpression = do
---   loe <- buildExpressionParser conditionalTable unaryExpression
---   ter <- optionMaybe $ do
---     _ <- lexeme (string "?")
---     e <- expression
---     _ <- lexeme (string ":")
---     a <- assignmentExpression
---     return (e, a)
---   case ter of
---     Nothing -> return loe
---     Just (e, a) -> return $ Selection loe e a
+conditionalExpression :: P Expr
+conditionalExpression = do
+  loe <- buildExpressionParser conditionalTable unaryExpression
+  ter <- optionMaybe $ do
+    _ <- lexeme (string "?")
+    e <- expression
+    _ <- lexeme (string ":")
+    a <- assignmentExpression
+    return (e, a)
+  case ter of
+    Nothing -> return loe
+    Just (e, a) -> return $ Selection loe e a
 
--- assignmentExpression :: P Expr
--- assignmentExpression = buildExpressionParser assignmentTable conditionalExpression
+assignmentExpression :: P Expr
+assignmentExpression = buildExpressionParser assignmentTable conditionalExpression
 
--- expression :: P Expr
--- expression = buildExpressionParser expressionTable assignmentExpression
+expression :: P Expr
+expression = buildExpressionParser expressionTable assignmentExpression
 
--- constantExpression :: P Expr
--- constantExpression = conditionalExpression
+constantExpression :: P Expr
+constantExpression = conditionalExpression
 
--- -- The GLSL grammar include here function definition but we don't
--- -- do this here because they should occur only at top level (page 28).
--- -- Function definitions are handled in externalDefinition instead.
--- declaration :: P Declaration
--- declaration = choice
---   [ try $ do
---        t <- fullySpecifiedType
---        l <- idecl `sepBy` comma
---        semicolon
---        return $ InitDeclaration (TypeDeclarator t) l
---   , do keyword "invariant"
---        i <- idecl `sepBy` comma
---        semicolon
---        return $ InitDeclaration InvariantDeclarator i
---   , do keyword "precision"
---        q <- precisionQualifier
---        s <- typeSpecifierNoPrecision
---        semicolon
---        return $ Precision q s
---   , do q <- typeQualifier
---        choice
---          [ semicolon >> return (TQ q)
---          , do i <- identifier
---               lbrace
---               s <- structDeclarationList
---               rbrace
---               m <- optionMaybe $ do
---                 j <- identifier
---                 n <- optionMaybe $ between lbracket rbracket $ optionMaybe constantExpression
---                 return (j,n)
---               semicolon
---               return $ Block q i s m
---          ]
---   ]
---   where idecl = do
---           i <- identifier
---           m <- optionMaybe $ between lbracket rbracket $
---             optionMaybe constantExpression
---           j <- optionMaybe $ lexeme (string "=") >> initializer
---           return $ InitDecl i m j
+-- The GLSL grammar include here function definition but we don't
+-- do this here because they should occur only at top level (page 28).
+-- Function definitions are handled in externalDefinition instead.
+declaration :: P Declaration
+declaration = choice
+  [ try $ do
+       t <- fullySpecifiedType
+       l <- idecl `sepBy` comma
+       semicolon
+       return $ InitDeclaration (TypeDeclarator t) l
+  , do keyword "invariant"
+       i <- idecl `sepBy` comma
+       semicolon
+       return $ InitDeclaration InvariantDeclarator i
+  , do keyword "precision"
+       q <- precisionQualifier
+       s <- typeSpecifierNoPrecision
+       semicolon
+       return $ Precision q s
+  , do q <- typeQualifier
+       choice
+         [ semicolon >> return (TQ q)
+         , do i <- identifier
+              lbrace
+              s <- structDeclarationList
+              rbrace
+              m <- optionMaybe $ do
+                j <- identifier
+                n <- optionMaybe $ between lbracket rbracket $ optionMaybe constantExpression
+                return (j,n)
+              semicolon
+              return $ Block q i s m
+         ]
+  ]
+  where idecl = do
+          i <- identifier
+          m <- optionMaybe $ between lbracket rbracket $
+            optionMaybe constantExpression
+          j <- optionMaybe $ lexeme (string "=") >> initializer
+          return $ InitDecl i m j
 
--- functionPrototype :: P FunctionPrototype
--- functionPrototype = do
---   (t, i, p) <- functionDeclarator
---   rparen
---   return $ FuncProt t i p
+functionPrototype :: P FunctionPrototype
+functionPrototype = do
+  (t, i, p) <- functionDeclarator
+  rparen
+  return $ FuncProt t i p
 
--- functionDeclarator :: P (FullType, String, [ParameterDeclaration])
--- functionDeclarator = do
---   (t, i) <- functionHeader
---   p <- parameterDeclaration `sepBy` comma
---   return (t, i, p)
+functionDeclarator :: P (FullType, String, [ParameterDeclaration])
+functionDeclarator = do
+  (t, i) <- functionHeader
+  p <- parameterDeclaration `sepBy` comma
+  return (t, i, p)
 
--- -- inside functionDeclarator
--- -- functionHeaderWithParameters = undefined
+-- inside functionDeclarator
+-- functionHeaderWithParameters = undefined
 
--- functionHeader :: P (FullType, String)
--- functionHeader = do
---   t <- fullySpecifiedType
---   i <- identifier
---   lparen
---   return (t, i)
+functionHeader :: P (FullType, String)
+functionHeader = do
+  t <- fullySpecifiedType
+  i <- identifier
+  lparen
+  return (t, i)
 
--- -- inside parameterDeclaration
--- -- parameterDeclarator = undefined
+-- inside parameterDeclaration
+-- parameterDeclarator = undefined
 
--- -- expanding parameterDeclarator and parameterTypeSpecifier, the rule is:
--- -- parameterDeclaration:
--- --   parameterTypeQualifier [parameterQualifier] typeSpecifier identifier[[e]]
--- --                          [parameterQualifier] typeSpecifier identifier[[e]]
--- --   parameterTypeQualifier [parameterQualifier] typeSpecifier
--- --                          [parameterQualifier] typeSpecifier
--- -- which is simply
--- --   [parameterTypeQualifier] [parameterQualifier] typeSpecifier [identifier[[e]]]
--- parameterDeclaration :: P ParameterDeclaration
--- parameterDeclaration = do
---   tq <- optionMaybe parameterTypeQualifier
---   q <- optionMaybe parameterQualifier
---   s <- typeSpecifier
---   m <- optionMaybe $ do
---     i <- identifier
---     b <- optionMaybe $ between lbracket rbracket constantExpression -- FIXME can't the bracket be empty, i.e. a[] ?
---     return (i,b)
---   return $ ParameterDeclaration tq q s m
+-- expanding parameterDeclarator and parameterTypeSpecifier, the rule is:
+-- parameterDeclaration:
+--   parameterTypeQualifier [parameterQualifier] typeSpecifier identifier[[e]]
+--                          [parameterQualifier] typeSpecifier identifier[[e]]
+--   parameterTypeQualifier [parameterQualifier] typeSpecifier
+--                          [parameterQualifier] typeSpecifier
+-- which is simply
+--   [parameterTypeQualifier] [parameterQualifier] typeSpecifier [identifier[[e]]]
+parameterDeclaration :: P ParameterDeclaration
+parameterDeclaration = do
+  tq <- optionMaybe parameterTypeQualifier
+  q <- optionMaybe parameterQualifier
+  s <- typeSpecifier
+  m <- optionMaybe $ do
+    i <- identifier
+    b <- optionMaybe $ between lbracket rbracket constantExpression -- FIXME can't the bracket be empty, i.e. a[] ?
+    return (i,b)
+  return $ ParameterDeclaration tq q s m
 
--- parameterQualifier :: P ParameterQualifier
--- parameterQualifier = choice
---   -- "empty" case handled in the caller
---   [ (try . lexeme . string) "inout" >> return InOutParameter
---   , (try . lexeme . string) "in" >> return InParameter
---   , (try . lexeme . string) "out" >> return OutParameter
---   ]
+parameterQualifier :: P ParameterQualifier
+parameterQualifier = choice
+  -- "empty" case handled in the caller
+  [ (try . lexeme . string) "inout" >> return InOutParameter
+  , (try . lexeme . string) "in" >> return InParameter
+  , (try . lexeme . string) "out" >> return OutParameter
+  ]
 
--- -- inside parameterDeclaration
--- -- parameterTypeSpecifier = typeSpecifier
+-- inside parameterDeclaration
+-- parameterTypeSpecifier = typeSpecifier
 
--- -- FIXME not correct w.r.t. the specs.
--- -- The specs allow
--- --   int
--- --   int, foo
--- --   invariant foo, bar[]
--- -- and disallow
--- --   invariant bar[]
+-- FIXME not correct w.r.t. the specs.
+-- The specs allow
+--   int
+--   int, foo
+--   invariant foo, bar[]
+-- and disallow
+--   invariant bar[]
 
--- -- It is not used, it is inside declaration.
--- -- initDeclaratorList = undefined
+-- It is not used, it is inside declaration.
+-- initDeclaratorList = undefined
 
--- -- inside initDeclaratorList
--- -- singleDeclaration = undefined
+-- inside initDeclaratorList
+-- singleDeclaration = undefined
 
--- fullySpecifiedType :: P FullType
--- fullySpecifiedType = choice
---   [ try typeSpecifier >>= return . FullType Nothing
---   , do q <- typeQualifier
---        s <- typeSpecifier
---        return $ FullType (Just q) s
---   ]
+fullySpecifiedType :: P FullType
+fullySpecifiedType = choice
+  [ try typeSpecifier >>= return . FullType Nothing
+  , do q <- typeQualifier
+       s <- typeSpecifier
+       return $ FullType (Just q) s
+  ]
 
--- invariantQualifier :: P InvariantQualifier
--- invariantQualifier = keyword "invariant" >> return Invariant
+invariantQualifier :: P InvariantQualifier
+invariantQualifier = keyword "invariant" >> return Invariant
 
--- interpolationQualifier :: P InterpolationQualifier
--- interpolationQualifier = choice
---   [ keyword "smooth" >> return Smooth
---   , keyword "flat" >> return Flat
---   , keyword "noperspective" >> return NoPerspective
---   ]
+interpolationQualifier :: P InterpolationQualifier
+interpolationQualifier = choice
+  [ keyword "smooth" >> return Smooth
+  , keyword "flat" >> return Flat
+  , keyword "noperspective" >> return NoPerspective
+  ]
 
--- layoutQualifier :: P LayoutQualifier
--- layoutQualifier = do
---   keyword "layout"
---   lparen
---   q <- layoutQualifierId `sepBy` comma
---   rparen
---   return $ Layout q
+layoutQualifier :: P LayoutQualifier
+layoutQualifier = do
+  keyword "layout"
+  lparen
+  q <- layoutQualifierId `sepBy` comma
+  rparen
+  return $ Layout q
 
--- -- implemented directly in layoutQualifier
--- -- layoutQualifierIdList = undefined
+-- implemented directly in layoutQualifier
+-- layoutQualifierIdList = undefined
 
--- layoutQualifierId :: P LayoutQualifierId
--- layoutQualifierId = do
---   i <- identifier
---   c <- optionMaybe $ lexeme (string "=") >> intConstant
---   return $ LayoutQualId i c
+layoutQualifierId :: P LayoutQualifierId
+layoutQualifierId = do
+  i <- identifier
+  c <- optionMaybe $ lexeme (string "=") >> intConstant
+  return $ LayoutQualId i c
 
--- parameterTypeQualifier :: P ParameterTypeQualifier
--- parameterTypeQualifier = keyword "const" >> return ConstParameter
+parameterTypeQualifier :: P ParameterTypeQualifier
+parameterTypeQualifier = keyword "const" >> return ConstParameter
 
--- -- sto
--- -- lay [sto]
--- -- int [sto]
--- -- inv [sto]
--- -- inv int sto
--- typeQualifier :: P TypeQualifier
--- typeQualifier = choice
---   [ do s <- storageQualifier
---        return $ TypeQualSto s
---   , do l <- layoutQualifier
---        s <- optionMaybe storageQualifier
---        return $ TypeQualLay l s
---   , do i <- interpolationQualifier
---        s <- optionMaybe storageQualifier
---        return $ TypeQualInt i s
---   , do i <- invariantQualifier
---        choice
---          [ do j <- interpolationQualifier
---               s <- storageQualifier
---               return $ TypeQualInv3 i j s
---          , do s <- optionMaybe storageQualifier
---               return $ TypeQualInv i s
---          ]
---   ]
+-- sto
+-- lay [sto]
+-- int [sto]
+-- inv [sto]
+-- inv int sto
+typeQualifier :: P TypeQualifier
+typeQualifier = choice
+  [ do s <- storageQualifier
+       return $ TypeQualSto s
+  , do l <- layoutQualifier
+       s <- optionMaybe storageQualifier
+       return $ TypeQualLay l s
+  , do i <- interpolationQualifier
+       s <- optionMaybe storageQualifier
+       return $ TypeQualInt i s
+  , do i <- invariantQualifier
+       choice
+         [ do j <- interpolationQualifier
+              s <- storageQualifier
+              return $ TypeQualInv3 i j s
+         , do s <- optionMaybe storageQualifier
+              return $ TypeQualInv i s
+         ]
+  ]
 
 -- TODO see 4.3 for restrictions
 storageQualifier :: P StorageQualifier
@@ -714,187 +708,189 @@ precisionQualifier = choice
   , keyword "lowp" >> return LowP
   ]
 
--- -- attributeQualifier :: P TypeSpecifierNonArray
--- -- attributeQualifier = do
--- --   lAttrQualifier
--- --   d <- qualifierDeclarationList
--- --   rAttrQualifier 
--- --   return $ AttributeQualifier i (head d) --StructSpecifier i d
+attributeQualifier :: P TypeSpecifierNonArray
+attributeQualifier = do
+  lAttrQualifier
+  i <- identifier
+  d <- qualifierDeclarationList
+  rAttrQualifier 
+  return $ AttributeQualifier (Just i) d--(head d) --StructSpecifier i d
 
--- -- qualifierDeclarationList :: P [Field]
--- -- qualifierDeclarationList = many1 qualifierDeclaration
+qualifierDeclarationList :: P [Field]
+qualifierDeclarationList = many1 qualifierDeclaration
 
--- -- qualifierDeclaration :: P Field
--- -- qualifierDeclaration = do
--- --   -- q <- optionMaybe typeQualifier
--- --   s <- typeSpecifier
--- --   lparen
--- --   l <- qualifierDeclarator
--- --   rparen
--- --   return $ Field s l 
+qualifierDeclaration :: P Field
+qualifierDeclaration = do
+  q <- optionMaybe typeQualifier
+  s <- typeSpecifier
+  lparen
+  l <- qualifierDeclarator
+  l <- structDeclarator
+  rparen
+  return $ Field q s [l] 
 
--- qualifierDeclaratorList :: P [QualifierDeclarator]
--- qualifierDeclaratorList = qualifierDeclarator `sepBy` comma
+qualifierDeclaratorList :: P [QualifierDeclarator]
+qualifierDeclaratorList = qualifierDeclarator `sepBy` comma
 
--- qualifierDeclarator :: P QualifierDeclarator
--- qualifierDeclarator = do
---   i <- identifier
---   choice
---     [ do lbracket
---          e <- optionMaybe constantExpression
---          rbracket
---          return $ QualifierDeclarator i (Just e)
---     , return $ QualifierDeclarator i Nothing
---     ]
+qualifierDeclarator :: P QualifierDeclarator
+qualifierDeclarator = do
+  i <- identifier
+  choice
+    [ do lbracket
+         e <- optionMaybe constantExpression
+         rbracket
+         return $ QualifierDeclarator i (Just e)
+    , return $ QualifierDeclarator i Nothing
+    ]
 
--- initializer :: P Expr
--- initializer = assignmentExpression
+initializer :: P Expr
+initializer = assignmentExpression
 
--- declarationStatement :: P Declaration
--- declarationStatement = declaration
+declarationStatement :: P Declaration
+declarationStatement = declaration
 
--- statement :: P Statement
--- statement = CompoundStatement `fmap` compoundStatement
---   <|> simpleStatement
+statement :: P Statement
+statement = CompoundStatement `fmap` compoundStatement
+  <|> simpleStatement
 
--- simpleStatement :: P Statement
--- simpleStatement = choice
---   [ declarationStatement >>= return . DeclarationStatement
---   , expressionStatement  >>= return . ExpressionStatement
---   , selectionStatement
---   , switchStatement
---   , caseLabel >>= return . CaseLabel
---   , iterationStatement
---   , jumpStatement
---   ]
+simpleStatement :: P Statement
+simpleStatement = choice
+  [ declarationStatement >>= return . DeclarationStatement
+  , expressionStatement  >>= return . ExpressionStatement
+  , selectionStatement
+  , switchStatement
+  , caseLabel >>= return . CaseLabel
+  , iterationStatement
+  , jumpStatement
+  ]
 
--- compoundStatement :: P Compound
--- compoundStatement = choice
---   [ try (lbrace >> rbrace) >> return (Compound [])
---   , between lbrace rbrace statementList >>= return . Compound
---   ]
+compoundStatement :: P Compound
+compoundStatement = choice
+  [ try (lbrace >> rbrace) >> return (Compound [])
+  , between lbrace rbrace statementList >>= return . Compound
+  ]
 
--- statementNoNewScope :: P Statement
--- statementNoNewScope = CompoundStatement `fmap` compoundStatementNoNewScope
---   <|> simpleStatement
+statementNoNewScope :: P Statement
+statementNoNewScope = CompoundStatement `fmap` compoundStatementNoNewScope
+  <|> simpleStatement
 
--- compoundStatementNoNewScope :: P Compound
--- compoundStatementNoNewScope = compoundStatement
+compoundStatementNoNewScope :: P Compound
+compoundStatementNoNewScope = compoundStatement
 
--- statementList :: P [Statement]
--- statementList = many1 statement
+statementList :: P [Statement]
+statementList = many1 statement
 
--- expressionStatement :: P (Maybe Expr)
--- expressionStatement = choice
---   [ semicolon >> return Nothing
---   , expression >>= \e -> semicolon >> return (Just e)
---   ]
+expressionStatement :: P (Maybe Expr)
+expressionStatement = choice
+  [ semicolon >> return Nothing
+  , expression >>= \e -> semicolon >> return (Just e)
+  ]
 
--- selectionStatement :: P Statement
--- selectionStatement = do
---   keyword "if"
---   lparen
---   c <- expression
---   rparen
---   t <- statement
---   f <- optionMaybe (keyword "else" >> statement)
---   return $ SelectionStatement c t f
+selectionStatement :: P Statement
+selectionStatement = do
+  keyword "if"
+  lparen
+  c <- expression
+  rparen
+  t <- statement
+  f <- optionMaybe (keyword "else" >> statement)
+  return $ SelectionStatement c t f
   
--- -- inside selectionStatement
--- -- selectionRestStatement = undefined
+-- inside selectionStatement
+-- selectionRestStatement = undefined
 
--- condition :: P Condition
--- condition = choice
---   [ expression >>= return . Condition
---   , do t <- fullySpecifiedType
---        i <- identifier
---        _ <- lexeme (string "=")
---        j <- initializer
---        return $ InitializedCondition t i j
---   ]
+condition :: P Condition
+condition = choice
+  [ expression >>= return . Condition
+  , do t <- fullySpecifiedType
+       i <- identifier
+       _ <- lexeme (string "=")
+       j <- initializer
+       return $ InitializedCondition t i j
+  ]
 
--- switchStatement :: P Statement
--- switchStatement = do
---   keyword "switch"
---   lparen
---   e <- expression
---   rparen
---   lbrace
---   l <- switchStatementList
---   rbrace
---   return $ SwitchStatement e l
+switchStatement :: P Statement
+switchStatement = do
+  keyword "switch"
+  lparen
+  e <- expression
+  rparen
+  lbrace
+  l <- switchStatementList
+  rbrace
+  return $ SwitchStatement e l
 
--- switchStatementList :: P [Statement]
--- switchStatementList = many statement
+switchStatementList :: P [Statement]
+switchStatementList = many statement
 
--- caseLabel :: P CaseLabel
--- caseLabel = choice
---   [ keyword "case" >> expression >>= \e -> colon >> return (Case e)
---   , keyword "default" >> colon >> return Default
---   ]
+caseLabel :: P CaseLabel
+caseLabel = choice
+  [ keyword "case" >> expression >>= \e -> colon >> return (Case e)
+  , keyword "default" >> colon >> return Default
+  ]
 
--- iterationStatement :: P Statement
--- iterationStatement = choice
---   [ do keyword "while"
---        lparen
---        c <- condition
---        rparen
---        s <- statementNoNewScope
---        return $ While c s
---   , do keyword "do"
---        s <- statement
---        keyword "while"
---        lparen
---        e <- expression
---        rparen
---        semicolon
---        return $ DoWhile s e
---   , do keyword "for"
---        lparen
---        i <- forInitStatement
---        c <- optionMaybe condition
---        semicolon
---        e <- optionMaybe expression
---        rparen
---        s <- statementNoNewScope
---        return $ For i c e s
---   ]
+iterationStatement :: P Statement
+iterationStatement = choice
+  [ do keyword "while"
+       lparen
+       c <- condition
+       rparen
+       s <- statementNoNewScope
+       return $ While c s
+  , do keyword "do"
+       s <- statement
+       keyword "while"
+       lparen
+       e <- expression
+       rparen
+       semicolon
+       return $ DoWhile s e
+  , do keyword "for"
+       lparen
+       i <- forInitStatement
+       c <- optionMaybe condition
+       semicolon
+       e <- optionMaybe expression
+       rparen
+       s <- statementNoNewScope
+       return $ For i c e s
+  ]
 
--- forInitStatement :: P (Either (Maybe Expr) Declaration)
--- forInitStatement = (expressionStatement >>= return . Left) <|> (declarationStatement >>= return . Right)
+forInitStatement :: P (Either (Maybe Expr) Declaration)
+forInitStatement = (expressionStatement >>= return . Left) <|> (declarationStatement >>= return . Right)
 
--- -- inside iterationStatement
--- -- conditionOp = undefined
+-- inside iterationStatement
+conditionOp = undefined
 
--- -- inside iterationStatement
--- -- forRestStatement = undefined
+-- inside iterationStatement
+forRestStatement = undefined
 
--- jumpStatement :: P Statement
--- jumpStatement = choice
---   [ keyword "continue" >> semicolon >> return Continue
---   , keyword "break" >> semicolon >> return Break 
---   , try (keyword "return" >> semicolon) >> return (Return Nothing)
---   , keyword "return" >> expression >>= \e -> semicolon >> return (Return $ Just e)
---   , keyword "discard" >> semicolon >> return Discard
---   ]
+jumpStatement :: P Statement
+jumpStatement = choice
+  [ keyword "continue" >> semicolon >> return Continue
+  , keyword "break" >> semicolon >> return Break 
+  , try (keyword "return" >> semicolon) >> return (Return Nothing)
+  , keyword "return" >> expression >>= \e -> semicolon >> return (Return $ Just e)
+  , keyword "discard" >> semicolon >> return Discard
+  ]
 
--- translationUnit :: P TranslationUnit
--- translationUnit = TranslationUnit `fmap` many1 externalDeclaration
+translationUnit :: P TranslationUnit
+translationUnit = TranslationUnit `fmap` many1 externalDeclaration
 
--- externalDeclaration :: P ExternalDeclaration
--- externalDeclaration = choice
---   [ do p <- try functionPrototype
---        choice
---          [ semicolon >> return (FunctionDeclaration p)
---          , compoundStatementNoNewScope >>= return . FunctionDefinition p
---          ]
---   , Declaration `fmap` declaration
---   ]
+externalDeclaration :: P ExternalDeclaration
+externalDeclaration = choice
+  [ do p <- try functionPrototype
+       choice
+         [ semicolon >> return (FunctionDeclaration p)
+         , compoundStatementNoNewScope >>= return . FunctionDefinition p
+         ]
+  , Declaration `fmap` declaration
+  ]
 
--- -- inside externalDeclaration, used only in tests
--- functionDefinition :: P ExternalDeclaration
--- functionDefinition = do
---   fp <- functionPrototype
---   cs <- compoundStatementNoNewScope
---   return $ FunctionDefinition fp cs
+-- inside externalDeclaration, used only in tests
+functionDefinition :: P ExternalDeclaration
+functionDefinition = do
+  fp <- functionPrototype
+  cs <- compoundStatementNoNewScope
+  return $ FunctionDefinition fp cs
 
