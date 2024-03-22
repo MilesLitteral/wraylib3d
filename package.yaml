@@ -61,6 +61,7 @@ dependencies:
 - OpenGLRaw
 # Window System Libs
 - GLFW-b 
+- sdl2
 - vulkan     # pick one
 - vulkan-api # pick one
 - vulkan-utils

@@ -229,6 +229,7 @@ library
     , proteaaudio
     , req
     , scientific
+    , sdl2
     , split
     , stm
     , template-haskell
@@ -321,6 +322,7 @@ executable RealmViewer-FE-Demo
     , proteaaudio
     , req
     , scientific
+    , sdl2
     , split
     , stm
     , template-haskell
@@ -412,6 +414,7 @@ executable hraylib3d
     , proteaaudio
     , req
     , scientific
+    , sdl2
     , split
     , stm
     , template-haskell

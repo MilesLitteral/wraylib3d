@@ -28,19 +28,6 @@ import Data.Yaml.Parser (YamlValue(Mapping))
 -- import Linear        (V4(..))
 -- import Control.Monad (unless)
 
--- -- defaultWindowConfig
--- glWindowConfig :: WindowConfig
--- glWindowConfig = WindowConfig
---     { windowBorder          = True
---     , windowHighDPI         = False
---     , windowInputGrabbed    = False
---     , windowMode            = Windowed
---     , windowGraphicsContext = OpenGLContext defaultOpenGL 	
---     , windowPosition        = Wherever
---     , windowResizable       = False
---     , windowInitialSize     = V2 800 600
---     , windowVisible         = True
---     }
 
 -- vkWindowConfig :: WindowConfig
 -- vkWindowConfig = WindowConfig

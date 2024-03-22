@@ -38,6 +38,19 @@ module HRayLib3d.WindowSystem.Context.Vulkan where
 -- import           System.IO
 -- import           System.Process
 
+-- vkWindowConfig :: WindowConfig
+-- vkWindowConfig = WindowConfig
+--     { windowBorder          = True
+--     , windowHighDPI         = False
+--     , windowInputGrabbed    = False
+--     , windowMode            = Windowed
+--     , windowGraphicsContext = VulkanContext
+--     , windowPosition        = Wherever
+--     , windowResizable       = False
+--     , windowInitialSize     = V2 800 600
+--     , windowVisible         = True
+--     }
+
 -- data SwapChainImgInfo
 --   = SwapChainImgInfo
 --   { swapchain   :: VkSwapchainKHR
@@ -911,6 +924,68 @@ module HRayLib3d.WindowSystem.Context.Vulkan where
 -- --     -- glSwapWindow window
 -- --     quit
 
+-- -- 
+-- main :: IO ()
+-- main = withGLFWWindow windowWidth windowHeight "05-GraphicsPipeline-Window"
+--           $ \window ->
+--        withGLFWVulkanInstance "05-GraphicsPipeline" $ \vulkanInstance ->
+--        withSurface vulkanInstance window $ \vulkanSurface -> do
+--         (Just scsd, pdev)
+--           <- pickPhysicalDevice vulkanInstance (Just vulkanSurface)
+--         withGraphicsDevice pdev vulkanSurface $ \dev queues ->
+--           withSwapChain dev scsd queues vulkanSurface $ \swInfo ->
+--           withImageViews dev swInfo $ \imgViews ->
+--           withVkShaderStageCI dev
+--               $(compileGLSL "shaders/triangle.vert")
+--               VK_SHADER_STAGE_VERTEX_BIT
+--               $ \shaderVert ->
+--           withVkShaderStageCI dev
+--               $(compileGLSL "shaders/triangle.frag")
+--               VK_SHADER_STAGE_FRAGMENT_BIT
+--               $ \shaderFrag ->
+--           withRenderPass dev swInfo $ \renderPass ->
+--           withGraphicsPipeline dev swInfo [shaderVert, shaderFrag] renderPass
+--               $ \graphicsPipeline ->
+--           withFramebuffers dev renderPass swInfo imgViews
+--               $ \framebuffers ->
+--           withCommandPool dev queues $ \commandPool ->
+--           withCommandBuffers dev graphicsPipeline commandPool
+--                              renderPass swInfo framebuffers
+--               $ \cmdBuffers ->
+--           withSemaphore dev $ \rendFinS ->
+--           withSemaphore dev $ \imAvailS ->
+--           alloca $ \imgIPtr -> do
+--             let rdata = RenderData
+--                   { renderFinished = rendFinS
+--                   , imageAvailable = imAvailS
+--                   , device         = dev
+--                   , swapChainInfo  = swInfo
+--                   , deviceQueues   = queues
+--                   , imgIndexPtr    = imgIPtr
+--                   , commandBuffers = cmdBuffers
+--                   }
+--             putStrLn $ "Selected physical device: " ++ show pdev
+--             putStrLn $ "Createad surface: " ++ show vulkanSurface
+--             putStrLn $ "Createad device: " ++ show dev
+--             putStrLn $ "Createad queues: " ++ show queues
+--             putStrLn $ "Createad swapchain: " ++ show swInfo
+--             putStrLn $ "Createad image views: " ++ show imgViews
+--             putStrLn $ "Createad vertex shader module: " ++ show shaderVert
+--             putStrLn $ "Createad fragment shader module: " ++ show shaderFrag
+--             putStrLn $ "Createad renderpass: " ++ show renderPass
+--             putStrLn $ "Createad pipeline: " ++ show graphicsPipeline
+--             putStrLn $ "Createad framebuffers: " ++ show framebuffers
+--             putStrLn $ "Createad command pool: " ++ show commandPool
+--             putStrLn $ "Createad command buffers: " ++ show cmdBuffers
+--             glfwMainLoop window $ do
+--               return () -- do some app logic
+--               throwingVK "vkQueueWaitIdle failed!"
+--                 $ vkQueueWaitIdle . presentQueue $ deviceQueues rdata
+--               drawFrame rdata
+--             throwingVK "vkDeviceWaitIdle failed!"
+--               $ vkDeviceWaitIdle dev
+
+-- Utilities
 -- -- -- | Low latency time in seconds since the start
 -- -- getTime :: HRayLib3d.WindowSystem.Context.Program r Double
 -- -- getTime = do
