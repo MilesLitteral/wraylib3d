@@ -231,9 +231,6 @@ Yes, they will be written with the fjvallarino/monomer library exclusively,
 one that could be made now is the Multiplayer launcher, the rest are TBA,
    
 ## How would exported games look in terms of exported filesystems?*
-* = There is a possibility for CMake support, this has to be explored
-   as it could also be the answer for generating vcprojs or xcprojs
- 
  ```
  General FS:
  C:/WRL/Projects/<YourGame>
@@ -329,3 +326,6 @@ XR Headsets
    settings.localproperties
    build.gradle -> ./build/YourGame.app
 ```
+* = There is a desire for CMake support, this has to be explored
+   as it could also be the answer for generating vcprojs and xcprojs.
+   as well as AutoMake support for linux.
