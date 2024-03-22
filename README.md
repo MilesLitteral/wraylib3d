@@ -173,7 +173,7 @@ You will need the following libraries and applications installed, in the future 
 
   + Script Engine
       - All Definitions for HRuby, later will be a generalized interface that the user can use to script ingame actions
-        , mods, and logic. Planned support: ![Python](https://hackage.haskell.org/package/hpython), ![Ruby](https://hackage.haskell.org/package/hruby), custom build included that builds to Ruby 3.2 rather than 2.2), and ![Lua](https://hackage.haskell.org/package/hslua)
+        , mods, and logic. Planned support: Python(https://hackage.haskell.org/package/hpython), Ruby(https://hackage.haskell.org/package/hruby), custom build included that builds to Ruby 3.2 rather than 2.2), and Lua(https://hackage.haskell.org/package/hslua)
 
   + Benchmarks
       - Application Benchmark Utilities, it has a Benchmark for running the mapviewer, running the default game, and
