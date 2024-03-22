@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, ScopedTypeVariables #-}
+{-# LANGUAGE OverloadedStrings, ScopedTypeVariables, FlexibleInstances, TypeSynonymInstances  #-}
 module HRayLib3d.Network.UDP  where
 
 import Data.Word       ()
@@ -11,6 +11,7 @@ import qualified Data.Text as T
 import Control.Exception (SomeException, catch)
 import Control.Monad ( forever, replicateM_ )
 import Control.Concurrent ( threadDelay, forkIO )
+import Network.HTTP.Types () 
 import Network.Socket
     ( defaultHints,
       getAddrInfo,
@@ -24,8 +25,8 @@ import Network.Socket
       SocketType(..) ) 
 import Network.Socket.Address hiding (bind)
 import Network.Socket.ByteString (recv)
-import Network.HTTP.Types 
 import HRayLib3d.Network.Requests ( requestWithJson, asIgnore, urlInfoFromString ) 
+
 -- #UDP
 -- A Special UDP module for utilizing UDP instead of TCP
 -- largely for Multiplayer, and Realm communication whereas
@@ -68,8 +69,7 @@ instance ToJSON UDPPacketData where
                                         ("state", toJSON s)
                                        ]
 
-
--- {-# Run a UDP Session #-}
+-- Run a UDP Session
 runUDPSession :: Maybe UDP_Address -> Maybe UDP_Port -> IO ()
 runUDPSession addr port = do
   addrinfos <- getAddrInfo Nothing addr port -- (Just "127.0.0.1") (Just "7000")
@@ -96,10 +96,13 @@ runUDPSessionWithWorker  longtime port = do
 -- {-# udpWorker, use with udp session functions to act over time. Useful for pinging a RESTful API #-}
 udpWorker :: Socket -> IO ()
 udpWorker sock = forever $ do
-  (msg, client) <- recvFrom sock 4096 :: IO (C.ByteString, String)
+  (msg, client) <- recvFrom sock 4096 ::  IO (C.ByteString, UDPResponse)
   threadDelay 1000000   -- simulate some processing or do something
   sendTo sock msg client
 
+instance SocketAddress UDPResponse 
+
+{-
 sendPackets ::  [(String, [UDPPacketData])] -> IO [String]
 sendPackets = mapM (\x -> do
     urlInfo <- urlInfoFromString ("http://" ++ fst x ++ "/mp/send")
@@ -110,3 +113,4 @@ sendPackets = mapM (\x -> do
         Left msg -> return msg
         Right () -> return $ fst x ++ "sequence sent"
     )
+-}

@@ -13,13 +13,13 @@ module HRayLib3d.ScriptEngine.HRubyHS where
 
   data RubyInterpreterProcess = RubyInterpreterProcess {hin :: Handle, hout :: Handle}
   data RValue = 
-    RINT       {rint    :: Int}
-    |RFLOAT32  {rfloat  :: Float}
-    |RDOUBLE   {rdouble :: Double}
-    |RCHAR     {rchar   :: Char}
-    |RSTR      {rstr    :: String}
-    |RLIST     {rlist   :: [RValue]}
-    |RDICT     {rdict   :: [(String, RValue)]}
+    RINT       {rInt    :: Int}
+    |RFLOAT32  {rFloat  :: Float}
+    |RDOUBLE   {rDouble :: Double}
+    |RCHAR     {rChar   :: Char}
+    |RSTR      {rStr    :: String}
+    |RLIST     {rList   :: [RValue]}
+    |RDICT     {rDict   :: [(String, RValue)]}
     deriving (Eq, Show)
 
   data RModule =

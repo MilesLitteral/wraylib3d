@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards, FlexibleInstances #-}
 module HRayLib3d.GameEngine.Graphics.OBJ
   ( addOBJ
   , addGPUOBJ
@@ -7,6 +7,7 @@ module HRayLib3d.GameEngine.Graphics.OBJ
   , GPUOBJ(..)
   , OBJInstance(..)
   ) where
+
 
 import Data.Map             (Map)
 import Data.Vector          (Vector)
@@ -38,8 +39,17 @@ import LambdaCube.GL
       Array(..),
       ArrayType(ArrFloat, ArrWord32),
       StreamType(Attribute_V3F, Attribute_V2F), V3 (V3) )
-
-
+import LambdaCube.GL.Mesh ( addMeshToObjectArray, uploadMeshToGPU )
+import LambdaCube.GL.Type
+    ( Array(..),
+      ArrayType(ArrFloat, ArrWord32),
+      Buffer,
+      GLStorage,
+      IndexStream(IndexStream),
+      Object(..),
+      Primitive(TriangleList),
+      Stream(ConstV2F, Stream, ConstV4F) )
+      
 import Data.Vect.Float.Base    ( Vec3(..)     )
 import qualified Data.Text as T
 import qualified Data.Foldable
@@ -138,7 +148,7 @@ addGPUOBJ r GPUOBJ{..} skin unis = do
 
     -- add collision geometry
     collisionObjs <- case objList of
-      (Object{}:_) -> do
+      (Object{..}:_) -> do
         sphereObj <- uploadMeshToGPU (sphere (V4 1 0 0 1) 4  (locW (V.head objLocations))) >>= addMeshToObjectArray r "CollisionShape" (setNub $ ["worldMat","origin"] ++ map T.unpack unis)
         boxObj    <- uploadMeshToGPU (bbox (V4 0 0 1 1) objX objY) >>= addMeshToObjectArray r "CollisionShape" (setNub $ ["worldMat","origin"] ++ map T.unpack unis)
         return [sphereObj,boxObj]

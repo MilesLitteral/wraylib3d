@@ -7,84 +7,91 @@ packages:
 - completed:
     hackage: vect-0.4.7@sha256:218bb44622096d1e72772507fac4e073887fa6483f7b64d068d14ed2300ca377,3208
     pantry-tree:
-      size: 2206
       sha256: 7b35a2433d7b8d88fa56c58fee97f0820f2f2526b7156194612c5566b7528713
+      size: 2206
   original:
     hackage: vect-0.4.7@sha256:218bb44622096d1e72772507fac4e073887fa6483f7b64d068d14ed2300ca377,3208
 - completed:
     hackage: proteaaudio-0.9.4@sha256:ece81858960a46661c09b64074cb9966359e8e8751e4066d6c332cc23bd96e6e,2907
     pantry-tree:
-      size: 1875
       sha256: f087bcde88e3cf9be15ea780ebe4683b9bdfd8fa6f2164c1c9054d0dc535292e
+      size: 1875
   original:
     hackage: proteaaudio-0.9.4@sha256:ece81858960a46661c09b64074cb9966359e8e8751e4066d6c332cc23bd96e6e,2907
 - completed:
     hackage: autoapply-0.4.1.3@sha256:b6e7e0555a8fd938e1a0fe681e6d561963e3f158803e6cb187169b5fa8bc00a9,2264
     pantry-tree:
-      size: 527
       sha256: 856b9c9acb8f8b0e82ba105ffa2244ae466b28b2c74668f2296f9b68071b9b84
+      size: 527
   original:
     hackage: autoapply-0.4.1.3@sha256:b6e7e0555a8fd938e1a0fe681e6d561963e3f158803e6cb187169b5fa8bc00a9
 - completed:
     hackage: monomer-hagrid-0.2.1.1@sha256:29245a958533b86c5b87004fd767c72871795ce2fd598417c388a1402fb9f518,4908
     pantry-tree:
-      size: 658
       sha256: 3e6f805e4e2cf92a9e0b3fb9c72f979e06040810dca43195539e38c981ea33eb
+      size: 658
   original:
     hackage: monomer-hagrid-0.2.1.1@sha256:29245a958533b86c5b87004fd767c72871795ce2fd598417c388a1402fb9f518,4908
 - completed:
     hackage: tinyfiledialogs-0.2.1.0@sha256:118f9fd7b721de68f1e84c8b820784e31140bf34e32f23fd6410fb57914a309c,1905
     pantry-tree:
-      size: 482
       sha256: 518def606ee59dad71b77dec20a9dc55072bdd8fe2194a0ccfca2b2afee1767e
+      size: 482
   original:
     hackage: tinyfiledialogs-0.2.1.0@sha256:118f9fd7b721de68f1e84c8b820784e31140bf34e32f23fd6410fb57914a309c,1905
 - completed:
     hackage: aeson-2.1.2.1@sha256:5b8d62a60963a925c4d123a46e42a8e235a32188522c9f119f64ac228c2612a7,6359
     pantry-tree:
-      size: 82465
       sha256: 58d33beedd6e0ff79920c636d8a4295deb684b6e97c9b1ca94d3c780958d6302
+      size: 82465
   original:
     hackage: aeson-2.1.2.1@sha256:5b8d62a60963a925c4d123a46e42a8e235a32188522c9f119f64ac228c2612a7,6359
 - completed:
     hackage: generically-0.1.1@sha256:2b9b5efb6eea2fb65377565d53d85b0ccc5b37404fba4bef1d60277caa877e5e,1155
     pantry-tree:
-      size: 233
       sha256: 98a8fe89d516d3752a9cc0af22cfa652f098cc6613da080762b63aa1d596e56d
+      size: 233
   original:
     hackage: generically-0.1.1@sha256:2b9b5efb6eea2fb65377565d53d85b0ccc5b37404fba4bef1d60277caa877e5e,1155
 - completed:
     hackage: vulkan-3.24.5@sha256:9e11572d2dfc43bd22a9c477b79494c884d3e94aad170088c08a32d695f46000,31913
     pantry-tree:
-      size: 86973
       sha256: db052d548bc83a3f6484c0bcda88561f43b78244a79ed7c35aca9747c7c1e242
+      size: 86973
   original:
     hackage: vulkan-3.24.5@sha256:9e11572d2dfc43bd22a9c477b79494c884d3e94aad170088c08a32d695f46000,31913
 - completed:
     hackage: vulkan-utils-0.5.10.2@sha256:bbc0bbd585218a4b2eb7d1977824843ff6aeeca5f2273bb1befa2f3316303ced,3959
     pantry-tree:
-      size: 2226
       sha256: e1921f324cc0e2c9a4351d9cae91ba3ca3be5868275994b811e19d91b10bc71f
+      size: 2226
   original:
     hackage: vulkan-utils-0.5.10.2@sha256:bbc0bbd585218a4b2eb7d1977824843ff6aeeca5f2273bb1befa2f3316303ced
 - completed:
     hackage: gltf-codec-0.1.0.4@sha256:41f3718e93b273ca65fd3072fd02ca59dec1c978a56dc891c62b53821c332326,2633
     pantry-tree:
-      size: 1619
       sha256: 8ea5a6aa2de74c5b6d5b2d17c057421fce81577a0cf1f8f51f2cb4e7e0ecb5be
+      size: 1619
   original:
     hackage: gltf-codec-0.1.0.4@sha256:41f3718e93b273ca65fd3072fd02ca59dec1c978a56dc891c62b53821c332326,2633
 - completed:
     hackage: gltf-loader-0.3.0.0@sha256:e1ebcadd308fa53fadfa284ad8e374cba96d44ed0939f52708534f8ae4feb6f7,5837
     pantry-tree:
-      size: 1863
       sha256: 556fefe2e71c1c8d4927ec467ad86f7308f8e8b377f43ed4c328ab5f2de37daf
+      size: 1863
   original:
     hackage: gltf-loader-0.3.0.0@sha256:e1ebcadd308fa53fadfa284ad8e374cba96d44ed0939f52708534f8ae4feb6f7,5837
+- completed:
+    hackage: vulkan-api-1.4.0.0@sha256:a8a9dcd0b97d0fe110a09776d757943e3c5197b0262ed0805d8ab33926be390a,28801
+    pantry-tree:
+      sha256: f9582d6284adf14bd55ef7bd4e1717a3d5035dcec7e021786c643b8fc6b84862
+      size: 42332
+  original:
+    hackage: vulkan-api-1.4.0.0
 snapshots:
 - completed:
+    sha256: 9fa4bece7acfac1fc7930c5d6e24606004b09e80aa0e52e9f68b148201008db9
     size: 649606
     url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/20/18.yaml
-    sha256: 9fa4bece7acfac1fc7930c5d6e24606004b09e80aa0e52e9f68b148201008db9
   original:
     url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/20/18.yaml

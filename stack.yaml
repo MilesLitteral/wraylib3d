@@ -10,6 +10,7 @@ packages:
 - ./submodules/megastore
 - ./submodules/monomer
 - ./submodules/wavefront
+- ./submodules/hruby
 #- ./submodules/lambdacube-metal
 #- ./submodules/lambdacube-directx
 
@@ -25,3 +26,4 @@ extra-deps:
 - vulkan-utils-0.5.10.2@sha256:bbc0bbd585218a4b2eb7d1977824843ff6aeeca5f2273bb1befa2f3316303ced
 - gltf-codec-0.1.0.4@sha256:41f3718e93b273ca65fd3072fd02ca59dec1c978a56dc891c62b53821c332326,2633
 - gltf-loader-0.3.0.0@sha256:e1ebcadd308fa53fadfa284ad8e374cba96d44ed0939f52708534f8ae4feb6f7,5837
+- vulkan-api-1.4.0.0

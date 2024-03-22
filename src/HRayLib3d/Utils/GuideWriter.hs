@@ -36,6 +36,7 @@ module HRayLib3d.Utils.GuideWriter (demo) where
      documentclass [] article
      author "Daniel Diaz"
      title  "Simple example"
+     hatex
     
     -- Body with a section.
     theBody :: Monad m => LaTeXT_ m
@@ -43,7 +44,7 @@ module HRayLib3d.Utils.GuideWriter (demo) where
      maketitle
      section "Hello"
      "This is a simple example using the "
-     hatex " library. "
+     "hatex library. "
      -- 'textbf' turns characters to bold font (as you already may know).
      textbf "Enjoy!"
      " "

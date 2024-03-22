@@ -135,9 +135,6 @@ library
       HRayLib3d.Network.UDP
       HRayLib3d.ScriptEngine
       HRayLib3d.ScriptEngine.HRuby
-      HRayLib3d.ScriptEngine.HRuby.Parser
-      HRayLib3d.ScriptEngine.HRuby.Pretty
-      HRayLib3d.ScriptEngine.HRuby.Syntax
       HRayLib3d.ScriptEngine.HRubyHS
       HRayLib3d.ScriptEngine.HRubyHSInterface
       HRayLib3d.Utils
@@ -155,9 +152,11 @@ library
       HRayLib3d.Utils.Subprocess
       HRayLib3d.Utils.Tooltips
       HRayLib3d.WindowSystem
+      HRayLib3d.WindowSystem.ComputePipelineWidget
       HRayLib3d.WindowSystem.Context
       HRayLib3d.WindowSystem.Core
       HRayLib3d.WindowSystem.RendererWidget
+      HRayLib3d.WindowSystem.RenderPipelineClient
       HRayLib3d.WindowSystem.RenderPipelineWidget
       HRayLib3d.WindowSystem.Streaming
       HRayLib3d.WindowSystem.Theme
@@ -199,6 +198,7 @@ library
     , gltf-codec
     , gltf-loader
     , hashable
+    , hruby
     , http-client
     , http-types
     , ilist
@@ -213,6 +213,7 @@ library
     , mersenne-random-pure64
     , microlens-platform
     , modern-uri
+    , monad-logger
     , monomer
     , monomer-hagrid
     , mtl
@@ -239,6 +240,7 @@ library
     , vect
     , vector
     , vulkan
+    , vulkan-api
     , vulkan-utils
     , wavefront
     , wreq
@@ -287,6 +289,7 @@ executable RealmViewer-FE-Demo
     , gltf-loader
     , hashable
     , hraylib3d
+    , hruby
     , http-client
     , http-types
     , ilist
@@ -301,6 +304,7 @@ executable RealmViewer-FE-Demo
     , mersenne-random-pure64
     , microlens-platform
     , modern-uri
+    , monad-logger
     , monomer
     , monomer-hagrid
     , mtl
@@ -327,6 +331,7 @@ executable RealmViewer-FE-Demo
     , vect
     , vector
     , vulkan
+    , vulkan-api
     , vulkan-utils
     , wavefront
     , wreq
@@ -374,6 +379,7 @@ executable hraylib3d
     , gltf-loader
     , hashable
     , hraylib3d
+    , hruby
     , http-client
     , http-types
     , ilist
@@ -388,6 +394,7 @@ executable hraylib3d
     , mersenne-random-pure64
     , microlens-platform
     , modern-uri
+    , monad-logger
     , monomer
     , monomer-hagrid
     , mtl
@@ -414,6 +421,7 @@ executable hraylib3d
     , vect
     , vector
     , vulkan
+    , vulkan-api
     , vulkan-utils
     , wavefront
     , wreq
@@ -463,6 +471,7 @@ test-suite hraylib3d-test
     , gltf-loader
     , hashable
     , hraylib3d
+    , hruby
     , http-client
     , http-types
     , ilist
@@ -477,6 +486,7 @@ test-suite hraylib3d-test
     , mersenne-random-pure64
     , microlens-platform
     , modern-uri
+    , monad-logger
     , monomer
     , monomer-hagrid
     , mtl
@@ -504,6 +514,7 @@ test-suite hraylib3d-test
     , vect
     , vector
     , vulkan
+    , vulkan-api
     , vulkan-utils
     , wavefront
     , wreq

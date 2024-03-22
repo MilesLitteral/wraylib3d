@@ -58,9 +58,13 @@ dependencies:
 - utf8-string
 - HaTeX
 - OpenGLRaw
+# Window System Libs
 - GLFW-b 
-- vulkan
+- vulkan     # pick one
+- vulkan-api # pick one
 - vulkan-utils
+- monad-logger
+# End Window System
 - proteaaudio
 - MonadRandom
 - attoparsec
@@ -94,6 +98,7 @@ dependencies:
 - monomer-hagrid
 - nsis
 - linear # This will replace Data.Vect entirely
+- hruby
 
 ghc-options:
 - -Wall

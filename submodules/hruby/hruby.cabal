@@ -30,10 +30,14 @@ library
                         , unordered-containers >= 0.2 && < 0.3
                         , stm                  >= 2.4 && < 2.6
                         , scientific           >= 0.2 && < 0.4
-  c-sources:            cbits/shim.c
-  install-includes:     cbits/shim.h
   include-dirs:         cbits
-  pkgconfig-depends:    ruby
+  install-includes:     cbits/shim.h
+  c-sources:            cbits/shim.c
+  if os(windows)
+    extra-lib-dirs:  C:/Users/Manda/OneDrive/Documentos/GitHub/wraylib3d/submodules/hruby/lib
+    extra-libraries: x64-ucrt-ruby320     
+  else
+    pkgconfig-depends: ruby
   default-language:     Haskell2010
 
 Test-Suite test-roundtrip

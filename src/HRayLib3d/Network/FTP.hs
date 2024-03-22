@@ -3,9 +3,10 @@
 {-# LANGUAGE    FlexibleInstances   #-}
 {-# LANGUAGE    ScopedTypeVariables #-}
 {-# LANGUAGE    OverloadedStrings   #-}
-module HRayLib3d.Network.FTP (searchDirectory, searchBooks, retrieveFromFTP) where
+module HRayLib3d.Network.FTP (searchDirectory, retrieveFromFTP) where
 
     import Control.Monad
+    import Control.Exception(SomeException, catch)
     import System.FilePath
     import System.Directory
     import Data.Either.Extra 
@@ -27,6 +28,10 @@ module HRayLib3d.Network.FTP (searchDirectory, searchBooks, retrieveFromFTP) whe
     -- updates the b state and possibly has some side effects. 
     -- Notice that the type of the state is chosen by the caller,
     -- who might put useful things there.
+
+    -- Utility function to avoid the "Ambiguous type variable..." error
+    catchAny :: IO a -> (SomeException -> IO a) -> IO a
+    catchAny = catch
 
     retrieveFromFTP :: Sess.Session -> String -> T.Text -> IO BooksEvt
     retrieveFromFTP sess tunnel apiQuery = do
