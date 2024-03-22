@@ -1,11 +1,11 @@
 _WRaylib3d (WRL3D)_
 ## Install Requirements
 You will need the following libraries and applications installed, in the future the library will search for these requirements by itself and install them:
-* Haskell Toolchain (ghc, stack, cabal), ghcup is a convenient solution: https://www.haskell.org/ghcup/
-* sdl   (window management), Ubuntu: run sudo apt install libsdl2-2.0-0; Windows: Run this command in your Haskell MinGW application: `pacman -S mingw-w64-x86_64-SDL2`
-* glfw  (low level window functions), available here: https://www.glfw.org/
-* libpq (to support Realm/DB functions), available here: https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
-* NEW! ruby (to use the ScriptEngine Module), on linux you need to install ruby where pkg-config can find it,  for windows you will need https://rubyinstaller.org/. Then follow these extra steps: 
+* Haskell Toolchain (`ghc`, `stack`, `cabal`), ghcup is a convenient solution: https://www.haskell.org/ghcup/
+* `sdl`   (window management), Ubuntu: run sudo apt install libsdl2-2.0-0; Windows: Run this command in your Haskell MinGW application: `pacman -S mingw-w64-x86_64-SDL2`
+* `glfw`  (low level window functions), available here: https://www.glfw.org/
+* `libpq` (to support Realm/DB functions), available here: https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
+* NEW! `ruby` (to use the ScriptEngine Module), on linux you need to install `ruby` where pkg-config can find it,  for windows you will need https://rubyinstaller.org/. Then follow these extra steps: 
   - Modify hruby.cabal so it's extra-lib-dirs is an absolute path to lib on your machine
   - OPTIONAL: If the provided .dlls have issues then replace x64-ucrt-ruby320.dll and x64-ucrt-ruby320.dll.a with provided versions from rubyinstaller. 
   
