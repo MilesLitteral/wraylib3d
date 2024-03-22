@@ -284,8 +284,7 @@ Linux
    WRL3D.so/dll
    YourGame.wasm
  
-(ghcjs?)
-WebGL (TBA, See Also: https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html)
+WebGL (TBA via ghc-js, See Also: https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html)
   ftp://127.0.0.1/YourGame/
   -- (Data URI)  AssetBundle(s)
   -- (Data URI)  ShaderCache(s)
