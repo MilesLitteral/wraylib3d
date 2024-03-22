@@ -5,7 +5,7 @@ You will need the following libraries and applications installed, in the future 
 * `glfw`  (low level window functions), available here: https://www.glfw.org/
 * `libpq` (to support Realm/DB functions), available here: https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
 * NEW! `ruby` (to use the ScriptEngine Module), on linux you need to install `ruby` where pkg-config can find it,  for windows you will need https://rubyinstaller.org/. Then follow these extra steps: 
-  - Modify hruby.cabal so it's extra-lib-dirs is an absolute path to lib on your machine
+  - Modify hruby.cabal so it's extra-lib-dirs is an absolute path to `lib` in the project root folder on your machine
   - OPTIONAL: If the provided .dlls have issues then replace x64-ucrt-ruby320.dll and x64-ucrt-ruby320.dll.a with provided versions from rubyinstaller. 
   
   
@@ -105,226 +105,227 @@ You will need the following libraries and applications installed, in the future 
             When this exists fully, SDL2 will handle Input (Controllers), Audio, Windowing, and Widgets therefore 
             separating concerns in terms of which modules handle what, its currently a bit of a mess
             
-    + Game Engine (Module)
-        - Data 
-            Contains all Type Level descriptions of ingame data like Maps (BSP), GameCharacters, Models (MD3)
-            There is an ongoing effort to add new Bits such as GLBs and GLTFs
+  + Game Engine (Module)
+      - Data 
+          Contains all Type Level descriptions of ingame data like Maps (BSP), GameCharacters, Models (MD3)
+          There is an ongoing effort to add new Bits such as GLBs and GLTFs
 
-        - Graphics
-            Contains Functions for operating on the Data Types and Rendering them, currently the Rendering Pipeling
-            presumes that everything will be interms of OpenGL Buffers, efforts are thus focused on having the GLBs
-            read into lists of GLTFs then the GLTFs are loaded and read into OpenGL Buffers, at a later point in 
-            Development the Rendering Pipeline will be backend agnostic and the Buffers will instead be a kind of 
-            Intermediate Representation (IR), expanding on LambdaCube-IR and probably LambdaCube-Compiler
+      - Graphics
+          Contains Functions for operating on the Data Types and Rendering them, currently the Rendering Pipeling
+          presumes that everything will be interms of OpenGL Buffers, efforts are thus focused on having the GLBs
+          read into lists of GLTFs then the GLTFs are loaded and read into OpenGL Buffers, at a later point in 
+          Development the Rendering Pipeline will be backend agnostic and the Buffers will instead be a kind of 
+          Intermediate Representation (IR), expanding on LambdaCube-IR and probably LambdaCube-Compiler
 
-            There was a time that I entertained creating a LambdaCube-DX for DirectX but I instead decided Vulkan
-            would maximize platform support and save time, additionally, Vulkan can use native D311 and D312.dll
-            where as it CANNOT do native Metal rendering (it can only communicate with metal-api which creates a 
-            bottleneck in Vulkan) thus LambdaCube-Metal is somewhat necessitated by comparison
-            Related Projects: LambdaCube-Vulkan, LambdaCube-Metal, LambdaCube-XR, LambdaCube-GL (The Backends)
-            (all will be renamed to eclipse-x)
+          There was a time that I entertained creating a LambdaCube-DX for DirectX but I instead decided Vulkan
+          would maximize platform support and save time, additionally, Vulkan can use native D311 and D312.dll
+          where as it CANNOT do native Metal rendering (it can only communicate with metal-api which creates a 
+          bottleneck in Vulkan) thus LambdaCube-Metal is somewhat necessitated by comparison
+          Related Projects: LambdaCube-Vulkan, LambdaCube-Metal, LambdaCube-XR, LambdaCube-GL (The Backends)
+          (all will be renamed to eclipse-x)
 
-            lambdacube will be renamed to eclipse
-            in the interest of this, lambdacube-gl should be replaced
-            with eclipse-gles whic has to be written
+          lambdacube will be renamed to eclipse
+          in the interest of this, lambdacube-gl should be replaced
+          with eclipse-gles whic has to be written
 
-            There's also a desire to upgrade LambdaCube-IR to use GraphQL as a querying language rather than JSON 
-            as it's currently using this is because GraphQL is incredibly flexible, and will need to be explored
+          There's also a desire to upgrade LambdaCube-IR to use GraphQL as a querying language rather than JSON 
+          as it's currently using this is because GraphQL is incredibly flexible, and will need to be explored
 
-        - Loader
-            Contains functions for reading the Binary File Types into their Logical Data Types, a GLB and GLTF Loader
-            is in Progress.
+      - Loader
+          Contains functions for reading the Binary File Types into their Logical Data Types, a GLB and GLTF Loader
+          is in Progress.
 
-        - MapViewer
-            Module for Loading Levels and viewing them, Full of QoL TODOs that will be addressed later on in
-            development.
-            
-            There is a desire to create a MapMaker, I'm not saying this should be Blender-HS but I am interested in Map Making 
-            functionality similar to Unity/Unreal Engine.
-            
-        - Realm
-            Module for Games and their Definition, here game logic, entities, levels, physics, and all are defined
-            This class is what users build via the UI and is actually "Compiled" by WRL3D when the user exports 
-            their game, rather, the assets here and logic here is what will be compiled as an executable with dlls, 
-            assetBundles,  and binaries. There is an interest here to add the DB Module connections, and a module for reading
-            a companion .db file.
+      - MapViewer
+          Module for Loading Levels and viewing them, Full of QoL TODOs that will be addressed later on in
+          development.
+          
+          There is a desire to create a MapMaker, I'm not saying this should be Blender-HS but I am interested in Map Making 
+          functionality similar to Unity/Unreal Engine.
+          
+      - Realm
+          Module for Games and their Definition, here game logic, entities, levels, physics, and all are defined
+          This class is what users build via the UI and is actually "Compiled" by WRL3D when the user exports 
+          their game, rather, the assets here and logic here is what will be compiled as an executable with dlls, 
+          assetBundles,  and binaries. There is an interest here to add the DB Module connections, and a module for reading
+          a companion .db file.
 
-        - All Other files in here relate to core Game Engine functions, Render System, Scene (Manager), and Utils will stay whereas 
-          there is a desire to work Collision and Content into their own Modules (Physics, and Content respectively).
+      - All Other files in here relate to core Game Engine functions, Render System, Scene (Manager), and Utils will stay whereas 
+        there is a desire to work Collision and Content into their own Modules (Physics, and Content respectively).
 
-    + Network
-        - Database
-            Low level Postgres-SQL Functions, so far it only contains Query, which is all that is necessary
-            for Realm purposes; you are required to have PostgresSQL installed on your system to use pgl
-            if you want to use this module and it is bound to pgl otherwise this module creates segfaults.
+  + Network
+      - Database
+          Low level Postgres-SQL Functions, so far it only contains Query, which is all that is necessary
+          for Realm purposes; you are required to have PostgresSQL installed on your system to use pgl
+          if you want to use this module and it is bound to pgl otherwise this module creates segfaults.
 
-        - Requests
-            Low Level HTTP Functions, it can query web addressed in terms of HTTPS, JSON, or Binary and can handle all
-            those responses, in the future any UDP Streaming functions will be described here for Multiplayer functionality 
-            as will any SSH or Tunneling functions that are of future interest
+      - Requests
+          Low Level HTTP Functions, it can query web addressed in terms of HTTPS, JSON, or Binary and can handle all
+          those responses, in the future any UDP Streaming functions will be described here for Multiplayer functionality 
+          as will any SSH or Tunneling functions that are of future interest
 
-        - Realms
-            Levels as described in their Web format, Levels can be queried and their assets downloaded.
-            This Module will probably be more important when Multiplayer is a thing in the future
+      - Realms
+          Levels as described in their Web format, Levels can be queried and their assets downloaded.
+          This Module will probably be more important when Multiplayer is a thing in the future
 
-        - Cloud 
-            A Module which handles interfacing with a SaaS like Firebase or Supabase if the User Desires,
-            look here for all analytic needs
+      - Cloud 
+          A Module which handles interfacing with a SaaS like Firebase or Supabase if the User Desires,
+          look here for all analytic needs
 
-    + Script Engine
-        - All Definitions for HRuby, later will be a generalized interface that the user can use to script ingame actions
-          , mods, and logic. Planned support: Python, Ruby, Lua
+  + Script Engine
+      - All Definitions for HRuby, later will be a generalized interface that the user can use to script ingame actions
+        , mods, and logic. Planned support: Python, Ruby, Lua
 
-    + Benchmarks
-        - Application Benchmark Utilities, it has a Benchmark for running the mapviewer, running the default game, and
-        entries for custom benchmarking full games or individual functions
+  + Benchmarks
+      - Application Benchmark Utilities, it has a Benchmark for running the mapviewer, running the default game, and
+      entries for custom benchmarking full games or individual functions
 
-        ? There is a desire to make visualization functions so that benchmarking can be presented Graphically or non Graphically 
+      ? There is a desire to make visualization functions so that benchmarking can be presented Graphically or non Graphically 
 
-    + GuideWriter 
-        - A Module for Generating LaTeX PDFs via HaTeX (haskell latex)
-        - This will be a general utility that could evolve into other
-          notation forms for UI etc
+  + GuideWriter 
+      - A Module for Generating LaTeX PDFs via HaTeX (haskell latex)
+      - This will be a general utility that could evolve into other
+        notation forms for UI etc
 
-    + Utils
-        - Misc Application Utils, all Logging functions for example are here, as is prettyPrinting and Md3Show;
-          the PrettyPrinter is entirely broken and needs to be fixed for generalized use. There needs to be an 
-          added GlTFShow, and GLBShow utility (perhaps it could be called ModelViewer), there is also the
-          small need for a MegaStore Printer,  ConfigShow, and a tracer (stack trace?)
+  + Utils
+      - Misc Application Utils, all Logging functions for example are here, as is prettyPrinting and Md3Show;
+        the PrettyPrinter is entirely broken and needs to be fixed for generalized use. There needs to be an 
+        added GlTFShow, and GLBShow utility (perhaps it could be called ModelViewer), there is also the
+        small need for a MegaStore Printer,  ConfigShow, and a tracer (stack trace?)
 
-Config.Yaml
+### Config.Yaml
 Will be expanded to include Tests, examples, and alternative builds based on simple flags passed
 as well as flags for conditions like if sdl2 is not installed leaving only the need to install libpq.
     
-Stack.Yaml
-used to control which extra modules are being built like which lambdacude backend the Application will
-build with (currently it only builds with lc-gl) in the future availalbe backends will be:
-* opengl (legacy)
+### Stack.Yaml
+Used to control which extra modules are being built like which lambdacude backend the Application will
+build with (currently it only builds with lc-gl) in the future available rendering backends will be:
+* opengl    (legacy)
 * opengl-es (gles)
-* vulkan (default, includes xr and metal-api)
-* metal  (apple only, optional for apple users)
-* sdl2   (software renderer)
-* ~~xr     (deprecated for vulkan instead)~~
-    
+* metal     (apple only, optional for apple users)
+* directx   (Windows Only, optional for Win64 users)
+
+Window rendering backends available will be:
+* vulkan    (default, includes xr and metal-api support)
+* sdl2/glfw (software renderer)
     
 ### How To Run WRayLib3d
+System Prerequisites: ghc, stack, cabal (ghcup toolchain), opengl
+Core Dependencies: lambdacube-compiler, lambdacube-ir, lambdacube-gl (There is no need to satisfy optionals, and 
+they all come in the project anyway, enable and disable them with the config.yaml)
 
-    -  System Prerequisites: ghc, stack, cabal (ghcup toolchain), opengl
-    -  Core Dependencies: lambdacube-compiler, lambdacube-ir, lambdacube-gl (There is no need to satisfy optionals, and 
-       they all come in the project anyway, enable and disable them with the config.yaml)
-    - in commandline: stack run/stack build
+in shell: `stack build` then `stack run` 
 
 ### How To Run The MapViewer or Demo
-First download this .pk3 (In the future it will be replaced by an "AssetBundle" (MegaStore):
+If it is not already present in root then you must first download this .pk3 (In the future it will be replaced by an "AssetBundle" (MegaStore):
 https://github.com/patdohere/dockerfiles/raw/master/quakejs-stack/quakejs/base/baseq3/pak0.pk3
 
 Place "pak0.pk3" in the root directory (./WRaylib3d)
-stack run mapviewer-debug
+in shell: `stack run mapviewer-debug`
 
 ### Notes:
 *  lambdacube-metal requires mtlpp:https://github.com/MilesLitteral/mtlpp
 *  Note if you wish to test the WebAssembly module you will need wasmtime installed on your machine: https://wasmtime.dev/
 
 ## Will WRayLib3d have companion apps?
-   Yes, they will be written with the fjvallarino/monomer library exclusively,
-   one that could be made now is the Multiplayer launcher, the rest are TBA
+Yes, they will be written with the fjvallarino/monomer library exclusively,
+one that could be made now is the Multiplayer launcher, the rest are TBA,
    
 ## How would exported games look in terms of exported filesystems?*
-   * = There is a possibility for CMake support, this has to be explored
-       as it could also be the answer for generating vcprojs or xcprojs
-       
-   ```
-   General FS:
-   C:/WRL/Projects/<YourGame>
-     AssetBundles/assets.AssetBundle(s)
-     ShaderCaches/shader.ShaderCache(s)
-     src/game/.hs(')
-     src/gameScripting/.rb(s)
-     Realms.db
-     YourGame.wrlp
+* = There is a possibility for CMake support, this has to be explored
+   as it could also be the answer for generating vcprojs or xcprojs
+ 
+ ```
+ General FS:
+ C:/WRL/Projects/<YourGame>
+   AssetBundles/assets.AssetBundle(s)
+   ShaderCaches/shader.ShaderCache(s)
+   src/game/.hs(')
+   src/gameScripting/.rb(s)
+   Realms.db
+   YourGame.wrlp
 
-   Windows:
-   NSIS (Standard)
-   C:/WRL/Games/<YourGame>
-     AssetBundles/assets.AssetBundle(s)
-     ShaderCaches/shader.ShaderCache(s)
-     WRL3D.dll
-     Realms.db
-     YourGame.exe
+ Windows:
+ NSIS (Standard)
+ C:/WRL/Games/<YourGame>
+   AssetBundles/assets.AssetBundle(s)
+   ShaderCaches/shader.ShaderCache(s)
+   WRL3D.dll
+   Realms.db
+   YourGame.exe
 
-   UWP
-   C:/WRL/Games/<YourGame>
-     <vcproj files>
-     WRL3D.dll
-     YourGame.vcproj -> ./build/YourGame.uwp
+ UWP
+ C:/WRL/Games/<YourGame>
+   <vcproj files>
+   WRL3D.dll
+   YourGame.vcproj -> ./build/YourGame.uwp
+ 
+ MacOS:
+ /user/WRL/Games/<YourGame>
+   AssetBundles/assets.AssetBundle(s)
+   ShaderCaches/shader.metallib(s), shader.metaldysm(s)
+   WRL3D.so
+   Realms.db
+   <xcproj/xcworkspace files>
+   YourGame.xcproj -> ./build/YourGame.app
+
+Linux
+/user/WRL/Games/<YourGame>
+   AssetBundles/assets.AssetBundle(s)
+   ShaderCaches/shader.ShaderCache(s)
+   configure
+   Makefile 
+   WRL3D.so
+   autogen.sh
+   Realms.db
+   YourGame.o
+
+ wasm
+ ftp://127.0.0.1/YourGame/
+   -- (Data URI)  AssetBundle(s)
+   -- (Data URI)  ShaderCache(s)
+   -- (DB Tunnel) Realm(s)
+   WRL3D.so/dll
+   YourGame.wasm
+ 
+(ghcjs?)
+WebGL (TBA, See Also: https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html)
+  ftp://127.0.0.1/YourGame/
+  -- (Data URI)  AssetBundle(s)
+  -- (Data URI)  ShaderCache(s)
+  -- (DB Tunnel) Realm(s)
+  Build
+  TemplateData
+  index.html
+  
+iOS
+/user/WRL/Games/Mobile/<YourGame>
+   AssetBundles/assets.AssetBundle(s)
+   ShaderCaches/shader.metallib(s), shader.metaldysm(s)
+   Realms.db
+   <vcproj/xcworkspace files>
+   YourGame.xcproj -> ./build/YourGame.app (iOS)          
    
-   MacOS:
-   /user/WRL/Games/<YourGame>
-     AssetBundles/assets.AssetBundle(s)
-     ShaderCaches/shader.metallib(s), shader.metaldysm(s)
-     WRL3D.so
-     Realms.db
-     <xcproj/xcworkspace files>
-     YourGame.xcproj -> ./build/YourGame.app
+Android
+../user/WRL/Games/Mobile/<YourGame>
+   AssetBundles/assets.HSAssetBundle(s)
+   ShaderCaches/shader.ShaderCache(s)
+   app/
+   build/
+   gradle/
+   <gradle_files>
+   Realms.db
+   settings.localproperties
+   build.gradle -> ./build/YourGame.app
 
-  Linux
-  /user/WRL/Games/<YourGame>
-     AssetBundles/assets.AssetBundle(s)
-     ShaderCaches/shader.ShaderCache(s)
-     configure
-     Makefile 
-     WRL3D.so
-     autogen.sh
-     Realms.db
-     YourGame.o
-
-   wasm
-   ftp://127.0.0.1/YourGame/
-     -- (Data URI)  AssetBundle(s)
-     -- (Data URI)  ShaderCache(s)
-     -- (DB Tunnel) Realm(s)
-     WRL3D.so/dll
-     YourGame.wasm
-   
-  (ghcjs?)
-  WebGL (TBA, See Also: https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html)
-    ftp://127.0.0.1/YourGame/
-    -- (Data URI)  AssetBundle(s)
-    -- (Data URI)  ShaderCache(s)
-    -- (DB Tunnel) Realm(s)
-    Build
-    TemplateData
-    index.html
-    
-  iOS
-  /user/WRL/Games/Mobile/<YourGame>
-     AssetBundles/assets.AssetBundle(s)
-     ShaderCaches/shader.metallib(s), shader.metaldysm(s)
-     Realms.db
-     <vcproj/xcworkspace files>
-     YourGame.xcproj -> ./build/YourGame.app (iOS)          
-     
-  Android
-  ../user/WRL/Games/Mobile/<YourGame>
-     AssetBundles/assets.HSAssetBundle(s)
-     ShaderCaches/shader.ShaderCache(s)
-     app/
-     build/
-     gradle/
-     <gradle_files>
-     Realms.db
-     settings.localproperties
-     build.gradle -> ./build/YourGame.app
-
-  XR Headsets
-  ../user/WRL/Games/Mobile/<YourGame>
-     -- (Data URI)  AssetBundle(s)
-     -- (Data URI)  ShaderCache(s)
-     -- (DB Tunnel) Realm(s)
-     app/
-     build/
-     gradle/
-     <gradle_files>
-     settings.localproperties
-     build.gradle -> ./build/YourGame.app
-  ```
+XR Headsets
+../user/WRL/Games/Mobile/<YourGame>
+   -- (Data URI)  AssetBundle(s)
+   -- (Data URI)  ShaderCache(s)
+   -- (DB Tunnel) Realm(s)
+   app/
+   build/
+   gradle/
+   <gradle_files>
+   settings.localproperties
+   build.gradle -> ./build/YourGame.app
+```
