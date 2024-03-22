@@ -154,6 +154,8 @@ library
       HRayLib3d.WindowSystem
       HRayLib3d.WindowSystem.ComputePipelineWidget
       HRayLib3d.WindowSystem.Context
+      HRayLib3d.WindowSystem.Context.SDL2
+      HRayLib3d.WindowSystem.Context.Vulkan
       HRayLib3d.WindowSystem.Core
       HRayLib3d.WindowSystem.RendererWidget
       HRayLib3d.WindowSystem.RenderPipelineClient
@@ -229,6 +231,7 @@ library
     , scientific
     , split
     , stm
+    , template-haskell
     , text
     , text-show
     , time
@@ -320,6 +323,7 @@ executable RealmViewer-FE-Demo
     , scientific
     , split
     , stm
+    , template-haskell
     , text
     , text-show
     , time
@@ -410,6 +414,7 @@ executable hraylib3d
     , scientific
     , split
     , stm
+    , template-haskell
     , text
     , text-show
     , time
@@ -503,6 +508,7 @@ test-suite hraylib3d-test
     , sdl2
     , split
     , stm
+    , template-haskell
     , text
     , text-show
     , time

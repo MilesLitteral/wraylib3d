@@ -9,18 +9,31 @@ module HRayLib3d.Utils.Subprocess (
 )
 where
 
-import Data.Text (Text, unpack, pack)
-import Control.Lens
-import Control.Exception
-import Control.Monad.IO.Class
 import GHC.IO.Handle (hGetLine)
+import Control.Exception ()
+import Control.Monad.IO.Class ()
+import Control.Lens ( (&), (%~), (.~), ASetter )
 
-import System.Environment
-import System.Directory (getHomeDirectory)
-import System.Process (StdStream(CreatePipe), CreateProcess, createProcess, readProcess, proc, cwd, env, std_in, std_out, std_err, shell, CmdSpec(RawCommand))
+import Data.Text          (Text, unpack, pack)
+import System.Environment ()
+import System.Directory   (getHomeDirectory)
+import System.Process     (
+    StdStream(CreatePipe),
+    CreateProcess, 
+    createProcess, 
+    readProcess, 
+    proc, 
+    cwd, 
+    env, 
+    std_in, 
+    std_out, 
+    std_err, 
+    shell, 
+    CmdSpec(RawCommand)
+ )
 
-import HRayLib3d.Utils.LogMessage
-import Monomer.Widgets.Composite
+import Monomer.Widgets.Composite ( EventResponse(Model) )
+import HRayLib3d.Utils.LogMessage ()
 
 -- | Test if a Subprocess succeeds or fails on startup
 -- This specific version will throw an IOException for 
@@ -28,18 +41,23 @@ import Monomer.Widgets.Composite
 -- the main window.
 -- Example Use:
 -- @
---   orderedMessage $ ManiLogMessage MANI_LOG_HEAD MANI_LOG_ZONE  ("Booting Maniex")
---   result <- try' $ (Manifest.Utils.Subprocess.startManiex mdl)
+--   orderedMessage $ LogMessage LOG_HEAD LOG_ZONE  ("Booting libpq")
+--   result <- try' $ (queryRealm mdl)
 --   case result of
---     Left ex  -> orderedMessage $ ManiLogMessage MANI_LOG_TAIL MANI_LOG_ERROR ("Maniex: " ++ show ex)
---     Right () -> orderedMessage $ ManiLogMessage MANI_LOG_TAIL MANI_LOG_ZONE  ("Maniex: CHECKLIST OK")
+--     Left ex  -> orderedMessage $ ManiLogMessage LOG_TAIL LOG_ERROR ("libpq: " ++ show ex)
+--     Right () -> orderedMessage $ ManiLogMessage LOG_TAIL LOG_ZONE  ("libpq: CHECKLIST OK")
 -- @
 append :: a -> [a] -> [a]
 append a [] = [a]
 append a (x:xs) = x : append a xs
 
+appendLens :: Monad m    => a1 -> (a2 -> b) -> ASetter a1 s a2 b -> m [EventResponse s e sp ep]
 appendLens    model a lens    = return [Model $ model & lens %~  a]
+
+appendHandles :: Monad m => a1 -> (a2 -> b) -> ASetter a1 s a2 b -> m [EventResponse s e sp ep]
 appendHandles model a lens    = return [Model $ model & lens %~  a]
+
+appendIO :: Monad m => a1 -> b -> ASetter a1 s a2 b -> m [EventResponse s e sp ep]
 appendIO      model a lens    = return [Model $ model & lens .~  a]
 
 -- | Boots the user specified IDE via console command ("atom ./",  "code ./")

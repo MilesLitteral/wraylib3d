@@ -29,6 +29,7 @@ dependencies:
 - pretty-show
 - deepseq
 - zlib
+- template-haskell
 - filepath
 - linear                 #This will replace both vect and Vector, or Vector will do so
 - mersenne-random-pure64 #wtf XD, it's from 2008 but maybe that's okay because it's RNG
