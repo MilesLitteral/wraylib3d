@@ -300,7 +300,7 @@ iOS
    ShaderCaches/shader.metallib(s), shader.metaldysm(s)
    Realms.db
    <vcproj/xcworkspace files>
-   YourGame.xcproj -> ./build/YourGame.app (iOS)          
+   YourGame.xcproj -> ./build/YourGame.ipa (iOS)          
    
 Android
 ../user/WRL/Games/Mobile/<YourGame>
@@ -312,7 +312,7 @@ Android
    <gradle_files>
    Realms.db
    settings.localproperties
-   build.gradle -> ./build/YourGame.app
+   build.gradle -> ./build/YourGame.apk
 
 XR Headsets
 ../user/WRL/Games/Mobile/<YourGame>
@@ -324,7 +324,8 @@ XR Headsets
    gradle/
    <gradle_files>
    settings.localproperties
-   build.gradle -> ./build/YourGame.app
+   build.gradle -> ./build/YourGame.apk
+OR JUST `./<YourGame>/YourGame.uwp` + .dlls
 ```
 * = There is a desire for CMake support, this has to be explored
    as it could also be the answer for generating vcprojs and xcprojs.
