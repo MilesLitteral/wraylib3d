@@ -192,11 +192,11 @@ You will need the following libraries and applications installed, in the future 
         added GlTFShow, and GLBShow utility (perhaps it could be called ModelViewer), there is also the
         small need for a MegaStore Printer,  ConfigShow, and a tracer (stack trace?)
 
-### Config.Yaml
+## Config.Yaml
 Will be expanded to include Tests, examples, and alternative builds based on simple flags passed
 as well as flags for conditions like if sdl2 is not installed leaving only the need to install libpq.
     
-### Stack.Yaml
+## Stack.Yaml
 Used to control which extra modules are being built like which lambdacude backend the Application will
 build with (currently it only builds with lc-gl) in the future available rendering backends will be:
 * opengl    (legacy)
@@ -208,29 +208,29 @@ Window rendering backends available will be:
 * vulkan    (default, includes xr and metal-api support)
 * sdl2/glfw (software renderer)
     
-### How To Run WRayLib3d
+## How To Run WRayLib3d
 System Prerequisites: ghc, stack, cabal (ghcup toolchain), opengl
 Core Dependencies: lambdacube-compiler, lambdacube-ir, lambdacube-gl (There is no need to satisfy optionals, and 
 they all come in the project anyway, enable and disable them with the config.yaml)
 
 in shell: `stack build` then `stack run` 
 
-### How To Run The MapViewer or Demo
+## How To Run The MapViewer or Demo
 If it is not already present in root then you must first download this .pk3 (In the future it will be replaced by an "AssetBundle" (MegaStore):
 https://github.com/patdohere/dockerfiles/raw/master/quakejs-stack/quakejs/base/baseq3/pak0.pk3
 
 Place "pak0.pk3" in the root directory (./WRaylib3d)
 in shell: `stack run mapviewer-debug`
 
-### Notes:
+## Notes:
 *  lambdacube-metal requires mtlpp:https://github.com/MilesLitteral/mtlpp
 *  Note if you wish to test the WebAssembly module you will need wasmtime installed on your machine: https://wasmtime.dev/
 
-## Will WRayLib3d have companion apps?
+### Will WRayLib3d have companion apps?
 Yes, they will be written with the fjvallarino/monomer library exclusively,
 one that could be made now is the Multiplayer launcher, the rest are TBA,
    
-## How would exported games look in terms of exported filesystems?*
+### How would exported games look in terms of exported filesystems?*
  ```
  General FS:
  C:/WRL/Projects/<YourGame>
