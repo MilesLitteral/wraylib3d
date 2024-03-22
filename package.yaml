@@ -97,7 +97,6 @@ dependencies:
 - criterion
 - monomer-hagrid
 - nsis
-- linear # This will replace Data.Vect entirely
 - hruby
 
 ghc-options:
@@ -119,7 +118,7 @@ library:
   source-dirs:  src
   cc-options:
     - -fPIC
-  build-tools:     c2hs
+  build-tools:  c2hs
 
   #include-dirs: cbits
   # install-includes:

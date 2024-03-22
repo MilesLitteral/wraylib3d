@@ -34,6 +34,7 @@ library
   install-includes:     cbits/shim.h
   c-sources:            cbits/shim.c
   if os(windows)
+    -- replace with an absolute path to lib in root dir on Windows
     extra-lib-dirs:  C:/Users/Manda/OneDrive/Documentos/GitHub/wraylib3d/submodules/hruby/lib
     extra-libraries: x64-ucrt-ruby320     
   else
