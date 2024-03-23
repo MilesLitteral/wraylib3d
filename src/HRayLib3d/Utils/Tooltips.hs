@@ -25,6 +25,13 @@ tooltipKeys =  [
   ("multiplayer_preferences",    pack "test"),
   ("run_preferences",            pack "test"),
   ("record_preferences",         pack "test"),
+  ("controller_add_button",      pack "Add/Edit Button Def to/in Controller Scheme"),
+  ("controller_delete_button",   pack "Remove Button Def to Controller Scheme"),
+  ("cloud_add_button",           pack "Add/Edit Button Def to/in Controller Scheme"),
+  ("cloud_delete_button",        pack "Remove Button Def to Controller Scheme"),
+
+  ("build_list_edit_button",     pack "Add/Edit Button Def to/in Controller Scheme"),
+  ("build_list_delete_button",   pack "Remove Button Def to Controller Scheme"),
   ("renderer_widget",            pack "test"),
   ("file_gui",                   pack "test"),
   ("run_dedicated_server",       pack "Will initialize a joinable server instance\n this allows for co-coding, but can also be used to run a live testable game session\n or multiplayer."),

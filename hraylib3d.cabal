@@ -258,6 +258,9 @@ library
 executable RealmViewer-FE-Demo
   main-is: Main.hs
   other-modules:
+      Lib.Types
+      Lib.Utils
+      Lib.Widgets
       OpenGLWidget
       Paths_hraylib3d
   hs-source-dirs:

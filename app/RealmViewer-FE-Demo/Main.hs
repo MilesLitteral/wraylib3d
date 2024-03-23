@@ -149,14 +149,9 @@ import HRayLib3d.Utils.Tooltips
 import HRayLib3d.WindowSystem.Core           hiding (name)
 import HRayLib3d.WindowSystem.RendererWidget hiding (name)
 
---check this out
 type BooksWenv = WidgetEnv  BooksModel BooksEvt
 type BooksNode = WidgetNode BooksModel BooksEvt
-
---TODO: break this up into a companion 'lib' module
---this file should only contain the following functions:
---buildUI, handleEvent, and Main
---the lib module should be comprised of: Types, Utils, Widgets.
+    
 keyListType c v =
     case c of
       XBOX_CONTROLLER     -> xboxKeyList    v
@@ -389,9 +384,9 @@ controllerRow wenv model idx t = animRow `nodeKey` cbKey where
       filler,
       box_ [alignRight] cbStatus `styleBasic` [width 80],
       spacer,
-      rowButton "📝" (ControllerButtonEdit idx t),
+      liftHelpOverlay (model ^. toolTips) "controller_add_button" $ rowButton "📝" (ControllerButtonEdit idx t),
       spacer,
-      rowButton "✂️" (ControllerButtonDeleteBegin idx t)
+      liftHelpOverlay (model ^. toolTips) "controller_delete_button" $ rowButton "✂️" (ControllerButtonDeleteBegin idx t)
     ] `styleBasic` [ paddingV 15, styleIf (not isLast) $ borderB 1 rowSepColor ]
   animRow  = animFadeOut_ [onFinished (ControllerButtonDelete idx t)] todoInfo
 
@@ -441,9 +436,9 @@ buildRow wenv model idx t = animRow `nodeKey` buildKey where
       filler,
       box_ [alignRight] buildStatus `styleBasic` [width 80],
       spacer,
-      rowButton "📝" (BuildListEdit idx t),
+      liftHelpOverlay (model ^. toolTips) "build_list_edit_button"   $ rowButton "📝" (BuildListEdit idx t),
       spacer,
-      rowButton "✂️" (BuildListDeleteBegin idx t)
+      liftHelpOverlay (model ^. toolTips) "build_list_delete_button" $ rowButton "✂️" (BuildListDeleteBegin idx t)
     ] `styleBasic` [ paddingV 15, styleIf (not isLast) $ borderB 1 rowSepColor ]
   animRow  = animFadeOut_ [onFinished (BuildListDelete idx t)] buildInfo
 
@@ -485,9 +480,9 @@ cloudRow wenv model idx t = animRow `nodeKey` cloudKey where
       filler,
       box_ [alignRight] cloudStatus, -- `styleBasic` [width 80],
       spacer,
-      rowButton "📝" (CloudEdit idx t),
+      liftHelpOverlay (model ^. toolTips) "cloud_add_button" $ rowButton "📝" (CloudEdit idx t),
       spacer,
-      rowButton "✂️" (CloudDeleteBegin idx t)
+      liftHelpOverlay (model ^. toolTips) "cloud_delete_button" $ rowButton "✂️" (CloudDeleteBegin idx t)
     ] `styleBasic` [ paddingV 15, styleIf (not isLast) $ borderB 1 rowSepColor ]
   animRow  = animFadeOut_ [onFinished (CloudDelete idx t)] cloudInfo
 
@@ -708,16 +703,10 @@ readProjectFileIndex   projSess = map (\x -> hstack [(image_  . matchPFType $ _p
 generateProjectFileGUI :: ProjectSession -> [WidgetNode BooksModel BooksEvt]
 generateProjectFileGUI projSess = reverse $ map (\x -> hstack [spacer, (image_  . matchPFType $ _projectFileType x) [fitWidth] `styleBasic` [border 1 black, width 45, height 45], label $ pack $ " " ++ _projectFileName x]) $ _projectFiles projSess
 
-rerr  :: Maybe Text -> Text
-rerr r  = fromMaybe "" r
-
-rbook :: Maybe Book -> Book
-rbook b = case b of
-            Nothing -> Book "NULL" [] (Just 0) (Just 0)
-            Just a  -> a
-
 hagridKey :: Text
 hagridKey = "SpiderHagrid"
+
+
 
 --https://github.com/fjvallarino/monomer/issues/83
 buildUI :: WidgetEnv BooksModel BooksEvt -> BooksModel -> WidgetNode BooksModel BooksEvt
@@ -1145,60 +1134,62 @@ buildUI wenv model = widgetTree where
         liftHelpOverlay (model ^. toolTips) "record_preferences" $ button "➿"   None                `styleBasic` [ textFont  "UI", textMiddle ],
         spacer
       ],
-      vstack[
+      vstack [
         -- put everything below this line in a Widget/Function
         vstack [
         spacer,
         separator,
-
         -- THE RENDERER WIDGET
         liftHelpOverlay (model ^. toolTips) "renderer_widget" $ scroll $ vstack [
             label  "📷0" `styleBasic` [textFont  "UI", textSize 10, textMiddle, textRight],
             rendererContext (model ^. threeDimensional),
             spacer --filler
-          ] `styleBasic` [padding 10]
-        ] `nodeVisible` (model ^. showMainRenderer) `styleBasic` [{-bgColor (rgbHex "#00AF54"),-} sizeReqW $ fixedSize 640, sizeReqH $ fixedSize 300], -- this is mainContent
+          ] `styleBasic` [padding 10]  `nodeVisible` (model ^. showRenderer)
+        ] `styleBasic` [{-bgColor (rgbHex "#00AF54"),-} sizeReqW $ fixedSize 640, sizeReqH $ fixedSize 300], -- this is mainContent
         -- RENDERER WIDGET END
+        filler,
+        separator,
         spacer,
-        separator,
-        hstack [
-          sideBarToggle,
-          liftHelpOverlay (model ^. toolTips) "fs_search" $ searchForm,
-          countLabel
-          -- box_ [mergeRequired booksChanged] $ vscroll (vstack (bookRow wenv <$> model ^. books)) `nodeKey` "mainScroll"
-        ],
-        separator,
-        hstack [
-          -- scroll $ vstack (label "File System" : readProjectFileIndex (fromJust $ model ^. projectSession)) `styleBasic` [bgColor (rgbHex "#A6A6A6")],
-          -- separator,
-          liftHelpOverlay (model ^. toolTips) "file_gui" $ scroll $ vstack (spacer : (label "File GUI" `styleBasic` [textColor $ rgbHex "#000000"]) : hstack [(button "./" None `styleBasic` [textColor $ rgbHex "#000000"]){- goToRoot -}, spacer, (button "../" {- goToDir --takeDirectory -} None `styleBasic` [textColor $ rgbHex "#000000"]), filler] : vstack [spacer, separator, spacer] : generateProjectFileGUI (fromJust $ model ^. projectSession))  `styleBasic` [bgColor (rgbHex "#EFC88B")],--"#612B8A")],
+        vstack [
           hstack [
-            liftHelpOverlay (model ^. toolTips) "fs_mk_directory" $  button "+" None `styleBasic` [textRight, bgColor $ rgbHex "#006600"], -- createDirectory 
-            liftHelpOverlay (model ^. toolTips) "fs_rm_directory" $  button "-" None `styleBasic` [textRight, bgColor $ rgbHex "#660000"]  -- removeDirectory 
-          ]
-        ] `nodeVisible` (model ^. showFileSystem),
-        separator,
-        spacer,
-        hstack [
+            sideBarToggle,
+            liftHelpOverlay (model ^. toolTips) "fs_search" $ searchForm,
+            countLabel
+            -- box_ [mergeRequired booksChanged] $ vscroll (vstack (bookRow wenv <$> model ^. books)) `nodeKey` "mainScroll"
+          ],
+          separator,
+          hstack [
+            -- scroll $ vstack (label "File System" : readProjectFileIndex (fromJust $ model ^. projectSession)) `styleBasic` [bgColor (rgbHex "#A6A6A6")],
+            -- separator,
+            liftHelpOverlay (model ^. toolTips) "file_gui" $ scroll $ vstack (spacer : (label "File GUI" `styleBasic` [textColor $ rgbHex "#000000"]) : hstack [(button "./" None `styleBasic` [textColor $ rgbHex "#000000"]){- goToRoot -}, spacer, (button "../" {- goToDir --takeDirectory -} None `styleBasic` [textColor $ rgbHex "#000000"]), filler] : vstack [spacer, separator, spacer] : generateProjectFileGUI (fromJust $ model ^. projectSession))  `styleBasic` [bgColor (rgbHex "#EFC88B")],--"#612B8A")],
+            hstack [
+              liftHelpOverlay (model ^. toolTips) "fs_mk_directory" $  button "+" None `styleBasic` [textRight, bgColor $ rgbHex "#006600"], -- createDirectory 
+              liftHelpOverlay (model ^. toolTips) "fs_rm_directory" $  button "-" None `styleBasic` [textRight, bgColor $ rgbHex "#660000"]  -- removeDirectory 
+            ]
+          ],
+          separator,
           spacer,
-          liftHelpOverlay (model ^. toolTips) "refresh_fs" $ button "💥" RefreshProjectFilesTask `styleBasic` [ textFont  "UI", textMiddle, textLeft ],
-          filler,
-          liftHelpOverlay (model ^. toolTips) "run_dedicated_server" $ label "Run Dedicated Server",
-          checkbox dedicatedServer,
+          hstack [
+            spacer,
+            liftHelpOverlay (model ^. toolTips) "refresh_fs" $ button "💥" RefreshProjectFilesTask `styleBasic` [ textFont  "UI", textMiddle, textLeft ],
+            filler,
+            liftHelpOverlay (model ^. toolTips) "run_dedicated_server" $ label "Run Dedicated Server",
+            checkbox dedicatedServer,
+            spacer,
+            liftHelpOverlay (model ^. toolTips) "debug_on_play" $ label "Debug On Play",
+            checkbox debugOnPlay,
+            spacer,
+            liftHelpOverlay (model ^. toolTips) "camera_view" $ label "📷" `styleBasic` [ textFont  "UI", textMiddle ],
+            checkbox rendererEnabled,
+            spacer,
+            liftHelpOverlay (model ^. toolTips) "tooltips" $  label "Tooltips",
+            checkbox toolTips,
+            spacer
+          ],
           spacer,
-          liftHelpOverlay (model ^. toolTips) "debug_on_play" $ label "Debug On Play",
-          checkbox debugOnPlay,
-          spacer,
-          liftHelpOverlay (model ^. toolTips) "camera_view" $ label "📷" `styleBasic` [ textFont  "UI", textMiddle ],
-          checkbox rendererEnabled,
-          spacer,
-          liftHelpOverlay (model ^. toolTips) "tooltips" $  label "Tooltips",
-          checkbox toolTips,
-          spacer
-        ],
-        spacer,
-        searchOverlay `nodeVisible` model ^. searching
-      ] `nodeVisible` (model ^. showRenderer),
+          searchOverlay `nodeVisible` model ^. searching
+        ]  `nodeVisible` (model ^. showFileSystem)
+      ] `nodeVisible` (model ^. showMainRenderer),
       controllerWidgetTree  `nodeVisible` (model ^. showControllerSetup),
       setPlatformWidgetTree `nodeVisible` (model ^. showPlatform),
       cloudSetupTree        `nodeVisible` (model ^. showCloudSetup),
@@ -1290,9 +1281,9 @@ buildUI wenv model = widgetTree where
   -- Window Manager
     menuDialog_ (vstack $ intersperse spacer [
       label         "View Window",
-      toggleButton  "MainWindow"            showRenderer,
-      toggleButton  "MainWindow - showFileSystem"            showFileSystem, 
-      toggleButton  "MainWindow - showRendererWidget"        showMainRenderer,
+      toggleButton  "MainWindow (Both File System and Renderer)"            showRenderer,
+      toggleButton  "MainWindow - showFileSystem"                           showFileSystem, 
+      toggleButton  "MainWindow - showRendererWidget"                       showMainRenderer,
       toggleButton  "ControllerSetupWindow" showControllerSetup,
       toggleButton  "BuildSettingsWindow"   showPlatform,--showRenderer,
       toggleButton  "ProjectSetupWindow"    showAppProjectPrefs, --showControllerSetup
@@ -1374,8 +1365,8 @@ handleEvent sess wenv node model evt = case evt of
       print dirCont
       return $ RefreshProjectFiles dirCont
     ]
-  OpenControllerSetup         -> [ Model $ model & showRenderer     .~ not (model ^. showRenderer) & showControllerSetup .~ not (model ^. showControllerSetup) ]
-  OpenWindowViewing           -> [ Model $ model & showWindowViewer .~ not (model ^. showWindowViewer) ]
+  OpenControllerSetup         -> [ Model $ model & showControllerSetup .~ not (model ^. showControllerSetup) ]
+  OpenWindowViewing           -> [ Model $ model & showWindowViewer    .~ not (model ^. showWindowViewer)    ]
   None                        -> []
   NoneB   b                   -> []
   --LoadFile fp         -> [Task $ do
@@ -1625,27 +1616,6 @@ handleEvent sess wenv node model evt = case evt of
   UpdateRealmBSPNameLocal     tx    -> [Model $ model & projectLoadedRealms . ix (getItemIndex (model ^. selectedRealm) (model ^. projectLoadedRealms)) . rlmBsp         .~ tx]
   UpdateRealmMultiplayerLocal bl    -> [Model $ model & projectLoadedRealms . ix (getItemIndex (model ^. selectedRealm) (model ^. projectLoadedRealms)) . rlmMultiplayer .~ bl] 
 
-indexList :: [a] -> [(Int, a)]
-indexList l = zip [1..] l
-
-getItemIndex :: Realm -> [Realm] -> Int
-getItemIndex rlm lst = fst $ head $ filter (\x -> rlm == snd x) $ indexList lst
--- dataAt :: Int -> [a] -> a
--- dataAt _ [] = error "Empty List!"
--- dataAt y (x:xs)  | y <= 0 = x
---                  | otherwise = dataAt (y-1) xs
-
-newSpider :: BooksModel -> Spider
-newSpider model =
-  Spider { 
-      index       = fromIntegral (length $ model ^. spiders),
-      sName       = "Extra Spider " <> pack (show (length $ model ^. spiders)),
-      species     = "Spider plant",
-      dateOfBirth = fromGregorian 2022 6 26,
-      weightKilos = 0.01
-    }
-    
-
 initialModel :: BooksModel
 initialModel = BooksModel {
   _bkmQuery     = "",
@@ -1761,6 +1731,34 @@ customDarkTheme :: Theme
 customDarkTheme = darkTheme
   & L.userColorMap . at "rowBgColor" ?~ rgbHex "#656565"
 
+rerr  :: Maybe Text -> Text
+rerr r  = fromMaybe "" r
+
+rbook :: Maybe Book -> Book
+rbook b = case b of
+            Nothing -> Book "NULL" [] (Just 0) (Just 0)
+            Just a  -> a
+
+indexList :: [a] -> [(Int, a)]
+indexList l = zip [1..] l
+
+getItemIndex :: Realm -> [Realm] -> Int
+getItemIndex rlm lst = fst $ head $ filter (\x -> rlm == snd x) $ indexList lst
+-- dataAt :: Int -> [a] -> a
+-- dataAt _ [] = error "Empty List!"
+-- dataAt y (x:xs)  | y <= 0 = x
+--                  | otherwise = dataAt (y-1) xs
+
+newSpider :: BooksModel -> Spider
+newSpider model =
+  Spider { 
+      index       = fromIntegral (length $ model ^. spiders),
+      sName       = "Extra Spider " <> pack (show (length $ model ^. spiders)),
+      species     = "Spider plant",
+      dateOfBirth = fromGregorian 2022 6 26,
+      weightKilos = 0.01
+    }
+    
 -- Utility function to avoid the "Ambiguous type variable..." error
 catchAny :: IO a -> (SomeException -> IO a) -> IO a
 catchAny = catch
