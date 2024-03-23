@@ -173,8 +173,6 @@ run = do
     finishAudio
     destroyWindow win
 
-
-
 {-
 doInScissor :: Size -> Double -> Point -> Rect -> IO () -> IO ()
 doInScissor winSize dpr offset vp action = do

@@ -14,6 +14,8 @@ Main module for the 'Books' example.
 {-# LANGUAGE    ScopedTypeVariables #-}
 {-# LANGUAGE    OverloadedStrings   #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use if" #-}
 -- Notes on making a Widget for direct backend use
 -- Very important for the RendererWidget that is coming up
 -- TODO:
@@ -143,6 +145,7 @@ import Text.Printf
 import HRayLib3d.Network.FTP
 import HRayLib3d.Core.BuildBundler
 import HRayLib3d.WindowSystem.Theme
+import HRayLib3d.Utils.Tooltips
 import HRayLib3d.WindowSystem.Core           hiding (name)
 import HRayLib3d.WindowSystem.RendererWidget hiding (name)
 
@@ -150,6 +153,10 @@ import HRayLib3d.WindowSystem.RendererWidget hiding (name)
 type BooksWenv = WidgetEnv  BooksModel BooksEvt
 type BooksNode = WidgetNode BooksModel BooksEvt
 
+--TODO: break this up into a companion 'lib' module
+--this file should only contain the following functions:
+--buildUI, handleEvent, and Main
+--the lib module should be comprised of: Types, Utils, Widgets.
 keyListType c v =
     case c of
       XBOX_CONTROLLER     -> xboxKeyList    v
@@ -769,7 +776,7 @@ buildUI wenv model = widgetTree where
     selector = box_ [alignLeft, onClick (ShowSection sectionIdx)] item `styleBasic` [cursorHand] `styleBasic` [border 1 black, width 45, height 45]
 
     --t ^. status
-  sideBarToggle = toggleButtonV "Toggle Inspector" (model ^. sideBarVisible) SideBarSummon :: WidgetNode BooksModel BooksEvt
+  sideBarToggle = liftHelpOverlay (model ^. toolTips) "toggle_inspector" $ toggleButtonV "Toggle Inspector" (model ^. sideBarVisible) SideBarSummon :: WidgetNode BooksModel BooksEvt
 
   sideBar    = item where
     children = vstack_ [childSpacing] $ sectionSelector <$> sectionIds
@@ -783,15 +790,15 @@ buildUI wenv model = widgetTree where
     layout = vstack [
         sideBarToggle,
         spacer,
-        hstack [
+        liftHelpOverlay (model ^. toolTips) "inspector_object" $ hstack [
           label  "♌️" `styleBasic` [textFont "UI"], 
           label  "Null Object", 
           spacer,
           --readd todoFg, rename todo to sceneObjectFg, make it work correctly
           labelS (pack "N/V") `styleBasic` [textFont "Regular", textSize 12, textAscender, textColor grayDark, padding 6, Monomer.paddingH 8, radius 12, bgColor grayLight],
           spacer,
-          rowButton "📝" (StartIDE) `styleBasic` [textFont "UI", textMiddle ]
-          --rowButton "📷" (None)
+          rowButton "📝" StartIDE `styleBasic` [textFont "UI", textMiddle ],
+          rowButton "📷" None
         ],
         spacer,
         children
@@ -923,7 +930,7 @@ buildUI wenv model = widgetTree where
       GENERIC_CONTROLLER -> [image "./assets/images/controller_icon.png"]
 
   -- Panel 1
-  controllerWidgetTree = vstack ([
+  controllerWidgetTree = vstack [
       spacer,
       hstack [
         label "Controller Type", 
@@ -938,29 +945,29 @@ buildUI wenv model = widgetTree where
       hstack $ controllerCase (model ^. controllerType),   
       spacer,
       mainLayer
-    ])
+    ]
 
   -- Panel 2
-  setPlatformWidgetTree = vstack ([
+  setPlatformWidgetTree = vstack [
     spacer, 
     label "Platform Setup",
     scroll_ [] (buList `styleBasic` [padding 20, paddingT 5]),
     filler,
     box_ [alignRight] addPlatform `styleBasic` [bgColor sectionBg, padding 20]
-    ])
+    ]
 
   -- Panel 3
-  cloudSetupTree = vstack ([
+  cloudSetupTree = vstack [
     spacer, 
     label "Cloud Setup",
     scroll_ [] (clList `styleBasic` [padding 20, paddingT 5]),
     filler,
     box_ [alignRight] addCloudConnection
       `styleBasic` [bgColor sectionBg, padding 20]
-    ])
+    ]
 
   -- Panel 4
-  appProjectPrefsTree = scroll $ vstack ([
+  appProjectPrefsTree = scroll $ vstack [
     spacer,
     label "Project & Realm Preferences",
     spacer,
@@ -991,14 +998,14 @@ buildUI wenv model = widgetTree where
     spacer,
     hstack [label "External Deps To Link (ex l.lib;lib.dll)", spacer, textField externalDepsList],
     filler
-    ])
+    ]
 
   -- put Connected IDE
   -- create alternative trees for the other menus and add transitions to all of them 
   -- animFadeIn (widget) `nodeKey` "fadeTimeLabel" -- (see handleEvent)
   -- SideBarSummon  bl  -> [Model $ model & sideBarVisible .~ bl, Message "fadeTimeLabel" AnimationStart]
   -- Panel 5
-  appRendererTree = vstack ([
+  appRendererTree = vstack [
     spacer,
     label "Renderer Settings",
     spacer,
@@ -1014,11 +1021,11 @@ buildUI wenv model = widgetTree where
     -- spacer,
     -- hstack [ label "Current Renderer", textDropdownS currentRenderer ["OpenGL(Default)", "Vulkan", "Metal(OSX only)"] ],
     filler
-    ])
+    ]
     -- ShowRealmViewer 
 
   appRealmViewerList  = intersperse spacer $ map (\x -> button (x ^. rlmLevelName) (ConfirmParentEvt $ OpenRealm x)) $ model ^. projectLoadedRealms
-  appRealmViewerTree  = vstack ([
+  appRealmViewerTree  = vstack [
       spacer,
       label "Realm Viewer",
       spacer,
@@ -1031,7 +1038,9 @@ buildUI wenv model = widgetTree where
       label "Multiplayer?",
       checkboxV  (model ^. selectedRealm .  rlmMultiplayer) (\x -> UpdateRealmMultiplayerLocal x),
       spacer
-    ])
+      --TODO: add realm viewer to "views" list
+      --button "Close View" OpenRealmViewer
+    ]
 
   -- Panel 6
   appRealmDBTree = vstack [ 
@@ -1107,33 +1116,33 @@ buildUI wenv model = widgetTree where
       spacer,
       hstack [
         spacer,
-        button "📖"  OpenFS              `styleBasic`  [ textFont  "UI", textMiddle ],
-        --spacer,
-        --button "🆔"  OpenAppPrefs        `styleBasic`  [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "file_window" $ button "📖"  OpenFS              `styleBasic`  [ textFont  "UI", textMiddle ],
         spacer,
-        button "🔍"  OpenWindowViewing   `styleBasic`  [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "app_preferences" $ button "🆔"  OpenAppPrefs        `styleBasic`  [ textFont  "UI", textMiddle ],
         spacer,
-        button "🌑"  OpenRealmList       `styleBasic`  [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "view_window" $ button "🔍"  OpenWindowViewing   `styleBasic`  [ textFont  "UI", textMiddle ],
         spacer,
-        button "🎮"  OpenControllerPrefs `styleBasic` [ textFont   "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "realm_preferences" $ button "🌑"  OpenRealmList       `styleBasic`  [ textFont  "UI", textMiddle ],
         spacer,
-        button "🆑"  OpenExportPrefs     `styleBasic` [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "controller_preferences" $ button "🎮"  OpenControllerPrefs `styleBasic` [ textFont   "UI", textMiddle ],
         spacer,
-        button "🎥"  OpenRunPrefs        `styleBasic` [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "export_preferences" $ button "🆑"  OpenExportPrefs     `styleBasic` [ textFont  "UI", textMiddle ],
         spacer,
-        button "⛳"  OpenMPPrefs         `styleBasic` [ textFont  "UI", textMiddle ], -- Multiplayer
+        liftHelpOverlay (model ^. toolTips) "run_preferences" $ button "🎥"  OpenRunPrefs        `styleBasic` [ textFont  "UI", textMiddle ],
         spacer,
-        textDropdownS selectedCamera ["Camera0", "Edit/Add Cameras"],
+        liftHelpOverlay (model ^. toolTips) "multiplayer_preferences" $ button "⛳"  OpenMPPrefs         `styleBasic` [ textFont  "UI", textMiddle ], -- Multiplayer
+        spacer,
+        liftHelpOverlay (model ^. toolTips) "cameras" $ textDropdownS selectedCamera ["Camera0", "Edit/Add Cameras"],
         spacer,
         separator,
         spacer,
-        toggleButton "2D"   (if  (not $ model ^. threeDimensional) then twoDimensional   else handleFalse ) `nodeEnabled` (model ^. showMainRenderer) `styleBasic` [textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "renderer_2d" $ toggleButton "2D"   (if  (not $ model ^. threeDimensional) then twoDimensional   else handleFalse ) `nodeEnabled` (model ^. showMainRenderer) `styleBasic` [textMiddle ],
         spacer,
-        toggleButton "3D"   (if  (not $ model ^. twoDimensional)   then threeDimensional else handleFalse ) `nodeEnabled` (model ^. showMainRenderer) `styleBasic` [textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "renderer_3d" $ toggleButton "3D"   (if  (not $ model ^. twoDimensional)   then threeDimensional else handleFalse ) `nodeEnabled` (model ^. showMainRenderer) `styleBasic` [textMiddle ],
         spacer,
-        button "#"    None               `styleBasic` [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "ruby_scripting" $ button "#"     None               `styleBasic` [ textFont  "UI", textMiddle ],
         spacer,
-        button "➿"   None                `styleBasic` [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "record_preferences" $ button "➿"   None                `styleBasic` [ textFont  "UI", textMiddle ],
         spacer
       ],
       vstack[
@@ -1143,7 +1152,7 @@ buildUI wenv model = widgetTree where
         separator,
 
         -- THE RENDERER WIDGET
-        scroll $ vstack [
+        liftHelpOverlay (model ^. toolTips) "renderer_widget" $ scroll $ vstack [
             label  "📷0" `styleBasic` [textFont  "UI", textSize 10, textMiddle, textRight],
             rendererContext (model ^. threeDimensional),
             spacer --filler
@@ -1154,7 +1163,7 @@ buildUI wenv model = widgetTree where
         separator,
         hstack [
           sideBarToggle,
-          searchForm,
+          liftHelpOverlay (model ^. toolTips) "fs_search" $ searchForm,
           countLabel
           -- box_ [mergeRequired booksChanged] $ vscroll (vstack (bookRow wenv <$> model ^. books)) `nodeKey` "mainScroll"
         ],
@@ -1162,28 +1171,28 @@ buildUI wenv model = widgetTree where
         hstack [
           -- scroll $ vstack (label "File System" : readProjectFileIndex (fromJust $ model ^. projectSession)) `styleBasic` [bgColor (rgbHex "#A6A6A6")],
           -- separator,
-          scroll $ vstack (spacer : (label "File GUI" `styleBasic` [textColor $ rgbHex "#000000"]) : hstack [(button "./" None `styleBasic` [textColor $ rgbHex "#000000"]){- goToRoot -}, spacer, (button "../" {- goToDir --takeDirectory -} None `styleBasic` [textColor $ rgbHex "#000000"]), filler] : vstack [spacer, separator, spacer] : generateProjectFileGUI (fromJust $ model ^. projectSession))  `styleBasic` [bgColor (rgbHex "#EFC88B")],--"#612B8A")],
+          liftHelpOverlay (model ^. toolTips) "file_gui" $ scroll $ vstack (spacer : (label "File GUI" `styleBasic` [textColor $ rgbHex "#000000"]) : hstack [(button "./" None `styleBasic` [textColor $ rgbHex "#000000"]){- goToRoot -}, spacer, (button "../" {- goToDir --takeDirectory -} None `styleBasic` [textColor $ rgbHex "#000000"]), filler] : vstack [spacer, separator, spacer] : generateProjectFileGUI (fromJust $ model ^. projectSession))  `styleBasic` [bgColor (rgbHex "#EFC88B")],--"#612B8A")],
           hstack [
-            button "+" None `styleBasic` [textRight, bgColor $ rgbHex "#006600"], -- createDirectory 
-            button "-" None `styleBasic` [textRight, bgColor $ rgbHex "#660000"]  -- removeDirectory 
+            liftHelpOverlay (model ^. toolTips) "fs_mk_directory" $  button "+" None `styleBasic` [textRight, bgColor $ rgbHex "#006600"], -- createDirectory 
+            liftHelpOverlay (model ^. toolTips) "fs_rm_directory" $  button "-" None `styleBasic` [textRight, bgColor $ rgbHex "#660000"]  -- removeDirectory 
           ]
         ] `nodeVisible` (model ^. showFileSystem),
         separator,
         spacer,
         hstack [
           spacer,
-          button "💥" RefreshProjectFilesTask `styleBasic` [ textFont  "UI", textMiddle, textLeft ],
+          liftHelpOverlay (model ^. toolTips) "refresh_fs" $ button "💥" RefreshProjectFilesTask `styleBasic` [ textFont  "UI", textMiddle, textLeft ],
           filler,
-          label "Run Dedicated Server",
+          liftHelpOverlay (model ^. toolTips) "run_dedicated_server" $ label "Run Dedicated Server",
           checkbox dedicatedServer,
           spacer,
-          label "Debug On Play",
+          liftHelpOverlay (model ^. toolTips) "debug_on_play" $ label "Debug On Play",
           checkbox debugOnPlay,
           spacer,
-          label "📷" `styleBasic` [ textFont  "UI", textMiddle ],
+          liftHelpOverlay (model ^. toolTips) "camera_view" $ label "📷" `styleBasic` [ textFont  "UI", textMiddle ],
           checkbox rendererEnabled,
           spacer,
-          label "Tooltips",
+          liftHelpOverlay (model ^. toolTips) "tooltips" $  label "Tooltips",
           checkbox toolTips,
           spacer
         ],
@@ -1216,6 +1225,8 @@ buildUI wenv model = widgetTree where
     --button "Assets"        (ConfirmParentEvt OpenAppPrefs),
     --button "Shaders"       (ConfirmParentEvt OpenAppPrefs),
     button "Renderer"      (ConfirmParentEvt OpenAppPrefs),
+    button "Script Engine" (ConfirmParentEvt OpenAppPrefs),
+    button "Network"       (ConfirmParentEvt OpenAppPrefs),
     button "Connected IDE" (ConfirmParentEvt OpenAppPrefs)
     ]) OpenAppPrefs OpenAppPrefs `nodeVisible` (model ^. applicationPreferences),
 

@@ -7,11 +7,8 @@ module HRayLib3d.WindowSystem.RendererWidget (
   codenameBigKahuna
 ) where
 
-
 import Data.IORef ( IORef )
 import Data.Maybe ()
-import Data.Char  (toLower)
-import qualified Data.Map as Map
 import Control.Monad
 import Control.Concurrent ()
 
@@ -32,20 +29,17 @@ import HRayLib3d.GameEngine.Loader.Zip ()
 import HRayLib3d.GameEngine.RealmViewer.Main   ( run, runAsWidget ) 
 import HRayLib3d.GameEngine.RealmViewer.Camera ()
 import HRayLib3d.GameEngine.RealmViewer.Engine ()
-import qualified Data.ByteString.Char8 as SB8
 
 import Data.Default
 import Data.Typeable (cast)
 import Data.Vector.Storable (Vector)
 
-import Control.Monad
 import Control.Lens ((&), (^.), (.~))
 
 import Foreign.C.String
 import Foreign.Marshal.Alloc
 import Foreign.Ptr
 import Foreign.Storable
-import Graphics.GL
 
 import qualified Data.Vector.Storable as V
 
@@ -53,7 +47,6 @@ import Monomer
 import Monomer.Widgets.Single
 import qualified Monomer.Lens as L
 
-import LambdaCube.GL.Type
 
 data OpenGLWidgetMsg
   = OpenGLWidgetInit GLuint (Ptr GLuint) (Ptr GLuint)
