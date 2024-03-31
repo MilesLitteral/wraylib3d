@@ -80,14 +80,14 @@ run = do
 
     win <- initWindow "LC DSL Quake 3 Demo" 800 600
 
-    -- loading screen
+    -- loading screen, check this block for bugs as something its doing is segfaulting the Ruby Interpreter
     loadingScreen <- createLoadingScreen
     (w,h)         <- getFramebufferSize win
     drawLoadingScreen w h loadingScreen pk3Data bspName
     swapBuffers win
     pollEvents
 
-    _ <- initAudio 64 44100 1024
+    -- _ <- initAudio 64 44100 1024 -- BUG FOUND! The Audio Allocation is leading to a segfault in the Ruby Interpreter
 
     (inputSchema, levelData) <- engineInit pk3Data fullBSPName
 
@@ -138,6 +138,8 @@ run = do
     (capturePress,capturePressSink)   <- unsafeExternal False
     (waypointPress,waypointPressSink) <- unsafeExternal []
 
+    putStrLn "script engine initialized"
+
     let draw (captureA,debugRender) = do
           if debugRender
             then renderFrame simpleRenderer
@@ -152,13 +154,13 @@ run = do
           renderFrame simpleRenderer
           readIORef rendererRef >>= renderFrame
           -- cleanup dead data
-          System.Mem.performGC
+          --System.Mem.performGC
 
 
     capRef <- newIORef False
     sc     <- start $ do
         u  <- scene win levelData graphicsData mousePosition fblrPress capturePress waypointPress capRef
-        return $ (draw <$> u)
+        return (draw <$> u)
     s <- fpsState
 
     -- finish up resource loading
@@ -212,14 +214,14 @@ runAsWidget winSize dpr offset vp = do
 
   win <- initWindow "LC DSL Quake 3 Demo" 800 600
 
-  -- loading screen
+  -- loading screen, check this block for bugs as something its doing is segfaulting the Ruby Interpreter
   loadingScreen <- createLoadingScreen
   (w,h)         <- getFramebufferSize win
   drawLoadingScreen w h loadingScreen pk3Data bspName
   swapBuffers win
   pollEvents
 
-  initAudio 64 44100 1024
+  _ <- initAudio 64 44100 1024
 
   -- Initialize Engine
   (inputSchema,levelData) <- engineInit pk3Data fullBSPName
@@ -263,7 +265,8 @@ runAsWidget winSize dpr offset vp = do
         smp' <- case takeExtension musicFName of
          ".ogg" -> sampleFromMemoryOgg buf 1
          ".wav" -> sampleFromMemoryWav buf 1
-        soundPlay smp' 1 1 0 1
+         _      -> error "Unsupported Format"
+        _ <- soundPlay smp' 1 1 0 1
         pure ()
 
   (mousePosition,mousePositionSink) <- unsafeExternal (0,0)
@@ -276,7 +279,7 @@ runAsWidget winSize dpr offset vp = do
         if debugRender
           then renderFrame simpleRenderer
           else readIORef rendererRef >>= renderFrame
-        captureA
+        _ <- captureA
         swapBuffers win
         System.Mem.performMinorGC
         pollEvents

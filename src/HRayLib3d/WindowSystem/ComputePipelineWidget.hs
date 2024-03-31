@@ -19,7 +19,6 @@ import Control.Concurrent.QSem (QSem, newQSem, waitQSem, signalQSem)
 -- TODO Create a GPU State Transformer.
 -- This can be a means for a Compute Pipeline
 -- ML in Gaming!
-
 -- | Takes StateT State and returns a WRayLib3d StateT ApplicationModel
 -- class RunInteraction state where 
 --     update  :: state -> ApplicationModel -> ApplicationModel 
@@ -51,6 +50,70 @@ data ComputePipelineCommand
 
 instance Show (MVar (Chan ComputePipelineCommand)) where
     show a = "MVar (Chan ComputePipelineCommand)"
+
+continuationPass :: Floating a => a -> (a -> r) -> r
+continuationPass a k = k (sqrt a)
+
+-- | Conversion Functions:
+-- (Word8 <-> Int16)
+toInt16 :: Float -> Int16
+toInt16 = fromIntegral . float2Int
+
+toFloat :: Int16 -> Float
+toFloat = int2Float    . fromIntegral
+
+chunkToInt16 ::  [Float] -> [Int16]
+chunkToInt16 a = map toInt16 a
+
+chunkToWord8 ::  [Int16]  -> [Float]
+chunkToWord8 a = map toFloat a 
+
+gpuProcess :: Chan ComputePipelineCommand -> IO ()
+gpuProcess chan = undefined
+    -- do 
+    -- context <- getContext []
+    -- runFutTIn context $ do 
+    --     let {doGPUProcess = do
+    --             command <- liftIO $ readChan chan
+    --             case command of
+    --                 GPUExit -> return () 
+    --                 _ -> do 
+    --                     result <- handlePipelineCommand command
+    --                     liftIO $ writeChan chan result --writeChan
+    --                     doFutharkProcess
+    --         }
+    --     doGPUProcess
+
+handlePipelineCommand :: ComputePipelineCommand -> IO ComputePipelineCommand --WRendererIO PipelineCommand
+handlePipelineCommand command = do 
+    case command of
+        ChangeRenderer a ->  return $ AllocRenderer (toGPU a) -- $ ImageResp $ Image result
+        AllocRenderer  a ->  return $ GPUSuccess
+        GPUExit          ->  return GPUExit
+        -- GPUSuccess       ->  warning
+        GPUFail          ->  error "var mismatch"
+
+            -- gpuObjB = toGPU  b
+            
+            -- !futOutput <- E.diffNoAlphaImages futA futB --E.diffImages futA futB
+            --run actual futhark diff operation
+            -- return result in ImageResp
+            -- result <- fromFuthark futOutput
+
+createPipelineHandle :: IO (RendererHandle)
+createPipelineHandle = do
+    chan <- newChan
+    mvar <- newMVar chan
+    tid  <- forkOS $ gpuProcess chan
+    return $ RendererHandle tid mvar
+
+runPipelineCommand :: RendererHandle -> ComputePipelineCommand -> IO ComputePipelineCommand 
+runPipelineCommand fut gcommand = do
+    commChan <- takeMVar $ procSem fut
+    writeChan commChan gcommand
+    result <- readChan commChan
+    putMVar (procSem fut) commChan
+    return result
 
 -- | Interface for speaking to GPU (Compute Pipeline)
 -- type WRendererT m a  = StateT m a
@@ -96,7 +159,6 @@ instance Show (MVar (Chan ComputePipelineCommand)) where
 --     restoreM = defaultRestoreM
 --     {-# INLINEABLE liftBaseWith #-}
 --     {-# INLINEABLE restoreM #-}
-
 
 -- class FutharkObject wrapped raw | wrapped -> raw, raw -> wrapped where
 --     wrapFO :: MVar Int -> ForeignPtr raw -> wrapped c
@@ -228,67 +290,3 @@ instance Show (MVar (Chan ComputePipelineCommand)) where
 
 -- wrapIO :: (Context -> IO a) -> FutIO c a
 -- wrapIO a = FutT a  
-
-continuationPass :: Floating a => a -> (a -> r) -> r
-continuationPass a k = k (sqrt a)
-
--- | Conversion Functions:
--- (Word8 <-> Int16)
-toInt16 :: Float -> Int16
-toInt16 = fromIntegral . float2Int
-
-toFloat :: Int16 -> Float
-toFloat = int2Float    . fromIntegral
-
-chunkToInt16 ::  [Float] -> [Int16]
-chunkToInt16 a = map toInt16 a
-
-chunkToWord8 ::  [Int16]  -> [Float]
-chunkToWord8 a = map toFloat a 
-
-gpuProcess :: Chan ComputePipelineCommand -> IO ()
-gpuProcess chan = undefined
-    -- do 
-    -- context <- getContext []
-    -- runFutTIn context $ do 
-    --     let {doGPUProcess = do
-    --             command <- liftIO $ readChan chan
-    --             case command of
-    --                 GPUExit -> return () 
-    --                 _ -> do 
-    --                     result <- handlePipelineCommand command
-    --                     liftIO $ writeChan chan result --writeChan
-    --                     doFutharkProcess
-    --         }
-    --     doGPUProcess
-
-handlePipelineCommand :: ComputePipelineCommand -> IO ComputePipelineCommand --WRendererIO PipelineCommand
-handlePipelineCommand command = do 
-    case command of
-        ChangeRenderer a ->  return $ AllocRenderer (toGPU a) -- $ ImageResp $ Image result
-        AllocRenderer  a ->  return $ GPUSuccess
-        GPUExit          ->  return GPUExit
-        -- GPUSuccess       ->  warning
-        GPUFail          ->  error "var mismatch"
-
-            -- gpuObjB = toGPU  b
-            
-            -- !futOutput <- E.diffNoAlphaImages futA futB --E.diffImages futA futB
-            --run actual futhark diff operation
-            -- return result in ImageResp
-            -- result <- fromFuthark futOutput
-
-createPipelineHandle :: IO (RendererHandle)
-createPipelineHandle = do
-    chan <- newChan
-    mvar <- newMVar chan
-    tid  <- forkOS $ gpuProcess chan
-    return $ RendererHandle tid mvar
-
-runPipelineCommand :: RendererHandle -> ComputePipelineCommand -> IO ComputePipelineCommand 
-runPipelineCommand fut gcommand = do
-    commChan <- takeMVar $ procSem fut
-    writeChan commChan gcommand
-    result <- readChan commChan
-    putMVar (procSem fut) commChan
-    return result

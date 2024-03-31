@@ -68,9 +68,9 @@ uploadTexture2DToGPU = uploadTexture2DToGPU' True False True False
 uploadTexture2DToGPU' :: Bool -> Bool -> Bool -> Bool -> DynamicImage -> IO TextureData
 uploadTexture2DToGPU' isFiltered isSRGB isMip isClamped bitmap' = do
     let bitmap = case bitmap' of
-          ImageRGB8 i@(Image w h _)   -> bitmap'
-          ImageRGBA8 i@(Image w h _)  -> bitmap'
-          ImageYCbCr8 i@(Image w h _) -> ImageRGB8 $ convertImage i
+          ImageRGB8   i@(Image w h _)   -> bitmap'
+          ImageRGBA8  i@(Image w h _)   -> bitmap'
+          ImageYCbCr8 i@(Image w h _)   -> ImageRGB8 $ convertImage i
           di -> ImageRGBA8 $ convertRGBA8 di
 
     glPixelStorei GL_UNPACK_ALIGNMENT 1

@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings, RecordWildCards, ScopedTypeVariables, FlexibleContexts, MultiParamTypeClasses, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
 
 module HRayLib3d.Utils.LogMessage (
     LogLevel   (..), 
@@ -10,11 +11,13 @@ module HRayLib3d.Utils.LogMessage (
     logMessage,
     logMessageBar,
     logMessageLines,
+    orderedMessage,
     exceptionMessage,
     eventMessage,
     errorMessage
     -- logOrderedMessage,
   ) where 
+
 
   import Data.List
   import Data.String

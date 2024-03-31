@@ -17,7 +17,9 @@ module Monomer.Main.Core (
   AppEventResponse(..),
   AppEventHandler(..),
   AppUIBuilder(..),
-  startApp
+  startApp,
+  retrieveSDLWindow,
+  retrieveModelAndRoot
 ) where
 
 import Control.Concurrent
@@ -136,7 +138,7 @@ startApp newModel eventHandler uiBuilder configs = do
   isGhci <- isGhciRunning
   channel <- newTChanIO
 
-  (model, oldRoot) <- retrieveModelAndRoot config newModel newRoot
+  (model, oldRoot)     <- retrieveModelAndRoot config newModel newRoot
   (window, glCtx, ctx) <- retrieveSDLWindow config channel model
 
   when isGhci $
@@ -152,11 +154,11 @@ startApp newModel eventHandler uiBuilder configs = do
   where
     config = mconcat configs
     compCfgs
-      = (onInit <$> _apcInitEvent config)
+      =  (onInit    <$> _apcInitEvent config)
       ++ (onDispose <$> _apcDisposeEvent config)
-      ++ (onResize <$> _apcResizeEvent config)
+      ++ (onResize  <$> _apcResizeEvent config)
     ~modelFp = maybe "" ($ newModel) (_apcModelFingerprintFn config)
-    newRoot = composite_ "app" id uiBuilder eventHandler compCfgs
+    newRoot  = composite_ "app" id uiBuilder eventHandler compCfgs
 
 runAppLoop
   :: (MonomerM sp ep m, Eq sp, WidgetEvent e, WidgetEvent ep)

@@ -35,7 +35,6 @@ tooltipKeys =  [
   ("renderer_widget",            pack "test"),
   ("file_gui",                   pack "test"),
   ("run_dedicated_server",       pack "Will initialize a joinable server instance\n this allows for co-coding, but can also be used to run a live testable game session\n or multiplayer."),
-  ("camera_view",                pack "Hide all editor widgets (including the FileSystem)\n except for the rendering widget"),
   ("debug_on_play",              pack "Run Debugging and Logging window instance alongside play.\n Game will run in Debug mode."),
   ("tooltips",                   pack "Show tooltips."),
   ("cameras",                    pack "Add camera(s) to the scene,\n allows you to switch between views also"),

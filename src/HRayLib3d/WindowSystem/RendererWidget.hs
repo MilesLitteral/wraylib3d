@@ -1,15 +1,25 @@
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts, LambdaCase, FlexibleInstances #-}
+{-# LANGUAGE CPP, FlexibleContexts, LambdaCase, FlexibleInstances #-}
+{-# OPTIONS_GHC -Wno-unused-matches #-}
+{-# OPTIONS_GHC -Wno-name-shadowing #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant return" #-}
 
 module HRayLib3d.WindowSystem.RendererWidget (
   openGLWidget,
   codenameBigKahuna
 ) where
 
-import Data.IORef ( IORef )
-import Data.Maybe ()
+import Data.IORef
 import Control.Monad
+import Control.Lens
+import qualified System.Mem
+
+import Graphics.GL.Core33
+import LambdaCube.GL as GL
+
+import Data.Maybe ()
 import Control.Concurrent ()
 
 import System.IO ()
@@ -17,14 +27,13 @@ import System.Exit ()
 import System.FilePath ()
 import System.Directory ()
 import System.Environment ()
-import qualified System.Mem
 
 import FRP.Elerea.Param ()
 import Sound.ProteaAudio ()
-import Graphics.GL.Core33
+-- import Graphics.GL.Core33
 import Graphics.UI.GLFW as GLFW ()
 
-import LambdaCube.GL as GL
+-- import LambdaCube.GL as GL
 import HRayLib3d.GameEngine.Loader.Zip ()
 import HRayLib3d.GameEngine.RealmViewer.Main   ( run, runAsWidget ) 
 import HRayLib3d.GameEngine.RealmViewer.Camera ()
@@ -33,8 +42,7 @@ import HRayLib3d.GameEngine.RealmViewer.Engine ()
 import Data.Default
 import Data.Typeable (cast)
 import Data.Vector.Storable (Vector)
-
-import Control.Lens ((&), (^.), (.~))
+-- import Control.Lens ((&), (^.), (.~))
 
 import Foreign.C.String
 import Foreign.Marshal.Alloc
@@ -45,8 +53,11 @@ import qualified Data.Vector.Storable as V
 
 import Monomer
 import Monomer.Widgets.Single
+-- import Monomer.Main.Core ( retrieveSDLWindow, retrieveModelAndRoot)
 import qualified Monomer.Lens as L
-
+-- import qualified Data.Map as Map
+-- import HRayLib3d.GameEngine.RealmViewer.Camera
+-- import Control.Concurrent.STM.TChan (TChan, newTChanIO, readTChan, writeTChan)
 
 data OpenGLWidgetMsg
   = OpenGLWidgetInit GLuint (Ptr GLuint) (Ptr GLuint)
@@ -79,81 +90,23 @@ instance Show (IO ())
 instance Show (IORef a)
 instance Show (IO (IO ()))
 
+type Sink a = a -> IO ()
+
+#ifdef CAPTURE
+-- framebuffer capture function
+withFrameBuffer :: Int -> Int -> Int -> Int -> (Ptr Word8 -> IO ()) -> IO ()
+withFrameBuffer x y w h fn = allocaBytes (w*h*4) $ \p -> do
+    glReadPixels (fromIntegral x) (fromIntegral y) (fromIntegral w) (fromIntegral h) GL_RGBA GL_UNSIGNED_BYTE $ castPtr p
+    fn p
+#endif
+
+captureRate :: Double
+captureRate = 30
+
 openGLWidget :: Color -> WidgetNode s e
 openGLWidget color = defaultWidgetNode "openGLWidget" widget where
   widget = makeOpenGLWidget  color state
   state  = OpenGLWidgetState False 0 nullPtr nullPtr
-
-makeOpenGLWidget :: Color -> OpenGLWidgetState -> Widget s e
-makeOpenGLWidget color state = widget where
-    widget = createSingle state def {
-    singleInit = init,
-    singleMerge = merge,
-    singleDispose = dispose,
-    singleHandleMessage = handleMessage,
-    singleGetSizeReq = getSizeReq,
-    singleRender = render
-    }
-
-    init wenv node = resultReqs node initReqs where
-        widgetId = node ^. L.info . L.widgetId
-        path = node ^. L.info . L.path
-        buffers = 2
-
-        initOpenGL = do
-            -- This needs to run in render thread
-            program <- createShaderProgram
-            vaoPtr <- malloc
-            vboPtr <- malloc
-            glGenVertexArrays buffers vaoPtr
-            glGenBuffers buffers vboPtr
-            -- GLuint (Ptr GLuint) (Ptr GLuint)
-            return $ OpenGLWidgetInit program vaoPtr vboPtr
-        initReqs = [RunInRenderThread widgetId path initOpenGL]
-
-    merge wenv node oldNode oldState = resultNode newNode where
-        newNode = node & L.widget .~ makeOpenGLWidget color oldState
-
-    dispose wenv node = resultReqs node disposeReqs where
-        OpenGLWidgetState _ shaderId vaoPtr vboPtr = state
-        widgetId = node ^. L.info . L.widgetId
-        path = node ^. L.info . L.path
-        buffers = 2
-        disposeOpenGL = do
-          -- This needs to run in render thread
-          glDeleteProgram shaderId
-          glDeleteVertexArrays buffers vaoPtr
-          glDeleteBuffers buffers vboPtr
-          free vaoPtr
-          free vboPtr
-        disposeReqs = [RunInRenderThread widgetId path disposeOpenGL]
-
-    handleMessage wenv node target msg = case cast msg of
-                                            Just (OpenGLWidgetInit shaderId vao vbo) -> Just result 
-                                                where
-                                                    newState = OpenGLWidgetState True shaderId vao vbo
-                                                    newNode  = node & L.widget .~ makeOpenGLWidget color newState
-                                                    result   = resultReqs newNode [RenderOnce]
-                                            _ -> Nothing
-
-    getSizeReq wenv node = (sizeReqW, sizeReqH) where
-    sizeReqW = expandSize 100 1
-    sizeReqH = expandSize 100 1
-
-    render wenv node renderer = when (_ogsLoaded state) $ createRawTask renderer $ doInScissor winSize dpr offset activeVp $
-        drawVertices state (toVectorVAO winSize offset color triangle)
-        where
-            dpr = wenv ^. L.dpr
-            winSize = wenv ^. L.windowSize
-            activeVp = wenv ^. L.viewport
-            offset = wenv ^. L.offset
-
-            -- Simple triangle
-            style = currentStyle wenv node
-            nodeVp = getContentArea node style
-
-            Rect rx ry rw rh = nodeVp
-            triangle = [(rx + rw, ry + rh), (rx, ry + rh), (rx + rw / 2, ry)]
 
 doInScissor :: Size -> Double -> Point -> Rect -> IO () -> IO ()
 doInScissor winSize dpr offset vp action = do
@@ -224,15 +177,13 @@ createShaderProgram = do
 
 compileShader :: GLenum -> FilePath -> IO GLuint
 compileShader shaderType shaderFile = do
-  shader <- glCreateShader shaderType
+  shader       <- glCreateShader shaderType
   shaderSource <- readFile shaderFile >>= newCString
-
   alloca $ \shadersStr -> do
     shadersStr `poke` shaderSource
     glShaderSource shader 1 shadersStr nullPtr
     glCompileShader shader
     checkShaderCompile shader
-
   return shader
 
 checkProgramLink :: GLuint -> IO ()
@@ -257,6 +208,78 @@ checkShaderCompile shaderId = do
         glGetShaderInfoLog shaderId 512 nullPtr infoLogPtr
         putStrLn "Failed to compile shader "
 
+
+makeOpenGLWidget :: Color -> OpenGLWidgetState -> Widget s e
+makeOpenGLWidget color state = widget where
+    widget = createSingle state def {
+    singleInit    = init,
+    singleMerge   = merge,
+    singleDispose = dispose,
+    singleHandleMessage = handleMessage,
+    singleGetSizeReq = getSizeReq,
+    singleRender = render
+    }
+
+    init wenv node = resultReqs node initReqs where
+        widgetId = node ^. L.info . L.widgetId
+        path     = node ^. L.info . L.path
+        buffers  = 2
+        initOpenGL = do
+            -- This needs to run in render thread
+            program <- createShaderProgram
+            vaoPtr <- malloc
+            vboPtr <- malloc
+            glGenVertexArrays buffers vaoPtr
+            glGenBuffers buffers vboPtr
+            -- GLuint (Ptr GLuint) (Ptr GLuint)
+            return $ OpenGLWidgetInit program vaoPtr vboPtr
+
+        initReqs = [RunInRenderThread widgetId path initOpenGL]
+
+    merge wenv node oldNode oldState = resultNode newNode where
+        newNode = node & L.widget .~ makeOpenGLWidget color oldState
+
+    dispose wenv node = resultReqs node disposeReqs where
+        OpenGLWidgetState _ shaderId vaoPtr vboPtr = state
+        widgetId = node ^. L.info . L.widgetId
+        path = node ^. L.info . L.path
+        buffers = 2
+        disposeOpenGL = do
+          -- This needs to run in render thread
+          glDeleteProgram shaderId
+          glDeleteVertexArrays buffers vaoPtr
+          glDeleteBuffers buffers vboPtr
+          free vaoPtr
+          free vboPtr
+        disposeReqs = [RunInRenderThread widgetId path disposeOpenGL]
+
+    handleMessage wenv node target msg = case cast msg of
+                                            Just (OpenGLWidgetInit shaderId vao vbo) -> Just result 
+                                                where
+                                                    newState = OpenGLWidgetState True shaderId vao vbo
+                                                    newNode  = node & L.widget .~ makeOpenGLWidget color newState
+                                                    result   = resultReqs newNode [RenderOnce]
+                                            _ -> Nothing
+
+    getSizeReq wenv node = (sizeReqW, sizeReqH) where
+    sizeReqW = expandSize 100 1
+    sizeReqH = expandSize 100 1
+
+    render wenv node renderer = when (_ogsLoaded state) $ createRawTask renderer $ doInScissor winSize dpr offset activeVp $
+        drawVertices state (toVectorVAO winSize offset color triangle)
+        where
+            dpr      = wenv ^. L.dpr
+            winSize  = wenv ^. L.windowSize
+            activeVp = wenv ^. L.viewport
+            offset   = wenv ^. L.offset
+
+            -- Simple triangle
+            style  = currentStyle wenv node
+            nodeVp = getContentArea node style
+
+            Rect rx ry rw rh = nodeVp
+            triangle = [(rx + rw, ry + rh), (rx, ry + rh), (rx + rw / 2, ry)]
+
 -- Put Game Main and RealmViewer Main in here and have it displayed as a widget
 -- Godspeed
 codenameBigKahuna ::  WidgetNode s e
@@ -269,7 +292,7 @@ makeTidalWaveWidget :: WRLEngineWidgetState -> Widget s e
 makeTidalWaveWidget state = widget where
     -- consider changing this
     wrlRun = run
-    wrlRunAsWidget winSize dpr offset activeVp = runAsWidget winSize dpr offset activeVp 
+    wrlRunAsWidget = runAsWidget --winSize dpr offset activeVp 
     widget = createSingle state def {
       singleInit          = init,
       singleMerge         = merge,
@@ -319,19 +342,3 @@ makeTidalWaveWidget state = widget where
       style  = currentStyle wenv node
       nodeVp = getContentArea node style
       Rect rx ry rw rh = nodeVp
-      --triangle = [(rx + rw, ry + rh), (rx, ry + rh), (rx + rw / 2, ry)]
-
-      -- render wenv node renderer = when (_ogsLoaded state) $ createRawTask renderer $ doInScissor winSize dpr offset activeVp $
-      -- drawVertices state (toVectorVAO winSize offset color triangle)
-      -- where
-      --     dpr = wenv ^. L.dpr
-      --     winSize = wenv ^. L.windowSize
-      --     activeVp = wenv ^. L.viewport
-      --     offset = wenv ^. L.offset
-
-      --     -- Simple triangle
-      --     style = currentStyle wenv node
-      --     nodeVp = getContentArea node style
-
-      --     Rect rx ry rw rh = nodeVp
-      --     triangle = [(rx + rw, ry + rh), (rx, ry + rh), (rx + rw / 2, ry)]

@@ -317,6 +317,7 @@ data BooksEvt
   | BooksCloseDetails
   | BooksCloseError
   | OpenFS
+  | SaveFS
   | OpenAppPrefs
   | OpenRealmList
   | OpenControllerPrefs

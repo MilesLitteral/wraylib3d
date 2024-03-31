@@ -8,13 +8,8 @@ Portability : non-portable
 
 Main module for the 'Books' example.
 -}
-{-# OPTIONS_GHC -Wno-name-shadowing #-}
-{-# LANGUAGE    FlexibleContexts    #-}
-{-# LANGUAGE    FlexibleInstances   #-}
-{-# LANGUAGE    ScopedTypeVariables #-}
-{-# LANGUAGE    OverloadedStrings   #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# OPTIONS_GHC -Wno-name-shadowing, -Wno-unrecognised-pragmas #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, ScopedTypeVariables, OverloadedStrings, TemplateHaskell #-}
 {-# HLINT ignore "Use if" #-}
 -- Notes on making a Widget for direct backend use
 -- Very important for the RendererWidget that is coming up
@@ -148,6 +143,8 @@ import HRayLib3d.WindowSystem.Theme
 import HRayLib3d.Utils.Tooltips
 import HRayLib3d.WindowSystem.Core           hiding (name)
 import HRayLib3d.WindowSystem.RendererWidget hiding (name)
+import HRayLib3d.Utils.Subprocess
+import HRayLib3d.WindowSystem.Core (HasSEList(sEList))
 
 type BooksWenv = WidgetEnv  BooksModel BooksEvt
 type BooksNode = WidgetNode BooksModel BooksEvt
@@ -159,6 +156,7 @@ keyListType c v =
       TP_CONTROLLER       -> thirdPartyList v 
       GENERIC_CONTROLLER  -> genericKeyList v
 
+keyTextListType :: ControllerType -> [ControllerListType]
 keyTextListType c =
   case c of
     XBOX_CONTROLLER     -> xboxKeyTextList
@@ -166,6 +164,7 @@ keyTextListType c =
     TP_CONTROLLER       -> thirdKeyTextList 
     GENERIC_CONTROLLER  -> thirdKeyTextList
 
+xboxKeyTextList :: [ControllerListType]
 xboxKeyTextList = [Mapping,        
   START,           
   SELECT,          
@@ -187,6 +186,7 @@ xboxKeyTextList = [Mapping,
   BUTTON_R3
   ]       
 
+psKeyTextList :: [ControllerListType]
 psKeyTextList = [
     Mapping,           
     OPTION,          
@@ -205,6 +205,7 @@ psKeyTextList = [
     PS_BUTTON_R3   
     ] 
 
+thirdKeyTextList :: [ControllerListType]
 thirdKeyTextList =  [
     Mapping,                 
     KEYBOARD_KEY,    
@@ -352,6 +353,9 @@ buildRowKey buildDesc     = "todoRow" <> showt (buildDesc ^. buId)
 cloudRowKey :: CloudDescription -> Text
 cloudRowKey cloud         = "todoRow" <> showt (cloud ^. cId)
 
+sERowKey :: SEDescription -> Text
+sERowKey se         = "todoRow" <> showt (se ^. seId)
+
 controllerRow :: BooksWenv -> BooksModel -> Int -> ControllerButton -> BooksNode
 controllerRow wenv model idx t = animRow `nodeKey` cbKey where
   sectionBg      = wenv ^. L.theme . L.sectionColor
@@ -394,7 +398,7 @@ buildRow :: BooksWenv -> BooksModel -> Int -> BuildDescription -> BooksNode
 buildRow wenv model idx t = animRow `nodeKey` buildKey where
   sectionBg      = wenv ^. L.theme . L.sectionColor
   rowButtonColor = wenv ^. L.theme . L.userColorMap . at "rowButton" . non def
-  rowSepColor    = gray & L.a .~ 0.5
+  rowSepColor    = gray &  L.a .~ 0.5
 
   buildKey  = buildRowKey t
   buildDone = t ^. buStatus == Build
@@ -456,7 +460,7 @@ cloudRow wenv model idx t = animRow `nodeKey` cloudKey where
 
   cloudKey  = cloudRowKey t
   cloudDone = t ^. cStatus == On
-  isLast   = idx == length (model ^. cloudList ) - 1
+  isLast    = idx == length (model ^. cloudList ) - 1
 
   (cloudBg, cloudFg)
     | cloudDone  = (doneBg,    doneFg)
@@ -509,7 +513,7 @@ controllerButtonEdit wenv model = editNode where
         hstack [
           label "Type:",
           spacer,
-          textDropdownS (activeControllerBinding . bType) (keyTextListType ((model ^. controllerType))) `nodeKey` "controllerType",
+          textDropdownS (activeControllerBinding . bType) (keyTextListType (model ^. controllerType)) `nodeKey` "controllerType",
           spacer -- Added here to avoid grid expanding it to 1/3 total width
         ],
         hstack [
@@ -600,7 +604,7 @@ cloudEdit wenv model = editNode where
 
   saveCloudBtn = mainButton saveLabel saveAction
 
-  editFields  = keystroke [("Enter", saveAction) | isValidInput] $ vstack [
+  editFields   = keystroke [("Enter", saveAction) | isValidInput] $ vstack [
       hstack [
         label "Task:",
         spacer,
@@ -639,6 +643,14 @@ addNewCloud wenv model = newModel where
     & cId .~ currentTimeMs wenv
   newModel = model
     & cloudList .~ (newTodo : model ^. cloudList)
+-- addNew Functions End
+
+addNewSE :: WidgetEnv s e -> BooksModel -> BooksModel
+addNewSE wenv model = newModel where
+  newTodo = model ^. activeSEList
+    & seId .~ currentTimeMs wenv
+  newModel = model
+    & sEList .~ (newTodo : model ^. sEList)
 -- addNew Functions End
 
 bookImage :: Maybe Int -> Text -> WidgetNode BooksModel BooksEvt
@@ -706,8 +718,6 @@ generateProjectFileGUI projSess = reverse $ map (\x -> hstack [spacer, (image_  
 hagridKey :: Text
 hagridKey = "SpiderHagrid"
 
-
-
 --https://github.com/fjvallarino/monomer/issues/83
 buildUI :: WidgetEnv BooksModel BooksEvt -> BooksModel -> WidgetNode BooksModel BooksEvt
 buildUI wenv model = widgetTree where
@@ -720,12 +730,16 @@ buildUI wenv model = widgetTree where
     | ControllerButtonEditing _ <- model ^. cBAction = True
     | otherwise = False
 
-  isBuildEditing -- Build
+  isBuildEditing -- Build Status Symbol
     | BuildEditing _ <- model ^. bUAction = True
     | otherwise = False
 
-  isCloudEditing -- Cloud
+  isCloudEditing -- Cloud Status Symbol
     | CloudEditing _ <- model ^. cLAction = True
+    | otherwise = False
+
+  isSEEditing -- SE Status Symbol
+    | SEEditing _ <- model ^. sEAction = True
     | otherwise = False
 
   sectionIds    = [1 .. model ^. maxSections]
@@ -851,8 +865,9 @@ buildUI wenv model = widgetTree where
   newControllerButton = mainButton "New Button"            ControllerButtonNew `nodeKey` "controllerNew" `nodeVisible` not isControllerButtonEditing
   addPlatform         = mainButton "Add Platform"          BuildListNew        `nodeKey` "buildNew" `nodeVisible` not isBuildEditing
   addCloudConnection  = mainButton "Add Cloud Connection"  CloudNew            `nodeKey` "cloudNew" `nodeVisible` not isCloudEditing
+  addSEConnection     = mainButton "Add ScriptEngine Definition"  ScriptEngineNew            `nodeKey` "scriptNew" `nodeVisible` not isCloudEditing
 
-  dialogBoxMenu        field content       = box_ [alignCenter, onClickEmpty OpenFS]   (boxShadow $ popup field content)
+  dialogBoxMenu        field content       = box_ [alignCenter, onClickEmpty OpenFSDialogue]   (boxShadow $ popup field content)
   fullscreenDialogMenu field content       = popup field content `styleBasic` [bgColor (rgbHex "#000000")]
   menuBar = hstack [
       hstack_ [childSpacing] (sectionSelector <$> sectionIds),
@@ -932,7 +947,7 @@ buildUI wenv model = widgetTree where
       ],
       spacer,
       hstack $ controllerCase (model ^. controllerType),   
-      spacer,
+      --spacer,
       mainLayer
     ]
 
@@ -943,6 +958,16 @@ buildUI wenv model = widgetTree where
     scroll_ [] (buList `styleBasic` [padding 20, paddingT 5]),
     filler,
     box_ [alignRight] addPlatform `styleBasic` [bgColor sectionBg, padding 20]
+    ]
+
+  -- Panel 3
+  scriptEngineTree = vstack [
+    spacer, 
+    label "ScriptEngine Setup",
+    scroll_ [] (clList `styleBasic` [padding 20, paddingT 5]),
+    filler,
+    box_ [alignRight] addSEConnection
+      `styleBasic` [bgColor sectionBg, padding 20]
     ]
 
   -- Panel 3
@@ -998,20 +1023,19 @@ buildUI wenv model = widgetTree where
     spacer,
     label "Renderer Settings",
     spacer,
-    hstack [ label "Current* Renderer**: ", textDropdownS currentRenderer ["OpenGL", "Vulkan", "Metal"] ],
+    hstack [ label "Current* Renderer**: ", textDropdownS currentRenderer ["OpenGL", "Vulkan", "Metal", "DirectX"] ],
     spacer,
-    hstack[label "SPIR-V Only", spacer, checkbox spirVOnly, spacer, label "GLSL Only", spacer, checkbox glslOnly],
+    hstack[label "SPIR-V Only", spacer, checkbox spirVOnly, spacer, label "GLSL Only", spacer, checkbox glslOnly, spacer, label "SPIR-V Disabled", spacer, checkbox spirVDisabled, spacer],
     spacer,
     label "*  = The backend will fallback to OpenGL in all instances of failure",
     spacer,
-    label "** = Vulkan runs on all computer platforms, OpenGL(GLES) is defaulted to for Android, native Metal is optional for Mac/iOS",
+    label "** = Vulkan runs on all computer platforms, OpenGL(GLES) is defaulted to for Android, native Metal is optional for Mac/iOS, DirectX is optional for Windows",
     spacer,
-    label "Note: by Default the OpenGL backend is SPIR-V enabled, a SPIR-V/GLSL toggle will be available soon(TBA)",
+    -- label "Note: by Default the OpenGL backend is SPIR-V enabled, a SPIR-V/GLSL toggle will be available soon(TBA)",
     -- spacer,
     -- hstack [ label "Current Renderer", textDropdownS currentRenderer ["OpenGL(Default)", "Vulkan", "Metal(OSX only)"] ],
     filler
     ]
-    -- ShowRealmViewer 
 
   appRealmViewerList  = intersperse spacer $ map (\x -> button (x ^. rlmLevelName) (ConfirmParentEvt $ OpenRealm x)) $ model ^. projectLoadedRealms
   appRealmViewerTree  = vstack [
@@ -1105,31 +1129,31 @@ buildUI wenv model = widgetTree where
       spacer,
       hstack [
         spacer,
-        liftHelpOverlay (model ^. toolTips) "file_window" $ button "📖"  OpenFS              `styleBasic`  [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "file_window"             $ button "📖"  OpenFSDialogue              `styleBasic`  [ textFont  "UI", textMiddle ],
         spacer,
-        liftHelpOverlay (model ^. toolTips) "app_preferences" $ button "🆔"  OpenAppPrefs        `styleBasic`  [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "app_preferences"         $ button "🆔"  OpenAppPrefs        `styleBasic`  [ textFont  "UI", textMiddle ],
         spacer,
-        liftHelpOverlay (model ^. toolTips) "view_window" $ button "🔍"  OpenWindowViewing   `styleBasic`  [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "view_window"             $ button "🔍"  OpenWindowViewing   `styleBasic`  [ textFont  "UI", textMiddle ],
         spacer,
-        liftHelpOverlay (model ^. toolTips) "realm_preferences" $ button "🌑"  OpenRealmList       `styleBasic`  [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "realm_preferences"       $ button "🌑"  OpenRealmList       `styleBasic`  [ textFont  "UI", textMiddle ],
         spacer,
-        liftHelpOverlay (model ^. toolTips) "controller_preferences" $ button "🎮"  OpenControllerPrefs `styleBasic` [ textFont   "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "controller_preferences"  $ button "🎮"  OpenControllerPrefs `styleBasic` [ textFont   "UI", textMiddle ],
         spacer,
-        liftHelpOverlay (model ^. toolTips) "export_preferences" $ button "🆑"  OpenExportPrefs     `styleBasic` [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "export_preferences"      $ button "🆑"  OpenExportPrefs     `styleBasic` [ textFont  "UI", textMiddle ],
         spacer,
-        liftHelpOverlay (model ^. toolTips) "run_preferences" $ button "🎥"  OpenRunPrefs        `styleBasic` [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "run_preferences"         $ button "🎥"  OpenRunPrefs        `styleBasic` [ textFont  "UI", textMiddle ],
         spacer,
         liftHelpOverlay (model ^. toolTips) "multiplayer_preferences" $ button "⛳"  OpenMPPrefs         `styleBasic` [ textFont  "UI", textMiddle ], -- Multiplayer
         spacer,
-        liftHelpOverlay (model ^. toolTips) "cameras" $ textDropdownS selectedCamera ["Camera0", "Edit/Add Cameras"],
+        liftHelpOverlay (model ^. toolTips) "cameras"                 $ textDropdownS selectedCamera ["Camera0", "Edit/Add Cameras"],
         spacer,
         separator,
         spacer,
-        liftHelpOverlay (model ^. toolTips) "renderer_2d" $ toggleButton "2D"   (if  (not $ model ^. threeDimensional) then twoDimensional   else handleFalse ) `nodeEnabled` (model ^. showMainRenderer) `styleBasic` [textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "renderer_2d"        $ toggleButton "2D"   (if  (not $ model ^. threeDimensional) then twoDimensional   else handleFalse ) `nodeEnabled` (model ^. showMainRenderer) `styleBasic` [textMiddle ],
         spacer,
-        liftHelpOverlay (model ^. toolTips) "renderer_3d" $ toggleButton "3D"   (if  (not $ model ^. twoDimensional)   then threeDimensional else handleFalse ) `nodeEnabled` (model ^. showMainRenderer) `styleBasic` [textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "renderer_3d"        $ toggleButton "3D"   (if  (not $ model ^. twoDimensional)   then threeDimensional else handleFalse ) `nodeEnabled` (model ^. showMainRenderer) `styleBasic` [textMiddle ],
         spacer,
-        liftHelpOverlay (model ^. toolTips) "ruby_scripting" $ button "#"     None               `styleBasic` [ textFont  "UI", textMiddle ],
+        liftHelpOverlay (model ^. toolTips) "ruby_scripting"     $ button "#"    StartIDE            `styleBasic` [ textFont  "UI", textMiddle ],
         spacer,
         liftHelpOverlay (model ^. toolTips) "record_preferences" $ button "➿"   None                `styleBasic` [ textFont  "UI", textMiddle ],
         spacer
@@ -1179,9 +1203,6 @@ buildUI wenv model = widgetTree where
             liftHelpOverlay (model ^. toolTips) "debug_on_play" $ label "Debug On Play",
             checkbox debugOnPlay,
             spacer,
-            liftHelpOverlay (model ^. toolTips) "camera_view" $ label "📷" `styleBasic` [ textFont  "UI", textMiddle ],
-            checkbox rendererEnabled,
-            spacer,
             liftHelpOverlay (model ^. toolTips) "tooltips" $  label "Tooltips",
             checkbox toolTips,
             spacer
@@ -1193,6 +1214,7 @@ buildUI wenv model = widgetTree where
       controllerWidgetTree  `nodeVisible` (model ^. showControllerSetup),
       setPlatformWidgetTree `nodeVisible` (model ^. showPlatform),
       cloudSetupTree        `nodeVisible` (model ^. showCloudSetup),
+      scriptEngineTree      `nodeVisible` (model ^. showScriptEngineSetup),
       appProjectPrefsTree   `nodeVisible` (model ^. showAppProjectPrefs),
       appRendererTree       `nodeVisible` (model ^. showRendererOptions),
       appRealmDBTree        `nodeVisible` (model ^. showAppRealmDB),
@@ -1202,12 +1224,12 @@ buildUI wenv model = widgetTree where
     --FileSystem Menu
     menuDialog_ (vstack $ intersperse spacer [
     label "Files",
-    button "Rename Project"   (ConfirmParentEvt OpenFS),
-    button "Save"   (ConfirmParentEvt OpenFS),
-    button "Load"   (ConfirmParentEvt OpenFS),
-    button "Import" (ConfirmParentEvt OpenFS),
-    button "Export" (ConfirmParentEvt OpenFS)
-    ]) OpenFS OpenFS `nodeVisible` (model ^. fileMenu),
+    separatorLine,
+    button "Load"   (ConfirmParentEvt $ OpenFS "Load Project File" "./projects" [".wrlp"] "WRayLib3d Project (.wrlp)" False),
+    button "Save"   (ConfirmParentEvt $ SaveFS "Save Project File" "./projects" [".wrlp"] "WRayLib3d Project (.wrlp)"),
+    button "Import" (ConfirmParentEvt $ OpenFS "Load Associated Asset" "./projects" [".assetBundle", ".glb", ".gltf"] "WRayLib3d Asset Types" True),
+    button "Export" (ConfirmParentEvt $ SaveFS "Save Associated Asset" "./projects" [".assetBundle", ".glb", ".gltf"] "WRayLib3d Asset Types" )
+    ]) None None `nodeVisible` (model ^. fileMenu),
 
     -- Application Preferences
     menuDialog_ (vstack $ intersperse spacer [
@@ -1245,7 +1267,7 @@ buildUI wenv model = widgetTree where
       button "Import Button Assignment"   (ConfirmParentEvt OpenControllerPrefs),
       button "Export Profile"             (ConfirmParentEvt OpenControllerPrefs),
       button "Export Button Assignment"   (ConfirmParentEvt OpenControllerPrefs)
-    ]) OpenControllerPrefs OpenControllerPrefs `nodeVisible` (model ^. controllerPreferences),
+    ]) None None `nodeVisible` (model ^. controllerPreferences),
     -- box_ [alignTop, onClick OpenFS] closeIcon
 
     -- Export Preferences
@@ -1284,6 +1306,7 @@ buildUI wenv model = widgetTree where
       toggleButton  "MainWindow (Both File System and Renderer)"            showRenderer,
       toggleButton  "MainWindow - showFileSystem"                           showFileSystem, 
       toggleButton  "MainWindow - showRendererWidget"                       showMainRenderer,
+      toggleButton  "ScriptEngine"          showScriptEngineSetup, --showControllerSetup
       toggleButton  "ControllerSetupWindow" showControllerSetup,
       toggleButton  "BuildSettingsWindow"   showPlatform,--showRenderer,
       toggleButton  "ProjectSetupWindow"    showAppProjectPrefs, --showControllerSetup
@@ -1352,7 +1375,15 @@ handleEvent sess wenv node model evt = case evt of
       & errorMsg ?~ msg
       & books .~ []
     ]
-  OpenFS                      -> [Model $ model & fileMenu .~ not (model ^. fileMenu)]
+  OpenFSDialogue              -> [Model $ model & fileMenu .~ not (model ^. fileMenu)]
+  OpenFS   oTitle oDefPath oFilterPatterns oFilterDesc oMultiFile -> [Model $ model & fileMenu .~ not (model ^. fileMenu), Task $ do 
+    _ <- osOpenFileDialog oTitle oDefPath oFilterPatterns oFilterDesc oMultiFile
+    return None
+    ]
+  SaveFS  oTitle oDefPath oFilterPatterns oFilterDesc -> [Model $ model & fileMenu .~ not (model ^. fileMenu), Task $ do 
+    _ <- osSaveFileDialog oTitle oDefPath oFilterPatterns oFilterDesc 
+    return None
+    ]
   OpenAppPrefs                -> [Model $ model & applicationPreferences .~ not (model ^. applicationPreferences)]
   OpenRealmList               -> [Model $ model & realmList .~ not (model ^. realmList)]
   OpenControllerPrefs         -> [Model $ model & controllerPreferences .~ not (model ^. controllerPreferences)]
@@ -1420,11 +1451,13 @@ handleEvent sess wenv node model evt = case evt of
     ]
 
   ControllerButtonDeleteBegin idx todo -> [
-    Model (model & cBAction .~ ControllerButtonConfirmingDelete idx todo)]
+    Model (model & cBAction .~ ControllerButtonConfirmingDelete idx todo)
+    ]
 
   ControllerButtonConfirmDelete idx todo -> [
     Model (model & cBAction .~ ControllerButtonNone),
-    Message (WidgetKey (controllerRowKey todo)) AnimationStart]
+    Message (WidgetKey (controllerRowKey todo)) AnimationStart
+    ]
 
   ControllerButtonCancelDelete -> [
     Model (model & cBAction .~ ControllerButtonNone)
@@ -1432,22 +1465,26 @@ handleEvent sess wenv node model evt = case evt of
 
   ControllerButtonDelete idx controllerBinding -> [
     Model $ model & controllerBindings .~ remove idx (model ^. controllerBindings),
-    SetFocusOnKey "controllerNew"]
+    SetFocusOnKey "controllerNew"
+    ]
 
   ControllerButtonCancel -> [
     Event ControllerButtonHideEdit,
     Model $ model
       & activeControllerBinding .~ def,
-    SetFocusOnKey "controllerNew"]
+    SetFocusOnKey "controllerNew"
+    ]
 
   ControllerButtonShowEdit -> [
     Message "animControllerButtonEditIn"  AnimationStart,
     Message "animControllerButtonEditOut" AnimationStop
     ]
+
   ControllerButtonHideEdit -> [
     Message "animControllerButtonEditIn"  AnimationStop,
     Message "animControllerButtonEditOut" AnimationStart
     ]
+
   ControllerButtonHideEditDone -> [
     Model $ model & cBAction .~ ControllerButtonNone
     ]
@@ -1486,11 +1523,14 @@ handleEvent sess wenv node model evt = case evt of
     ]
 
   BuildListDeleteBegin idx todo -> [
-    Model (model & bUAction .~ BuildConfirmingDelete idx todo)]
+    Model (model & bUAction .~ BuildConfirmingDelete idx todo)
+    ]
 
   BuildListConfirmDelete idx build -> [
     Model (model & bUAction .~ BuildNone),
-    Message (WidgetKey (buildRowKey build)) AnimationStart]
+    Message (WidgetKey (buildRowKey build)) AnimationStart
+    ]
+
   BuildListCancelDelete -> [
     Model (model & bUAction .~ BuildNone)
     ]
@@ -1518,6 +1558,75 @@ handleEvent sess wenv node model evt = case evt of
   BuildListHideEditDone -> [
     Model $ model & bUAction .~ BuildNone
     ]
+
+  -- se
+  ScriptEngineInit -> [SetFocusOnKey "cloudNew"]
+  
+  ScriptEngineNew  -> [
+    Event ScriptEngineShowEdit,
+    Model $ model
+      & activeSEList .~ def
+      & sEList          .~ (model ^. sEList  ++ [model ^. activeSEList])
+      & sEAction        .~ SEEditing (length (model ^. sEList)),
+    SetFocusOnKey "cloudDesc"
+    ]
+
+  ScriptEngineEdit idx td -> [
+    Event ScriptEngineShowEdit,
+    Model $ model
+      & sEAction .~ SEEditing idx
+      & activeSEList .~ td,
+    SetFocusOnKey "cloudDesc"
+    ]
+
+  ScriptEngineAdd -> [
+    Event ScriptEngineHideEdit,
+    Model $ addNewSE wenv model,
+    SetFocusOnKey "cloudNew"
+    ]
+
+  ScriptEngineSave idx -> [
+    Event ScriptEngineHideEdit,
+    Model $ model
+      & sEList . ix idx .~ model ^. activeSEList,
+    SetFocusOnKey "cloudNew"
+    ]
+
+  ScriptEngineDeleteBegin idx todo -> [
+    Model (model & sEAction .~ SEConfirmingDelete idx todo)
+    ]
+
+  ScriptEngineConfirmDelete idx todo -> [
+    Model (model & sEAction .~ SENone),
+    Message (WidgetKey (sERowKey todo)) AnimationStart
+    ]
+
+
+  ScriptEngineCancelDelete -> [
+    Model (model & sEAction .~ SENone)
+    ]
+
+  ScriptEngineDelete idx todo -> [
+    Model $ model & sEList .~ remove idx (model ^. sEList),
+    SetFocusOnKey "cloudNew"]
+
+  ScriptEngineCancel -> [
+    Event CloudHideEdit,
+    Model $ model
+      & activeCloudList .~ def,
+    SetFocusOnKey "cloudNew"]
+
+  ScriptEngineShowEdit -> [
+    Message "animCloudEditIn"  AnimationStart,
+    Message "animCloudEditOut" AnimationStop
+    ]
+
+  ScriptEngineHideEdit -> [
+    Message "animCloudEditIn"  AnimationStop,
+    Message "animCloudEditOut" AnimationStart
+    ]
+
+  ScriptEngineHideEditDone    -> [Model $ model & sEAction .~ SENone]
 
   --sc
   CloudInit -> [SetFocusOnKey "cloudNew"]
@@ -1585,9 +1694,7 @@ handleEvent sess wenv node model evt = case evt of
     Message "animCloudEditOut" AnimationStart
     ]
 
-  CloudHideEditDone -> [
-    Model $ model & cLAction .~ CloudNone
-    ]
+  CloudHideEditDone    -> [Model $ model & cLAction .~ CloudNone]
   --end
   XboxController       -> [Model $ model & controllerType .~ XBOX_CONTROLLER & controllerBindings .~ []]
   PsController         -> [Model $ model & controllerType .~ PS_CONTROLLER   & controllerBindings .~ []]
@@ -1606,7 +1713,7 @@ handleEvent sess wenv node model evt = case evt of
     [Producer (const (putStrLn ("Name column was sorted: " <> show direction)))]
   ScrollToOriginalIndex -> [scrollToRow (WidgetKey hagridKey) (rowScrollIndex model)]
   StartIDE -> [Task $ do
-    startIDE (T.unpack $ model ^. ideArgument) 
+    HRayLib3d.Utils.Subprocess.startIDE 
     return None
     ]
   AddRealm        -> [Model $ model &   projectLoadedRealms .~ (model ^. projectLoadedRealms) ++ [Realm "new" "new.bsp" False]]
@@ -1615,83 +1722,93 @@ handleEvent sess wenv node model evt = case evt of
   UpdateRealmNameLocal        tx    -> [Model $ model & projectLoadedRealms . ix (getItemIndex (model ^. selectedRealm) (model ^. projectLoadedRealms)) . rlmLevelName   .~ tx]  
   UpdateRealmBSPNameLocal     tx    -> [Model $ model & projectLoadedRealms . ix (getItemIndex (model ^. selectedRealm) (model ^. projectLoadedRealms)) . rlmBsp         .~ tx]
   UpdateRealmMultiplayerLocal bl    -> [Model $ model & projectLoadedRealms . ix (getItemIndex (model ^. selectedRealm) (model ^. projectLoadedRealms)) . rlmMultiplayer .~ bl] 
+  OpenFile ftitle fFilepath filterPatterns filterDesc multipleSelect -> []
+  SaveFile ftitle fFilepath filterPatterns filterDesc                -> []
+
+  FTPSearchResult _ -> []
+  FTPSearchError  _ -> []
 
 initialModel :: BooksModel
 initialModel = BooksModel {
-  _bkmQuery     = "",
-  _bmkSearching = False,
-  _bkmErrorMsg  = Nothing,
-  _bkmBooks     = [],
-  _bkmFilePaths = [],
-  _bmkSelected  = Nothing,
-  _bmkToolTips  = False,
-  _bmkMultiplayerEnabled     = False,
-  _bmkOptimizeShaders        = False,
-  _bmkOptimizeForWeb         = False,
-  _bmkRendererEnabled        = False,
-  _bmkDebugOnPlay            = False,
-  _bmkDedicatedServer        = False,
-  _bmkFileMenu               = False,
-  _bmkApplicationPreferences = False,
-  _bmkRealmList              = False,
-  _bmkControllerPreferences  = False,
-  _bmkExportPreferences      = False,
-  _bmkRunPreferences         = False,
-  _bmkMPPreferences          = False,
-  _bmkProjectSession         = (Just $ ProjectSession "default" [] [] (ProjectSessionPrefs [] False)),
-  _bmkSideBarVisible         = False,
-  _bmkMaxSections            = 0,
-  _bmkActiveSection          = 0,
-  _bmkControllerBindings     = [],
-  _bmkBuildList              = [],
-  _bmkCloudList              = [],
-  _bmkActiveControllerBinding  = def,
-  _bmkActiveBuildList           = def,
-  _bmkActiveCloudList           = def,
-  _bmkCBAction                  = ControllerButtonNone,
-  _bmkBUAction                  = BuildNone,
-  _bmkCLAction                  = CloudNone,
-  _bmkSearchableRealm  = False,
-  _bmkPrivateRealmOnly = False,
-  _bmkRealmVisibility  = "Public",
-  _bmkSelectedCamera   = "Camera0",
+  _bkmQuery                         = "",
+  _bmkSearching                     = False,
+  _bkmErrorMsg                      = Nothing,
+  _bkmBooks                         = [],
+  _bkmFilePaths                     = [],
+  _bmkSelected                      = Nothing,
+  _bmkToolTips                      = False,
+  _bmkMultiplayerEnabled            = False,
+  _bmkOptimizeShaders               = False,
+  _bmkOptimizeForWeb                = False,
+  _bmkRendererEnabled               = False,
+  _bmkDebugOnPlay                   = False,
+  _bmkDedicatedServer               = False,
+  _bmkFileMenu                      = False,
+  _bmkApplicationPreferences        = False,
+  _bmkRealmList                     = False,
+  _bmkControllerPreferences         = False,
+  _bmkExportPreferences             = False,
+  _bmkRunPreferences                = False,
+  _bmkMPPreferences                 = False,
+  _bmkProjectSession                = (Just $ ProjectSession "default" [] [] (ProjectSessionPrefs [] False)),
+  _bmkSideBarVisible                = False,
+  _bmkMaxSections                   = 0,
+  _bmkActiveSection                 = 0,
+  _bmkControllerBindings            = [],
+  _bmkBuildList                     = [],
+  _bmkCloudList                     = [],
+  _bmkSEList                        = [],
+  _bmkActiveControllerBinding       = def,
+  _bmkActiveBuildList               = def,
+  _bmkActiveCloudList               = def,
+  _bmkActiveSEList                  = def,
+  _bmkCBAction                      = ControllerButtonNone,
+  _bmkBUAction                      = BuildNone,
+  _bmkCLAction                      = CloudNone,
+  _bmkSEAction                      = SENone,
+  _bmkSearchableRealm               = False,
+  _bmkPrivateRealmOnly              = False,
+  _bmkRealmVisibility               = "Public",
+  _bmkSelectedCamera                = "Camera0",
   _bmkDisableScriptEngineExecution  = False,
   _bmkLegacyRenderPipelineOnly      = False,
-  _bmkRunCurrentScene  = False,
-  _bmkRunNamedScene    = "default",
-  _bmkShowRenderer     = True,
-  _bmkShowPlatform           = False,
-  _bmkShowCloudSetup         = False,
-  _bmkShowRendererOptions    = False,
-  _bmkShowControllerSetup    = False,
-  _bmkShowAppProjectPrefs    = False,
-  _bmkShowAppRealmDB         = False,
-  _bmkShowWindowViewer       = False,
-  _bmkIdeArgument            = "",
-  _bmkCurrentRenderer        = "OpenGL", 
-  _bmkSpiders                = spiders,
-  _bmkColumns                = (AppColumn True <$ gridColumns),
-  _bmkRowToScrollTo          = 0,
-  _bmkProjectTitleName       = "",
-  _bmkCurrentRealmName       = "",
-  _bmkControllerType         =  GENERIC_CONTROLLER,
-  _bmkExternalDepsList       =  "",
-  _bmkColorPicked            =  Color 0 0 0 1,
-  _bmkWidgetSelected         =  "N/A",
-  _bmkSpirVOnly              =  False,
-  _bmkGlslOnly               =  False,
-  _bmkColor1                 =  red,
-  _bmkColor2                 =  green,
-  _bmkColor3                 =  blue,
-  _bmkColor4                 =  orange,
-  _bmkShowFileSystem         =  True,
-  _bmkShowMainRenderer       =  True,
-  _bmkThreeDimensional       =  False,
-  _bmkTwoDimensional         =  False,
-  _bmkHandleFalse            =  False,
-  _bmkProjectLoadedRealms    =  [Realm "default" "default.bsp" False],
-  _bmkShowRealmViewer        =  False,
-  _bmkSelectedRealm          =  Realm "" "" False
+  _bmkRunCurrentScene               = False,
+  _bmkRunNamedScene                 = "default",
+  _bmkShowRenderer                  = True,
+  _bmkShowPlatform                  = False,
+  _bmkShowCloudSetup                = False,
+  _bmkShowScriptEngineSetup         = False,
+  _bmkShowRendererOptions           = False,
+  _bmkShowControllerSetup           = False,
+  _bmkShowAppProjectPrefs           = False,
+  _bmkShowAppRealmDB                = False,
+  _bmkShowWindowViewer              = False,
+  _bmkIdeArgument                   = "",
+  _bmkCurrentRenderer               = "OpenGL", 
+  _bmkSpiders                       = spiders,
+  _bmkColumns                       = (AppColumn True <$ gridColumns),
+  _bmkRowToScrollTo                 = 0,
+  _bmkProjectTitleName              = "",
+  _bmkCurrentRealmName              = "",
+  _bmkControllerType                =  GENERIC_CONTROLLER,
+  _bmkExternalDepsList              =  "",
+  _bmkColorPicked                   =  Color 0 0 0 1,
+  _bmkWidgetSelected                =  "N/A",
+  _bmkSpirVDisabled                 =  False,
+  _bmkSpirVOnly                     =  False,
+  _bmkGlslOnly                      =  False,
+  _bmkColor1                        =  red,
+  _bmkColor2                        =  green,
+  _bmkColor3                        =  blue,
+  _bmkColor4                        =  orange,
+  _bmkShowFileSystem                =  True,
+  _bmkShowMainRenderer              =  True,
+  _bmkThreeDimensional              =  False,
+  _bmkTwoDimensional                =  False,
+  _bmkHandleFalse                   =  False,
+  _bmkProjectLoadedRealms           =  [Realm "default" "default.bsp" False],
+  _bmkShowRealmViewer               =  False,
+  _bmkSelectedRealm                 =  Realm "" "" False
 } where 
   spiders  = S.fromFunction numSpiders spider
   spider i =
@@ -1744,6 +1861,7 @@ indexList l = zip [1..] l
 
 getItemIndex :: Realm -> [Realm] -> Int
 getItemIndex rlm lst = fst $ head $ filter (\x -> rlm == snd x) $ indexList lst
+
 -- dataAt :: Int -> [a] -> a
 -- dataAt _ [] = error "Empty List!"
 -- dataAt y (x:xs)  | y <= 0 = x

@@ -103,8 +103,8 @@ dependencies:
 
 ghc-options:
 - -Wall
-# - -shared
-# - -fno-shared-implib
+#- -shared
+#- -fno-shared-implib
 - -optl-mconsole
 - -optl-mwindows
 - -Wcompat
@@ -120,6 +120,14 @@ library:
   source-dirs:  src
   cc-options:
     - -fPIC
+  # when:
+  #   - condition: os(windows)
+  #     then:
+  #       extra-include-dirs: C:/Users/Manda/OneDrive/Documentos/GitHub/wraylib3d/submodules/hruby/lib
+  #       extra-lib-dirs:  C:/Users/Manda/OneDrive/Documentos/GitHub/wraylib3d/submodules/hruby/lib
+  #       extra-libraries: x64-ucrt-ruby320    
+  #     else:
+  #       pkgconfig-depends: ruby
   build-tools:  c2hs
 
   #include-dirs: cbits
@@ -153,7 +161,8 @@ executables:
     ghc-options:
     - -threaded
     - -rtsopts
-    - -with-rtsopts=-N
+    - -with-rtsopts=-N64
+    - -O2
     dependencies:
     - hraylib3d
 

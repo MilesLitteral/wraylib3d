@@ -1,0 +1,41 @@
+Statically linked binaries with Haskell GHC
+TL;DR Use AppImage
+
+I am working on a nostr-project Futr written in Haskell. Since I don't want users of the application to install a bunch of dependencies manually upfront in order to use it, I digged deep into statically linking binaries with Haskell. I tried the nix build system, which didn't bring me to success, I only lost many many hours recompiling the same things again and again. My main requirements are secp256k1 (C-lib), glew and SDL2 (for monomer). What should have been "a not too hard task to solve" took me actually several weeks to find out. So I gave AppImage a try and it worked great basically from the first try on.
+
+It'a two-step-process
+
+1) Compile the haskell binary as usual
+2) Build the AppImage
+
+The resulting binary can then be shipped to the users. Compilation first (I'm using stack here): `stack build` - that part was easy!
+
+First I need a build directory, my application is called "futr", so I name the directory "futr.AppDir". Within there I need two files:
+
+"AppRun":
+#!/bin/sh
+SELF=$(readlink -f "$0")
+HERE=${SELF%/*}
+EXEC="${HERE}/usr/bin/futr"
+exec "${EXEC}"
+and "futr.desktop":
+[Desktop Entry]
+Name=futr
+Exec=futr
+Icon=futr-icon
+Type=Application
+Categories=Network
+X-AppImage-Version=4702f2f
+
+
+The latter is "only" for the desktop entry. Okay, so my binary requires some assets to live alongside the binary in the same directory, so let's add those:
+cp -R assets futr.AppDir/usr/bin
+cp assets/icons/futr-icon.png futr.AppDir
+
+
+And all there is left is to create the final AppImage:
+APPIMAGE_EXTRACT_AND_RUN=1 linuxdeploy-x86_64.AppImage --appdir futr.AppDir
+ARCH=x86_64 appimagetool-x86_64.AppImage futr.AppDir
+
+
+My project already uses Github Action, so I can automate the whole process and attach a binary to each release. Check the repository for the configuration: Futr Github Action

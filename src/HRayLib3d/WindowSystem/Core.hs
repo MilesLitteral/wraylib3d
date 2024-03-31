@@ -17,7 +17,7 @@ import qualified Data.Sequence as S
 import qualified Data.Text as T
 import Data.Time (Day, addDays, defaultTimeLocale, formatTime, fromGregorian)
 import Data.Yaml.Parser (YamlValue(Mapping))
-
+import Graphics.UI.TinyFileDialogs
 -- SDL2
 -- Channel Monomer here, It's going to be necessary xD
 -- Maybe even take some inspiration from it?
@@ -338,7 +338,17 @@ matchPFType pt = case pt of
   XRFile            -> "./assets/images/file-icon/asset-xr.png"
   ImageFile         -> "./assets/images/image.png"
   --_       -> error "Bad Type included in Project"
-  
+
+--OS specific File Dialogs
+osSaveFileDialog :: Text -> Text -> [Text] -> Text -> IO (Maybe Text)
+osSaveFileDialog = saveFileDialog
+
+osOpenFileDialog :: Text -> Text -> [Text] -> Text -> Bool -> IO (Maybe [Text])
+osOpenFileDialog = openFileDialog
+
+osSelectFolderDialog :: Text -> Text -> IO (Maybe Text)
+osSelectFolderDialog = selectFolderDialog
+
 data ControllerType 
   = XBOX_CONTROLLER
   |PS_CONTROLLER 
@@ -381,12 +391,15 @@ data BooksModel = BooksModel {
   _bmkControllerBindings      :: [ControllerButton],
   _bmkBuildList               :: [BuildDescription],
   _bmkCloudList               :: [CloudDescription],
+  _bmkSEList               :: [SEDescription],
   _bmkActiveControllerBinding :: ControllerButton,
   _bmkActiveBuildList  :: BuildDescription,
   _bmkActiveCloudList  :: CloudDescription,
+  _bmkActiveSEList     :: SEDescription,
   _bmkCBAction         :: ControllerButtonAction,
   _bmkBUAction         :: BuildAction,
   _bmkCLAction         :: CloudAction,
+  _bmkSEAction         :: SEAction,
   _bmkSearchableRealm  :: Bool,
   _bmkPrivateRealmOnly :: Bool,
   _bmkRealmVisibility  :: Text,
@@ -398,6 +411,7 @@ data BooksModel = BooksModel {
   _bmkShowRenderer     :: Bool,
   _bmkShowPlatform     :: Bool,
   _bmkShowCloudSetup   :: Bool,
+  _bmkShowScriptEngineSetup :: Bool,
   _bmkShowRendererOptions   :: Bool,
   _bmkShowControllerSetup   :: Bool,
   _bmkShowAppProjectPrefs   :: Bool,
@@ -414,6 +428,7 @@ data BooksModel = BooksModel {
   _bmkExternalDepsList :: Text,
   _bmkColorPicked      :: Color,
   _bmkWidgetSelected   :: Text,
+  _bmkSpirVDisabled    :: Bool,
   _bmkSpirVOnly        :: Bool,
   _bmkGlslOnly         :: Bool,
   _bmkColor1 :: Color,
@@ -456,6 +471,14 @@ instance Default CloudDescription where
     _cDescription = ""
   }
 
+instance Default SEDescription where
+  def = SEDescription{
+    _seId          = 0,
+    _seType        = Ruby,
+    _seStatus      = ActiveDef,
+    _seDescription = "Ruby Interpreter (Ruby v3.2.1)"
+  }
+
 newtype AppColumn = AppColumn { enabled :: Bool } deriving (Eq, Show)
 
 instance Default ProjectSession where
@@ -467,6 +490,14 @@ data ControllerButtonAction
   | ControllerButtonAdding
   | ControllerButtonEditing Int
   | ControllerButtonConfirmingDelete Int ControllerButton
+  deriving (Eq, Show)
+
+data SEAction
+  = SENone
+  | SECreate
+  | SEAdding
+  | SEEditing Int
+  | SEConfirmingDelete Int SEDescription
   deriving (Eq, Show)
 
 data CloudAction
@@ -527,6 +558,12 @@ data ControllerListType
   |  XR_GESTURE
   deriving (Eq, Show, Enum)
 
+data SEListType
+  = Ruby
+  | Python
+  | Lua
+  deriving (Eq, Show, Enum)
+
 data CloudListType
   = Firebase
   | GCP
@@ -557,6 +594,11 @@ data TodoStatus
 data ControllerButtonStatus
   = Active
   | Inactive
+  deriving (Eq, Show, Enum)
+
+data SEStatus
+  = ActiveDef
+  | InactiveDef
   deriving (Eq, Show, Enum)
 
 data CloudStatus
@@ -642,7 +684,22 @@ data BooksEvt
   | CloudHideEditDone
   | CloudCancel
   -- End List Events
-  | OpenFS
+  | ScriptEngineInit
+  | ScriptEngineNew
+  | ScriptEngineAdd
+  | ScriptEngineEdit          Int SEDescription
+  | ScriptEngineSave          Int
+  | ScriptEngineConfirmDelete Int SEDescription
+  | ScriptEngineCancelDelete
+  | ScriptEngineDeleteBegin   Int   SEDescription
+  | ScriptEngineDelete        Int   SEDescription
+  | ScriptEngineShowEdit
+  | ScriptEngineHideEdit
+  | ScriptEngineHideEditDone
+  | ScriptEngineCancel
+  | OpenFSDialogue 
+  | OpenFS Text Text [Text] Text Bool
+  | SaveFS Text Text [Text] Text 
   | OpenAppPrefs
   | OpenRealmList
   | OpenControllerPrefs
@@ -674,6 +731,8 @@ data BooksEvt
   | UpdateRealmNameLocal  Text
   | UpdateRealmBSPNameLocal  Text
   | UpdateRealmMultiplayerLocal  Bool 
+  | SaveFile Text Text [Text] Text 
+  | OpenFile Text Text [Text] Text Bool
   | NoneB Bool
   | None
   deriving (Eq, Show)
@@ -683,6 +742,13 @@ data ControllerButton = ControllerButton {
   _bType        :: ControllerListType,
   _bstatus      :: ControllerButtonStatus,
   _bDescription :: Text
+} deriving (Eq, Show)
+
+data SEDescription = SEDescription {
+  _seId          :: Millisecond,
+  _seType        :: SEListType,
+  _seStatus      :: SEStatus,
+  _seDescription :: Text
 } deriving (Eq, Show)
 
 data CloudDescription = CloudDescription {
@@ -711,6 +777,12 @@ buildTypes = enumFrom (toEnum 0)
 buildStatuses :: [BuildStatus]
 buildStatuses = enumFrom (toEnum 0)
 
+seTypes :: [SEListType]
+seTypes = enumFrom (toEnum 0)
+
+seStatuses :: [SEStatus]
+seStatuses = enumFrom (toEnum 0)
+
 cloudTypes :: [CloudListType]
 cloudTypes = enumFrom (toEnum 0)
 
@@ -719,6 +791,7 @@ cloudStatuses = enumFrom (toEnum 0)
 
 makeLenses     'ControllerButton
 makeLenses     'CloudDescription
+makeLenses     'SEDescription
 makeLenses     'BuildDescription
 makeLenses     'ProjectSession 
 makeLenses     'ProjectSessionFile
@@ -729,6 +802,7 @@ makeLensesWith  abbreviatedFields 'BookResp
 makeLensesWith  abbreviatedFields 'BooksModel
 makeLensesFor  [("enabled", "_enabled")] ''AppColumn
 --makeLensesFor [("columns", "_columns"), ("theme", "_theme"), ("rowToScrollTo", "_rowToScrollTo")] ''AppModel
+
 
 {-
   --Monomer Style: Alerts, Warnings, Confirmations
@@ -742,15 +816,6 @@ makeLensesFor  [("enabled", "_enabled")] ''AppColumn
   customDialog :: (Typeable s, Typeable e) => e  -> [AlertCfg]  -> WidgetNode () e -> WidgetNode s e
   customDialog e c d = alert_ e c d
 
-  --OS specific File Dialogs
-  osSaveFileDialog :: Text -> Text	-> [Text]	-> Text	-> IO (Maybe Text)	
-  osSaveFileDialog = saveFileDialog
-
-  osOpenFileDialog :: Text -> Text	-> [Text]	-> Text	-> Bool	-> IO (Maybe [Text])	
-  osOpenFileDialog = openFileDialog
-
-  osSelectFolderDialog :: Text	-> Text	-> IO (Maybe Text)	
-  osSelectFolderDialog = selectFolderDialog
 
   {- 
     evt:ManimerEvt configs:AlertCfg dialogBody:Text

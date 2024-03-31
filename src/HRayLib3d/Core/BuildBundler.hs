@@ -10,7 +10,6 @@ module HRayLib3d.Core.BuildBundler (
     , buildMacOs
     , configureAutoLinux
     , buildLinux
-    , startIDE
     ) where
 
     --windows support only for now
@@ -174,15 +173,6 @@ module HRayLib3d.Core.BuildBundler (
     buildWebGL :: String -> IO Handle
     buildWebGL appName = do
         (_, Just hout, _, _) <- createProcess (proc "ghcjs" [(appName ++ ".hs"), "-o", (appName ++ ".js")]){ cwd = Just "./", std_out = CreatePipe }
-        return hout
-
-    -- | Boots the user specified IDE via console command ("atom ./",  "code ./")
-    -- NOTE: All 'start' functions appends a reference of the process' pipe to the
-    -- ManifestModel subprocess Lens so they can be closed all at once when the main 
-    -- window is, or be communicated to later
-    startIDE :: String -> IO Handle
-    startIDE  txt = do
-        (_, Just hout, _, _) <- createProcess (shell txt){ cwd = Just "./assets/projects/", std_out = CreatePipe } --(_, Just hout, _, _) 
         return hout
 
     -- Build for Mobile Functions (EXPERIMENTAL)
