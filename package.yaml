@@ -35,7 +35,9 @@ dependencies:
 - mersenne-random-pure64 #wtf XD, it's from 2008 but maybe that's okay because it's RNG
 - data-binary-ieee754    #wtf x2, atleast its an IEEE standard
 - elerea                 # ??? DCT? DWT? FRP??? Signals??? https://hackage.haskell.org/package/elerea-2.9.0/docs/FRP-Elerea-Param.html#t:Signal
-- megaparsec
+- megaparsec >=6.3 && <7
+- parsers-megaparsec >= 0.1 && < 0.2
+- digit >= 0.7 && < 0.8
 - parsec
 - containers
 - scientific
@@ -104,6 +106,7 @@ dependencies:
 ghc-options:
 - -Wall
 #- -shared
+#- -o "WRayLib3d.dll"
 #- -fno-shared-implib
 - -optl-mconsole
 - -optl-mwindows

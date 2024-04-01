@@ -82,6 +82,20 @@ packages:
   original:
     hackage: gltf-loader-0.3.0.0@sha256:e1ebcadd308fa53fadfa284ad8e374cba96d44ed0939f52708534f8ae4feb6f7,5837
 - completed:
+    hackage: parsers-megaparsec-0.1.0.2@sha256:8aff82b79c0021965a46a98f7a6a9eaaf9896a54fefedae45d693686e674db4d,1670
+    pantry-tree:
+      sha256: 8eac61938f53db8127244c0d8d036bf6b5f4b2f87fd1d15e24b8f2d500dc65c9
+      size: 238
+  original:
+    hackage: parsers-megaparsec-0.1.0.2@sha256:8aff82b79c0021965a46a98f7a6a9eaaf9896a54fefedae45d693686e674db4d,1670
+- completed:
+    hackage: digit-0.7@sha256:d7e8252022d89cc962da29fdb54bdda54d997c2073b6977e6490b8bcd877650c,3919
+    pantry-tree:
+      sha256: 85f1ff5b950d60093fdcbc353affac3c50670e81c50efebe15d310c78f2324d6
+      size: 1943
+  original:
+    hackage: digit-0.7@sha256:d7e8252022d89cc962da29fdb54bdda54d997c2073b6977e6490b8bcd877650c,3919
+- completed:
     hackage: vulkan-api-1.4.0.0@sha256:a8a9dcd0b97d0fe110a09776d757943e3c5197b0262ed0805d8ab33926be390a,28801
     pantry-tree:
       sha256: f9582d6284adf14bd55ef7bd4e1717a3d5035dcec7e021786c643b8fc6b84862

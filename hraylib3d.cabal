@@ -135,8 +135,9 @@ library
       HRayLib3d.Network.UDP
       HRayLib3d.ScriptEngine
       HRayLib3d.ScriptEngine.HRuby
-      HRayLib3d.ScriptEngine.HRubyHS
-      HRayLib3d.ScriptEngine.HRubyHSInterface
+      HRayLib3d.ScriptEngine.HRuby.Core
+      HRayLib3d.ScriptEngine.HRuby.HRubyHS
+      HRayLib3d.ScriptEngine.HRuby.HRubyHSInterface
       HRayLib3d.Utils
       HRayLib3d.Utils.Benchmarks
       HRayLib3d.Utils.Exception
@@ -191,6 +192,7 @@ library
     , data-default-class
     , deepseq
     , digest
+    , digit ==0.7.*
     , directory
     , dlist
     , elerea
@@ -210,7 +212,7 @@ library
     , lens
     , linear
     , linear-base
-    , megaparsec
+    , megaparsec >=6.3 && <7
     , megastore
     , mersenne-random-pure64
     , microlens-platform
@@ -222,6 +224,7 @@ library
     , network
     , nsis
     , parsec
+    , parsers-megaparsec ==0.1.*
     , postgresql-simple
     , pretty-show
     , prettyclass
@@ -286,6 +289,7 @@ executable RealmViewer-FE-Demo
     , data-default-class
     , deepseq
     , digest
+    , digit ==0.7.*
     , directory
     , dlist
     , elerea
@@ -306,7 +310,7 @@ executable RealmViewer-FE-Demo
     , lens
     , linear
     , linear-base
-    , megaparsec
+    , megaparsec >=6.3 && <7
     , megastore
     , mersenne-random-pure64
     , microlens-platform
@@ -318,6 +322,7 @@ executable RealmViewer-FE-Demo
     , network
     , nsis
     , parsec
+    , parsers-megaparsec ==0.1.*
     , postgresql-simple
     , pretty-show
     , prettyclass
@@ -378,6 +383,7 @@ executable hraylib3d
     , data-default-class
     , deepseq
     , digest
+    , digit ==0.7.*
     , directory
     , dlist
     , elerea
@@ -398,7 +404,7 @@ executable hraylib3d
     , lens
     , linear
     , linear-base
-    , megaparsec
+    , megaparsec >=6.3 && <7
     , megastore
     , mersenne-random-pure64
     , microlens-platform
@@ -410,6 +416,7 @@ executable hraylib3d
     , network
     , nsis
     , parsec
+    , parsers-megaparsec ==0.1.*
     , postgresql-simple
     , pretty-show
     , prettyclass
@@ -472,6 +479,7 @@ test-suite hraylib3d-test
     , data-default-class
     , deepseq
     , digest
+    , digit ==0.7.*
     , directory
     , dlist
     , elerea
@@ -492,7 +500,7 @@ test-suite hraylib3d-test
     , lens
     , linear
     , linear-base
-    , megaparsec
+    , megaparsec >=6.3 && <7
     , megastore
     , mersenne-random-pure64
     , microlens-platform
@@ -504,6 +512,7 @@ test-suite hraylib3d-test
     , network
     , nsis
     , parsec
+    , parsers-megaparsec ==0.1.*
     , postgresql-simple
     , pretty-show
     , prettyclass
