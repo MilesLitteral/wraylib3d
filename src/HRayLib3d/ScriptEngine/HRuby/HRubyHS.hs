@@ -13,8 +13,11 @@ module HRayLib3d.ScriptEngine.HRuby.HRubyHS where
   type FlagValue  = ()     -- For Symbols (:name)
   type family     RubyObject t d -- for catching whole gems/modules or custom classes on the Ruby end 
                                  -- (IE: RubyObject Identifier [RValue] || RubyObject Identifier [RClass] || RubyObject Identifier [Identifier] || RubyObject Identifier RClass)
+  -- data RubyInterpreterProcess = RubyInterpreterProcess {
+  --  hin :: Handle, 
+  --  hout :: Handle
+  --  } --MVar () (String)
 
-  data RubyInterpreterProcess = RubyInterpreterProcess {hin :: Handle, hout :: Handle}
   data RValueHS =
     RINT       {rInt    :: Int}
     |RFLOAT32  {rFloat  :: Float}

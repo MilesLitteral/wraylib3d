@@ -119,7 +119,7 @@ import Text.Megaparsec
   ( (<?>), MonadParsec, Parsec, Stream(..), SourcePos(..), eof, try, lookAhead
   , notFollowedBy
   )
-import Text.Megaparsec.Char (satisfy)
+import Text.Megaparsec (satisfy)
 
 
 import qualified Data.List.NonEmpty as NonEmpty
@@ -152,44 +152,44 @@ instance Stream PyTokens where
   chunkToTokens Proxy = unPyTokens
   chunkLength Proxy = length . unPyTokens
   chunkEmpty Proxy = null . unPyTokens
-  positionAt1 Proxy _ tk =
-    let
-      ann = pyTokenAnn tk
-    in
-      SourcePos
-        (_srcInfoName ann)
-        (Megaparsec.mkPos $ _srcInfoLineStart ann)
-        (Megaparsec.mkPos $ _srcInfoColStart ann)
-  positionAtN Proxy spos (PyTokens tks) =
-    case tks of
-      [] -> spos
-      _ ->
-        let
-          ann = pyTokenAnn $ last tks
-        in
-          SourcePos
-            (_srcInfoName ann)
-            (Megaparsec.mkPos $ _srcInfoLineStart ann)
-            (Megaparsec.mkPos $ _srcInfoColStart ann)
-  advance1 Proxy _ _ tk =
-    let
-      ann = pyTokenAnn tk
-    in
-      SourcePos
-        (_srcInfoName ann)
-        (Megaparsec.mkPos $ _srcInfoLineEnd ann)
-        (Megaparsec.mkPos $ _srcInfoColEnd ann)
-  advanceN Proxy _ spos (PyTokens tks) =
-    case tks of
-      [] -> spos
-      _ ->
-        let
-          ann = pyTokenAnn $ last tks
-        in
-          SourcePos
-            (_srcInfoName ann)
-            (Megaparsec.mkPos $ _srcInfoLineEnd ann)
-            (Megaparsec.mkPos $ _srcInfoColEnd ann)
+  -- positionAt1 Proxy _ tk =
+  --   let
+  --     ann = pyTokenAnn tk
+  --   in
+  --     SourcePos
+  --       (_srcInfoName ann)
+  --       (Megaparsec.mkPos $ _srcInfoLineStart ann)
+  --       (Megaparsec.mkPos $ _srcInfoColStart ann)
+  -- positionAtN Proxy spos (PyTokens tks) =
+  --   case tks of
+  --     [] -> spos
+  --     _ ->
+  --       let
+  --         ann = pyTokenAnn $ last tks
+  --       in
+  --         SourcePos
+  --           (_srcInfoName ann)
+  --           (Megaparsec.mkPos $ _srcInfoLineStart ann)
+  --           (Megaparsec.mkPos $ _srcInfoColStart ann)
+  -- advance1 Proxy _ _ tk =
+  --   let
+  --     ann = pyTokenAnn tk
+  --   in
+  --     SourcePos
+  --       (_srcInfoName ann)
+  --       (Megaparsec.mkPos $ _srcInfoLineEnd ann)
+  --       (Megaparsec.mkPos $ _srcInfoColEnd ann)
+  -- advanceN Proxy _ spos (PyTokens tks) =
+  --   case tks of
+  --     [] -> spos
+  --     _ ->
+  --       let
+  --         ann = pyTokenAnn $ last tks
+  --       in
+  --         SourcePos
+  --           (_srcInfoName ann)
+  --           (Megaparsec.mkPos $ _srcInfoLineEnd ann)
+  --           (Megaparsec.mkPos $ _srcInfoColEnd ann)
 
   take1_ (PyTokens p) =
     case p of
@@ -207,20 +207,25 @@ class AsParseError s t | s -> t where
   _ParseError
     :: Prism'
          s
-         ( NonEmpty SourcePos
+         ( Int --NonEmpty SourcePos
          , Maybe (Megaparsec.ErrorItem t)
          , Set (Megaparsec.ErrorItem t)
          )
 
+--          unsafeFromLexicalError :: AsLexicalError (Parsec.Token s) [PyToken SrcInfo] => Parsec.ParseErrorBundle s e -> Parsec.Token s
+-- unsafeFromLexicalError (Parsec.ParseErrorBundle d _) = do
+--     case NonEmpty.head d of
+--         (Parsec.TrivialError a b c) -> _LexicalError # (a, b, c)
+--         Parsec.FancyError{}         -> Prelude.error "'fancy error' used in lexer"
+
 -- | Convert a concrete 'Megaparsec.ParseError' to a value that has an instance of 'AsParseError'
 --
 -- This function is partial because our parser will never use 'Megaparsec.FancyError'
-unsafeFromParseError
-  :: (HasCallStack, AsParseError s t)
-  => Megaparsec.ParseError t e
-  -> s
-unsafeFromParseError Megaparsec.FancyError{} = error "there are none of these"
-unsafeFromParseError (Megaparsec.TrivialError pos a b) = _ParseError # (pos, a, b)
+unsafeFromParseError :: AsParseError t (Token s) => Megaparsec.ParseErrorBundle s e -> t
+unsafeFromParseError (Megaparsec.ParseErrorBundle d _) = do 
+  case NonEmpty.head d of
+    (Megaparsec.TrivialError pos a b) -> _ParseError # (pos, a, b)
+    Megaparsec.FancyError{}           -> error "there are none of these"
 
 type Parser = Parsec Void PyTokens
 
@@ -846,7 +851,7 @@ orExpr ws =
       (\i -> Ident (i ^. annot_) i) <$> identifier ws <|>
       parensOrUnit
 
-simpleStatement :: MonadParsec e PyTokens m => m (SimpleStatement SrcInfo)
+simpleStatement :: (MonadParsec e PyTokens m, Megaparsec.TraversableStream PyTokens) => m (SimpleStatement SrcInfo)
 simpleStatement =
   returnSt <|>
   passSt <|>
@@ -1069,7 +1074,7 @@ sepBy1' val sep = go
       optional ((,) <$> sep <*> optional go)
 
 smallStatement
-  :: MonadParsec e PyTokens m
+  :: (MonadParsec e PyTokens m, Megaparsec.TraversableStream PyTokens)
   => m (SmallStatement SrcInfo)
 smallStatement =
   (\(a, b, c) d -> MkSmallStatement a b c d) <$>
@@ -1078,7 +1083,7 @@ smallStatement =
   optional eol
 
 statement
-  :: (Alternative m, MonadParsec e PyTokens m)
+  :: (Alternative m, MonadParsec e PyTokens m, Megaparsec.TraversableStream PyTokens)
   => m (Indents SrcInfo)
   -> Indents SrcInfo
   -> m (Statement SrcInfo)
@@ -1088,7 +1093,7 @@ statement pIndent indentBefore =
   CompoundStatement <$> compoundStatement pIndent indentBefore <|>
   SmallStatement indentBefore <$> smallStatement
 
-blank :: MonadParsec e PyTokens m => m (Blank SrcInfo)
+blank :: (MonadParsec e PyTokens m, Megaparsec.TraversableStream PyTokens) => m (Blank SrcInfo)
 blank =
   withSrcInfo $
   (\b c a -> Blank (Ann a) b c) <$>
@@ -1099,7 +1104,7 @@ blank =
 
   (\b a -> Blank (Ann a) [] b) <$> optional comment
 
-suite :: MonadParsec e PyTokens m => m (Suite SrcInfo)
+suite :: (MonadParsec e PyTokens m, Megaparsec.TraversableStream PyTokens) => m (Suite SrcInfo)
 suite =
   (\(tk, s) ->
      either
@@ -1337,7 +1342,7 @@ decoratorValue = do
       Just (l, x, r) -> Call (derefs ^. exprAnn) derefs l x r
 
 decorator
-  :: MonadParsec e PyTokens m
+  :: (MonadParsec e PyTokens m, Megaparsec.TraversableStream PyTokens)
   => Indents SrcInfo
   -> m (Decorator SrcInfo)
 decorator indentBefore =
@@ -1349,7 +1354,7 @@ decorator indentBefore =
   many ((,) <$> blank <*> eol)
 
 decorators
-  :: MonadParsec e PyTokens m
+  :: (MonadParsec e PyTokens m, Megaparsec.TraversableStream PyTokens)
   => m (Indents SrcInfo)
   -> Indents SrcInfo
   -> m [Decorator SrcInfo]
@@ -1363,7 +1368,7 @@ decorators pIndent indentBefore =
       lookAhead (token space (\case; TkAt{} -> True; _ -> False) "@")
 
 compoundStatement
-  :: MonadParsec e PyTokens m
+  :: (MonadParsec e PyTokens m, Megaparsec.TraversableStream PyTokens)
   => m (Indents SrcInfo)
   -> Indents SrcInfo
   -> m (CompoundStatement SrcInfo)
@@ -1549,7 +1554,7 @@ compoundStatement pIndent indentBefore =
             (snd <$> token space (\case; TkElse{} -> True; _ -> False) "else")) <*>
          suite)
 
-module_ :: MonadParsec e PyTokens m => m (Module SrcInfo)
+module_ :: (MonadParsec e PyTokens m, Megaparsec.TraversableStream PyTokens) => m (Module SrcInfo)
 module_ =
   ModuleStatement <$> (statement tlIndent =<< tlIndent) <*> module_
 

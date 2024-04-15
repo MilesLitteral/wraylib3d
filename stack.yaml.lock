@@ -102,6 +102,13 @@ packages:
       size: 42332
   original:
     hackage: vulkan-api-1.4.0.0
+- completed:
+    hackage: hslua-marshalling-2.3.1@sha256:d9244da15cf045d094ad583520b0bce326890bd366b5eff89bf5f1ce779cdd51,3932
+    pantry-tree:
+      sha256: 79de5c5562a1f5720e3838c15898734e59ebf7677aef4cefb87e97c4a13e9b1f
+      size: 1023
+  original:
+    hackage: hslua-marshalling-2.3.1
 snapshots:
 - completed:
     sha256: 9fa4bece7acfac1fc7930c5d6e24606004b09e80aa0e52e9f68b148201008db9

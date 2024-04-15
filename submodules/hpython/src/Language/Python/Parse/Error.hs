@@ -22,6 +22,7 @@ import Language.Python.Internal.Lexer
 import Language.Python.Internal.Parse (AsParseError(..))
 import Language.Python.Internal.Syntax.IR (AsIRError(..))
 import Language.Python.Internal.Token (PyToken)
+import qualified Data.List.NonEmpty as NonEmpty
 
 data ParseError a
   -- | An error occured during tokenization (this is a re-packed megaparsec error)
@@ -55,13 +56,7 @@ data ParseError a
   | InvalidUnpacking a
   deriving (Eq, Show)
 
-instance AsLexicalError (ParseError a) Char where
-  _LexicalError =
-    prism'
-      (\(a, b, c) -> LexicalError a b c)
-      (\case
-          LexicalError a b c -> Just (a, b ,c)
-          _ -> Nothing)
+instance AsLexicalError (ParseError a) Char
 
 instance AsTabError (ParseError a) a where
   _TabError =
@@ -79,13 +74,7 @@ instance AsIncorrectDedent (ParseError a) a where
           IncorrectDedent a -> Just a
           _ -> Nothing)
 
-instance AsParseError (ParseError a) (PyToken a) where
-  _ParseError =
-    prism'
-      (\(a, b, c) -> ParseError a b c)
-      (\case
-          ParseError a b c -> Just (a, b ,c)
-          _ -> Nothing)
+instance AsParseError (ParseError a) (PyToken a) 
 
 instance AsIRError (ParseError a) a where
   _InvalidUnpacking =

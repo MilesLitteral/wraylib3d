@@ -60,6 +60,10 @@ data OpenGLWidgetMsg
   = OpenGLWidgetInit GLuint (Ptr GLuint) (Ptr GLuint)
   deriving (Show, Eq)
 
+-- data VAO    = VAO    { vaoWindowSize :: Size, vaoBoundary :: Point, vaoTexture :: [[Float]], vaoColor :: Color, vaoVerticies :: [(Double, Double)] }
+-- data Sprite = Sprite { rawData       :: VAO, rawAnimations :: [VAO], animationState :: SpriteState,  }
+-- data Scene  = Scene  { inhabitants   :: [Sprite], boundary :: V2 Int, gravity :: Float }.
+
 data OpenGLWidgetState = OpenGLWidgetState {
   _ogsLoaded   :: Bool,
   _ogsShaderId :: GLuint,
@@ -156,7 +160,7 @@ makeOpenGLWidget color state = widget where
             offset = wenv ^. L.offset
 
             -- Simple triangle
-            style = currentStyle wenv node
+            style  = currentStyle wenv node
             nodeVp = getContentArea node style
 
             Rect rx ry rw rh = nodeVp

@@ -437,6 +437,7 @@ data BooksModel = BooksModel {
   _bmkColor4 :: Color,
   _bmkShowFileSystem   :: Bool,
   _bmkShowMainRenderer :: Bool,
+  _bmkShowRecordSettings :: Bool,
   _bmkThreeDimensional :: Bool,
   _bmkTwoDimensional   :: Bool,
   _bmkHandleFalse      :: Bool,
@@ -725,6 +726,8 @@ data BooksEvt
   | FTPSearchError  Text 
   | AppSearchDir [FilePath]
   | StartIDE
+  | StartFFMPEGSession
+  | ToggleRecordPreferences -- FFMPEG integration
   | AddRealm
   | RemoveRealm
   | OpenRealm Realm

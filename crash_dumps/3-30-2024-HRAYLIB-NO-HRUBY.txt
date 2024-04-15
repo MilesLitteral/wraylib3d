@@ -1,0 +1,299 @@
+
+Renderer: AMD Radeon RX 6650 XT
+Version: 3.2.0 Core Profile Context 23.11.1.231020
+Available maps:
+q3dm1 q3dm17 q3dm7 q3tourney2
+Enter map name:
+q3dm1
+load (128 x 128): levelshots/q3dm1.jpg
+loading map: "q3dm1"
+"Entities Path:      .lc_q3.cache\\q3dm1.entities"
+"JSON Entities Path: .lc_q3.cache\\q3dm1.json"
+"File Exists: q3dm1.json"
+Try to load entities at: C:\Users\Manda\OneDrive\Documentos\GitHub\wraylib3d\.lc_q3.cache\q3dm1.json
+loading level materials
+"Current WIP (q3 shader parsing)"
+bsp model count: 1
+start to compile
+loading textures:
+unknown texure: .jpg in shader:
+load (32 x 64): models/mapobjects/gratelamp/gratetorch2.jpg
+load (32 x 64): models/mapobjects/gratelamp/gratetorch2b.tga
+load (128 x 64): models/mapobjects/major_h_st.jpg
+load (256 x 256): models/mapobjects/major_st.jpg
+load (128 x 256): models/mapobjects/storch/storch_tall.jpg
+load (256 x 256): models/mapobjects/visor_st.jpg
+load (128 x 256): models/mapobjects/wallhead/lion.jpg
+load (64 x 64): models/mapobjects/wallhead/lion_m.tga
+load (64 x 64): models/mapobjects/wallhead/lion_m.tga
+load (128 x 128): textures/sfx/firewalla.tga
+load (128 x 128): models/mapobjects/wallhead/wallhead02.jpg
+load (256 x 256): models/players/grunt/blue.jpg
+load (128 x 128): models/players/grunt/blue_h.jpg
+load (256 x 256): models/players/grunt/grunt.jpg
+load (128 x 128): models/players/grunt/grunt_h.jpg
+load (256 x 256): models/players/grunt/red.jpg
+load (128 x 128): models/players/grunt/red_h.jpg
+load (256 x 256): models/players/grunt/stripe.jpg
+load (128 x 128): models/players/grunt/stripe_h.tga
+load (128 x 128): textures/sfx/electricgrade3.jpg
+load (256 x 256): models/players/major/blue.jpg
+load (128 x 64): models/players/major/blue_h.jpg
+load (256 x 256): models/players/major/daemia.tga
+load (128 x 128): textures/sfx/electricslime.jpg
+load (128 x 64): models/players/major/daemia2_h.jpg
+RealmViewer-FEloa-d (D256 x e256): models/playerms/majoor/major.jpg
+.EXE: srloacd \(1L28 x 6a4): mmboddelas/plCayers/major/major_h.jpg
+ube\Compiler\Lexer.hs:(lo3a1d7 (,256 x 525)6): models/players/maj-or/red.jpg
+(329,62load ()128 x 64): mo:del s/players/major/red_h.jpgN
+on-exhaustive patterns load (i256 x n256): models/players/sarge/band.jpg
+ function compileOps
+
+load (256 x 256): models/players/sarge/blue.jpg
+load (16 x 8): models/players/sarge/cigar.glow.jpg
+load (16 x 8): models/players/sarge/cigar.jpg
+load (256 x 256): models/players/sarge/krusade.tga
+load (128 x 128): textures/sfx/firegorre.tga
+load (16 x 8): models/players/sarge/null.jpg
+load (256 x 256): models/players/sarge/red.jpg
+load (256 x 256): models/players/visor/blue.jpg
+load (256 x 256): models/players/visor/red.jpg
+load (256 x 256): models/players/visor/visor.jpg
+load (128 x 128): models/powerups/ammo/machammo.tga
+load (128 x 128): textures/effects/tinfx2d.jpg
+load (64 x 64): models/powerups/ammo/machammo2.tga
+load (128 x 128): models/powerups/ammo/plasammo.tga
+load (64 x 64): textures/effects/envmapplas.jpg
+load (64 x 64): models/powerups/ammo/plasammo2.jpg
+load (128 x 128): models/powerups/ammo/shotammo.tga
+load (128 x 128): textures/effects/tinfx2c.jpg
+load (64 x 64): models/powerups/ammo/shotammo2.jpg
+load (64 x 64): textures/effects/envmaprail.jpg
+load (128 x 64): models/powerups/armor/energy_red1.jpg
+load (128 x 128): models/powerups/armor/newred.tga
+load (128 x 128): textures/sfx/specular.jpg
+load (64 x 64): models/powerups/armor/shard2.tga
+load (128 x 128): textures/effects/tinfx2c.jpg
+load (64 x 64): textures/effects/envmapgold.jpg
+load (64 x 64): textures/sfx/kenelectric.jpg
+load (64 x 64): textures/effects/envmapgold2.jpg
+load (64 x 64): textures/effects/envmapyel.jpg
+load (128 x 128): textures/effects/tinfx2b.jpg
+load (256 x 256): models/weapons2/plasma/plasma.jpg
+load (128 x 128): textures/effects/tinfxb.jpg
+load (64 x 64): models/weapons2/plasma/plasma_glo.jpg
+load (128 x 128): textures/effects/tinfxb.jpg
+load (256 x 256): models/weapons2/rocketl/rocketl.jpg
+load (64 x 64): models/weapons2/rocketl/rocketl2.jpg
+load (256 x 256): models/weapons2/shotgun/shotgun.jpg
+load (64 x 4): models/weapons2/shotgun/shotgun_laser.jpg
+unknown texure: noshader.jpg in shader: noshader
+load (128 x 256): textures/base_wall/protobanner.tga
+load (256 x 256): textures/gothic_block/blocks11b.jpg
+load (256 x 256): textures/gothic_block/blocks15.jpg
+load (256 x 256): textures/gothic_block/blocks17.jpg
+load (256 x 256): textures/gothic_block/blocks18b.jpg
+load (256 x 256): textures/gothic_block/blocks18c.jpg
+load (256 x 256): textures/gothic_block/blocks18c_3.jpg
+load (256 x 256): textures/gothic_block/demon_block15fx.tga
+load (128 x 128): textures/sfx/firegorre.tga
+load (256 x 256): textures/gothic_block/killblock.jpg
+load (256 x 256): textures/gothic_block/killblock_i.jpg
+load (256 x 256): textures/gothic_block/killblock_i4.jpg
+load (256 x 256): textures/gothic_block/blocks18cgeomtrn2.tga
+load (256 x 256): textures/gothic_block/blocks18cgeomtrn2.tga
+load (256 x 256): textures/gothic_block/killblockgeomtrn.tga
+load (128 x 128): textures/sfx/firegorre.tga
+load (128 x 128): textures/effects/tinfx3.jpg
+load (256 x 256): textures/gothic_block/largerblock3blood.tga
+load (128 x 128): textures/liquids/proto_grueldark2.jpg
+load (256 x 256): textures/gothic_ceiling/woodceiling1a.jpg
+load (256 x 256): textures/gothic_ceiling/woodceiling1b_dark.jpg
+unknown texure: textures/gothic_door/km_arena1archfinalc_mid.jpg in shader: textures/gothic_door/km_arena1archfinalc_mid
+load (256 x 64): textures/gothic_door/km_arena1archfinalc_top.jpg
+load (256 x 256): textures/gothic_door/km_arena1archfinald_bot.jpg
+load (256 x 256): textures/gothic_door/km_arena1archfinald_mid.jpg
+load (66 x 640): textures/gothic_door/km_arena1columna2r.jpg
+load (64 x 256): textures/gothic_door/skull_door_a.tga
+load (256 x 256): textures/gothic_door/skull_door_b.tga
+load (64 x 256): textures/gothic_door/skull_door_c.tga
+load (64 x 128): textures/gothic_door/skull_door_d.tga
+load (256 x 128): textures/gothic_door/skull_door_e.tga
+load (64 x 128): textures/gothic_door/skull_door_f.tga
+load (256 x 64): textures/gothic_door/skullarch_a.tga
+load (256 x 256): textures/gothic_door/skullarch_b.tga
+load (128 x 128): textures/sfx/firegorre.tga
+load (256 x 256): textures/gothic_door/skullarch_c.tga
+load (256 x 256): textures/gothic_door/xian_tourneyarch_inside2.jpg
+load (256 x 256): textures/gothic_floor/blocks17floor2.jpg
+load (256 x 256): textures/gothic_floor/center2trn.tga
+load (256 x 256): textures/gothic_floor/center2trn.tga
+load (128 x 128): textures/sfx/fireswirl2.jpg
+load (512 x 512): textures/gothic_floor/largerblock3b.jpg
+load (256 x 256): textures/gothic_floor/largerblock3b_ow.tga
+load (128 x 128): textures/sfx/firegorre.tga
+load (256 x 256): textures/gothic_floor/metalbridge06.jpg
+load (256 x 256): textures/gothic_floor/metalbridge06broke.jpg
+load (256 x 32): textures/gothic_floor/xstairtop4.jpg
+load (256 x 32): textures/gothic_floor/xstairtop4bbrn.jpg
+load (256 x 16): textures/gothic_floor/xstepborder3.jpg
+load (256 x 16): textures/gothic_floor/xstepborder3brn.jpg
+load (64 x 64): textures/gothic_light/pentagram_light1.jpg
+load (64 x 64): textures/gothic_light/pentagram_light1_blend.jpg
+load (128 x 32): textures/gothic_trim/baseboard04.jpg
+load (256 x 128): textures/gothic_trim/baseboard09_c3.jpg
+load (256 x 128): textures/gothic_trim/baseboard09_e.jpg
+load (128 x 64): textures/gothic_trim/baseboard09_e2.jpg
+load (256 x 128): textures/gothic_trim/baseboard09_l2.jpg
+load (256 x 128): textures/gothic_trim/baseboard09_o3.jpg
+load (64 x 256): textures/gothic_trim/km_arena1tower4.jpg
+load (256 x 64): textures/gothic_trim/km_arena1tower4_a.jpg
+load (64 x 64): textures/gothic_trim/km_arena1tower_short.tga
+load (256 x 256): textures/gothic_trim/metaldemonkillblock.jpg
+load (256 x 256): textures/gothic_trim/metalsupport4b.jpg
+load (128 x 128): textures/gothic_trim/metalsupsolid.jpg
+load (256 x 256): textures/gothic_trim/pitted_rust.jpg
+load (256 x 256): textures/gothic_trim/pitted_rust2.jpg
+load (256 x 256): textures/gothic_trim/pitted_rust2.jpg
+load (256 x 256): textures/gothic_trim/pitted_rust3.jpg
+load (128 x 128): textures/gothic_trim/skullsvertgray02b.jpg
+load (256 x 256): textures/gothic_wall/iron01_e.jpg
+load (128 x 256): textures/gothic_wall/iron01_ntech3.jpg
+load (256 x 256): textures/gothic_wall/skull4.jpg
+load (256 x 256): textures/gothic_wall/slateroofc.jpg
+load (64 x 256): textures/gothic_wall/supportborder_blue_b.jpg
+load (64 x 256): textures/gothic_wall/supportborder_blue_c.jpg
+load (128 x 128): textures/liquids/lavahell.jpg
+load (128 x 128): textures/liquids/lavahell.jpg
+load (128 x 128): textures/organics/dirt2.jpg
+load (256 x 256): textures/sfx/computer_blocks17.jpg
+load (64 x 64): textures/sfx/compscreen/letters1.tga
+load (64 x 64): textures/sfx/compscreen/letters2.tga
+load (64 x 64): textures/sfx/compscreen/letters3.tga
+load (8 x 8): textures/sfx/compscreen/letters5.jpg
+load (64 x 64): textures/sfx/compscreen/letters4.tga
+load (8 x 8): textures/sfx/compscreen/letters5.jpg
+load (8 x 8): textures/sfx/compscreen/letters5.jpg
+load (128 x 256): textures/sfx/flameball.jpg
+load (128 x 256): textures/sfx/flame1.jpg
+load (128 x 256): textures/sfx/flame2.jpg
+load (128 x 256): textures/sfx/flame3.jpg
+load (128 x 256): textures/sfx/flame4.jpg
+load (128 x 256): textures/sfx/flame5.jpg
+load (128 x 256): textures/sfx/flame6.jpg
+load (128 x 256): textures/sfx/flame7.jpg
+load (128 x 256): textures/sfx/flame8.jpg
+load (128 x 256): textures/sfx/flame2.jpg
+load (128 x 256): textures/sfx/flame3.jpg
+load (128 x 256): textures/sfx/flame4.jpg
+load (128 x 256): textures/sfx/flame5.jpg
+load (128 x 256): textures/sfx/flame6.jpg
+load (128 x 256): textures/sfx/flame7.jpg
+load (128 x 256): textures/sfx/flame8.jpg
+load (128 x 256): textures/sfx/flame1.jpg
+load (128 x 256): textures/sfx/flameball.jpg
+load (128 x 256): textures/sfx/flame1.jpg
+load (128 x 256): textures/sfx/flame2.jpg
+load (128 x 256): textures/sfx/flame3.jpg
+load (128 x 256): textures/sfx/flame4.jpg
+load (128 x 256): textures/sfx/flame5.jpg
+load (128 x 256): textures/sfx/flame6.jpg
+load (128 x 256): textures/sfx/flame7.jpg
+load (128 x 256): textures/sfx/flame8.jpg
+load (128 x 256): textures/sfx/flame2.jpg
+load (128 x 256): textures/sfx/flame3.jpg
+load (128 x 256): textures/sfx/flame4.jpg
+load (128 x 256): textures/sfx/flame5.jpg
+load (128 x 256): textures/sfx/flame6.jpg
+load (128 x 256): textures/sfx/flame7.jpg
+load (128 x 256): textures/sfx/flame8.jpg
+load (128 x 256): textures/sfx/flame1.jpg
+load (128 x 256): textures/sfx/flameball.jpg
+load (128 x 256): textures/sfx/flame1.jpg
+load (128 x 256): textures/sfx/flame2.jpg
+load (128 x 256): textures/sfx/flame3.jpg
+load (128 x 256): textures/sfx/flame4.jpg
+load (128 x 256): textures/sfx/flame5.jpg
+load (128 x 256): textures/sfx/flame6.jpg
+load (128 x 256): textures/sfx/flame7.jpg
+load (128 x 256): textures/sfx/flame8.jpg
+load (128 x 256): textures/sfx/flame2.jpg
+load (128 x 256): textures/sfx/flame3.jpg
+load (128 x 256): textures/sfx/flame4.jpg
+load (128 x 256): textures/sfx/flame5.jpg
+load (128 x 256): textures/sfx/flame6.jpg
+load (128 x 256): textures/sfx/flame7.jpg
+load (128 x 256): textures/sfx/flame8.jpg
+load (128 x 256): textures/sfx/flame1.jpg
+load (256 x 256): textures/skies/killsky_1.jpg
+load (256 x 256): textures/skies/killsky_2.jpg
+load (256 x 256): textures/skin/chapthroat.jpg
+load (256 x 256): textures/skin/chapthroat2.jpg
+load (128 x 128): textures/liquids/proto_gruel3.jpg
+load (256 x 256): textures/skin/chapthroatooz.tga
+load (256 x 256): textures/skin/skin6.jpg
+load (256 x 256): textures/skin/surface8.jpg
+load (128 x 128): textures/skin/tongue.jpg
+add bsp to storage
+add 2097 bsp surfaces to storage
+add model: models/powerups/ammo/machinegunam.md3
+add model: models/powerups/ammo/machinegunam.md3
+add model: models/powerups/ammo/shotgunam.md3
+add model: models/powerups/ammo/shotgunam.md3
+add model: models/powerups/armor/armor_red.md3
+add model: models/powerups/armor/armor_red.md3
+add model: models/powerups/armor/armor_red.md3
+add model: models/powerups/armor/shard.md3
+add model: models/powerups/armor/shard.md3
+add model: models/powerups/armor/shard.md3
+add model: models/powerups/armor/shard.md3
+add model: models/powerups/armor/shard.md3
+add model: models/powerups/armor/shard.md3
+add model: models/powerups/health/medium_cross.md3
+add model: models/powerups/health/medium_sphere.md3
+add model: models/powerups/health/medium_cross.md3
+add model: models/powerups/health/medium_sphere.md3
+add model: models/powerups/health/medium_cross.md3
+add model: models/powerups/health/medium_sphere.md3
+add model: models/powerups/health/medium_cross.md3
+add model: models/powerups/health/medium_sphere.md3
+add model: models/powerups/health/large_cross.md3
+add model: models/powerups/health/large_sphere.md3
+add model: models/powerups/health/large_cross.md3
+add model: models/powerups/health/large_sphere.md3
+add model: models/weapons2/plasma/plasma.md3
+add model: models/weapons2/plasma/plasma.md3
+add model: models/weapons2/rocketl/rocketl.md3
+add model: models/weapons2/rocketl/rocketl.md3
+add model: models/powerups/health/medium_cross.md3
+add model: models/powerups/health/medium_sphere.md3
+add model: models/powerups/health/medium_cross.md3
+add model: models/powerups/health/medium_sphere.md3
+add model: models/powerups/health/medium_cross.md3
+add model: models/powerups/health/medium_sphere.md3
+add model: models/powerups/health/medium_cross.md3
+add model: models/powerups/health/medium_sphere.md3
+add model: models/powerups/ammo/plasmaam.md3
+add model: models/powerups/ammo/plasmaam.md3
+add model: models/powerups/armor/shard.md3
+add model: models/powerups/armor/shard.md3
+add model: models/powerups/armor/shard.md3
+add model: models/powerups/armor/shard.md3
+add model: models/powerups/armor/shard.md3
+add model: models/powerups/armor/shard.md3
+add model: models/weapons2/shotgun/shotgun.md3
+add model: models/weapons2/shotgun/shotgun.md3
+storage created
+load SimpleGraphics.json
+allocate pipeline...49.2ms
+setStorage...1.5ms
+load SimpleGraphics.json
+allocate pipeline...3.0ms
+setStorage...1.0ms
+619 FPS - 3095 frames in 5.000054599999993
+627 FPS - 3135 frames in 5.001441500000009
+533 FPS - 2663 frames in 5.0005695999999915
+374 FPS - 1870 frames in 5.000042999999991
+435 FPS - 2173 frames in 5.0004908000000095
+417 FPS - 2084 frames in 5.000952599999998
+526 FPS - 2629 frames in 5.000664099999993

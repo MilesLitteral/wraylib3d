@@ -74,7 +74,7 @@ dependencies:
 - attoparsec
 - data-default-class
 - ilist
-- lambdacube-compiler
+- lambdacube-compiler #add - compdata?
 - lambdacube-ir
 - lambdacube-gl
 #- lambdacube-metal
@@ -102,6 +102,13 @@ dependencies:
 - monomer-hagrid
 - nsis
 - hruby
+- hpython
+- hslua 
+- hslua-typing
+- hslua-marshalling
+- tasty
+- tasty-hunit
+
 
 ghc-options:
 - -Wall

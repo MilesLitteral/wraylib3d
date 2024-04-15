@@ -13,6 +13,7 @@ packages:
 - ./submodules/hruby
 - ./submodules/hpython
 - ./submodules/hslua
+- ./submodules/hslua-typing
 #- ./submodules/lambdacube-metal
 #- ./submodules/lambdacube-directx
 
@@ -31,3 +32,6 @@ extra-deps:
 - parsers-megaparsec-0.1.0.2@sha256:8aff82b79c0021965a46a98f7a6a9eaaf9896a54fefedae45d693686e674db4d,1670
 - digit-0.7@sha256:d7e8252022d89cc962da29fdb54bdda54d997c2073b6977e6490b8bcd877650c,3919
 - vulkan-api-1.4.0.0
+#- hslua-2.3.1
+- hslua-marshalling-2.3.1
+#- hslua-typing-0.1.1

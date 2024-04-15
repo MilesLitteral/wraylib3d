@@ -1331,6 +1331,16 @@ buildUI wenv model = widgetTree where
       editCloudLayer            `nodeVisible` isCloudEditing
     ] <> confirmDeleteLayerCB) <> confirmDeleteLayerBU) <> confirmDeleteLayerCL)
 
+    -- FFMPEG (Recording) Preferences
+    menuDialog_ (vstack $ intersperse spacer [
+      label "Files",
+      separatorLine,
+      button "Load"   (ConfirmParentEvt $ OpenFS "Load Project File" "./projects" [".wrlp"] "WRayLib3d Project (.wrlp)" False),
+      -- text input for video types
+      -- bool flags (-i etc)
+      -- button "Start Recording Session"   (ConfirmParentEvt $ StartFFMPEGSession "Save Project File" "./projects" [".wrlp"] "WRayLib3d Project (.wrlp)"),
+    ]) None None `nodeVisible` (model ^. fileMenu),
+
 buildProjectSession :: BooksModel -> String -> IO ProjectSession
 buildProjectSession model projPath =  do
   projDir <- listDirectory  projPath
@@ -1716,6 +1726,7 @@ handleEvent sess wenv node model evt = case evt of
     HRayLib3d.Utils.Subprocess.startIDE 
     return None
     ]
+  ToggleRecordPreferences  -> [Model $ model &   showRecordSettings .~ (not $ model ^. showRecordSettings)]
   AddRealm        -> [Model $ model &   projectLoadedRealms .~ (model ^. projectLoadedRealms) ++ [Realm "new" "new.bsp" False]]
   RemoveRealm     -> [Model $ model &   projectLoadedRealms .~ (filter (\x -> x /= last (model ^. projectLoadedRealms)) $ model ^. projectLoadedRealms)]
   OpenRealm rlm   -> [Model $ model &   selectedRealm .~ rlm & showRealmViewer .~ True & showMainRenderer .~ False]
@@ -1824,6 +1835,9 @@ initialModel = BooksModel {
 main :: IO ()
 main = do
   sess <- Sess.newAPISession
+  print "Init RubyInterface"
+  print "Init PythonInterface"
+  print "Init LuaInterface"
   startApp initModel (handleEvent sess) buildUI config
   where
     config = [

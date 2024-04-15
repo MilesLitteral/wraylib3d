@@ -134,10 +134,15 @@ library
       HRayLib3d.Network.Requests
       HRayLib3d.Network.UDP
       HRayLib3d.ScriptEngine
+      HRayLib3d.ScriptEngine.HLua
+      HRayLib3d.ScriptEngine.HLua.Core
+      HRayLib3d.ScriptEngine.HLua.HLuaHS
+      HRayLib3d.ScriptEngine.HPython
+      HRayLib3d.ScriptEngine.HPython.Core
+      HRayLib3d.ScriptEngine.HPython.HPythonHS
       HRayLib3d.ScriptEngine.HRuby
       HRayLib3d.ScriptEngine.HRuby.Core
       HRayLib3d.ScriptEngine.HRuby.HRubyHS
-      HRayLib3d.ScriptEngine.HRuby.HRubyHSInterface
       HRayLib3d.Utils
       HRayLib3d.Utils.Benchmarks
       HRayLib3d.Utils.Exception
@@ -202,7 +207,11 @@ library
     , gltf-codec
     , gltf-loader
     , hashable
+    , hpython
     , hruby
+    , hslua
+    , hslua-marshalling
+    , hslua-typing
     , http-client
     , http-types
     , ilist
@@ -235,6 +244,8 @@ library
     , sdl2
     , split
     , stm
+    , tasty
+    , tasty-hunit
     , template-haskell
     , text
     , text-show
@@ -299,8 +310,12 @@ executable RealmViewer-FE-Demo
     , gltf-codec
     , gltf-loader
     , hashable
+    , hpython
     , hraylib3d
     , hruby
+    , hslua
+    , hslua-marshalling
+    , hslua-typing
     , http-client
     , http-types
     , ilist
@@ -333,6 +348,8 @@ executable RealmViewer-FE-Demo
     , sdl2
     , split
     , stm
+    , tasty
+    , tasty-hunit
     , template-haskell
     , text
     , text-show
@@ -393,8 +410,12 @@ executable hraylib3d
     , gltf-codec
     , gltf-loader
     , hashable
+    , hpython
     , hraylib3d
     , hruby
+    , hslua
+    , hslua-marshalling
+    , hslua-typing
     , http-client
     , http-types
     , ilist
@@ -427,6 +448,8 @@ executable hraylib3d
     , sdl2
     , split
     , stm
+    , tasty
+    , tasty-hunit
     , template-haskell
     , text
     , text-show
@@ -489,8 +512,12 @@ test-suite hraylib3d-test
     , gltf-codec
     , gltf-loader
     , hashable
+    , hpython
     , hraylib3d
     , hruby
+    , hslua
+    , hslua-marshalling
+    , hslua-typing
     , http-client
     , http-types
     , ilist
@@ -523,6 +550,8 @@ test-suite hraylib3d-test
     , sdl2
     , split
     , stm
+    , tasty
+    , tasty-hunit
     , template-haskell
     , text
     , text-show

@@ -21,7 +21,7 @@ snakeToCamel =
 
 recase :: IO ()
 recase = do
-  m <- readModule @(ParseError SrcInfo) "example/snake_cased.py"
+  m <- readModule "C:/Users/Manda/OneDrive/Documentos/GitHub/wraylib3d/submodules/hpython/example/snake_cased.py" -- @(ParseError SrcInfo)
   case m of
     Failure err -> error $ show err
     Success a -> do

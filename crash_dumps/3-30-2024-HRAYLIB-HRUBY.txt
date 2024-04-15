@@ -1,0 +1,26 @@
+Renderer: AMD Radeon RX 6650 XT
+Version: 3.2.0 Core Profile Context 23.11.1.231020
+Available maps:
+q3dm1 q3dm17 q3dm7 q3tourney2
+Enter map name:
+q3dm1
+load (128 x 128): levelshots/q3dm1.jpg
+
+Access violation in generated code when reading 0x38
+
+ Attempting to reconstruct a stack trace...
+
+loading map: "q3dm1"
+"Entities Path:      .lc_q3.cache\\q3dm1.entities"
+"JSON Entities Path: .lc_q3.cache\\q3dm1.json"
+"File Exists: q3dm1.json"
+Try to load entities at: C:\Users\Manda\OneDrive\Documentos\GitHub\wraylib3d\.lc_q3.cache\q3dm1.json
+loading level materials
+"Current WIP (q3 shader parsing)"
+   Frame        Code address
+ * 0x254bfe80   0x7ffe4efda312 C:\Ruby32-x64\bin\x64-ucrt-ruby320.dll+0x23a312
+ * 0x254bfec0   0x93b5a0 C:\Users\Manda\OneDrive\Documentos\GitHub\wraylib3d\.stack-work\install\55b3dbe1\bin\RealmViewer-FE-Demo.EXE+0x53b5a0
+ * 0x254bfef0   0x7fff1a5ee634 C:\WINDOWS\System32\msvcrt.dll+0x3e634
+ * 0x254bff20   0x7fff1a5ee70c C:\WINDOWS\System32\msvcrt.dll+0x3e70c
+ * 0x254bff50   0x7fff1a4a257d C:\WINDOWS\System32\KERNEL32.DLL+0x1257d
+ * 0x254bffd0   0x7fff1ba2aa58 C:\WINDOWS\SYSTEM32\ntdll.dll+0x5aa58

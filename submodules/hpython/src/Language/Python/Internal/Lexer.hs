@@ -6,6 +6,8 @@
 {-# language TypeFamilies #-}
 {-# language OverloadedStrings #-}
 {-# language LambdaCase #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE RankNTypes #-}
 
 {-|
 Module      : Language.Python.Internal.Lexer
@@ -48,9 +50,9 @@ import Data.Digit.Octal (parseOctal)
 import Data.FingerTree (FingerTree, Measured(..))
 import Data.Foldable (asum)
 import Data.Functor.Identity (Identity)
-import Data.List.NonEmpty (NonEmpty(..), some1)
+import Data.List.NonEmpty (NonEmpty(..), some1, toList)
 import Data.Monoid (Sum(..))
-import Data.Set (Set)
+import Data.Set (Set, fromList, fold)
 import Data.Semigroup (Semigroup, (<>))
 import Data.Semigroup.Foldable (foldMap1)
 import Data.These (These(..))
@@ -75,6 +77,8 @@ import Language.Python.Syntax.Ident
 import Language.Python.Syntax.Numbers
 import Language.Python.Syntax.Strings
 import Language.Python.Syntax.Whitespace
+import Control.Lens (Traversal)
+import Control.Lens.Fold (preview)
 
 data SrcInfo
   = SrcInfo
@@ -96,15 +100,20 @@ initialSrcInfo :: FilePath -> SrcInfo
 initialSrcInfo fp = SrcInfo fp 0 0 0 0 0 0
 
 {-# inline withSrcInfo #-}
-withSrcInfo :: MonadParsec e s m => m (SrcInfo -> a) -> m a
+withSrcInfo :: (Parsec.TraversableStream s, MonadParsec e s m) => m (SrcInfo -> a) -> m a
 withSrcInfo m =
   (\(Parsec.SourcePos name l c) o f (Parsec.SourcePos _ l' c') o' ->
      f $ SrcInfo name (unPos l) (unPos l') (unPos c) (unPos c') o o') <$>
-  Parsec.getPosition <*>        --Parsec.PosState.pstateSourcePos Parsec.State.statePosState 
-  Parsec.getTokensProcessed <*> --Parsec.State.stateOffset 
+  Parsec.getSourcePos  <*>
+  Parsec.getOffset     <*>
   m <*>
-  Parsec.getPosition <*>
-  Parsec.getTokensProcessed
+  Parsec.getSourcePos  <*>
+  Parsec.getOffset
+
+  --Parsec.getPosition <*>
+  --Parsec.getTokensProcessed <*>
+  --Parsec.getPosition <*>
+  --Parsec.getTokensProcessed
 
 newline :: CharParsing m => m Newline
 newline = LF <$ char '\n' <|> char '\r' *> (CRLF <$ char '\n' <|> pure CR)
@@ -296,7 +305,7 @@ number = do
 
 {-# inline parseToken #-}
 parseToken
-  :: (Monad m, CharParsing m, LookAheadParsing m, MonadParsec e s m)
+  :: (Monad m, CharParsing m, LookAheadParsing m, Parsec.TraversableStream s, MonadParsec e s m)
   => m (PyToken SrcInfo)
 parseToken =
   withSrcInfo $
@@ -464,31 +473,51 @@ class AsLexicalError s t | s -> t where
   _LexicalError
     :: Prism'
          s
-         ( NonEmpty Parsec.SourcePos
-         , Maybe (Parsec.ErrorItem t)
-         , Set (Parsec.ErrorItem t)
+         ( Int --NonEmpty (ParseError s e)
+         , Maybe    (Parsec.ErrorItem s)
+         , Set      (Parsec.ErrorItem s)
          )
 
+  --_LexicalError =  preview (getCompose . _LexicalError) (a, b, c)
 -- | Convert a concrete 'ParseError' to a value that has an instance of 'AsLexicalError'
 --
 -- This function is partial, because our parser will never use 'Parsec.FancyError'
-unsafeFromLexicalError
-  :: ( HasCallStack
-     , AsLexicalError s t
-     )
-  => ParseError t Void
-  -> s
-unsafeFromLexicalError (Parsec.TrivialError a b c) = _LexicalError # (a, b, c)
-unsafeFromLexicalError Parsec.FancyError{} = error "'fancy error' used in lexer"
+-- unsafeFromLexicalError
+--   :: ( HasCallStack
+--      , AsLexicalError s t
+--      )
+--   => ParseError t Void
+--   -> s
+--pure $ fmap (t f) . t g ≡ getCompose . t (Compose . fmap f . g)
+--unsafeFromLexicalError :: Parsec.ParseErrorBundle s e -> [Parsec.Token s]
+unsafeFromLexicalError :: AsLexicalError (Parsec.Token s) [PyToken SrcInfo] => Parsec.ParseErrorBundle s e -> Parsec.Token s
+unsafeFromLexicalError (Parsec.ParseErrorBundle d _) = do
+    case NonEmpty.head d of
+        (Parsec.TrivialError a b c) -> _LexicalError # (a, b, c)
+        Parsec.FancyError{}         -> Prelude.error "'fancy error' used in lexer"
+        
+      --rawList = toList d
+  -- map unsafeFromError rawList
+
+-- bundleErrors :: NonEmpty (ParseError s e)	
+-- A collection of ParseErrors that is sorted by parse error offsets
+-- bundlePosState :: PosState s	
+-- The state that is used for line/column calculation
+
+  -- do
+  --   case map (toList) a of 
+  --     (Parsec.TrivialError b c d) -> _LexicalError # (a, b, c) 
+  --     Parsec.FancyError{}         -> error "'fancy error' used in lexer"
+
+-- unsafeFromLexicalError (Parsec.TrivialError a b c) = _LexicalError # (a, b, c)
+-- unsafeFromLexicalError Parsec.FancyError{}         = error "'fancy error' used in lexer"
+
+instance AsLexicalError Char [PyToken SrcInfo]
 
 {-# noinline tokenize #-}
 -- | Convert some input to a sequence of tokens. Indent and dedent tokens are not added
 -- (see 'insertTabs')
-tokenize
-  :: AsLexicalError e Char
-  => FilePath -- ^ File name
-  -> Text.Text -- ^ Input to tokenize
-  -> Either e [PyToken SrcInfo]
+tokenize :: String -> Text.Text -> Either Char [PyToken SrcInfo]
 tokenize fp = first unsafeFromLexicalError . parse (unParsecT tokens) fp
   where
     tokens :: ParsecT Void Text.Text Identity [PyToken SrcInfo]
@@ -528,7 +557,7 @@ collapseContinue ((tk@TkContinued{}, Continued nl ws) : xs) =
     xs' = collapseContinue xs
   in
     [(tk : (xs' >>= fst), Continued nl $ ws <> fmap snd xs')]
-collapseContinue _ = error "invalid token/whitespace pair in collapseContinue"
+collapseContinue _ = Prelude.error "invalid token/whitespace pair in collapseContinue"
 
 spanMaybe :: (a -> Maybe b) -> [a] -> ([b], [a])
 spanMaybe f as =
@@ -575,7 +604,7 @@ logicalLines tks =
      else
        LogicalLine
          (case tks of
-           [] -> error "couldn't generate annotation for logical line"
+           [] -> Prelude.error "couldn't generate annotation for logical line"
            tk : _ -> pyTokenAnn tk)
          (spaces' >>= fst, fmap snd spaces' ^. from indentWhitespaces)
          line
@@ -655,7 +684,7 @@ indentation ann lls =
       when (n `notElem` fmap (indentLevel . snd) (NonEmpty.toList is)) .
         throwError $ IncorrectDedent ann
       put $ case remainder of
-        [] -> error "I don't know whether this can happen"
+        [] -> Prelude.error "I don't know whether this can happen"
         x : xs -> x :| xs
       pure $ replicate (length popped) (Dedent ann)
 
@@ -683,7 +712,7 @@ indentation ann lls =
           case (spTks, spcs ^. indentWhitespaces) of
             ([], []) -> []
             (x:xs, y:ys) -> [ Level (y:|ys) (foldMap1 pyTokenAnn $ x:|xs) ]
-            _ -> error "impossible"
+            _ -> Prelude.error "impossible"
       case compare ilSpcs ili of
         LT -> (<> (levelIndent <> [IndentedLine ll])) <$> dedents ann ilSpcs
         EQ ->
@@ -715,7 +744,7 @@ splitIndents ns ws = go ns ws []
                   FingerTree.split ((> getSum (measure ns')) . getIndentLevel) $ unIndent ws
               in
                 if FingerTree.null afters
-                then error $ "could not carve out " <> show n <> " from " <> show ws
+                then Prelude.error $ "could not carve out " <> show n <> " from " <> show ws
                 else go ns' (MkIndent befores) . (MkIndent afters :)
 
 chunked :: [IndentedLine a] -> [PyToken a]
@@ -733,7 +762,7 @@ chunked = go FingerTree.empty
         TkIndent a (Indents (splitIndents leaps' i) (Ann a)) : go leaps' is
     go leaps (Dedent a : is) =
       case FingerTree.viewr leaps of
-        FingerTree.EmptyR -> error "impossible"
+        FingerTree.EmptyR -> Prelude.error "impossible"
         leaps' FingerTree.:> _ -> TkDedent a : go leaps' is
     go leaps (IndentedLine ll : is) = logicalLineToTokens ll <> go leaps is
     go leaps (Level i a : is) =
@@ -756,14 +785,9 @@ insertTabs a =
   indentation a .
   logicalLines
 
+instance AsTabError Char SrcInfo
+instance AsIncorrectDedent Char SrcInfo
+
 -- | Tokenize an input file, inserting indent\/level\/dedent tokens in appropriate
 -- positions according to the block structure.
-tokenizeWithTabs
-  :: ( AsLexicalError s Char
-     , AsTabError s SrcInfo
-     , AsIncorrectDedent s SrcInfo
-     )
-  => FilePath -- ^ File name
-  -> Text.Text -- ^ Input to tokenize
-  -> Either s [PyToken SrcInfo]
 tokenizeWithTabs fp = insertTabs (initialSrcInfo fp) <=< tokenize fp

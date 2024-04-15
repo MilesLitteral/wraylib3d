@@ -2,6 +2,7 @@
 {-# language GeneralizedNewtypeDeriving #-}
 {-# language ScopedTypeVariables, TypeApplications #-}
 {-# language FlexibleInstances, MultiParamTypeClasses, TemplateHaskell, TypeFamilies #-}
+{-# LANGUAGE InstanceSigs #-}
 
 {-|
 Module      : Language.Python.Syntax.Ann
@@ -21,7 +22,7 @@ where
 
 import Control.Lens.Lens (Lens')
 import Control.Lens.TH (makeWrapped)
-import Control.Lens.Wrapped (Wrapped(..), Rewrapped(..), _Wrapped)
+import Control.Lens.Wrapped (_Wrapped)
 import Data.Deriving (deriveEq1, deriveOrd1, deriveShow1)
 import Data.Semigroup (Semigroup)
 import Data.Monoid (Monoid)
@@ -35,8 +36,9 @@ class HasAnn s where
   annot :: Lens' (s a) (Ann a)
 
 instance HasAnn Ann where
+  annot :: Lens' (Ann a) (Ann a)
   annot = id
-    
+  
 makeWrapped ''Ann
 deriveEq1   ''Ann
 deriveOrd1  ''Ann
@@ -45,3 +47,5 @@ deriveShow1 ''Ann
 -- | Get an annotation and forget the wrapper
 annot_ :: HasAnn s => Lens' (s a) a
 annot_ = annot . _Wrapped
+
+

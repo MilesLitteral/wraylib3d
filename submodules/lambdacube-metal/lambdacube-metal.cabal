@@ -1,0 +1,59 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.2.
+--
+-- see: https://github.com/sol/hpack
+
+name:           lambdacube-metal
+version:        0.0.1.0
+description:    Apple Metal 3 Core Profile Backend for LambdaCube 3D
+homepage:       https://github.com/MilesLitteral/lambdacube-metal#readme
+bug-reports:    https://github.com/MilesLitteral/lambdacube-metal/issues
+author:         Miles J. Litteral
+maintainer:     mandaloe2@gmail.com
+copyright:      2023 Miles J. Litteral
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/MilesLitteral/lambdacube-metal
+
+library
+  exposed-modules:
+      LambdaCube.Metal
+      LambdaCube.Metal.Backend
+      LambdaCube.Metal.Bindings
+      LambdaCube.Metal.Data
+      LambdaCube.Metal.Input
+      LambdaCube.Metal.Mesh
+      LambdaCube.Metal.Renderer
+      LambdaCube.Metal.Type
+      LambdaCube.Metal.Util
+  other-modules:
+      Paths_lambdacube_metal
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  include-dirs:
+      cbits
+  install-includes:
+      cbits/mtlpp.h
+  c-sources:
+      cbits/mtlpp.cc
+  build-tools:
+      c2hs
+  build-depends:
+      JuicyPixels >=3.2.7 && <3.4
+    , base >=4.7 && <5
+    , bytestring >=0.10 && <0.12
+    , containers >=0.5 && <0.7
+    , lambdacube-ir ==0.3.*
+    , mtl ==2.2.*
+    , vector >=0.11 && <0.13
+    , vector-algorithms >=0.7 && <0.9
+  default-language: Haskell2010
