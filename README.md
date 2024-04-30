@@ -9,16 +9,16 @@ You will need the following libraries and applications installed, in the future 
   - OPTIONAL: If the provided .dlls have issues then replace x64-ucrt-ruby320.dll and x64-ucrt-ruby320.dll.a with provided versions from rubyinstaller. 
   
 ## WRayLib3d Module/Engine Structure (Unity-Like FP Application)
-Frontend
+### Frontend
   * monomer
-Application/Library
+### Application/Library
   * Core
   * GameEngine
   * Network
   * ScriptEngine
   * GuideWriter 
   * Utils
-Low Level Backends
+### Low Level Backends
   * gl
   * directx
   * metal
