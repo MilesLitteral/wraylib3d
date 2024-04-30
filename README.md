@@ -10,21 +10,21 @@ You will need the following libraries and applications installed, in the future 
   
 ## WRayLib3d Module/Engine Structure (Unity-Like FP Application)
 Frontend
-  + monomer
+  * monomer
 Application/Library
-  + Core
-  + GameEngine
-  + Network
-  + ScriptEngine
-  + GuideWriter 
-  + Utils
+  * Core
+  * GameEngine
+  * Network
+  * ScriptEngine
+  * GuideWriter 
+  * Utils
 Low Level Backends
-  + gl
-  + directx
-  + metal
-  + vulkan
-  + sdl2/glfw
-  + protea-audio
+  * gl
+  * directx
+  * metal
+  * vulkan
+  * sdl2/glfw
+  * protea-audio
   
 
 ## Engine Structure In-Depth
