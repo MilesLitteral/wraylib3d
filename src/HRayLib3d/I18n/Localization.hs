@@ -14,6 +14,25 @@ module HRayLib3d.I18n.Localization where
     -- All Localization datatypes are used here
     -- these functions are also related to tooltips
     -- and getting the system locale.
+
+    -- I18NCollections are Arrays of Localizations
+    -- represented as JSON objects. A collection would
+    -- hold all available languages, eg:
+    -- [English, Spanish, Chinese]
+    -- The Localizations then share keys but have
+    -- localized entries for the same key. 
+    -- eg: {
+    --       "open_app_welcome" : "Hello"
+    --     }
+    --     then
+    --     {
+    --        "open_app_welcome" : "你好"
+    --     }
+    -- The Locale variable from system is therefore
+    -- mapped to an specific index in the I18NCollection.
+    -- Perhaps in the future the variable could be mapped to some sort of 
+    -- Key in the data structure itself??
+
     data LJSON = 
         LJSON  { 
             lKey      :: String,           

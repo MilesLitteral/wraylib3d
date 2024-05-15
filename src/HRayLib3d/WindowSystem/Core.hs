@@ -18,6 +18,9 @@ import qualified Data.Text as T
 import Data.Time (Day, addDays, defaultTimeLocale, formatTime, fromGregorian)
 import Data.Yaml.Parser (YamlValue(Mapping))
 import Graphics.UI.TinyFileDialogs
+
+-- All Front-End Types and lens
+
 -- SDL2
 -- Channel Monomer here, It's going to be necessary xD
 -- Maybe even take some inspiration from it?

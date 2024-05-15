@@ -5,6 +5,7 @@ module HRayLib3d.Utils.GLTFShow where
     import System.Environment
     import HRayLib3d.GameEngine.Loader.GLTF ( loadGLTF )
 
+    -- Show a GLTF (as a string)
     gltfShow :: IO ()
     gltfShow = getArgs >>= mapM_ (loadGLTF >=> pPrint)
 

@@ -59,6 +59,7 @@ import qualified Monomer.Lens as L
 -- import HRayLib3d.GameEngine.RealmViewer.Camera
 -- import Control.Concurrent.STM.TChan (TChan, newTChanIO, readTChan, writeTChan)
 
+-- 2d rendering widget
 data OpenGLWidgetMsg
   = OpenGLWidgetInit GLuint (Ptr GLuint) (Ptr GLuint)
   deriving (Show, Eq)

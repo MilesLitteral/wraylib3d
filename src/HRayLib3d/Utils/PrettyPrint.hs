@@ -10,6 +10,7 @@ import Control.Monad
 import HRayLib3d.Utils.Project
 import qualified Data.Text as Text
 
+-- Print functions for Project Hierarchies
 asTree :: Project -> Tree String 
 asTree project = 
     case project of

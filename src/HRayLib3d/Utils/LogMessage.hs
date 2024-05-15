@@ -23,7 +23,8 @@ module HRayLib3d.Utils.LogMessage (
   import Data.String
   import Control.Monad.State 
 
-  -- Ternary Function Helper
+ -- | Utils for logging messages in console and 
+--    a Ternary Function Helper
   data Ternary a = a :? a
 
   infixl 0 ?
@@ -32,7 +33,6 @@ module HRayLib3d.Utils.LogMessage (
   (?) :: Bool -> Ternary a -> a
   True  ? (x :? _) = x
   False ? (_ :? y) = y
-  -- Ternary Function Helper
 
   data LogLevel   =
     LOG_ZONE
@@ -88,8 +88,8 @@ module HRayLib3d.Utils.LogMessage (
         LOG_BODY   -> "╠(" ++ logSymbol level ++ ")" 
         LOG_TAIL   -> "╚(" ++ logSymbol level ++ ")"
         _          -> error "\x1b[31m ✖ INVALID LOG PREFIX ✖ \033[0m"
-
-  -- | Util Functions for managing message formatting
+        
+ -- | Util Functions for managing message formatting
   logMessage :: MonadIO m => String -> m ()
   logMessage text = liftIO $ putStr text
 
