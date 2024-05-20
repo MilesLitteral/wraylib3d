@@ -1,4 +1,5 @@
-![]("")
+![build-v3-completed](build-v3-completed.png)
+
 ## Install Requirements
 You will need the following libraries and applications installed, in the future the library will search for these requirements by itself and install them:
 * Haskell Toolchain (`ghc`, `stack`, `cabal`), ghcup is a convenient solution: https://www.haskell.org/ghcup/
