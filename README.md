@@ -82,7 +82,7 @@ You will need the following libraries and applications installed, in the future 
       aren't lost and the appropriate libraries (like wrl3d.dll or wrl3d.exe ) aren't lost in the build process
 
       In the future Xross may also help condone the creation of React(JSX) projects as a potential export option
-
+    
     - Resource Bundler
         Handles The compiling of all project 3d Assets (and associated assets) into .AssetBundles which are 
         accessed at runtime. AssetBundles can be thought of like onion data structure, 
@@ -348,4 +348,4 @@ OR JUST `./<YourGame>/YourGame.uwp` + .dlls
 ```
 * = There is a desire for CMake support, this has to be explored
    as it could also be the answer for generating vcprojs and xcprojs.
-   as well as AutoMake support for linux.
+   as well as AutoMake support for linux. There is an interest in [!xmake](https://github.com/xmake-io/xmake)
